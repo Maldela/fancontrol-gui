@@ -1,0 +1,21 @@
+[Domain]
+Name=Fancontrol-GUI
+URL=http://github.com/maldela/fancontrol-gui
+
+[fancontrol.gui.helper.write]
+Name=Save your configfile
+Description=Save the fancontrol configuration file
+Policy=auth_admin
+Persistence=session
+
+[fancontrol.gui.helper.read]
+Name=Read configfile
+Description=Read the fancontrol configuration file
+Policy=auth_admin
+Persistence=session
+
+[fancontrol.gui.helper.dbusaction]
+Name=Manipulate systemd over DBus
+Description=Manipulate systemd to start, stop or restart the fancontrol service
+Policy=auth_admin
+Persistence=session
