@@ -35,6 +35,7 @@ RowLayout {
             property int padding: 10
 
             Layout.preferredWidth: root.width / loader.hwmons.length - root.spacing
+            Layout.maximumWidth: 500
             Layout.fillHeight: true
             border.width: 1
             border.color: "black"

@@ -75,28 +75,22 @@ ApplicationWindow {
                 }
             }
             ToolButton {
-                property bool serviceActive
-
                 id: restartButton
-                iconName: serviceActive ? "system-reboot" : "system-run"
+                iconName: activeTimer.serviceActive ? "system-reboot" : "system-run"
                 visible: typeof systemdCom !== "undefined"
                 onClicked: systemdCom.dbusAction("ReloadOrRestartUnit",
                                                  [systemdCom.serviceName + ".service", "replace"])
 
                 ToolTip {
-                    text: parent.serviceActive ? "Restart fancontrol" : "Start fancontrol"
+                    text: activeTimer.serviceActive ? "Restart fancontrol" : "Start fancontrol"
                 }
 
-                Timer {
-                    interval: 1000
-                    running: typeof systemdCom !== "undefined"
-                    repeat: true
-                    onTriggered: parent.serviceActive = systemdCom.serviceActive()
-                }
+
             }
             ToolButton {
                 iconName: "system-shutdown"
                 visible: typeof systemdCom !== "undefined"
+                enabled: activeTimer.serviceActive
                 onClicked: systemdCom.dbusAction("StopUnit",
                                                  [systemdCom.serviceName + ".service", "replace"])
 
@@ -178,6 +172,16 @@ ApplicationWindow {
                     text = ""
             }
         }
+    }
+
+    Timer {
+        property bool serviceActive
+
+        id: activeTimer
+        interval: 1000
+        running: typeof systemdCom !== "undefined"
+        repeat: true
+        onTriggered: serviceActive = systemdCom.serviceActive()
     }
 
     FileDialog {

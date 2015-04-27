@@ -104,7 +104,7 @@ bool SystemdCommunicator::serviceExists()
 
 bool SystemdCommunicator::serviceActive()
 {
-    if (m_serviceInterface->isValid())
+    if (m_serviceInterface && m_serviceInterface->isValid())
     {
         if (m_serviceInterface->property("ActiveState").toString() == "active")
         {

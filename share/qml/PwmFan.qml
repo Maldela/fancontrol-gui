@@ -394,7 +394,7 @@ Rectangle {
                 color: enabled ? palette.text : disabledPalette.text
                 renderType: Text.NativeRendering
             }
-            NumberOption {
+            OptionInput {
                 id: minStartInput
                 anchors.right: parent.right
                 width: 50

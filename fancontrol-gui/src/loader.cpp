@@ -70,8 +70,6 @@ void Loader::parseHwmons()
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
         connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
         m_hwmons << hwmon;
-
-//        qDebug() << m_devnames.value(hwmon);
     }
     emit hwmonsChanged();
 }
