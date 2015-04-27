@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Fancontrol-GUI
+Comment=GUI for the fancontrol script
+Exec=fancontrol-gui
+Icon=fancontrol-gui
+Terminal=false
+Categories=System;Settings;
+Keywords=pwmconfig;

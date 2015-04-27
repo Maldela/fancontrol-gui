@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
+
 #include "systemdcommunicator.h"
 
 #ifndef NO_KF5_AUTH
@@ -8,7 +27,6 @@ using namespace KAuth;
 
 #include <QDebug>
 #include <QVariant>
-#include <QScopedPointer>
 
 
 SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
@@ -30,6 +48,27 @@ void SystemdCommunicator::setServiceName(const QString &name)
     {
         m_serviceName = name;
         emit serviceNameChanged();
+
+        if (m_serviceInterface)
+            m_serviceInterface->deleteLater();
+
+        m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
+                                                m_servicePath,
+                                                "org.freedesktop.systemd1.Unit",
+                                                QDBusConnection::systemBus(),
+                                                this);
+
+        QList<QVariant> arguments;
+        arguments << QVariant(m_serviceName + ".service");
+        dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
+        if (dbusreply.type() == QDBusMessage::ErrorMessage)
+        {
+            m_error = dbusreply.errorMessage();
+            emit errorChanged();
+            m_servicePath.clear();
+        }
+        else
+            m_servicePath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
     }
 }
 
@@ -52,25 +91,6 @@ bool SystemdCommunicator::serviceExists()
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
         {
-            QList<QVariant> arguments;
-            arguments << QVariant(m_serviceName + ".service");
-            dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
-            if (dbusreply.type() == QDBusMessage::ErrorMessage)
-            {
-                m_error = dbusreply.errorMessage();
-                emit errorChanged();
-                return false;
-            }
-            m_servicePath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
-
-            if (m_serviceInterface)
-                m_serviceInterface->deleteLater();
-
-            m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
-                                                    m_servicePath,
-                                                    "org.freedesktop.systemd1.Unit",
-                                                    QDBusConnection::systemBus(),
-                                                    this);
             m_error = "Success";
             emit errorChanged();
             return true;
