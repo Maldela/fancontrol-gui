@@ -118,7 +118,7 @@ void SystemdCommunicator::dbusAction(const QString &method, const QList<QVariant
 {
     QDBusMessage dbusreply;
 
-    if (m_managerInterface->isValid())
+    if (m_managerInterface && m_managerInterface->isValid())
         dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
