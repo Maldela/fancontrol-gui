@@ -60,7 +60,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
 
         QList<QVariant> arguments;
         arguments << QVariant(m_serviceName + ".service");
-        dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
+        QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
         if (dbusreply.type() == QDBusMessage::ErrorMessage)
         {
             m_error = dbusreply.errorMessage();
