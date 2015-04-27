@@ -31,7 +31,6 @@ using namespace KAuth;
 
 SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
 {
-    m_serviceName = "fancontrol";
     m_serviceInterface = nullptr;
     m_error = "Success";
 
@@ -40,7 +39,7 @@ SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
                                             "org.freedesktop.systemd1.Manager",
                                             QDBusConnection::systemBus(),
                                             this);
-    serviceExists();
+    setServiceName("fancontrol");
 }
 
 void SystemdCommunicator::setServiceName(const QString &name)
@@ -50,26 +49,31 @@ void SystemdCommunicator::setServiceName(const QString &name)
         m_serviceName = name;
         emit serviceNameChanged();
 
-        if (m_serviceInterface)
-            m_serviceInterface->deleteLater();
-
-        m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
-                                                m_servicePath,
-                                                "org.freedesktop.systemd1.Unit",
-                                                QDBusConnection::systemBus(),
-                                                this);
-
-        QList<QVariant> arguments;
-        arguments << QVariant(m_serviceName + ".service");
-        QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
-        if (dbusreply.type() == QDBusMessage::ErrorMessage)
+        if (serviceExists())
         {
-            m_error = dbusreply.errorMessage();
-            emit errorChanged();
-            m_servicePath.clear();
+            QList<QVariant> arguments;
+            arguments << QVariant(m_serviceName + ".service");
+            QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
+            if (dbusreply.type() == QDBusMessage::ErrorMessage)
+            {
+                m_error = dbusreply.errorMessage();
+                emit errorChanged();
+                m_servicePath.clear();
+            }
+            else
+            {
+                m_servicePath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
+
+                if (m_serviceInterface)
+                    m_serviceInterface->deleteLater();
+
+                m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
+                                                        m_servicePath,
+                                                        "org.freedesktop.systemd1.Unit",
+                                                        QDBusConnection::systemBus(),
+                                                        this);
+            }
         }
-        else
-            m_servicePath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
     }
 }
 

@@ -1,4 +1,4 @@
-kauth_install_helper_files(Fancontrol-GUIHelper fancontrol.gui.helper root)
+kauth_install_helper_files(fancontrol-gui-helper fancontrol.gui.helper root)
 kauth_install_actions(fancontrol.gui.helper fancontrol-gui.actions)
 
 set(LIBRARIES KF5::Auth)
