@@ -31,7 +31,6 @@ using namespace KAuth;
 
 SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
 {
-    m_serviceName = "fancontrol";
     m_serviceInterface = nullptr;
     m_error = "Success";
 
@@ -40,6 +39,8 @@ SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
                                             "org.freedesktop.systemd1.Manager",
                                             QDBusConnection::systemBus(),
                                             this);
+    setServiceName("fancontrol");
+
     serviceExists();
 }
 
