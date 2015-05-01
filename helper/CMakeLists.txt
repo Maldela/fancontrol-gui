@@ -4,9 +4,14 @@ kauth_install_actions(fancontrol.gui.helper fancontrol-gui.actions)
 set(LIBRARIES KF5::Auth)
 
 if(NO_SYSTEMD)
+
     add_definitions(-DNO_SYSTEMD)
+
 else(NO_SYSTEMD)
-    set(LIBRARIES ${LIBRARIES} Qt5::DBus)
+
+    set(LIBRARIES ${LIBRARIES}
+                  Qt5::DBus)
+
 endif(NO_SYSTEMD)
 
 add_executable(fancontrol-gui-helper src/helper.cpp)
