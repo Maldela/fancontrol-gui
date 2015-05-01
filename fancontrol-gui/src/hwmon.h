@@ -23,17 +23,19 @@
 #include <QObject>
 
 #include "sensors.h"
+#include "loader.h"
 
 class Fan;
 class PwmFan;
 class Temp;
+class Loader;
 
 class Hwmon : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY pathChanged)
-    Q_PROPERTY(QString path READ path NOTIFY pathChanged)
-    Q_PROPERTY(int index READ index NOTIFY pathChanged)
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(QString path READ path CONSTANT)
+    Q_PROPERTY(int index READ index CONSTANT)
     Q_PROPERTY(QList<QObject *> fans READ fans NOTIFY fansChanged)
     Q_PROPERTY(QList<QObject *> pwmFans READ pwmFans NOTIFY pwmFansChanged)
     Q_PROPERTY(QList<QObject *> temps READ temps NOTIFY tempsChanged)
@@ -41,7 +43,7 @@ class Hwmon : public QObject
 
 public:
 
-    explicit Hwmon(const QString &);
+    explicit Hwmon(const QString &, Loader *parent);
 
     QString name() const { return m_name; }
     QString path() const { return m_path; }
@@ -62,7 +64,6 @@ public slots:
 
 signals:
 
-    void pathChanged();
     void fansChanged();
     void pwmFansChanged();
     void tempsChanged();
@@ -72,6 +73,7 @@ signals:
 
 protected:
 
+    Loader *m_parent;
     QString m_name;
     QString m_path;
     int m_index;

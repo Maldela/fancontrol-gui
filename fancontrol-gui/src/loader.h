@@ -27,6 +27,7 @@
 
 #include "hwmon.h"
 
+class Hwmon;
 
 class Loader : public QObject
 {

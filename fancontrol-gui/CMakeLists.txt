@@ -6,7 +6,8 @@ set(Fancontrol-GUI_SRCS src/main.cpp
 set(LIBRARIES ${Qt5Widgets_LIBRARIES}
               ${Qt5Qml_Libraries}
               ${Qt5Quick_LIBRARIES}
-              KF5::Auth)
+              KF5::Auth
+              KF5::ConfigCore)
 
 if(NO_SYSTEMD)
 

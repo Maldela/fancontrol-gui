@@ -20,13 +20,15 @@
 #include "sensors.h"
 #include <QFile>
 #include <QDir>
+#include <KConfigGroup>
 
 Sensor::Sensor(Hwmon *parent, uint index) : QObject(parent)
 {
     m_parent = parent;
     m_index = index;
-    emit indexChanged();
+    m_config = KSharedConfig::openConfig();
 }
+
 
 Fan::Fan(Hwmon *parent, uint index) : Sensor(parent, index)
 {
@@ -38,7 +40,6 @@ Fan::Fan(Hwmon *parent, uint index) : Sensor(parent, index)
         {
             m_rpmStream.setDevice(rpmFile);
             m_rpmStream >> m_rpm;
-            emit rpmChanged();
 
             setName("fan"+ QString::number(index));
         }
@@ -49,13 +50,33 @@ Fan::Fan(Hwmon *parent, uint index) : Sensor(parent, index)
     }
 }
 
+QString Fan::name() const
+{
+    KConfigGroup names = m_config->group("names");
+    KConfigGroup localNames = names.group(m_parent->name());
+    QString name = localNames.readEntry("fan" + QString::number(m_index), QString());
+    if (name.isEmpty())
+        return "fan" + QString::number(m_index);
+    return name;
+}
+
+void Fan::setName(const QString &name)
+{
+    KConfigGroup names = m_config->group("names");
+    KConfigGroup localNames = names.group(m_parent->name());
+    if (name != localNames.readEntry("fan" + QString::number(m_index), QString()))
+    {
+        localNames.writeEntry("fan" + QString::number(m_index), name);
+        emit nameChanged();
+    }
+}
+
 void Fan::update()
 {
     m_rpmStream.seek(0);
     m_rpmStream >> m_rpm;
     emit rpmChanged();
 }
-
 
 
 PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
@@ -86,7 +107,6 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
         {
             m_pwmStream.setDevice(pwmFile);
             m_pwmStream >> m_pwm;
-            emit pwmChanged();
         }
         else
         {
@@ -103,10 +123,10 @@ void PwmFan::update()
     emit pwmChanged();
 }
 
-void PwmFan::writePwm()
-{
-    m_pwmStream << m_pwm;
-}
+//void PwmFan::writePwm()
+//{
+//    m_pwmStream << m_pwm;
+//}
 
 void PwmFan::reset()
 {
@@ -132,7 +152,6 @@ Temp::Temp(Hwmon *parent, uint index) : Sensor(parent, index)
             m_valueStream.setDevice(valueFile);
             m_valueStream >> m_value;
             m_value /= 1000;
-            emit valueChanged();
         }
         else
             qDebug() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
@@ -143,10 +162,33 @@ Temp::Temp(Hwmon *parent, uint index) : Sensor(parent, index)
         }
         else
         {
-            m_label = "temp" + QString::number(index);
             qDebug() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
         }
-        emit labelChanged();
+    }
+}
+
+QString Temp::name() const
+{
+    KConfigGroup names = m_config->group("names");
+    KConfigGroup localNames = names.group(m_parent->name());
+    QString name = localNames.readEntry("temp" + QString::number(m_index), QString());
+    if (name.isEmpty())
+    {
+        if (m_label.isEmpty())
+            return "temp" + QString::number(m_index);
+        return m_label;
+    }
+    return name;
+}
+
+void Temp::setName(const QString &name)
+{
+    KConfigGroup names = m_config->group("names");
+    KConfigGroup localNames = names.group(m_parent->name());
+    if (name != localNames.readEntry("temp" + QString::number(m_index), QString()))
+    {
+        localNames.writeEntry(m_parent->name() + "temp" + QString::number(m_index), name);
+        emit nameChanged();
     }
 }
 

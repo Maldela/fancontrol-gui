@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QTextStream>
 #include <QDebug>
+#include <KSharedConfig>
 
 #include "hwmon.h"
 
@@ -31,7 +32,7 @@ class Hwmon;
 class Sensor : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(uint index READ index NOTIFY indexChanged)
+    Q_PROPERTY(uint index READ index CONSTANT)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(Hwmon * parent READ parent CONSTANT)
 
@@ -39,8 +40,8 @@ public:
 
     explicit Sensor(Hwmon *parent, uint index);
 
-    QString name() const { return m_name; }
-    void setName(const QString &name) { if (name != m_name) { m_name = name; emit nameChanged(); } }
+    virtual QString name() const = 0;
+    virtual void setName(const QString &name) = 0;
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
 
@@ -53,14 +54,13 @@ public slots:
 signals:
 
     void nameChanged();
-    void indexChanged();
 
 
 protected:
 
-    QString m_name;
     Hwmon *m_parent;
     uint m_index;
+    KSharedConfigPtr m_config;
 };
 
 
@@ -76,6 +76,8 @@ public:
 
     QString label() const { return m_label; }
     int value() const { return m_value; }
+    QString name() const;
+    void setName(const QString &name);
 
 
 public slots:
@@ -107,6 +109,8 @@ public:
     explicit Fan(Hwmon *parent, uint index);
 
     int rpm() const { return m_rpm; }
+    QString name() const;
+    void setName(const QString &name);
 
     virtual int pwm() const { return 0; }
     virtual void setPwm(int) { qDebug() << "setPwm(int) is not implemented in standard Fan"; }
@@ -132,7 +136,7 @@ protected:
 class PwmFan : public Fan
 {
     Q_OBJECT
-    Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)
+    //Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)
     Q_PROPERTY(Temp * temp READ temp WRITE setTemp NOTIFY tempChanged)
     Q_PROPERTY(bool hasTemp READ hasTemp WRITE setHasTemp NOTIFY hasTempChanged)
     Q_PROPERTY(int minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
@@ -146,8 +150,8 @@ public:
 
     explicit PwmFan(Hwmon *parent, uint index);
 
-    int pwm() const { return m_pwm; }
-    void setPwm(int pwm) { if (pwm != m_pwm) { m_pwm = pwm; emit pwmChanged(); writePwm(); } }
+//    int pwm() const { return m_pwm; }
+//    void setPwm(int pwm) { if (pwm != m_pwm) { m_pwm = pwm; emit pwmChanged(); writePwm(); } }
     Temp * temp() const { return m_temp; }
     bool hasTemp() const { return m_hasTemp; }
     int minTemp() const { return m_minTemp; }
@@ -183,7 +187,7 @@ signals:
 protected slots:
 
     void update();
-    void writePwm();
+//    void writePwm();
 
 
 protected:

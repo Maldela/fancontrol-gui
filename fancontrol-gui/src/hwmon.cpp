@@ -22,16 +22,16 @@
 #include <QTextStream>
 #include <QDebug>
 
-Hwmon::Hwmon(const QString &path) : QObject()
+Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent)
 {
+    m_parent = parent;
     m_path = path;
     m_index = path.split('/').last().remove("hwmon").toInt();
     QFile nameFile(path + "/name");
     if (nameFile.open(QFile::ReadOnly))
         m_name = QTextStream(&nameFile).readLine();
     else
-        m_name = "Nameless hwmon";
-    emit pathChanged();
+        m_name = path.split('/').last();
 
     QDir dir(m_path);
     QStringList entrys = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
@@ -63,7 +63,6 @@ Hwmon::Hwmon(const QString &path) : QObject()
         if (entry.contains("temp") && entry.contains("input"))
         {
             Temp *newTemp = new Temp(this, index);
-            newTemp->setName(m_name + "/" + newTemp->label());
             connect(this, SIGNAL(sensorsUpdateNeeded()), newTemp, SLOT(update()));
             m_temps << newTemp;
             emit tempsChanged();

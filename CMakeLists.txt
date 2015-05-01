@@ -23,7 +23,7 @@ cmake_policy(SET CMP0037 OLD)
 find_package(ECM REQUIRED)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(KF5 COMPONENTS Auth REQUIRED)
+find_package(KF5 COMPONENTS Auth Config REQUIRED)
 find_package(Qt5DBus)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

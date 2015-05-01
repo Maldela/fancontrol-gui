@@ -359,7 +359,7 @@ Rectangle {
             ComboBox {
                 id: tempBox
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                model: ArrayFunctions.labels(hwmonBox.hwmon.temps)
+                model: ArrayFunctions.names(hwmonBox.hwmon.temps)
                 enabled: hasTempCheckBox.checked
                 onCurrentIndexChanged: { 
                     if (hasTempCheckBox.checked)

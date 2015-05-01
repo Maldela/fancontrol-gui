@@ -66,7 +66,7 @@ void Loader::parseHwmons()
 
     foreach (QString hwmonPath, list)
     {
-        Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)));
+        Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)), this);
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
         connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
         m_hwmons << hwmon;
