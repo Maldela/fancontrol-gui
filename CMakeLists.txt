@@ -5,6 +5,7 @@ project(fancontroller)
 include(FeatureSummary)
 
 option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality significantly!")
+option(BUILD_LIB_ONLY "Compile the shared library only")
 
 #Find Qt5
 find_package(Qt5 COMPONENTS Widgets Qml Quick REQUIRED)
@@ -32,8 +33,6 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 
-add_subdirectory(helper)
-
 #Systemd
 find_library(SYSTEMD_FOUND NAMES systemd)
 
@@ -50,5 +49,8 @@ else(NOT NO_SYSTEMD AND SYSTEMD_FOUND AND Qt5DBus_FOUND)
 
 endif(NOT NO_SYSTEMD AND SYSTEMD_FOUND AND Qt5DBus_FOUND)
 
+add_subdirectory(helper)
 add_subdirectory(share)
-add_subdirectory(fancontrol-gui)
+if(NOT BUILD_LIB_ONLY)
+    add_subdirectory(fancontrol-gui)
+endif(NOT BUILD_LIB_ONLY)
