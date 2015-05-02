@@ -26,6 +26,7 @@
 #include <KSharedConfig>
 
 #include "hwmon.h"
+#include "export.h"
 
 class Hwmon;
 
@@ -64,7 +65,7 @@ protected:
 };
 
 
-class Temp : public Sensor
+class FANCONTROL_GUI_EXPORT Temp : public Sensor
 {
     Q_OBJECT
     Q_PROPERTY(QString label READ label NOTIFY labelChanged)
@@ -99,7 +100,7 @@ protected:
 };
 
 
-class Fan : public Sensor
+class FANCONTROL_GUI_EXPORT Fan : public Sensor
 {
     Q_OBJECT
     Q_PROPERTY(int rpm READ rpm NOTIFY rpmChanged)
@@ -133,7 +134,7 @@ protected:
 };
 
 
-class PwmFan : public Fan
+class FANCONTROL_GUI_EXPORT PwmFan : public Fan
 {
     Q_OBJECT
     //Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)

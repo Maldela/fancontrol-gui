@@ -1,30 +1,7 @@
-set(Fancontrol-GUI_SRCS src/main.cpp
-                        src/loader.cpp
-                        src/hwmon.cpp
-                        src/sensors.cpp)
-
-set(LIBRARIES ${Qt5Widgets_LIBRARIES}
-              ${Qt5Qml_Libraries}
-              ${Qt5Quick_LIBRARIES}
-              KF5::Auth
-              KF5::ConfigCore)
-
-if(NO_SYSTEMD)
-
-    add_definitions(-DNO_SYSTEMD)
-
-else(NO_SYSTEMD)
-
-    set(Fancontrol-GUI_SRCS ${Fancontrol-GUI_SRCS}
-                            src/systemdcommunicator.cpp)
-
-    set(LIBRARIES ${LIBRARIES}
-                  Qt5::DBus)
-
-endif(NO_SYSTEMD)
+set(Fancontrol-GUI_SRCS src/main.cpp)
 
 add_executable(fancontrol-gui ${Fancontrol-GUI_SRCS} ${RESOURCES})
-target_link_libraries(fancontrol-gui ${LIBRARIES})
+target_link_libraries(fancontrol-gui LINK_PUBLIC fancontrol-gui-lib)
 set_property(TARGET fancontrol-gui PROPERTY CXX_STANDARD 11)
 
 install(TARGETS fancontrol-gui RUNTIME DESTINATION bin)

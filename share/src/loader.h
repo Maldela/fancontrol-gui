@@ -26,10 +26,11 @@
 #include <QTimer>
 
 #include "hwmon.h"
+#include "export.h"
 
 class Hwmon;
 
-class Loader : public QObject
+class FANCONTROL_GUI_EXPORT Loader : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)

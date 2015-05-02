@@ -24,13 +24,14 @@
 
 #include "sensors.h"
 #include "loader.h"
+#include "export.h"
 
 class Fan;
 class PwmFan;
 class Temp;
 class Loader;
 
-class Hwmon : public QObject
+class FANCONTROL_GUI_EXPORT Hwmon : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name CONSTANT)

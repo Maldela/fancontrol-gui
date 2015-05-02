@@ -23,7 +23,9 @@
 #include <QObject>
 #include <QtDBus/QtDBus>
 
-class SystemdCommunicator : public QObject
+#include "export.h"
+
+class FANCONTROL_GUI_EXPORT SystemdCommunicator : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
@@ -68,7 +70,7 @@ Q_DECLARE_METATYPE(SystemdUnitFile)
 typedef QList<SystemdUnitFile> SystemdUnitFileList;
 Q_DECLARE_METATYPE(SystemdUnitFileList)
 
-QDBusArgument &operator<<(QDBusArgument &argument, const SystemdUnitFile &unitFile);
-const QDBusArgument &operator>>(const QDBusArgument &argument, SystemdUnitFile &unitFile);
+QDBusArgument &operator <<(QDBusArgument &argument, const SystemdUnitFile &unitFile);
+const QDBusArgument &operator >>(const QDBusArgument &argument, SystemdUnitFile &unitFile);
 
 #endif // SYSTEMDCOMMUNICATOR_H

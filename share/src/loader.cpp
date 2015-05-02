@@ -24,11 +24,9 @@
 #include <QTextStream>
 #include <QDebug>
 
-#ifndef NO_KF5_AUTH
 #include <KF5/KAuth/kauthexecutejob.h>
 
 using namespace KAuth;
-#endif
 
 #define HWMON_PATH "/sys/class/hwmon"
 
@@ -88,14 +86,6 @@ void Loader::open(const QUrl &url)
         m_error = "Success";
         emit errorChanged();
     }
-#ifdef NO_KF5_AUTH
-    else
-    {
-        m_error = file.errorString();
-        emit errorChanged();
-        return;
-    }
-#else
     else if (file.exists())
     {
         Action action("fancontrol.gui.helper.read");
@@ -118,7 +108,6 @@ void Loader::open(const QUrl &url)
             stream.setString(&string);
         }
     }
-#endif
     m_configFile = stream.readAll();
     emit configFileChanged();
     m_configUrl = url;
@@ -293,13 +282,6 @@ void Loader::save(const QUrl &url)
         stream << m_configFile;
         qDebug() << m_configFile;
     }
-#ifdef NO_KF5_AUTH
-    else
-    {
-        m_error = file.errorString();
-        emit errorChanged();
-    }
-#else
     else
     {
         Action action("fancontrol.gui.helper.write");
@@ -316,7 +298,6 @@ void Loader::save(const QUrl &url)
             emit errorChanged();
         }
     }
-#endif
 }
 
 void Loader::createConfigFile()

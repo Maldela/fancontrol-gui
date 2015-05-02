@@ -19,11 +19,9 @@
 
 #include "systemdcommunicator.h"
 
-#ifndef NO_KF5_AUTH
 #include <KF5/KAuth/kauthexecutejob.h>
 
 using namespace KAuth;
-#endif
 
 #include <QDebug>
 #include <QVariant>

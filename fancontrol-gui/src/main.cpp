@@ -22,10 +22,10 @@
 #include <QQmlContext>
 #include <QQuickView>
 
-#include "loader.h"
+#include "../share/src/loader.h"
 
 #ifndef NO_SYSTEMD
-#include "systemdcommunicator.h"
+#include "../share/src/systemdcommunicator.h"
 #endif
 
 int main(int argc, char *argv[])
