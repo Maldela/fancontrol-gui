@@ -44,7 +44,6 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent)
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
                 PwmFan *newPwmFan = new PwmFan(this, index);
-                newPwmFan->setName(m_name + "/pwm" + QString::number(index));
                 connect(this, SIGNAL(sensorsUpdateNeeded()), newPwmFan, SLOT(update()));
                 m_pwmFans << newPwmFan;
                 emit pwmFansChanged();

@@ -81,7 +81,7 @@ RowLayout {
                         Text {
                             anchors.left: parent.left
                             anchors.leftMargin: padding
-                            text: hwmon.temps[index].label + ": "
+                            text: hwmon.temps[index].name + ": "
                             Layout.maximumWidth: parent.width - tempValue.width - padding*2
                             clip: true
                         }

@@ -40,8 +40,6 @@ Fan::Fan(Hwmon *parent, uint index) : Sensor(parent, index)
         {
             m_rpmStream.setDevice(rpmFile);
             m_rpmStream >> m_rpm;
-
-            setName("fan"+ QString::number(index));
         }
         else
         {
@@ -64,7 +62,8 @@ void Fan::setName(const QString &name)
 {
     KConfigGroup names = m_config->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
-    if (name != localNames.readEntry("fan" + QString::number(m_index), QString()))
+    if (name != localNames.readEntry("fan" + QString::number(m_index), QString())
+        && !name.isEmpty())
     {
         localNames.writeEntry("fan" + QString::number(m_index), name);
         emit nameChanged();
