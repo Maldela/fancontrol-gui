@@ -137,7 +137,7 @@ protected:
 class FANCONTROL_GUI_EXPORT PwmFan : public Fan
 {
     Q_OBJECT
-    //Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)
+    Q_PROPERTY(int pwm READ pwm NOTIFY pwmChanged)
     Q_PROPERTY(Temp * temp READ temp WRITE setTemp NOTIFY tempChanged)
     Q_PROPERTY(bool hasTemp READ hasTemp WRITE setHasTemp NOTIFY hasTempChanged)
     Q_PROPERTY(int minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
@@ -151,7 +151,7 @@ public:
 
     explicit PwmFan(Hwmon *parent, uint index);
 
-//    int pwm() const { return m_pwm; }
+    int pwm() const { return m_pwm; }
 //    void setPwm(int pwm) { if (pwm != m_pwm) { m_pwm = pwm; emit pwmChanged(); writePwm(); } }
     Temp * temp() const { return m_temp; }
     bool hasTemp() const { return m_hasTemp; }

@@ -184,7 +184,8 @@ void Temp::setName(const QString &name)
 {
     KConfigGroup names = m_config->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
-    if (name != localNames.readEntry("temp" + QString::number(m_index), QString()))
+    if (name != localNames.readEntry("temp" + QString::number(m_index), QString())
+        && !name.isEmpty())
     {
         localNames.writeEntry(m_parent->name() + "temp" + QString::number(m_index), name);
         emit nameChanged();
