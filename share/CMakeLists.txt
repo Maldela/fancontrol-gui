@@ -24,10 +24,11 @@ endif(NO_SYSTEMD)
 
 add_definitions(-DFANCONTROL_GUI_LIBRARY)
 
-add_library(fancontrol-gui-lib ${LIB_SRCS})
+add_library(fancontrol-gui-lib STATIC ${LIB_SRCS})
 
 target_link_libraries(fancontrol-gui-lib ${LIBRARIES})
-target_include_directories (fancontrol-gui-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-install(DIRECTORY qml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/fancontrol-gui)
-install(DIRECTORY javascript DESTINATION ${CMAKE_INSTALL_PREFIX}/share/fancontrol-gui)
+install(DIRECTORY qml DESTINATION share/fancontrol-gui)
+install(DIRECTORY javascript DESTINATION share/fancontrol-gui)
+#install(TARGETS fancontrol-gui-lib DESTINATION lib/fancontrol-gui EXPORT fancontrol-gui-lib-targets)
+#install(EXPORT fancontrol-gui-lib-targets DESTINATION lib/fancontrol-gui)
