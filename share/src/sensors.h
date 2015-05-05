@@ -137,7 +137,7 @@ protected:
 class FANCONTROL_GUI_EXPORT PwmFan : public Fan
 {
     Q_OBJECT
-    Q_PROPERTY(int pwm READ pwm NOTIFY pwmChanged)
+    Q_PROPERTY(int pwm READ pwm /*WRITE setPwm*/ NOTIFY pwmChanged)
     Q_PROPERTY(Temp * temp READ temp WRITE setTemp NOTIFY tempChanged)
     Q_PROPERTY(bool hasTemp READ hasTemp WRITE setHasTemp NOTIFY hasTempChanged)
     Q_PROPERTY(int minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
@@ -146,6 +146,7 @@ class FANCONTROL_GUI_EXPORT PwmFan : public Fan
     Q_PROPERTY(int maxPwm READ maxPwm WRITE setMaxPwm NOTIFY maxPwmChanged)
     Q_PROPERTY(int minStart READ minStart WRITE setMinStart NOTIFY minStartChanged)
     Q_PROPERTY(int minStop READ minStop WRITE setMinStop NOTIFY minStopChanged)
+    Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
 
 public:
 
@@ -161,6 +162,7 @@ public:
     int maxPwm() const { return m_maxPwm; }
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
+    bool active() const;
     void setTemp(Temp *temp) { setHasTemp(temp != nullptr); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
@@ -169,6 +171,7 @@ public:
     void setMaxPwm(int maxPwm) { if (maxPwm != m_maxPwm) { m_maxPwm = maxPwm; emit maxPwmChanged(); } }
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
+    void setActive(bool active);
     void reset();
 
 
@@ -183,6 +186,7 @@ signals:
     void maxPwmChanged();
     void minStartChanged();
     void minStopChanged();
+    void activeChanged();
 
 
 protected slots:

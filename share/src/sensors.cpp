@@ -138,6 +138,24 @@ void PwmFan::reset()
     setMinStop(255);
 }
 
+bool PwmFan::active() const
+{
+    KConfigGroup active = m_config->group("active");
+    KConfigGroup localActive = active.group(m_parent->name());
+    return localActive.readEntry("pwmfan" + QString::number(m_index), true);
+}
+
+void PwmFan::setActive(bool a)
+{
+    KConfigGroup active = m_config->group("active");
+    KConfigGroup localActive = active.group(m_parent->name());
+    if (a != localActive.readEntry("pwmfan" + QString::number(m_index), true))
+    {
+        localActive.writeEntry("pwmfan" + QString::number(m_index), a);
+        emit activeChanged();
+    }
+}
+
 
 Temp::Temp(Hwmon *parent, uint index) : Sensor(parent, index)
 {

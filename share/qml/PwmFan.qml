@@ -44,6 +44,7 @@ Rectangle {
     border.width: 2
     radius: 10
     clip: false
+    state: fan.active ? "" : "minimized"
 
     function update() {
         hasTempCheckBox.checked = fan.hasTemp;
@@ -145,7 +146,7 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton
-                onClicked: root.state = (root.state != "minimized") ? "minimized" : ""
+                onClicked: fan.active = fan.active ? false : true
             }
         }
     }
