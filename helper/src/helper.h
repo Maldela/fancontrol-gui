@@ -18,6 +18,7 @@
  */
 
 #include <KAuth>
+#include <QtDBus/QtDBus>
 
 using namespace KAuth;
 

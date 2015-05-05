@@ -158,6 +158,28 @@ Item {
                     onTextChanged: systemdCom.serviceName = text
                 }
             }
+            RowLayout {
+                width: parent.width
+                visible: typeof systemdCom != "undefined"
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: padding
+                    Layout.maximumWidth: parent.width - maxTempValue.width - padding*2
+                    clip: true
+                    text: "Fancontrol systemd service autostart:"
+                }
+                ComboBox {
+                    id: autostartBox
+                    anchors.right: parent.right
+                    anchors.rightMargin: padding
+                    model: ["disabled" , "enabled"]
+                    currentIndex: systemdCom.serviceEnabled ? 1 : 0
+                    onCurrentIndexChanged: {
+                        systemdCom.serviceEnabled = (currentIndex == 1) ? true : false;
+                    }
+                }
+            }
         }
     }
 }

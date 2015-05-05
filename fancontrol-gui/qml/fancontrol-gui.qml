@@ -160,7 +160,7 @@ ApplicationWindow {
             color: "red"
 
             onSystemdErrorChanged: {
-                if (systemdError !== "Success")
+                if (systemdError !== "Success" && systemdError.search("succeeded") == -1)
                     text = systemdError;
                 else if (loaderError === "Success" || loaderError === "")
                     text = ""

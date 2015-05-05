@@ -45,41 +45,43 @@ void SystemdCommunicator::setServiceName(const QString &name)
     if (name != m_serviceName)
     {
         m_serviceName = name;
-        emit serviceNameChanged();
 
         if (serviceExists())
         {
-            QList<QVariant> arguments;
+            QVariantList arguments;
             arguments << QVariant(m_serviceName + ".service");
             QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
             if (dbusreply.type() == QDBusMessage::ErrorMessage)
             {
                 m_error = dbusreply.errorMessage();
                 emit errorChanged();
-                m_servicePath.clear();
+                m_serviceObjectPath.clear();
             }
             else
             {
-                m_servicePath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
+                m_serviceObjectPath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
 
                 if (m_serviceInterface)
                     m_serviceInterface->deleteLater();
 
                 m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
-                                                        m_servicePath,
+                                                        m_serviceObjectPath,
                                                         "org.freedesktop.systemd1.Unit",
                                                         QDBusConnection::systemBus(),
                                                         this);
             }
         }
     }
+
+    emit serviceNameChanged();
+    emit serviceEnabledChanged();
 }
 
 bool SystemdCommunicator::serviceExists()
 {
     QDBusMessage dbusreply;
 
-    if (m_managerInterface->isValid())
+    if (m_managerInterface && m_managerInterface->isValid())
         dbusreply = m_managerInterface->call(QDBus::AutoDetect, "ListUnitFiles");
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
@@ -117,12 +119,52 @@ bool SystemdCommunicator::serviceActive()
     return false;
 }
 
-void SystemdCommunicator::dbusAction(const QString &method, const QList<QVariant> &arguments)
+bool SystemdCommunicator::serviceEnabled()
+{
+    if (m_serviceInterface && m_serviceInterface->isValid())
+    {
+        if (m_serviceInterface->property("UnitFileState").toString() == "enabled")
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void SystemdCommunicator::setServiceEnabled(bool enabled)
+{
+    if (enabled != serviceEnabled() && serviceExists())
+    {
+        QVariantList arguments;
+        QStringList files = QStringList() << m_serviceName + ".service";
+
+        if (enabled)
+        {
+            arguments << files << false << true;
+            dbusAction("EnableUnitFiles", arguments);
+            dbusAction("Reload");
+        }
+        else
+        {
+            arguments << files << false;
+            dbusAction("DisableUnitFiles", arguments);
+            dbusAction("Reload");
+        }
+        emit serviceEnabledChanged();
+    }
+}
+
+void SystemdCommunicator::dbusAction(const QString &method, const QVariantList &arguments)
 {
     QDBusMessage dbusreply;
 
     if (m_managerInterface && m_managerInterface->isValid())
-        dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
+    {
+        if (arguments.isEmpty())
+            dbusreply = m_managerInterface->call(QDBus::AutoDetect, method);
+        else
+            dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
+    }
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
@@ -145,7 +187,7 @@ void SystemdCommunicator::dbusAction(const QString &method, const QList<QVariant
             }
             else
             {
-                m_error = "Success";
+                m_error = method + " succeeded";
                 emit errorChanged();
             }
             return;
@@ -156,7 +198,7 @@ void SystemdCommunicator::dbusAction(const QString &method, const QList<QVariant
     }
     else
     {
-        m_error = "Success";
+        m_error = method + " succeeded";
         emit errorChanged();
     }
 }

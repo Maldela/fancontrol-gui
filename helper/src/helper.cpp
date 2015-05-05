@@ -28,7 +28,7 @@
 ActionReply Helper::dbusaction(const QVariantMap &arguments)
 {
     QString method = arguments["method"].toString();
-    QList<QVariant> argsForCall = arguments["arguments"].toList();
+    QVariantList argsForCall = arguments["arguments"].toList();
 
     ActionReply reply;
 
@@ -58,7 +58,6 @@ ActionReply Helper::dbusaction(const QVariantMap &arguments)
     return reply;
 }
 #endif
-
 
 ActionReply Helper::read(const QVariantMap &args)
 {
