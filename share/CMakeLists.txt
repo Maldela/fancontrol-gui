@@ -36,8 +36,8 @@ add_library(fancontrol-gui-share ${LIB_SRCS})
 
 target_link_libraries(fancontrol-gui-share ${LIBRARIES})
 
-install(DIRECTORY qml DESTINATION share/fancontrol-gui)
-install(DIRECTORY javascript DESTINATION share/fancontrol-gui)
-install(FILES ${LIB_HEADER} DESTINATION lib/fancontrol-gui/include)
-install(TARGETS fancontrol-gui-share DESTINATION lib EXPORT libfancontrol-gui-share-targets)
-install(EXPORT libfancontrol-gui-share-targets DESTINATION lib/fancontrol-gui)
+install(DIRECTORY qml DESTINATION "${SHARE_INSTALL_PREFIX}/fancontrol-gui")
+install(DIRECTORY javascript DESTINATION "${SHARE_INSTALL_PREFIX}/fancontrol-gui")
+install(FILES ${LIB_HEADER} DESTINATION "${LIB_INSTALL_DIR}/fancontrol-gui/include")
+install(TARGETS fancontrol-gui-share DESTINATION ${LIB_INSTALL_DIR} EXPORT libfancontrol-gui-share-targets)
+install(EXPORT libfancontrol-gui-share-targets DESTINATION "${LIB_INSTALL_DIR}/fancontrol-gui")
