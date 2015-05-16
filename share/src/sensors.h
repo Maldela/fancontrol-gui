@@ -113,8 +113,8 @@ public:
     QString name() const;
     void setName(const QString &name);
 
-    virtual int pwm() const { return 0; }
-    virtual void setPwm(int) { qDebug() << "setPwm(int) is not implemented in standard Fan"; }
+    virtual int pwm() const { return 255; }
+//    virtual void setPwm(int) { qDebug() << "setPwm(int) is not implemented in standard Fan"; }
 
 
 signals:

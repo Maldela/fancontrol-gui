@@ -59,7 +59,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
             }
             else
             {
-                m_serviceObjectPath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().first()).path();
+                m_serviceObjectPath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().at(0)).path();
 
                 if (m_serviceInterface)
                     m_serviceInterface->deleteLater();
@@ -90,7 +90,7 @@ bool SystemdCommunicator::serviceExists()
         emit errorChanged();
         return false;
     }
-    SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().first());
+    SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
 
     foreach (const SystemdUnitFile &unitFile, list)
     {
