@@ -302,10 +302,24 @@ void Loader::save(const QUrl &url)
 
 void Loader::createConfigFile()
 {
+    QList<Hwmon *> usedHwmons;
+    foreach (Hwmon *hwmon, m_hwmons)
+    {
+        if (hwmon->pwmFans().size() > 0)
+            usedHwmons << hwmon;
+        foreach (QObject *fan, hwmon->pwmFans())
+        {
+            PwmFan *pwmFan = qobject_cast<PwmFan *>(fan);
+            if (pwmFan->hasTemp() && pwmFan->temp())
+                if (!usedHwmons.contains(pwmFan->temp()->parent()))
+                    usedHwmons << pwmFan->temp()->parent();
+        }
+    }
+    
     m_configFile = "INTERVAL=" + QString::number(m_interval) + "\n";
 
     m_configFile += "DEVPATH=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (Hwmon *hwmon, usedHwmons)
     {
         QString sanitizedPath = hwmon->path();
         sanitizedPath.remove(QRegExp("^/sys/"));
@@ -315,7 +329,7 @@ void Loader::createConfigFile()
     m_configFile += "\n";
 
     m_configFile += "DEVNAME=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (Hwmon *hwmon, usedHwmons)
     {
         m_configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + " ";
     }
