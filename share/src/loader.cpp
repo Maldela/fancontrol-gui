@@ -305,6 +305,7 @@ void Loader::save(const QUrl &url)
 void Loader::createConfigFile()
 {
     QList<Hwmon *> usedHwmons;
+    QList<PwmFan *> usedFans;
     foreach (Hwmon *hwmon, m_hwmons)
     {
         if (hwmon->pwmFans().size() > 0)
@@ -312,9 +313,12 @@ void Loader::createConfigFile()
         foreach (QObject *fan, hwmon->pwmFans())
         {
             PwmFan *pwmFan = qobject_cast<PwmFan *>(fan);
-            if (pwmFan->hasTemp() && pwmFan->temp())
+            if (pwmFan->active() && pwmFan->hasTemp() && pwmFan->temp())
+            {
+                usedFans << pwmFan;
                 if (!usedHwmons.contains(pwmFan->temp()->parent()))
                     usedHwmons << pwmFan->temp()->parent();
+            }
         }
     }
 
@@ -338,132 +342,76 @@ void Loader::createConfigFile()
     m_configFile += "\n";
 
     m_configFile += "FCTEMPS=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp() && pwmFan->temp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += "hwmon" + QString::number(pwmFan->temp()->parent()->index()) + "/";
-                m_configFile += "temp" + QString::number(pwmFan->temp()->index()) + "_input ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += "hwmon" + QString::number(pwmFan->temp()->parent()->index()) + "/";
+        m_configFile += "temp" + QString::number(pwmFan->temp()->index()) + "_input ";
     }
     m_configFile += "\n";
 
     m_configFile += "FCFANS=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "fan" + QString::number(pwmFan->index()) + "_input ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "fan" + QString::number(pwmFan->index()) + "_input ";
     }
     m_configFile += "\n";
 
     m_configFile += "MINTEMP=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->minTemp()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->minTemp()) + " ";
     }
     m_configFile += "\n";
 
     m_configFile += "MAXTEMP=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->maxTemp()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->maxTemp()) + " ";
     }
     m_configFile += "\n";
 
     m_configFile += "MINSTART=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->minStart()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->minStart()) + " ";
     }
     m_configFile += "\n";
 
     m_configFile += "MINSTOP=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp())
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->minStop()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->minStop()) + " ";
     }
     m_configFile += "\n";
 
     m_configFile += "MINPWM=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp() && pwmFan->minPwm() != 0)
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->minPwm()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->minPwm()) + " ";
     }
     m_configFile += "\n";
 
     m_configFile += "MAXPWM=";
-    foreach (Hwmon *hwmon, m_hwmons)
+    foreach (PwmFan *pwmFan, usedFans)
     {
-        foreach (QObject *object, hwmon->pwmFans())
-        {
-            PwmFan *pwmFan = qobject_cast<PwmFan *>(object);
-            if (pwmFan->hasTemp() && pwmFan->maxPwm() != 255)
-            {
-                m_configFile += "hwmon" + QString::number(hwmon->index()) + "/";
-                m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                m_configFile += QString::number(pwmFan->maxPwm()) + " ";
-            }
-        }
+        m_configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+        m_configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+        m_configFile += QString::number(pwmFan->maxPwm()) + " ";
     }
     m_configFile += "\n";
 
