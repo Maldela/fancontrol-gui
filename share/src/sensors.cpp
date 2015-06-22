@@ -108,44 +108,101 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
     if (QDir(parent->path()).isReadable())
     {
         QFile *pwmFile = new QFile(parent->path() + "/pwm" + QString::number(index), this);
-
-        if (pwmFile->open(QFile::ReadOnly))
+        if (pwmFile->open(QFile::ReadWrite))
+        {
+            m_pwmStream.setDevice(pwmFile);
+            m_pwmStream >> m_pwm;
+        }
+        else if (pwmFile->open(QFile::ReadOnly))
         {
             m_pwmStream.setDevice(pwmFile);
             m_pwmStream >> m_pwm;
         }
         else
+            qDebug() << "Can't open pwmFile " << pwmFile->fileName();
+
+        QFile *pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
+        if (pwmModeFile->open(QFile::ReadWrite))
         {
-            qDebug() << "Can't open pwmFile " << parent->path() + "/pwm" + QString::number(index);
+            m_modeStream.setDevice(pwmModeFile);
+            m_modeStream >> m_pwmMode;
         }
+        else if (pwmModeFile->open(QFile::ReadOnly))
+        {
+            m_modeStream.setDevice(pwmModeFile);
+            m_modeStream >> m_pwmMode;
+        }
+        else
+            qDebug() << "Can't open pwmModeFile " << pwmModeFile->fileName();
     }
 }
 
 void PwmFan::update()
 {
     Fan::update();
+
     m_pwmStream.seek(0);
-    m_pwmStream >> m_pwm;
-    emit pwmChanged();
+    setPwm(m_pwmStream.readAll().toInt(), false);
+
+    m_modeStream.seek(0);
+    setPwmMode(m_modeStream.readAll().toInt(), false);
 }
 
-bool PwmFan::writePwm(int pwm)
+void PwmFan::setPwm(int pwm, bool write)
 {
-    if (m_pwmStream.device()->isWritable())
-        m_pwmStream << m_pwm;
-    else
+    if (m_pwm != pwm)
     {
-        KAuth::Action action("fancontrol.gui.helper.action");
-        action.setHelperId("fancontrol.gui.helper");
-        QVariantMap map;
-        map["action"] = "write";
-        map["filename"] = qobject_cast<QFile *>(m_pwmStream.device())->fileName();
-        map["content"] = pwm;
-        action.setArguments(map);
-        KAuth::ExecuteJob *reply = action.execute();
-        return reply->exec();
+        m_pwm = pwm;
+        emit pwmChanged();
+
+        if (write)
+        {
+            if (m_pwmStream.device()->isWritable())
+                m_pwmStream << pwm;
+            else
+            {
+                KAuth::Action action("fancontrol.gui.helper.action");
+                action.setHelperId("fancontrol.gui.helper");
+                QVariantMap map;
+                map["action"] = "write";
+                map["filename"] = qobject_cast<QFile *>(m_pwmStream.device())->fileName();
+                map["content"] = QString::number(pwm);
+                action.setArguments(map);
+                KAuth::ExecuteJob *reply = action.execute();
+
+                if (!reply->exec())
+                    qDebug() << reply->errorString() << reply->errorText();
+            }
+        }
     }
-    return true;
+}
+
+void PwmFan::setPwmMode(int pwmMode, bool write)
+{
+    if (m_pwmMode != pwmMode)
+    {
+        m_pwmMode = pwmMode;
+        emit pwmModeChanged();
+
+        if (write)
+        {
+            if (m_modeStream.device()->isWritable())
+                m_modeStream << pwmMode;
+            else
+            {
+                KAuth::Action action("fancontrol.gui.helper.action");
+                action.setHelperId("fancontrol.gui.helper");
+                QVariantMap map;
+                map["action"] = "write";
+                map["filename"] = qobject_cast<QFile *>(m_modeStream.device())->fileName();
+                map["content"] = QString::number(pwmMode);
+                action.setArguments(map);
+                KAuth::ExecuteJob *reply = action.execute();
+
+                if (!reply->exec())
+                    qDebug() << reply->errorString() << reply->errorText();            }
+        }
+    }
 }
 
 void PwmFan::test()
@@ -154,6 +211,7 @@ void PwmFan::test()
     emit testingChanged();
 
     m_testStatus = findingStop1;
+    setPwmMode(1);
     setPwm(255);
     m_testTimer.setInterval(2000);
     m_testTimer.start();
@@ -175,8 +233,8 @@ void PwmFan::continueTesting()
     switch (m_testStatus)
     {
     case findingStop1:
-        if (rpm() > 0)
-            setPwm(qMin(pwm() * 0.9, pwm() - 5.0));
+        if (m_rpm > 0)
+            setPwm(qMin(m_pwm * 0.9, m_pwm - 5.0));
         else
         {
             m_testStatus = findingStart;
@@ -187,22 +245,22 @@ void PwmFan::continueTesting()
         break;
 
     case findingStart:
-        if (rpm() == 0)
-            setPwm(pwm() + 2);
+        if (m_rpm == 0)
+            setPwm(m_pwm + 2);
         else
         {
             m_testStatus = findingStop2;
             m_testTimer.setInterval(1000);
-            setMinStart(pwm());
+            setMinStart(m_pwm);
             qDebug() << "Start finding stop value...";
         }
         m_testTimer.start();
         break;
 
     case findingStop2:
-        if (rpm() > 0)
+        if (m_rpm > 0)
         {
-            setPwm(pwm() - 1);
+            setPwm(m_pwm - 1);
             m_testTimer.start();
         }
         else
@@ -210,7 +268,7 @@ void PwmFan::continueTesting()
             m_testStatus = notTesting;
             m_testing = false;
             emit testingChanged();
-            setMinStop(pwm() + 5);
+            setMinStop(m_pwm + 5);
             qDebug() << "Finished testing!";
         }
         break;

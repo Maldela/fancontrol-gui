@@ -149,13 +149,13 @@ class FANCONTROL_GUI_EXPORT PwmFan : public Fan
     Q_PROPERTY(int minStop READ minStop WRITE setMinStop NOTIFY minStopChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
+    Q_PROPERTY(int pwmMode READ pwmMode WRITE setPwmMode NOTIFY pwmModeChanged)
 
 public:
 
     explicit PwmFan(Hwmon *parent, uint index);
 
     int pwm() const { return m_pwm; }
-    void setPwm(int pwm) { if (pwm != m_pwm) { if (writePwm(pwm)) { m_pwm = pwm; emit pwmChanged(); } } }
     Temp * temp() const { return m_temp; }
     bool hasTemp() const { return m_hasTemp; }
     int minTemp() const { return m_minTemp; }
@@ -164,8 +164,10 @@ public:
     int maxPwm() const { return m_maxPwm; }
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
+    int pwmMode() const { return m_pwmMode; }
     bool active() const;
     bool testing() const { return m_testing; }
+    void setPwm(int pwm, bool write = true);
     void setTemp(Temp *temp) { setHasTemp(temp != nullptr); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
@@ -174,6 +176,7 @@ public:
     void setMaxPwm(int maxPwm) { if (maxPwm != m_maxPwm) { m_maxPwm = maxPwm; emit maxPwmChanged(); } }
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
+    void setPwmMode(int pwmMode, bool write = true);
     void setActive(bool active);
     void reset();
     Q_INVOKABLE void test();
@@ -193,12 +196,12 @@ signals:
     void minStopChanged();
     void activeChanged();
     void testingChanged();
+    void pwmModeChanged();
 
 
 protected slots:
 
     void update();
-    bool writePwm(int);
     void continueTesting();
 
 
@@ -206,6 +209,7 @@ protected:
 
     int m_pwm;
     QTextStream m_pwmStream;
+    QTextStream m_modeStream;
     QTimer m_testTimer;
     Temp *m_temp;
     bool m_hasTemp;
@@ -216,6 +220,7 @@ protected:
     int m_maxPwm;
     int m_minStart;
     int m_minStop;
+    int m_pwmMode;
 
     enum
     {
