@@ -65,7 +65,8 @@ ActionReply Helper::read(const QVariantMap &args)
     QString filename = args["filename"].toString();
     QFile file(filename);
 
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly))
+    {
        reply = ActionReply::HelperErrorType;
        reply.setErrorCode(ActionReply::AuthorizationDeniedError);
 
@@ -88,7 +89,8 @@ ActionReply Helper::write(const QVariantMap &args)
     QString filename = args["filename"].toString();
     QFile file(filename);
 
-    if (!file.open(QIODevice::WriteOnly)) {
+    if (!file.open(QIODevice::WriteOnly))
+    {
        reply = ActionReply::HelperErrorType;
        reply.addData("errorDescription", file.errorString());
 

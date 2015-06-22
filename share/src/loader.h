@@ -47,6 +47,7 @@ public:
     Q_INVOKABLE void parseHwmons();
     Q_INVOKABLE void open(const QUrl & = QUrl());
     Q_INVOKABLE void save(const QUrl & = QUrl());
+    Q_INVOKABLE void testFans();
     QUrl configUrl() const { return m_configUrl; }
     void setConfigUrl(const QUrl &url) { open(url); if (m_configUrl != url) { m_configUrl = url; emit configUrlChanged(); } }
     QString configFile() const { return m_configFile; }

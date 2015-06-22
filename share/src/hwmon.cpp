@@ -99,3 +99,11 @@ QList<QObject *> Hwmon::temps() const
     }
     return list;
 }
+
+void Hwmon::testFans()
+{
+    for (int i=0; i<m_pwmFans.size(); i++)
+    {
+        m_pwmFans.at(i)->test();
+    }
+}

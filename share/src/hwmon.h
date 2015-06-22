@@ -55,6 +55,7 @@ public:
     Fan * fan(int i) const { return m_fans.value(i, nullptr); }
     PwmFan * pwmFan(int i) const { return m_pwmFans.value(i, nullptr); }
     Temp * temp(int i) const { return m_temps.value(i, nullptr); }
+    Q_INVOKABLE void testFans();
 
 
 public slots:

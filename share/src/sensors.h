@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <QTimer>
 #include <QDebug>
 #include <KSharedConfig>
 
@@ -137,7 +138,7 @@ protected:
 class FANCONTROL_GUI_EXPORT PwmFan : public Fan
 {
     Q_OBJECT
-    Q_PROPERTY(int pwm READ pwm /*WRITE setPwm*/ NOTIFY pwmChanged)
+    Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)
     Q_PROPERTY(Temp * temp READ temp WRITE setTemp NOTIFY tempChanged)
     Q_PROPERTY(bool hasTemp READ hasTemp WRITE setHasTemp NOTIFY hasTempChanged)
     Q_PROPERTY(int minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
@@ -147,13 +148,14 @@ class FANCONTROL_GUI_EXPORT PwmFan : public Fan
     Q_PROPERTY(int minStart READ minStart WRITE setMinStart NOTIFY minStartChanged)
     Q_PROPERTY(int minStop READ minStop WRITE setMinStop NOTIFY minStopChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
+    Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
 
 public:
 
     explicit PwmFan(Hwmon *parent, uint index);
 
     int pwm() const { return m_pwm; }
-//    void setPwm(int pwm) { if (pwm != m_pwm) { m_pwm = pwm; emit pwmChanged(); writePwm(); } }
+    void setPwm(int pwm) { if (pwm != m_pwm) { if (writePwm(pwm)) { m_pwm = pwm; emit pwmChanged(); } } }
     Temp * temp() const { return m_temp; }
     bool hasTemp() const { return m_hasTemp; }
     int minTemp() const { return m_minTemp; }
@@ -163,6 +165,7 @@ public:
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
     bool active() const;
+    bool testing() const { return m_testing; }
     void setTemp(Temp *temp) { setHasTemp(temp != nullptr); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
@@ -173,6 +176,7 @@ public:
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
     void setActive(bool active);
     void reset();
+    Q_INVOKABLE void test();
 
 
 signals:
@@ -187,26 +191,38 @@ signals:
     void minStartChanged();
     void minStopChanged();
     void activeChanged();
+    void testingChanged();
 
 
 protected slots:
 
     void update();
-//    void writePwm();
+    bool writePwm(int);
+    void continueTesting();
 
 
 protected:
 
     int m_pwm;
     QTextStream m_pwmStream;
+    QTimer m_testTimer;
     Temp *m_temp;
     bool m_hasTemp;
+    bool m_testing;
     int m_minTemp;
     int m_maxTemp;
     int m_minPwm;
     int m_maxPwm;
     int m_minStart;
     int m_minStop;
+
+    enum
+    {
+        findingStop1,
+        findingStop2,
+        findingStart,
+        notTesting
+    } m_testStatus;
 };
 
 #endif // SENSORS_H

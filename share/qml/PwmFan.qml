@@ -404,5 +404,15 @@ Rectangle {
                 onTextChanged: fan.minStart = text
             }
         }
+
+        Button {
+            text: "Auto"
+            height: 15
+            enabled: !fan.testing
+            onClicked: {
+                systemdCom.dbusAction("StopUnit", [systemdCom.serviceName + ".service", "replace"]);
+                fan.test();
+            }
+        }
     }
 }

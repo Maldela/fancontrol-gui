@@ -315,7 +315,7 @@ void Loader::createConfigFile()
                     usedHwmons << pwmFan->temp()->parent();
         }
     }
-    
+
     m_configFile = "INTERVAL=" + QString::number(m_interval) + "\n";
 
     m_configFile += "DEVPATH=";
@@ -466,6 +466,14 @@ void Loader::createConfigFile()
     m_configFile += "\n";
 
     emit configFileChanged();
+}
+
+void Loader::testFans()
+{
+    for (int i=0; i<m_hwmons.size(); i++)
+    {
+        m_hwmons.at(i)->testFans();
+    }
 }
 
 QList<QObject *> Loader::hwmons() const
