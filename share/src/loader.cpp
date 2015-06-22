@@ -313,7 +313,7 @@ void Loader::createConfigFile()
         foreach (QObject *fan, hwmon->pwmFans())
         {
             PwmFan *pwmFan = qobject_cast<PwmFan *>(fan);
-            if (pwmFan->active() && pwmFan->hasTemp() && pwmFan->temp())
+            if (pwmFan->hasTemp() && pwmFan->temp())
             {
                 usedFans << pwmFan;
                 if (!usedHwmons.contains(pwmFan->temp()->parent()))

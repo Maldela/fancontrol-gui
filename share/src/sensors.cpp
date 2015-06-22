@@ -103,7 +103,6 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
     connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(activeChanged()), parent, SLOT(updateConfig()));
     connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(continueTesting()));
 
     if (QDir(parent->path()).isReadable())
