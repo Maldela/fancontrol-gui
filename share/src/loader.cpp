@@ -88,9 +88,10 @@ void Loader::open(const QUrl &url)
     }
     else if (file.exists())
     {
-        Action action("fancontrol.gui.helper.read");
+        Action action("fancontrol.gui.helper.action");
         action.setHelperId("fancontrol.gui.helper");
         QVariantMap map;
+        map["action"] = "read";
         map["filename"] = fileName;
         action.setArguments(map);
         ExecuteJob *reply = action.execute();
@@ -284,9 +285,10 @@ void Loader::save(const QUrl &url)
     }
     else
     {
-        Action action("fancontrol.gui.helper.write");
+        Action action("fancontrol.gui.helper.action");
         action.setHelperId("fancontrol.gui.helper");
         QVariantMap map;
+        map["action"] = "write";
         map["content"] = m_configFile;
 
         map["filename"] = fileName;

@@ -171,9 +171,10 @@ void SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 #ifndef NO_KF5_AUTH
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
-            Action action("fancontrol.gui.helper.dbusaction");
+            Action action("fancontrol.gui.helper.action");
             action.setHelperId("fancontrol.gui.helper");
             QVariantMap map;
+            map["action"] = "dbusaction";
             map["method"] = method;
             map["arguments"] = arguments;
             action.setArguments(map);

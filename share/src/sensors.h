@@ -177,6 +177,7 @@ public:
     void setActive(bool active);
     void reset();
     Q_INVOKABLE void test();
+    Q_INVOKABLE void abortTesting();
 
 
 signals:

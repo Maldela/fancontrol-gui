@@ -405,13 +405,31 @@ Rectangle {
             }
         }
 
-        Button {
-            text: "Auto"
-            height: 15
-            enabled: !fan.testing
-            onClicked: {
-                systemdCom.dbusAction("StopUnit", [systemdCom.serviceName + ".service", "replace"]);
-                fan.test();
+        RowLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            Text {
+                text: "Test start and stop values"
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
+                color: enabled ? palette.text : disabledPalette.text
+                renderType: Text.NativeRendering
+            }
+            Button {
+                text: fan.testing? "Abort" : "Test"
+                anchors.right: parent.right
+                height: hwmonBox.height
+                onClicked: {
+                    if (fan.testing) {
+                        systemdCom.dbusAction("StartUnit", [systemdCom.serviceName + ".service", "replace"]);
+                        fan.abortTesting();
+                    } else {
+                        systemdCom.dbusAction("StopUnit", [systemdCom.serviceName + ".service", "replace"]);
+                        minStartInput.text = Qt.binding(function() { return fan.minStart });
+                        fan.test();
+                    }
+                }
             }
         }
     }

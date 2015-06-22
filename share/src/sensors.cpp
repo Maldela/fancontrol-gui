@@ -135,9 +135,10 @@ bool PwmFan::writePwm(int pwm)
         m_pwmStream << m_pwm;
     else
     {
-        KAuth::Action action("fancontrol.gui.helper.write");
+        KAuth::Action action("fancontrol.gui.helper.action");
         action.setHelperId("fancontrol.gui.helper");
         QVariantMap map;
+        map["action"] = "write";
         map["filename"] = qobject_cast<QFile *>(m_pwmStream.device())->fileName();
         map["content"] = pwm;
         action.setArguments(map);
@@ -157,6 +158,15 @@ void PwmFan::test()
     m_testTimer.setInterval(2000);
     m_testTimer.start();
     qDebug() << "Start testing...";
+}
+
+void PwmFan::abortTesting()
+{
+    setPwm(255);
+    m_testTimer.stop();
+
+    m_testing = false;
+    emit testingChanged();
 }
 
 void PwmFan::continueTesting()
