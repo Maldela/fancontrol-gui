@@ -23,10 +23,10 @@
 #include <KConfigGroup>
 #include <KF5/KAuth/KAuthExecuteJob>
 
-Sensor::Sensor(Hwmon *parent, uint index) : QObject(parent)
+Sensor::Sensor(Hwmon *parent, uint index) : QObject(parent),
+                                            m_parent(parent),
+                                            m_index(index)
 {
-    m_parent = parent;
-    m_index = index;
     m_config = KSharedConfig::openConfig();
 }
 
@@ -200,7 +200,8 @@ void PwmFan::setPwmMode(int pwmMode, bool write)
                 KAuth::ExecuteJob *reply = action.execute();
 
                 if (!reply->exec())
-                    qDebug() << reply->errorString() << reply->errorText();            }
+                    qDebug() << reply->errorString() << reply->errorText();
+            }
         }
     }
 }
@@ -218,7 +219,7 @@ void PwmFan::test()
     qDebug() << "Start testing...";
 }
 
-void PwmFan::abortTesting()
+void PwmFan::abortTest()
 {
     setPwm(255);
     m_testTimer.stop();
@@ -227,7 +228,7 @@ void PwmFan::abortTesting()
     emit testingChanged();
 }
 
-void PwmFan::continueTesting()
+void PwmFan::continueTest()
 {
     update();
     switch (m_testStatus)

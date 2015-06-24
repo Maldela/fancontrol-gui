@@ -61,7 +61,7 @@ signals:
 protected:
 
     Hwmon *m_parent;
-    uint m_index;
+    const uint m_index;
     KSharedConfigPtr m_config;
 };
 
@@ -115,7 +115,7 @@ public:
     void setName(const QString &name);
 
     virtual int pwm() const { return 255; }
-//    virtual void setPwm(int) { qDebug() << "setPwm(int) is not implemented in standard Fan"; }
+    virtual void setPwm(int, bool) { qDebug() << "setPwm(int, bool) is not implemented in standard Fan"; }
 
 
 signals:
@@ -180,7 +180,7 @@ public:
     void setActive(bool active);
     void reset();
     Q_INVOKABLE void test();
-    Q_INVOKABLE void abortTesting();
+    Q_INVOKABLE void abortTest();
 
 
 signals:
@@ -202,7 +202,7 @@ signals:
 protected slots:
 
     void update();
-    void continueTesting();
+    void continueTest();
 
 
 protected:

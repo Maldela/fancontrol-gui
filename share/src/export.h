@@ -1,5 +1,5 @@
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef EXPORT_H
+#define EXPORT_H
 
 #if defined(FANCONTROL_GUI_LIBRARY)
 #  define FANCONTROL_GUI_EXPORT Q_DECL_EXPORT
@@ -7,5 +7,5 @@
 #  define FANCONTROL_GUI_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // LIBRARY_H
+#endif // EXPORT_H
 
