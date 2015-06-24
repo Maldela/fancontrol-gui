@@ -60,7 +60,7 @@ signals:
 
 protected:
 
-    Hwmon *m_parent;
+    Hwmon *const m_parent;
     const uint m_index;
     KSharedConfigPtr m_config;
 };
