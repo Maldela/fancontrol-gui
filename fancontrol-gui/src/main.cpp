@@ -21,6 +21,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickView>
+#include <KDeclarative/KDeclarative>
+#include <KI18n/KLocalizedString>
 
 #include "../share/src/loader.h"
 
@@ -33,6 +35,10 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    KDeclarative::KDeclarative decl;
+    decl.setDeclarativeEngine(&engine);
+    decl.setupBindings();
+    KLocalizedString::setApplicationDomain("fancontrol-gui");
     Loader loader;
     engine.rootContext()->setContextProperty("loader", &loader);
 #ifndef NO_SYSTEMD
