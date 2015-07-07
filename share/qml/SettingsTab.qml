@@ -28,7 +28,7 @@ Item {
     property real maxTemp: 90.0
     property int interval: 1
     property int padding: 10
-    property string unit: "Celsius"
+    property string unit: i18n("Celsius")
 
     id: root
     anchors.fill: parent
@@ -61,7 +61,7 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - intervalValue.width - padding*2
                     clip: true
-                    text: "Interval:"
+                    text: i18n("Interval:")
                 }
                 OptionInput {
                     id: intervalValue
@@ -81,7 +81,7 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - minTempValue.width - padding*2
                     clip: true
-                    text: "Minimum temperature for fan graphs:"
+                    text: i18n("Minimum temperature for fan graphs:")
                 }
                 OptionInput {
                     id: minTempValue
@@ -101,7 +101,7 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - maxTempValue.width - padding*2
                     clip: true
-                    text: "Maximum temperature for fan graphs:"
+                    text: i18n("Maximum temperature for fan graphs:")
                 }
                 OptionInput {
                     id: maxTempValue
@@ -122,13 +122,13 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - maxTempValue.width - padding*2
                     clip: true
-                    text: "Unit:"
+                    text: i18n("Unit:")
                 }
                 ComboBox {
                     id: unitBox
                     anchors.right: parent.right
                     anchors.rightMargin: padding
-                    model: ["Celsius", "Kelvin", "Fahrenheit"]
+                    model: [i18n("Celsius"), i18n("Kelvin"), i18n("Fahrenheit")]
                     currentIndex: find(root.unit)
                     onCurrentIndexChanged: {
                         unit = currentText;
@@ -146,7 +146,7 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - maxTempValue.width - padding*2
                     clip: true
-                    text: "Name of the fancontrol systemd service:"
+                    text: i18n("Name of the fancontrol systemd service:")
                 }
                 OptionInput {
                     id: serviceName
@@ -167,7 +167,7 @@ Item {
                     anchors.leftMargin: padding
                     Layout.maximumWidth: parent.width - maxTempValue.width - padding*2
                     clip: true
-                    text: "Fancontrol systemd service autostart:"
+                    text: i18n("Fancontrol systemd service autostart:")
                 }
                 ComboBox {
                     id: autostartBox

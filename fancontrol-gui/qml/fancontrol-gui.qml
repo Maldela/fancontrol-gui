@@ -25,28 +25,28 @@ import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     id: window
-    title: qsTr("Fancontrol-GUI")
+    title: i18n("Fancontrol-GUI")
     width: 1024
     height: 768
     visible: true
 
     menuBar: MenuBar {
         Menu {
-            title: qsTr("&File")
+            title: i18n("File")
             MenuItem {
-                text: qsTr("Load configuration file")
+                text: i18n("Load configuration file")
                 onTriggered: openFileDialog.open();
             }
             MenuItem {
-                text: qsTr("Save configuration file")
+                text: i18n("Save configuration file")
                 onTriggered: loader.save();
             }
             MenuItem {
-                text: qsTr("Save configuration file as")
+                text: i18n("Save configuration file as")
                 onTriggered: saveFileDialog.open();
             }
             MenuItem {
-                text: qsTr("Exit")
+                text: i18n("Exit")
                 onTriggered: Qt.quit();
             }
         }
@@ -63,7 +63,7 @@ ApplicationWindow {
                 onClicked: openFileDialog.open();
 
                 ToolTip {
-                    text: "Open config file"
+                    text: i18n("Load configuration file")
                 }
             }
             ToolButton {
@@ -71,7 +71,7 @@ ApplicationWindow {
                 onClicked: loader.save();
 
                 ToolTip {
-                    text: "Save config file"
+                    text: i18n("Save configuration file")
                 }
             }
             ToolButton {
@@ -82,7 +82,7 @@ ApplicationWindow {
                                                  [systemdCom.serviceName + ".service", "replace"])
 
                 ToolTip {
-                    text: activeTimer.serviceActive ? "Restart fancontrol" : "Start fancontrol"
+                    text: activeTimer.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
 
 
@@ -95,7 +95,7 @@ ApplicationWindow {
                                                  [systemdCom.serviceName + ".service", "replace"])
 
                 ToolTip {
-                    text: "Stop fancontrol"
+                    text: i18n("Stop fancontrol")
                 }
             }
             Item {
@@ -121,11 +121,11 @@ ApplicationWindow {
         anchors.fill: parent
 
         Tab {
-            title: "Sensors"
+            title: i18n("Sensors")
             SensorsTab {}
         }
         Tab {
-            title: "PwmFans"
+            title: i18n("PwmFans")
             PwmFansTab {
                 size: sizeSlider.value
                 minTemp: tabView.minTemp
@@ -134,12 +134,12 @@ ApplicationWindow {
             }
         }
         Tab {
-            title: "Configfile"
+            title: i18n("Configfile")
             ConfigfileTab {}
         }
 
         Tab {
-            title: "Settings"
+            title: i18n("Settings")
             SettingsTab {
                 id: settingsTab
                 interval: loader.interval
@@ -186,7 +186,7 @@ ApplicationWindow {
 
     FileDialog {
         id: openFileDialog
-        title: "Please choose a configuration file"
+        title: i18n("Please choose a configuration file")
         folder: "file:///etc"
         selectExisting: true
         selectMultiple: false
@@ -199,7 +199,7 @@ ApplicationWindow {
 
     FileDialog {
         id: saveFileDialog
-        title: "Save configuration file as"
+        title: i18n("Save configuration file as")
         folder: "file:///etc"
         selectExisting: false
         selectMultiple: false

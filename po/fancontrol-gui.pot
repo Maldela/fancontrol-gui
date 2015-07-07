@@ -1,0 +1,123 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
+"POT-Creation-Date: 2015-07-07 11:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:28
+msgid "Fancontrol-GUI"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:35
+msgid "File"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:37
+#: fancontrol-gui/qml/fancontrol-gui.qml:66
+msgid "Load configuration file"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:41
+#: fancontrol-gui/qml/fancontrol-gui.qml:74
+msgid "Save configuration file"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:45
+#: fancontrol-gui/qml/fancontrol-gui.qml:202
+msgid "Save configuration file as"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:49
+msgid "Exit"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:85
+msgid "Restart fancontrol"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:85
+msgid "Start fancontrol"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:98
+msgid "Stop fancontrol"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:124
+msgid "Sensors"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:128
+msgid "PwmFans"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:137
+msgid "Configfile"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:142
+msgid "Settings"
+msgstr ""
+
+#: fancontrol-gui/qml/fancontrol-gui.qml:189
+msgid "Please choose a configuration file"
+msgstr ""
+
+#: rc.cpp:1 rc.cpp:1
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr ""
+
+#: rc.cpp:2 rc.cpp:2
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:31 share/qml/SettingsTab.qml:131
+msgid "Celsius"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:64
+msgid "Interval:"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:84
+msgid "Minimum temperature for fan graphs:"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:104
+msgid "Maximum temperature for fan graphs:"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:125
+msgid "Unit:"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:131
+msgid "Kelvin"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:131
+msgid "Fahrenheit"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:149
+msgid "Name of the fancontrol systemd service:"
+msgstr ""
+
+#: share/qml/SettingsTab.qml:170
+msgid "Fancontrol systemd service autostart:"
+msgstr ""

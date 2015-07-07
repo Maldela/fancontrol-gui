@@ -7,7 +7,7 @@
 #  define FANCONTROL_GUI_EXPORT Q_DECL_IMPORT
 #endif
 
-#define TRANSLATION_DOMAIN "fancontrol-gui"
+//#define TRANSLATION_DOMAIN "fancontrol-gui"
 
 #endif // EXPORT_H
 

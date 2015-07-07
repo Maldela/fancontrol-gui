@@ -64,3 +64,23 @@ if(BUILD_GUI)
     add_subdirectory(fancontrol-gui)
     
 endif(BUILD_GUI)
+
+#translations
+FILE(GLOB MO_FILES po/*.mo)
+
+set(catalogname fancontrol-gui)
+
+FOREACH(MO_FILE ${MO_FILES})
+    
+    GET_FILENAME_COMPONENT(_moFileName ${MO_FILE} NAME)
+    STRING(REGEX REPLACE "^${catalogname}_?" "" _langCode ${_moFileName} )
+    STRING(REGEX REPLACE "\\.mo$" "" _langCode ${_langCode} )
+
+    IF( _langCode )
+    
+        INSTALL(FILES ${MO_FILE} DESTINATION ${LOCALE_INSTALL_DIR}/${_langCode}/LC_MESSAGES/ RENAME ${catalogname}.mo)
+        LIST(APPEND GMO_FILES ${_gmoFile})
+    
+    ENDIF( _langCode )
+
+ENDFOREACH(MO_FILE ${MO_FILES})
