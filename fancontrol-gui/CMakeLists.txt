@@ -1,14 +1,20 @@
-set(Fancontrol-GUI_SRCS src/main.cpp)
+set(Fancontrol_GUI_SRCS src/main.cpp
+                        src/gui.cpp)
 
-set(LIBRARIES fancontrol-gui-share
-              KF5::Declarative
-              KF5::I18n)
+set(LIBRARIES fancontrol_gui_lib
+	      Qt5::Widgets
+	      KF5::Declarative
+              KF5::I18n
+              KF5::Package)
+              
+find_package(Qt5Widgets REQUIRED)
+find_package(KF5Declarative REQUIRED)
 
-add_executable(fancontrol-gui ${Fancontrol-GUI_SRCS} ${RESOURCES})
-target_link_libraries(fancontrol-gui ${LIBRARIES})
-set_property(TARGET fancontrol-gui PROPERTY CXX_STANDARD 11)
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
+add_definitions(${Qt5Widgets_DEFINITIONS})
 
-install(TARGETS fancontrol-gui RUNTIME DESTINATION ${BIN_INSTALL_DIR})
-install(FILES other/fancontrol-gui.desktop DESTINATION "${SHARE_INSTALL_PREFIX}/applications")
-install(FILES other/fancontrol-gui.svg DESTINATION "${ICON_INSTALL_DIR}/hicolor/scalable/apps")
-install(FILES qml/fancontrol-gui.qml DESTINATION "${SHARE_INSTALL_PREFIX}/fancontrol-gui/qml")
+add_executable(fancontrol_gui ${Fancontrol_GUI_SRCS})
+target_link_libraries(fancontrol_gui ${LIBRARIES})
+
+install(TARGETS fancontrol_gui RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+install(FILES metadata.desktop RENAME "fancontrol_gui.desktop" DESTINATION ${XDG_APPS_INSTALL_DIR})

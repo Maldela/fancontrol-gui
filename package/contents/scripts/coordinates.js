@@ -17,16 +17,22 @@
  *
  */
 
-#include <KAuth>
+function absoluteCoordinatesOf(item) {
+    if (typeof item === "undefined") {
+        item = this;
+    }
+    var offset = Qt.point(0, 0);
+    while (item.parent) {
+        offset.x += item.x;
+        offset.y += item.y;
+        item = item.parent
+    }
+    return offset;
+}
 
-using namespace KAuth;
-
-class Helper : public QObject
-{
-    Q_OBJECT
-
-    public Q_SLOTS:
-
-        ActionReply action(const QVariantMap &args);
-        ActionReply save(QVariantMap args) { args["action"] = "write"; return action(args); }
-};
+function centerOf(item) {
+    var p = Qt.point(0, 0);
+    p.x = item.x + item.width / 2;
+    p.y = item.y + item.height / 2;
+    return p;
+}

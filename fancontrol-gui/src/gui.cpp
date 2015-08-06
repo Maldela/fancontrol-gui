@@ -17,16 +17,23 @@
  *
  */
 
-#include <KAuth>
+#include "gui.h"
+#include "../lib/src/sensors.h"
+#include "../lib/src/hwmon.h"
 
-using namespace KAuth;
+#include <QtQml>
 
-class Helper : public QObject
+GUI::GUI(QObject *parent) : QObject(parent)
 {
-    Q_OBJECT
-
-    public Q_SLOTS:
-
-        ActionReply action(const QVariantMap &args);
-        ActionReply save(QVariantMap args) { args["action"] = "write"; return action(args); }
-};
+    m_loader->load(QUrl::fromLocalFile("/etc/fancontrol"));
+    
+    qmlRegisterType<Loader>();
+    qmlRegisterType<Hwmon>();
+    qmlRegisterType<Fan>();
+    qmlRegisterType<PwmFan>();
+    qmlRegisterType<Temp>();
+    
+#ifndef NO_SYSTEMD
+    qmlRegisterType<SystemdCommunicator>();
+#endif
+}

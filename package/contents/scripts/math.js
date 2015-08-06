@@ -17,16 +17,11 @@
  *
  */
 
-#include <KAuth>
+function bound(floor, value, ceiling) {
+    if (value >= floor) {
+        if (value <= ceiling) return value;
+        else return ceiling;
+    }
+    return floor;
+}
 
-using namespace KAuth;
-
-class Helper : public QObject
-{
-    Q_OBJECT
-
-    public Q_SLOTS:
-
-        ActionReply action(const QVariantMap &args);
-        ActionReply save(QVariantMap args) { args["action"] = "write"; return action(args); }
-};

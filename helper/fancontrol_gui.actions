@@ -1,0 +1,9 @@
+[Domain]
+Name=Fancontrol-GUI
+URL=http://github.com/maldela/fancontrol-gui
+
+[fancontrol.gui.helper.action]
+Name=Action with su rights
+Description=This action requires superuser rights.
+Policy=auth_admin
+Persistence=session

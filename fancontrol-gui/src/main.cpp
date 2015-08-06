@@ -20,36 +20,46 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QQuickView>
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
+#include <KPackage/PackageLoader>
+#include <KAboutData>
 
-#include "../share/src/loader.h"
+#include "gui.h"
 
-#ifndef NO_SYSTEMD
-#include "../share/src/systemdcommunicator.h"
-#endif
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    
+    KLocalizedString::setApplicationDomain("kcm_fancontrol");
+    
+    KAboutData about("fancontrol_gui",
+                    i18n("Fancontrol-GUI"),
+                    "0.1",
+                    i18n("Graphical user interface for fancontrol"),
+                    KAboutLicense::KAboutLicense::GPL_V2,
+                    "Copyright (C) 2015 Malte Veerman",
+                    QString(),
+                    "http://github.com/maldela/fancontrol-gui",
+                    "http://github.com/maldela/fancontrol-gui/issues");
+    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de"); 
+    KAboutData::setApplicationData(about);
 
     QQmlApplicationEngine engine;
+    
     KDeclarative::KDeclarative decl;
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
-    KLocalizedString::setApplicationDomain("fancontrol-gui");
-    Loader loader;
-    engine.rootContext()->setContextProperty("loader", &loader);
-#ifndef NO_SYSTEMD
-    SystemdCommunicator com;
-    engine.rootContext()->setContextProperty("systemdCom", &com);
-#endif
-    qmlRegisterType<Hwmon>();
-    qmlRegisterType<Fan>();
-    qmlRegisterType<PwmFan>();
-    qmlRegisterType<Temp>();
-    engine.load(QUrl(QStringLiteral("file:///usr/share/fancontrol-gui/qml/fancontrol-gui.qml")));
+        
+    GUI gui;
+    engine.rootContext()->setContextProperty("gui", &gui);
+    
+    KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");
+    package.setDefaultPackageRoot("kpackage/kcms");
+    package.setPath("kcm_fancontrol");
+
+    engine.load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
 
     return app.exec();
 }

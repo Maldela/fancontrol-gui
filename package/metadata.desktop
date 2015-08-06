@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Fancontrol-GUI-QML-Package
+Comment=Control PWM-fans
+Icon=fancontrol-gui
+Encoding=UTF-8
+Keywords=
+Type=Service
+X-KDE-PluginInfo-Author=Malte Veerman
+X-KDE-PluginInfo-Email=maldela@halloarsch.de
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-Name=kcm_fancontrol
+X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-Website=
+X-KDE-ServiceTypes=Plasma/Generic
+X-Plasma-API=declarativeappletscript 
+X-Plasma-MainScript=ui/KCM.qml

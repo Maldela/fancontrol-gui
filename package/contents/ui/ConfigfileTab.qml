@@ -17,16 +17,38 @@
  *
  */
 
-#include <KAuth>
+import QtQuick 2.4
+import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.1
+import "../scripts/arrayfunctions.js" as ArrayFunctions
 
-using namespace KAuth;
+ColumnLayout {
+    property QtObject loader
+    
+    anchors.fill: parent
+    anchors.topMargin: 5
 
-class Helper : public QObject
-{
-    Q_OBJECT
+    Text {
+        anchors.top: parent.top
+        text: loader ? decodeURIComponent(loader.configUrl) : ""
+    }
 
-    public Q_SLOTS:
+    Rectangle {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
 
-        ActionReply action(const QVariantMap &args);
-        ActionReply save(QVariantMap args) { args["action"] = "write"; return action(args); }
-};
+        border.width: 1
+        radius: 5
+
+        ScrollView {
+            id: scrollView
+            anchors.fill: parent
+            anchors.margins: 5
+
+            TextEdit {
+                text: loader ? loader.configFile : ""
+                readOnly: true
+            }
+        }
+    }
+}
