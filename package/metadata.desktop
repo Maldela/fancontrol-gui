@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Fancontrol-GUI-QML-Package
 Comment=Control PWM-fans
-Icon=fancontrol-gui
+Icon=fancontrol_gui
 Encoding=UTF-8
 Keywords=
 Type=Service
