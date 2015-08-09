@@ -33,16 +33,6 @@ function labels(array) {
     return labels;
 }
 
-function allPwmFans(hwmons) {
-    var pwmFans = [];
-    for (var i=0; i<hwmons.length; i++) {
-        for (var j=0; j<hwmons[i].pwmFans.length; j++) {
-            pwmFans[pwmFans.length] = hwmons[i].pwmFans[j];
-        }
-    }
-    return pwmFans;
-}
-
 function maxProperty(array, prop) {
     var max = 0;
     for (var i=0; i<array.length; i++) {

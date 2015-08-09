@@ -44,7 +44,7 @@ ScrollView {
         }
 
         Repeater {
-            property var fans: loader ? ArrayFunctions.allPwmFans(loader.hwmons) : []
+            property var fans: loader ? loader.allPwmFans : []
 
             id: repeater
             model: fans.length

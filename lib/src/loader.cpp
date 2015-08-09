@@ -26,8 +26,6 @@
 
 #include <KF5/KAuth/kauthexecutejob.h>
 
-using namespace KAuth;
-
 #define HWMON_PATH "/sys/class/hwmon"
 
 Loader::Loader(QObject *parent) : QObject(parent)
@@ -68,10 +66,12 @@ void Loader::parseHwmons()
     {
         Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)), this);
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+	connect(hwmon, SIGNAL(pwmFansChanged()), this, SLOT(emitAllPwmFansChanged()));
         connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
         m_hwmons << hwmon;
     }
     emit hwmonsChanged();
+    emit allPwmFansChanged();
 }
 
 void Loader::load(const QUrl &url)
@@ -98,13 +98,13 @@ void Loader::load(const QUrl &url)
     }
     else if (file.exists())
     {
-        Action action("fancontrol.gui.helper.action");
+        KAuth::Action action("fancontrol.gui.helper.action");
         action.setHelperId("fancontrol.gui.helper");
         QVariantMap map;
         map["action"] = "read";
         map["filename"] = fileName;
         action.setArguments(map);
-        ExecuteJob *reply = action.execute();
+        KAuth::ExecuteJob *reply = action.execute();
         if (!reply->exec())
         {
             m_error = reply->errorString();
@@ -295,7 +295,7 @@ void Loader::save(const QUrl &url)
     }
     else
     {
-        Action action("fancontrol.gui.helper.action");
+        KAuth::Action action("fancontrol.gui.helper.action");
         action.setHelperId("fancontrol.gui.helper");
 
         QVariantMap map;
@@ -304,7 +304,7 @@ void Loader::save(const QUrl &url)
         map["content"] = m_configFile;
 
         action.setArguments(map);
-        ExecuteJob *reply = action.execute();
+        KAuth::ExecuteJob *reply = action.execute();
 
         if (!reply->exec())
         {
@@ -446,6 +446,16 @@ QList<QObject *> Loader::hwmons() const
     foreach (Hwmon *hwmon, m_hwmons)
     {
         list << qobject_cast<QObject *>(hwmon);
+    }
+    return list;
+}
+
+QList< QObject* > Loader::allPwmFans() const
+{
+    QList<QObject *> list;
+    foreach (const Hwmon *hwmon, m_hwmons)
+    {
+        list += hwmon->pwmFans();
     }
     return list;
 }

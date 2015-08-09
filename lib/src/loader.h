@@ -35,6 +35,7 @@ class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmons NOTIFY hwmonsChanged)
+    Q_PROPERTY(QList<QObject *> allPwmFans READ allPwmFans NOTIFY allPwmFansChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     
@@ -50,6 +51,7 @@ public:
     QUrl configUrl() const { return m_configUrl; }
     QString configFile() const { return m_configFile; }
     QList<QObject *> hwmons() const;
+    QList<QObject *> allPwmFans() const;
     int interval() { return m_interval; }
     void setInterval(int interval) { if (interval != m_interval) { m_interval = interval; emit intervalChanged(m_interval*1000); createConfigFile(); } }
     Hwmon * hwmon(int i) { return m_hwmons.value(i, Q_NULLPTR); }
@@ -58,6 +60,7 @@ public:
     static int getHwmonNumber(const QString &str) { return str.split('/').value(0).remove("hwmon").toInt(); }
     static int getSensorNumber(const QString &str) { return str.split('/').value(1).remove(QRegExp("pwm|fan|temp|_input")).toInt() - 1; }
 
+    
 public slots:
 
     void updateSensors() { emit sensorsUpdateNeeded(); }
@@ -66,6 +69,7 @@ public slots:
 protected slots:
 
     void createConfigFile();
+    void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
 
 
 protected:
@@ -87,6 +91,7 @@ signals:
     void intervalChanged(int);
     void errorChanged();
     void sensorsUpdateNeeded();
+    void allPwmFansChanged();
 };
 
 #endif // LOADER_H
