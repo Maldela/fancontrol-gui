@@ -5,16 +5,16 @@ set(LIB_SRCS src/hwmon.cpp
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
 			  KF5::Auth
 			  KF5::ConfigCore)
+
+set(LIB_PUBLIC_LIBRARIES Qt5::Core)
               
 if(NOT NO_SYSTEMD)
 
     set(LIB_SRCS ${LIB_SRCS}
                  src/systemdcommunicator.cpp)
 
-    set(LIB_HEADER ${LIB_HEADER}
-                   src/systemdcommunicator.h)
-
-    set(LIB_PUBLIC_LIBRARIES Qt5::DBus)
+    set(LIB_PUBLIC_LIBRARIES ${LIB_PUBLIC_LIBRARIES}
+			     Qt5::DBus)
 
 endif(NOT NO_SYSTEMD)
 
