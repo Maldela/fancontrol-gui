@@ -55,7 +55,7 @@ Item {
         RowLayout {
             width: parent.width
 
-            Text {
+            Label {
                 Layout.preferredWidth: root.textWidth
                 clip: true
                 text: i18n("Interval:")
@@ -74,7 +74,7 @@ Item {
         RowLayout {
             width: parent.width
 
-            Text {
+            Label {
                 Layout.preferredWidth: root.textWidth
                 clip: true
                 text: i18n("Minimum temperature for fan graphs:")
@@ -93,7 +93,7 @@ Item {
         RowLayout {
             width: parent.width
 
-            Text {
+            Label {
                 Layout.preferredWidth: root.textWidth
                 clip: true
                 text: i18n("Maximum temperature for fan graphs:")
@@ -113,7 +113,7 @@ Item {
         RowLayout {
             width: parent.width
 
-            Text {
+            Label {
                 Layout.preferredWidth: root.textWidth
                 clip: true
                 text: i18n("Unit:")
@@ -137,7 +137,7 @@ Item {
             sourceComponent: RowLayout {
                 width: column.width
 
-                Text {
+                Label {
                     Layout.preferredWidth: root.textWidth
                     clip: true
                     text: i18n("Name of the fancontrol systemd service:")
@@ -159,7 +159,7 @@ Item {
             sourceComponent: RowLayout {
                 width: column.width
 
-                Text {
+                Label {
                     Layout.preferredWidth: root.textWidth
                     clip: true
                     text: i18n("Fancontrol systemd service autostart:")

@@ -18,7 +18,8 @@
  */
 
 import QtQuick 2.4
-import QtQuick.Layouts 1.1
+import QtQuick.Layouts 1.2
+import QtQuick.Controls 1.4
 
 Rectangle {
     property Item canvas: parent
@@ -62,12 +63,12 @@ Rectangle {
         visible: pwmMouse.containsMouse || drag.active
 
         Column {
-            Text {
+            Label {
                 id: pwm
                 font.pointSize: 9
                 text: Math.round(canvas.scalePwm(root.centerY) / 2.55) + '%'
             }
-            Text {
+            Label {
                 id: temp
                 font.pointSize: 9
                 text: Math.round(canvas.scaleTemp(root.centerX)) + '°'

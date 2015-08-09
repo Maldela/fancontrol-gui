@@ -48,7 +48,7 @@ class FancontrolKCM : public ConfigModule
     
 public:
     
-    explicit FancontrolKCM(QObject *parent, const QVariantList &args);
+    explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
     
     Loader *loader() const { return m_loader; }
         

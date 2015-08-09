@@ -18,7 +18,7 @@
  */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
+import QtQuick.Controls 1.4
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 
 ScrollView {
@@ -59,5 +59,12 @@ ScrollView {
                 unit: scrollView.unit
             }
         }
+    }
+    
+    Label {
+	anchors.margins: 10
+	visible: repeater.fans.length == 0
+	text: i18n("There are no pwm capable fans in your system.")
+	font.bold: true
     }
 }

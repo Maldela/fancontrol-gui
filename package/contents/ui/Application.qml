@@ -157,7 +157,7 @@ ApplicationWindow {
     }
 
     statusBar: StatusBar {
-        Text {
+        Label {
             property string systemdError: gui.hasSystemdCommunicator() ? gui.systemdCom.error : ""
             property string loaderError: gui.loader.error
 

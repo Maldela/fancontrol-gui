@@ -18,8 +18,7 @@
  */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import "../scripts/arrayfunctions.js" as ArrayFunctions
@@ -138,7 +137,7 @@ Rectangle {
             color: collapseMouseArea.containsMouse ? "red" : "transparent"
             radius: width / 2
 
-            Text {
+            Label {
                 anchors.fill: parent
                 text: root.state == "minimized" ? "-" : "X"
                 color: collapseMouseArea.containsMouse ? "black" : "red"
@@ -354,7 +353,7 @@ Rectangle {
                 model: ArrayFunctions.names(loader.hwmons)
                 enabled: hasTempCheckBox.checked
             }
-            Text {
+            Label {
                 text: "/"
                 color: enabled ? palette.text : disabledPalette.text
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -393,7 +392,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            Text {
+            Label {
                 text: "Pwm value for fan to start:"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
@@ -414,7 +413,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            Text {
+            Label {
                 text: "Test start and stop values"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled

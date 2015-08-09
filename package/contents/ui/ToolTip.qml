@@ -21,16 +21,16 @@ import QtQuick 2.4
 import "../scripts/coordinates.js" as Coordinates
 
 Rectangle {
-    property alias text: text.text
-    property alias textColor: text.color
+    property alias text: label.text
+    property alias textColor: label.color
     property alias backgroundColor: rect.color
     property int delay: 1000
     property Item target: parent
     readonly property bool hovered: target.hovered
 
     id: rect
-    width: text.width + 20
-    height: text.height + 10
+    width: label.width + 20
+    height: label.height + 10
     anchors.top: target.bottom
     anchors.horizontalCenter: target.horizontalCenter
     anchors.horizontalCenterOffset: Math.max(0, width/2 - (Coordinates.absoluteCoordinatesOf(target).x+target.width/2))
@@ -53,8 +53,8 @@ Rectangle {
         }
     }
 
-    Text {
-        id: text
+    Label {
+        id: label
         anchors.centerIn: parent
         color: palette.highlightedText
     }

@@ -48,7 +48,7 @@ RowLayout {
                 id: column
                 anchors.fill: parent
 
-                Text {
+                Label {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: hwmon.name
                     horizontalAlignment: Text.horizontalCenter
@@ -60,14 +60,14 @@ RowLayout {
                     RowLayout {
                         width: parent.width
 
-                        Text {
+                        Label {
                             anchors.left: parent.left
                             anchors.leftMargin: padding
                             Layout.maximumWidth: parent.width - rpmValue.width - padding*2
                             clip: true
                             text: "Fan " + (index+1) + " RPM : "
                         }
-                        Text {
+                        Label {
                             id: rpmValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding
@@ -81,14 +81,14 @@ RowLayout {
                     RowLayout {
                         width: parent.width
 
-                        Text {
+                        Label {
                             anchors.left: parent.left
                             anchors.leftMargin: padding
                             text: hwmon.temps[index].name + ": "
                             Layout.maximumWidth: parent.width - tempValue.width - padding*2
                             clip: true
                         }
-                        Text {
+                        Label {
                             id: tempValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding

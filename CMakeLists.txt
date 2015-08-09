@@ -20,6 +20,10 @@ find_package(ECM REQUIRED)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 
+#Find Qt5
+find_package(Qt5Core REQUIRED)
+
+
 #Find KF5
 find_package(KF5 COMPONENTS I18n Package REQUIRED)
 

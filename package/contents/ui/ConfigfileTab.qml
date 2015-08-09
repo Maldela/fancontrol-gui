@@ -28,7 +28,7 @@ ColumnLayout {
     anchors.fill: parent
     anchors.topMargin: 5
 
-    Text {
+    Label {
         anchors.top: parent.top
         text: loader ? decodeURIComponent(loader.configUrl) : ""
     }
