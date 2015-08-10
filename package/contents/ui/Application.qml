@@ -33,21 +33,17 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: i18n("File")
-            MenuItem {
-                text: i18n("Load configuration file")
-                onTriggered: openFileDialog.open()
-            }
-            MenuItem {
-                text: i18n("Save configuration file")
-                onTriggered: gui.loader.save()
-            }
-            MenuItem {
-                text: i18n("Save configuration file as")
-                onTriggered: saveFileDialog.open()
-            }
+            MenuItem { action: loadAction }
+            MenuItem { action: saveAction }
+            MenuItem { 
+		text: i18n("Save configuration file as")
+		onTriggered: saveFileDialog.open()
+		shortcut: StandardKey.SaveAs
+	    }
             MenuItem {
                 text: i18n("Exit")
                 onTriggered: Qt.quit()
+		shortcut: StandardKey.Quit
             }
         }
     }
@@ -56,31 +52,14 @@ ApplicationWindow {
         RowLayout {
             anchors.fill: parent
 
-            ToolButton {
-                iconName: "document-open"
-                onClicked: openFileDialog.open()
-
-                ToolTip {
-                    text: i18n("Load configuration file")
-                }
-            }
-            ToolButton {
-                iconName: "document-save"
-                onClicked: gui.loader.save()
-
-                ToolTip {
-                    text: i18n("Save configuration file")
-                }
-            }
+            ToolButton { action: loadAction }
+            ToolButton { action: saveAction }
             Loader {
                 active: gui.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
                     iconName: gui.systemdCom.serviceActive ? "system-reboot" : "system-run"
                     onClicked: gui.systemdCom.serviceActive ? gui.systemdCom.restartService() : gui.systemdCom.serviceActive = true;
-
-                    ToolTip {
-                        text: gui.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
-                    }
+		    tooltip: gui.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
             }
             Loader {
@@ -89,10 +68,7 @@ ApplicationWindow {
                     iconName: "system-shutdown"
                     enabled: gui.systemdCom.serviceActive
                     onClicked: gui.systemdCom.serviceActive = false;
-                    
-                    ToolTip {
-                        text: i18n("Stop fancontrol")
-                    }
+                    tooltip: i18n("Stop fancontrol")
                 }
             }
             Item {
@@ -177,7 +153,24 @@ ApplicationWindow {
             }
         }
     }
-
+    
+    Action {
+	id: loadAction
+        text: i18n("Load configuration file")
+        iconName: "document-open"
+	onTriggered: openFileDialog.open()
+	tooltip: i18n("Load configuration file")
+	shortcut: StandardKey.Open
+    }
+    Action {
+	id: saveAction
+	text: i18n("Save configuration file")
+        onTriggered: gui.loader.save()
+        iconName: "document-save"
+	tooltip: i18n("Save configuration file")
+	shortcut: StandardKey.Save
+    }
+    
     FileDialog {
         id: openFileDialog
         title: i18n("Please choose a configuration file")
@@ -190,7 +183,6 @@ ApplicationWindow {
             gui.loader.load(fileUrl);
         }
     }
-
     FileDialog {
         id: saveFileDialog
         title: i18n("Save configuration file as")
