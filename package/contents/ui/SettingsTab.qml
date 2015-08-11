@@ -39,7 +39,7 @@ Item {
 
     onIntervalChanged: {
         if (loader !== null) {
-            var fans = ArrayFunctions.allPwmFans(loader.hwmons);
+            var fans = loader.allPwmFans;
             for (var i=0; i<fans.length; i++) {
                 fans[i].interval = interval;
             }
