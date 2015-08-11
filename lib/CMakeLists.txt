@@ -30,6 +30,6 @@ generate_export_header(fancontrol_gui_lib)
 
 if(INSTALL_SHARED)
 
-    install(TARGETS fancontrol_gui_lib LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS fancontrol_gui_lib ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
     
 endif(INSTALL_SHARED)

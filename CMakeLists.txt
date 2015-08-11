@@ -94,10 +94,6 @@ if(INSTALL_SHARED)
 
 
     #translations
-    if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
-    
-	ki18n_install(po)
-	
-    endif (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
-    
+    ki18n_install(po)
+	    
 endif(INSTALL_SHARED)
