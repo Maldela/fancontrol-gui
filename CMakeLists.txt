@@ -94,22 +94,10 @@ if(INSTALL_SHARED)
 
 
     #translations
-    FILE(GLOB MO_FILES po/*.mo)
-
-    set(catalogname kcm_fancontrol)
-
-    foreach(MO_FILE ${MO_FILES})
+    if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
+    
+	ki18n_install(po)
 	
-	GET_FILENAME_COMPONENT(_moFileName ${MO_FILE} NAME)
-	STRING(REGEX REPLACE "^${catalogname}_?" "" _langCode ${_moFileName} )
-	STRING(REGEX REPLACE "\\.mo$" "" _langCode ${_langCode} )
-
-	if(_langCode)
-	
-	    install(FILES ${MO_FILE} DESTINATION ${LOCALE_INSTALL_DIR}/${_langCode}/LC_MESSAGES/ RENAME ${catalogname}.mo)
-	
-	endif(_langCode)
-
-    endforeach(MO_FILE ${MO_FILES})
+    endif (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
     
 endif(INSTALL_SHARED)

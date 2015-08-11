@@ -1,6 +1,6 @@
 #!/bin/sh
 BASEDIR="../"	                                        # root of translatable sources
-PROJECT="fancontrol-gui"	                        # project name
+PROJECT="kcm_fancontrol"	                        # project name
 BUGADDR="http://github.com/maldela/fancontrol-gui"	# MSGID-Bugs
 WDIR=`pwd`		                                # working dir
  

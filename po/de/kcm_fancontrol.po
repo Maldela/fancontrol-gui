@@ -1,0 +1,157 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Malte Veerman <maldela@halloarsch.de>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: fancontrol-gui\n"
+"Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
+"POT-Creation-Date: 2015-08-11 14:56+0200\n"
+"PO-Revision-Date: 2015-08-09 21:50+0100\n"
+"Last-Translator: Malte Veerman <maldela@halloarsch.de>\n"
+"Language-Team: German <kde-i18n-de@kde.org>\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 2.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: fancontrol-gui/src/main.cpp:38 package/contents/ui/Application.qml:28
+msgid "Fancontrol-GUI"
+msgstr "Fancontrol-GUI"
+
+#: fancontrol-gui/src/main.cpp:40
+msgid "Graphical user interface for fancontrol"
+msgstr "Graphische Benutzeroberfläche für fanontrol"
+
+#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:49
+msgid "Malte Veerman"
+msgstr "Malte Veerman"
+
+#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:49
+msgid "Main Developer"
+msgstr "Hauptentwickler"
+
+#: kcm/src/fancontrolkcm.cpp:41
+msgid "Fancontrol-KCM"
+msgstr "Fancontrol-KCM"
+
+#: kcm/src/fancontrolkcm.cpp:43
+msgid "KDE Fancontrol Module"
+msgstr "KDE Fancontrol Modul"
+
+#: package/contents/ui/Application.qml:35
+msgid "File"
+msgstr "Datei"
+
+#: package/contents/ui/Application.qml:39
+#: package/contents/ui/Application.qml:188
+msgid "Save configuration file as"
+msgstr "Konfigurationsdatei speichern unter..."
+
+#: package/contents/ui/Application.qml:44
+msgid "Exit"
+msgstr "Schließen"
+
+#: package/contents/ui/Application.qml:62
+msgid "Restart fancontrol"
+msgstr "Fancontrol neustarten"
+
+#: package/contents/ui/Application.qml:62
+msgid "Start fancontrol"
+msgstr "Fancontrol starten"
+
+#: package/contents/ui/Application.qml:71
+msgid "Stop fancontrol"
+msgstr "Fancontrol stoppen"
+
+#: package/contents/ui/Application.qml:90
+#: package/contents/ui/SettingsTab.qml:33
+#: package/contents/ui/SettingsTab.qml:127
+msgid "Celsius"
+msgstr "Celsius"
+
+#: package/contents/ui/Application.qml:98 package/contents/ui/KCM.qml:41
+msgid "Sensors"
+msgstr "Sensoren"
+
+#: package/contents/ui/Application.qml:104 package/contents/ui/KCM.qml:47
+msgid "PwmFans"
+msgstr "PwmLüfter"
+
+#: package/contents/ui/Application.qml:114 package/contents/ui/KCM.qml:57
+msgid "Configfile"
+msgstr "Konfigurationsdatei"
+
+#: package/contents/ui/Application.qml:120 package/contents/ui/KCM.qml:63
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: package/contents/ui/Application.qml:159
+#: package/contents/ui/Application.qml:162
+msgid "Load configuration file"
+msgstr "Konfigurationsdatei öffnen"
+
+#: package/contents/ui/Application.qml:167
+#: package/contents/ui/Application.qml:170
+msgid "Save configuration file"
+msgstr "Konfigurationsdatei speichern"
+
+#: package/contents/ui/Application.qml:176
+msgid "Please choose a configuration file"
+msgstr "Konfigurationsdatei auswählen"
+
+#: package/contents/ui/PwmFansTab.qml:67
+msgid "There are no pwm capable fans in your system."
+msgstr "Es gibt keine pwm-fähigen Lüfter in ihrem System."
+
+#: package/contents/ui/SettingsTab.qml:61
+msgid "Interval:"
+msgstr "Intervall:"
+
+#: package/contents/ui/SettingsTab.qml:80
+msgid "Minimum temperature for fan graphs:"
+msgstr "Minimale Temperatur für Lüftergraphen:"
+
+#: package/contents/ui/SettingsTab.qml:99
+msgid "Maximum temperature for fan graphs:"
+msgstr "Maximale Temperatur für Lüftergraphen:"
+
+#: package/contents/ui/SettingsTab.qml:119
+msgid "Unit:"
+msgstr "Einheit:"
+
+#: package/contents/ui/SettingsTab.qml:127
+msgid "Kelvin"
+msgstr "Kelvin"
+
+#: package/contents/ui/SettingsTab.qml:127
+msgid "Fahrenheit"
+msgstr "Fahrenheit"
+
+#: package/contents/ui/SettingsTab.qml:143
+msgid "Name of the fancontrol systemd service:"
+msgstr "Name des fancontrol systemd services:"
+
+#: package/contents/ui/SettingsTab.qml:165
+msgid "Fancontrol systemd service autostart:"
+msgstr "Fancontrol systemd service Autostart:"
+
+#: package/contents/ui/SettingsTab.qml:173
+msgid "disabled"
+msgstr "deaktiviert"
+
+#: package/contents/ui/SettingsTab.qml:173
+msgid "enabled"
+msgstr "aktiviert"
+
+#: po/rc.cpp:1 rc.cpp:1
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Malte Veerman"
+
+#: po/rc.cpp:2 rc.cpp:2
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "maldela@halloarsch.de"

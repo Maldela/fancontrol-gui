@@ -30,6 +30,6 @@ generate_export_header(fancontrol_gui_lib)
 
 if(INSTALL_SHARED)
 
-    install(TARGETS fancontrol_gui_lib LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+    install(TARGETS fancontrol_gui_lib LIBRARY DESTINATION ${LIB_INSTALL_DIR})
     
 endif(INSTALL_SHARED)
