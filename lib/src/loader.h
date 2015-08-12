@@ -42,18 +42,18 @@ class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
 
 public:
 
-    explicit Loader(QObject *parent = 0);
+    explicit Loader(QObject *parent = Q_NULLPTR);
     
     Q_INVOKABLE void parseHwmons();
-    Q_INVOKABLE void load(const QUrl & = QUrl());
-    Q_INVOKABLE void save(const QUrl & = QUrl());
+    Q_INVOKABLE bool load(const QUrl & = QUrl());
+    Q_INVOKABLE bool save(const QUrl & = QUrl());
     Q_INVOKABLE void testFans();
     QUrl configUrl() const { return m_configUrl; }
     QString configFile() const { return m_configFile; }
     QList<QObject *> hwmons() const;
     QList<QObject *> allPwmFans() const;
-    int interval() { return m_interval; }
-    void setInterval(int interval) { if (interval != m_interval) { m_interval = interval; emit intervalChanged(m_interval*1000); createConfigFile(); } }
+    int interval() const { return m_interval; }
+    void setInterval(int interval, bool writeNewConfig = true);
     Hwmon * hwmon(int i) { return m_hwmons.value(i, Q_NULLPTR); }
     QString error() const { return m_error; }
     
@@ -73,8 +73,10 @@ protected slots:
 
 
 protected:
-
-    bool m_parsed;
+    
+    void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
+    void success() { setError("Success"); }
+    
     int m_interval;
     QList<Hwmon *> m_hwmons;
     QUrl m_configUrl;
@@ -88,7 +90,7 @@ signals:
     void configUrlChanged();
     void configFileChanged();
     void hwmonsChanged();
-    void intervalChanged(int);
+    void intervalChanged();
     void errorChanged();
     void sensorsUpdateNeeded();
     void allPwmFansChanged();

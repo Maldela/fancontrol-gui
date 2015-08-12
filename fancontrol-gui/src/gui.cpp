@@ -23,7 +23,13 @@
 
 #include <QtQml>
 
-GUI::GUI(QObject *parent) : QObject(parent)
+GUI::GUI(QObject *parent) : QObject(parent),
+    
+#ifndef NO_SYSTEMD
+    m_com(new SystemdCommunicator(this)),
+#endif
+
+    m_loader(new Loader(this))
 {
     m_loader->load(QUrl::fromLocalFile("/etc/fancontrol"));
     

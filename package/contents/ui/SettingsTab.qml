@@ -37,15 +37,6 @@ Item {
     anchors.fill: parent
     anchors.topMargin: 5
 
-    onIntervalChanged: {
-        if (loader !== null) {
-            var fans = loader.allPwmFans;
-            for (var i=0; i<fans.length; i++) {
-                fans[i].interval = interval;
-            }
-        }
-    }
-
     Column {
         id: column
         anchors.fill: parent
@@ -68,7 +59,7 @@ Item {
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 text: interval
-                onTextChanged: if (text != "") loader.interval = parseInt(text)
+                onTextChanged: if (text && text != "0") loader.interval = parseInt(text)
             }
         }
         RowLayout {

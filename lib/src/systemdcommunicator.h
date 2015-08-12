@@ -47,8 +47,8 @@ public:
     void setServiceEnabled(bool enabled);
     void setServiceActive(bool active);
     QString error() const { return m_error; }
-    Q_INVOKABLE void dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
-    Q_INVOKABLE void restartService();
+    Q_INVOKABLE bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
+    Q_INVOKABLE bool restartService();
 
 
 signals:
@@ -65,10 +65,13 @@ protected slots:
     
     
 protected:
+    
+    void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
+    void success() { setError("Success"); }
 
     QString m_serviceName;
     QString m_serviceObjectPath;
-    QString m_error = "Success";
+    QString m_error;
     QDBusInterface *m_managerInterface = new QDBusInterface("org.freedesktop.systemd1",
                                                             "/org/freedesktop/systemd1",
                                                             "org.freedesktop.systemd1.Manager",

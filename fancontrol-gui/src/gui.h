@@ -55,13 +55,12 @@ public:
 
     
 protected:
-    
-    Loader *const m_loader = new Loader(this);
-    
+        
 #ifndef NO_SYSTEMD
-    SystemdCommunicator *const m_com = new SystemdCommunicator(this);
+    SystemdCommunicator *const m_com;
 #endif
     
+    Loader *const m_loader;    
 };
 
 #endif // GUI_H

@@ -30,6 +30,7 @@ using namespace KAuth;
 SystemdCommunicator::SystemdCommunicator(QObject *parent) : QObject(parent)
 {
     setServiceName("fancontrol");
+    m_error = "Success";
 }
 
 void SystemdCommunicator::setServiceName(const QString &name)
@@ -133,9 +134,8 @@ bool SystemdCommunicator::serviceEnabled()
     if (serviceExists())
     {
         if (m_serviceInterface->property("UnitFileState").toString() == "enabled")
-        {
             return true;
-        }
+
     }
     return false;
 }
@@ -144,49 +144,33 @@ void SystemdCommunicator::setServiceEnabled(bool enabled)
 {
     if (serviceExists() && enabled != serviceEnabled())
     {
-        QVariantList arguments;
+	QString action = enabled ? "EnableUnitFiles" : "DisableUnitFiles";
         QStringList files = QStringList() << m_serviceName + ".service";
+        QVariantList arguments = QVariantList() << files << false;
+	if (enabled)
+	    arguments << true;
 
-        if (enabled)
-        {
-            arguments << files << false << true;
-            dbusAction("EnableUnitFiles", arguments);
-            dbusAction("Reload");
+	if (dbusAction(action, arguments))
+	{
+	    dbusAction("Reload");
+            emit serviceEnabledChanged();
         }
-        else
-        {
-            arguments << files << false;
-            dbusAction("DisableUnitFiles", arguments);
-            dbusAction("Reload");
-        }
-        emit serviceEnabledChanged();
     }
 }
 
 void SystemdCommunicator::setServiceActive(bool active)
 {
-    if (serviceExists())
+    if (serviceExists() && active != serviceActive())
     {
-        if (active && !serviceActive())
-        {
-            QVariantList args;
-            args << m_serviceName + ".service" << "replace";
-            dbusAction("ReloadOrRestartUnit", args);
-            emit serviceActiveChanged();
-        }
-        else if (!active && serviceActive()) 
-        {
-            QVariantList args;
-            args << m_serviceName + ".service" << "replace";
-            dbusAction("StopUnit", args);
-            emit serviceActiveChanged();
-        }
-        else 
-            qDebug() << "ServiceActive already " << active;
+	QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
+	QString action = active ? "ReloadOrRestartUnit" : "StopUnit";
+	
+	if (dbusAction(action, args))
+		emit serviceActiveChanged();
     }
 }
 
-void SystemdCommunicator::dbusAction(const QString &method, const QVariantList &arguments)
+bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &arguments)
 {
     QDBusMessage dbusreply;
 
@@ -200,7 +184,6 @@ void SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
-#ifndef NO_KF5_AUTH
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
             Action action("fancontrol.gui.helper.action");
@@ -214,36 +197,35 @@ void SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             ExecuteJob *reply = action.execute();
 
             if (!reply->exec())
-            {
-                m_error = reply->errorString();
-                emit errorChanged();
-            }
+	    {
+                setError(reply->errorString());
+		return false;
+	    }
             else
-            {
-                m_error = method + " succeeded";
-                emit errorChanged();
-            }
-            return;
+	    {
+                success();
+		return true;
+	    }
         }
-#endif
-        m_error = dbusreply.errorMessage();
-        emit errorChanged();
+        setError(dbusreply.errorMessage());
+        return false;
     }
-    else
-    {
-        m_error = method + " succeeded";
-        emit errorChanged();
-    }
+    
+    success();
+    return true;
 }
 
-void SystemdCommunicator::restartService()
+bool SystemdCommunicator::restartService()
 {
     if (serviceExists())
     {
         QVariantList args;
         args << m_serviceName + ".service" << "replace";
-        dbusAction("ReloadOrRestartUnit", args);
+        return dbusAction("ReloadOrRestartUnit", args);
     }
+    
+    setError("Service doesn't exist");
+    return false;
 }
 
 void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchanged, QStringList)

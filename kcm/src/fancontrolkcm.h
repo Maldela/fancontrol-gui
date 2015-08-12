@@ -49,6 +49,7 @@ class FancontrolKCM : public ConfigModule
 public:
     
     explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
+    ~FancontrolKCM() Q_DECL_OVERRIDE;
     
     Loader *loader() const { return m_loader; }
         
@@ -63,18 +64,16 @@ public slots:
     
     void load() Q_DECL_OVERRIDE;
     void save() Q_DECL_OVERRIDE;
-//     void defaults() { load(); }
-    
-    void setNeedsSave(bool needs = true) { ConfigModule::setNeedsSave(needs); qDebug() << "Needs save: " << needs; }
-    
+    void defaults() Q_DECL_OVERRIDE;
+        
     
 protected:
-    
-    Loader *const m_loader = new Loader(this);
-    
+        
 #ifndef NO_SYSTEMD
-    SystemdCommunicator *const m_communicator = new SystemdCommunicator(this);
+    SystemdCommunicator *const m_communicator;
 #endif
+    
+    Loader *const m_loader;
 };
 
 #endif // FANCONTROLKCM_H

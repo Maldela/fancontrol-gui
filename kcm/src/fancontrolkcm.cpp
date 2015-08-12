@@ -33,10 +33,15 @@
 
 K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
 
-FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args) : ConfigModule(parent, args)
-{
-    KLocalizedString::setApplicationDomain("fancontrol-gui");
+FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
+    : ConfigModule(parent, args),
 
+#ifndef NO_SYSTEMD
+    m_communicator(new SystemdCommunicator(this)),
+#endif
+
+    m_loader(new Loader(this))
+{
     KAboutData *about = new KAboutData("kcm_fancontrol",
                                        i18n("Fancontrol-KCM"),
                                        "0.1",
@@ -49,10 +54,11 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args) : Config
     about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de"); 
     setAboutData(about);
     
-    setButtons(FancontrolKCM::Apply);
+    setButtons(Apply | Default);
     setAuthActionName("fancontrol.gui.helper.action");
     
-    connect(m_loader, SIGNAL(configFileChanged()), this, SLOT(setNeedsSave()));
+    connect(m_loader, &Loader::configFileChanged, [this] () { setNeedsSave(true);
+							      qDebug() << "Changes made..."; });
     
     qmlRegisterType<Loader>();
     qmlRegisterType<Hwmon>();
@@ -63,23 +69,39 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args) : Config
 #ifndef NO_SYSTEMD
     qmlRegisterType<SystemdCommunicator>();
 #endif
+    
+}
+
+FancontrolKCM::~FancontrolKCM() 
+{
 }
 
 void FancontrolKCM::save()
 {
     qDebug() << "saving...";
-    setNeedsSave(false);
-    m_loader->save();
-    
+    setNeedsSave(!m_loader->save()
+
 #ifndef NO_SYSTEMD
-    m_communicator->restartService();
+		 || !m_communicator->restartService()
 #endif
+
+		);
 }
 
 void FancontrolKCM::load()
 {
-    setNeedsSave(false);
-    m_loader->load(QUrl::fromLocalFile("/etc/fancontrol"));
+    setNeedsSave(!m_loader->load(QUrl::fromLocalFile("/etc/fancontrol")));
+    qDebug() << "Loaded config file";
+}
+
+void FancontrolKCM::defaults() 
+{
+    
+#ifndef NO_SYSTEMD
+    m_communicator->setServiceEnabled(false);
+    m_communicator->setServiceActive(false);    
+#endif
+    
 }
 
 
