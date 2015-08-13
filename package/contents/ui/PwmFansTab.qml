@@ -53,7 +53,7 @@ ScrollView {
                 width: 1000 * size
                 hwRatio: 0.8
                 fan: repeater.fans[index]
-                loader: loader
+                loader: scrollView.loader
                 minTemp: scrollView.minTemp
                 maxTemp: scrollView.maxTemp
                 unit: scrollView.unit

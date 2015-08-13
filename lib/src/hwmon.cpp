@@ -23,10 +23,10 @@
 #include <QtQml>
 #include <QDebug>
 
-Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent)
+Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
+    m_parent(parent),
+    m_path(path)
 {
-    m_parent = parent;
-    m_path = path;
     m_index = path.split('/').last().remove("hwmon").toInt();
     QFile nameFile(path + "/name");
     if (nameFile.open(QFile::ReadOnly))

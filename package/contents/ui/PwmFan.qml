@@ -346,7 +346,7 @@ Rectangle {
                 Layout.fillWidth: true
             }
             ComboBox {
-                property var hwmon: loader.hwmons[currentIndex]
+                property QtObject hwmon: loader.hwmons[currentIndex]
 
                 id: hwmonBox
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -367,11 +367,11 @@ Rectangle {
                 model: ArrayFunctions.names(hwmonBox.hwmon.temps)
                 enabled: hasTempCheckBox.checked
                 onCurrentIndexChanged: { 
-                    if (hasTempCheckBox.checked)
+                    if (hasTempCheckBox.checked && hwmonBox.hwmon)
                         fan.temp = hwmonBox.hwmon.temps[currentIndex];
                 }
                 onModelChanged: {
-                    if (hasTempCheckBox.checked)
+                    if (hasTempCheckBox.checked && hwmonBox.hwmon)
                         fan.temp = hwmonBox.hwmon.temps[currentIndex];
                 }
             }
