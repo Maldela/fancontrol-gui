@@ -22,11 +22,9 @@ import QtQuick.Controls 1.4
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 
 ScrollView {
-    property QtObject loader
+    property QtObject baseObject
+    property QtObject loader: baseObject ? baseObject.loader : null
     property real size: 1.0
-    property real minTemp: 30.0
-    property real maxTemp: 90.0
-    property string unit: "Celsius"
 
     id: scrollView
     anchors.fill: parent
@@ -54,9 +52,9 @@ ScrollView {
                 hwRatio: 0.8
                 fan: repeater.fans[index]
                 loader: scrollView.loader
-                minTemp: scrollView.minTemp
-                maxTemp: scrollView.maxTemp
-                unit: scrollView.unit
+                minTemp: baseObject.minTemp
+                maxTemp: baseObject.maxTemp
+                unit: baseObject.unit
             }
         }
     }

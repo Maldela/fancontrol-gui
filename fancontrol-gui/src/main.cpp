@@ -25,7 +25,7 @@
 #include <KPackage/PackageLoader>
 #include <KAboutData>
 
-#include "gui.h"
+#include "../lib/src/guibase.h"
 
 
 int main(int argc, char *argv[])
@@ -52,8 +52,9 @@ int main(int argc, char *argv[])
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
         
-    GUI gui;
-    engine.rootContext()->setContextProperty("gui", &gui);
+    GUIBase base;
+    base.loader()->load();
+    engine.rootContext()->setContextProperty("base", &base);
     
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");
     package.setDefaultPackageRoot("kpackage/kcms");

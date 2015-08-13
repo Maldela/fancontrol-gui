@@ -20,7 +20,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
-import QtQuick.Window 2.2
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/math.js" as MoreMath
 import "../scripts/units.js" as Units
@@ -34,7 +33,7 @@ Rectangle {
     property int margin: 5
     property int minimizeDuration: 400
     property real hwRatio
-    property string unit: "Celsius"
+    property int unit: 0
 
     id: root
     height: width * hwRatio
@@ -54,8 +53,9 @@ Rectangle {
         canvas.requestPaint();
     }
     
-    onFanChanged: update();
-    onLoaderChanged: update();
+    onFanChanged: update()
+    onLoaderChanged: update()
+    onUnitChanged: update()
     
     Connections {
         target: loader
@@ -156,10 +156,11 @@ Rectangle {
     }
 
     Canvas {
-        property int leftPadding: 40 * Screen.devicePixelRatio
-        property int rightPadding: 20 * Screen.devicePixelRatio
-        property int topPadding: 10 * Screen.devicePixelRatio
-        property int bottomPadding: 20 * Screen.devicePixelRatio
+        property int fontSize: Math.max(9, Math.min(height / 20, 20))
+        property int leftPadding: fontSize * 4
+        property int rightPadding: fontSize * 2
+        property int topPadding: fontSize
+        property int bottomPadding: fontSize * 2
         property int plotWidth: width - leftPadding - rightPadding
         property int plotHeight: height - topPadding - bottomPadding
         property alias minTemp: root.minTemp
@@ -183,7 +184,7 @@ Rectangle {
             id: currentPwm
             x: parent.scaleX(fan.temp ? fan.temp.value : minTemp) - width/2
             y: parent.scaleY(fan.pwm) - height/2
-            width: 7
+            width: canvas.fontSize
             height: width
             radius: width / 2
             color: "black"
@@ -192,6 +193,7 @@ Rectangle {
         PwmPoint {
             id: stopPoint
             color: "blue"
+            size: canvas.fontSize
             drag.maximumX: Math.min(canvas.scaleX(canvas.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
             drag.minimumY: Math.max(canvas.scaleY(canvas.scalePwm(maxPoint.y)-1), maxPoint.y+1)
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2
@@ -208,6 +210,7 @@ Rectangle {
         PwmPoint {
             id: maxPoint
             color: "red"
+            size: canvas.fontSize
             drag.minimumX: stopPoint.x
             drag.maximumY: stopPoint.y
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2
@@ -240,6 +243,7 @@ Rectangle {
 
         onPaint: {
             var c = canvas.getContext("2d");
+            c.font = canvas.fontSize + "px sans-serif";
 
             c.clearRect(0, 0, width, height);
             c.fillStyle = palette.base;
@@ -299,7 +303,7 @@ Rectangle {
             var convertedMaxTemp = Units.fromCelsius(maxTemp, unit);
             for (i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
                 var x = scaleX(Units.toCelsius(i, unit));
-                c.fillText(i + '°', x, height-15);
+                c.fillText(i + '°', x, topPadding+plotHeight+fontSize/2);
                 if (i != convertedMinTemp) {
                     for (var j=scaleY(255); j<=scaleY(0); j+=20) {
                         c.moveTo(x, j);
@@ -308,7 +312,7 @@ Rectangle {
                     c.stroke();
                 }
             }
-            c.fillText(convertedMaxTemp + '°', scaleX(maxTemp), height-15);
+            c.fillText(convertedMaxTemp + '°', scaleX(maxTemp), topPadding+plotHeight+fontSize/2);
         }
     }
 
@@ -327,59 +331,61 @@ Rectangle {
         visible: root.height >= header.height + height + 2*margin
         opacity: canvas.opacity
         clip: true
-        spacing: 0
+        spacing: 2
 
         RowLayout {
             spacing: 0
-            height: hwmonBox.height
-            anchors.left: parent.left
-            anchors.right: parent.right
+            width: parent.width
 
             CheckBox {
                 id: hasTempCheckBox
-                text: "Controlled by:"
+                text: i18n("Controlled by:")
                 checked: fan.hasTemp
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 onCheckedChanged: fan.hasTemp = checked
             }
-            Item {
+            Row {    
                 Layout.fillWidth: true
-            }
-            ComboBox {
+                
+                ComboBox {
                 property QtObject hwmon: loader.hwmons[currentIndex]
 
                 id: hwmonBox
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                width: (parent.width-slash.width) / 2
+                anchors.verticalCenter: parent.verticalCenter
                 model: ArrayFunctions.names(loader.hwmons)
                 enabled: hasTempCheckBox.checked
-            }
-            Label {
-                text: "/"
-                color: enabled ? palette.text : disabledPalette.text
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                verticalAlignment: Text.AlignVCenter
-                enabled: hasTempCheckBox.checked
-                renderType: Text.NativeRendering
-            }
-            ComboBox {
-                id: tempBox
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                model: ArrayFunctions.names(hwmonBox.hwmon.temps)
-                enabled: hasTempCheckBox.checked
-                onCurrentIndexChanged: { 
-                    if (hasTempCheckBox.checked && hwmonBox.hwmon)
-                        fan.temp = hwmonBox.hwmon.temps[currentIndex];
                 }
-                onModelChanged: {
-                    if (hasTempCheckBox.checked && hwmonBox.hwmon)
-                        fan.temp = hwmonBox.hwmon.temps[currentIndex];
+                Label {
+                    id: slash
+                    text: "/"
+                    color: enabled ? palette.text : disabledPalette.text
+                    anchors.verticalCenter: parent.verticalCenter
+                    verticalAlignment: Text.AlignVCenter
+                    enabled: hasTempCheckBox.checked
+                    renderType: Text.NativeRendering
+                }
+                ComboBox {
+                    id: tempBox
+                    width: (parent.width-slash.width) / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    model: ArrayFunctions.names(hwmonBox.hwmon.temps)
+                    enabled: hasTempCheckBox.checked
+                    onCurrentIndexChanged: { 
+                        if (hasTempCheckBox.checked && hwmonBox.hwmon)
+                            fan.temp = hwmonBox.hwmon.temps[currentIndex];
+                    }
+                    onModelChanged: {
+                        if (hasTempCheckBox.checked && hwmonBox.hwmon)
+                            fan.temp = hwmonBox.hwmon.temps[currentIndex];
+                    }
                 }
             }
         }
 
         CheckBox {
             id: fanOffCheckBox
-            text: "Turn Fan off if temp < MINTEMP"
+            text: i18n("Turn Fan off if temp < MINTEMP")
             enabled: hasTempCheckBox.checked
             checked: fan.minPwm == 0
             onCheckedChanged: {
@@ -393,7 +399,7 @@ Rectangle {
             anchors.right: parent.right
 
             Label {
-                text: "Pwm value for fan to start:"
+                text: i18n("Pwm value for fan to start:")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 color: enabled ? palette.text : disabledPalette.text
@@ -414,14 +420,14 @@ Rectangle {
             anchors.right: parent.right
 
             Label {
-                text: "Test start and stop values"
+                text: i18n("Test start and stop values")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 color: enabled ? palette.text : disabledPalette.text
                 renderType: Text.NativeRendering
             }
             Button {
-                text: fan.testing? "Abort" : "Test"
+                text: fan.testing? i18n("Abort") : i18n("Test")
                 anchors.right: parent.right
                 height: hwmonBox.height
                 onClicked: {

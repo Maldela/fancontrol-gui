@@ -1,9 +1,8 @@
-set(Fancontrol_GUI_SRCS src/main.cpp
-                        src/gui.cpp)
+set(Fancontrol_GUI_SRCS src/main.cpp)
 
 set(LIBRARIES fancontrol_gui_lib
-	      Qt5::Widgets
-	      KF5::Declarative
+              Qt5::Widgets
+              KF5::Declarative
               KF5::I18n)
               
 find_package(Qt5Widgets REQUIRED)

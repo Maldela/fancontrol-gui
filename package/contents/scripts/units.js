@@ -18,7 +18,7 @@
  */
 
 function round(number, dec) {
-    if (!dec) dec = 5;
+    if (!dec || dec == 0) return Math.round(number);
     return Math.round(number*10*dec) / (10*dec);
 }
 

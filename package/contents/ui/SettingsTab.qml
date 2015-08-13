@@ -24,13 +24,11 @@ import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
 
 Item {
-    property QtObject loader
-    property QtObject systemdCom
-    property real minTemp: 30.0
-    property real maxTemp: 90.0
+    property QtObject baseObject
+    property QtObject loader: baseObject ? baseObject.loader : null
+    property QtObject systemdCom: baseObject ? baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null : null
     property int interval: loader ? loader.interval : 1
     property int padding: 10
-    property string unit: i18n("Celsius")
     property real textWidth: 0
 
     id: root
@@ -77,8 +75,13 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) minTemp = Units.toCelsius(text, unit)
-                Component.onCompleted: text = Units.fromCelsius(minTemp, unit)
+                onTextChanged: if (activeFocus) baseObject.minTemp = Units.toCelsius(text, baseObject.unit)
+                Component.onCompleted: text = Units.fromCelsius(baseObject.minTemp, baseObject.unit)
+                
+                Connections {
+                    target: baseObject
+                    onUnitChanged: minTempValue.text = Units.fromCelsius(baseObject.minTemp, baseObject.unit)
+                }
             }
         }
         RowLayout {
@@ -96,9 +99,13 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                text: Units.fromCelsius(maxTemp, unit.currentText)
-                onTextChanged: if (activeFocus) maxTemp = Units.toCelsius(text, unit)
-                Component.onCompleted: text = Units.fromCelsius(maxTemp, unit)
+                onTextChanged: if (activeFocus) baseObject.maxTemp = Units.toCelsius(text, baseObject.unit)
+                Component.onCompleted: text = Units.fromCelsius(baseObject.maxTemp, baseObject.unit)
+                
+                Connections {
+                    target: baseObject
+                    onUnitChanged: maxTempValue.text = Units.fromCelsius(baseObject.maxTemp, baseObject.unit)
+                }
             }
         }
         RowLayout {
@@ -116,10 +123,9 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 model: [i18n("Celsius"), i18n("Kelvin"), i18n("Fahrenheit")]
-                currentIndex: find(root.unit)
+                currentIndex: baseObject.unit
                 onCurrentIndexChanged: {
-                    minTempValue.text = Units.fromCelsius(minTemp, currentIndex);
-                    maxTempValue.text = Units.fromCelsius(maxTemp, currentIndex);
+                    baseObject.unit = currentIndex;
                 }
             }
         }
