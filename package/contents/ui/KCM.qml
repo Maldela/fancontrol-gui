@@ -23,10 +23,6 @@ import QtQuick.Controls 1.3
 import org.kde.kcm 1.0
 
 TabView {
-    property real minTemp: 30.0
-    property real maxTemp: 90.0
-    property string unit: "Celsius"
-
     id: tabView
     frameVisible: true
     implicitHeight: 480
@@ -41,11 +37,8 @@ TabView {
     Tab {
         title: i18n("PwmFans")
         PwmFansTab {
-            size: 1
-            minTemp: tabView.minTemp
-            maxTemp: tabView.maxTemp
-            unit: tabView.unit
-            loader: kcm.base.loader
+            size: 0.5
+            baseObject: kcm.base
         }
     }
     Tab {
@@ -57,14 +50,7 @@ TabView {
     Tab {
         title: i18n("Settings")
         SettingsTab {
-            id: settingsTab
-            minTemp: tabView.minTemp
-            maxTemp: tabView.maxTemp
-            onMinTempChanged: tabView.minTemp = minTemp
-            onMaxTempChanged: tabView.maxTemp = maxTemp
-            onUnitChanged: tabView.unit = unit
-            loader: kcm.base.loader
-            systemdCom: kcm.base.hasSystemdCommunicator() ? kcm.base.systemdCom : null
+            baseObject: kcm.base
         }
     }
     

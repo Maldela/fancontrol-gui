@@ -65,7 +65,7 @@ void Loader::parseHwmons()
     {
         Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)), this);
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-	connect(hwmon, SIGNAL(pwmFansChanged()), this, SLOT(emitAllPwmFansChanged()));
+        connect(hwmon, SIGNAL(pwmFansChanged()), this, SLOT(emitAllPwmFansChanged()));
         connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
         m_hwmons << hwmon;
     }

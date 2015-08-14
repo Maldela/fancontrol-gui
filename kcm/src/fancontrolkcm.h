@@ -39,7 +39,7 @@ public:
     
     explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
     
-    QUIBase *base() const { return m_base; }
+    GUIBase *base() const { return m_base; }
     
     
 public slots:
