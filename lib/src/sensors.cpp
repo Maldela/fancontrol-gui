@@ -26,8 +26,8 @@
 #include <KF5/KAuth/KAuthExecuteJob>
 
 Sensor::Sensor(Hwmon *parent, uint index) : QObject(parent),
-                                            m_parent(parent),
-                                            m_index(index)
+    m_parent(parent),
+    m_index(index)
 {
 }
 
@@ -80,21 +80,19 @@ void Fan::update()
 }
 
 
-PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
+PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
+    m_temp(Q_NULLPTR),
+    m_hasTemp(false),
+    m_testing(false),
+    m_minTemp(0),
+    m_maxTemp(100),
+    m_minPwm(255),
+    m_maxPwm(255),
+    m_minStart(255),
+    m_minStop(255),
+    m_testStatus(notTesting)
 {
-    m_temp = Q_NULLPTR;
-    m_hasTemp = false;
-    m_minTemp = 0;
-    m_maxTemp = 100;
-    m_minPwm = 255;
-    m_maxPwm = 255;
-    m_minStart = 255;
-    m_minStop = 255;
-
     m_testTimer.setSingleShot(true);
-
-    m_testStatus = notTesting;
-    m_testing = false;
 
     connect(this, SIGNAL(tempChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(hasTempChanged()), parent, SLOT(updateConfig()));
@@ -104,7 +102,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index)
     connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
-    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(continueTesting()));
+    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(continueTest()));
 
     if (QDir(parent->path()).isReadable())
     {

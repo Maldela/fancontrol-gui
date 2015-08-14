@@ -27,20 +27,12 @@
 #include <KLocalizedString>
 #include <KPluginFactory>
 
-#include "../../lib/src/hwmon.h"
-#include "../../lib/src/sensors.h"
-
 
 K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args),
-
-#ifndef NO_SYSTEMD
-    m_communicator(new SystemdCommunicator(this)),
-#endif
-
-    m_loader(new Loader(this))
+    m_base(new GUIBase(this))
 {
     KAboutData *about = new KAboutData("kcm_fancontrol",
                                        i18n("Fancontrol-KCM"),
@@ -57,32 +49,16 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     setButtons(Apply | Default);
     setAuthActionName("fancontrol.gui.helper.action");
     
-    connect(m_loader, &Loader::configFileChanged, [this] () { setNeedsSave(true);
-							      qDebug() << "Changes made..."; });
-    
-    qmlRegisterType<Loader>();
-    qmlRegisterType<Hwmon>();
-    qmlRegisterType<Fan>();
-    qmlRegisterType<PwmFan>();
-    qmlRegisterType<Temp>();
-    
-#ifndef NO_SYSTEMD
-    qmlRegisterType<SystemdCommunicator>();
-#endif
-    
-}
-
-FancontrolKCM::~FancontrolKCM() 
-{
+    connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
 }
 
 void FancontrolKCM::save()
 {
     qDebug() << "saving...";
-    setNeedsSave(!m_loader->save()
+    setNeedsSave(!m_base->loader()->save()
 
 #ifndef NO_SYSTEMD
-		 || !m_communicator->restartService()
+		 || !m_base->systemdCommunicator()->restartService()
 #endif
 
 		);
@@ -90,7 +66,7 @@ void FancontrolKCM::save()
 
 void FancontrolKCM::load()
 {
-    setNeedsSave(!m_loader->load(QUrl::fromLocalFile("/etc/fancontrol")));
+    setNeedsSave(!m_base->loader()->load(QUrl::fromLocalFile("/etc/fancontrol")));
     qDebug() << "Loaded config file";
 }
 
@@ -98,8 +74,8 @@ void FancontrolKCM::defaults()
 {
     
 #ifndef NO_SYSTEMD
-    m_communicator->setServiceEnabled(false);
-    m_communicator->setServiceActive(false);    
+    m_base->systemdCommunicator()->setServiceEnabled(false);
+    m_base->systemdCommunicator()->setServiceActive(false);    
 #endif
     
 }

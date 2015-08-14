@@ -1,10 +1,11 @@
 set(LIB_SRCS src/hwmon.cpp
-	     src/loader.cpp
-	     src/sensors.cpp)
+             src/loader.cpp
+             src/sensors.cpp
+             src/guibase.cpp)
                         
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
-			  KF5::Auth
-			  KF5::ConfigCore)
+                          KF5::Auth
+                          KF5::ConfigCore)
 
 set(LIB_PUBLIC_LIBRARIES Qt5::Core)
               
@@ -14,7 +15,7 @@ if(NOT NO_SYSTEMD)
                  src/systemdcommunicator.cpp)
 
     set(LIB_PUBLIC_LIBRARIES ${LIB_PUBLIC_LIBRARIES}
-			     Qt5::DBus)
+                             Qt5::DBus)
 
 endif(NOT NO_SYSTEMD)
 

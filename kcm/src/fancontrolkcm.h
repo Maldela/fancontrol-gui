@@ -25,55 +25,33 @@
 
 #include <KQuickAddons/ConfigModule>
 
-#include "../../lib/src/loader.h"
+#include "../lib/src/guibase.h"
 
-#ifndef NO_SYSTEMD
-#include "../../lib/src/systemdcommunicator.h"
-
-#define SYSTEMD_BOOL true
-#else
-#define SYSTEMD_BOOL false
-#endif
 
 using namespace KQuickAddons;
 
 class FancontrolKCM : public ConfigModule
 {
     Q_OBJECT
-    Q_PROPERTY(Loader* loader READ loader CONSTANT)
-    
-#ifndef NO_SYSTEMD
-    Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
-#endif
+    Q_PROPERTY(GUIBase *base READ base CONSTANT)
     
 public:
     
     explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
-    ~FancontrolKCM() Q_DECL_OVERRIDE;
     
-    Loader *loader() const { return m_loader; }
-        
-    Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
+    QUIBase *base() const { return m_base; }
     
-#ifndef NO_SYSTEMD
-    SystemdCommunicator *systemdCommunicator() const { return m_communicator; }
-#endif
-        
-        
+    
 public slots:
     
     void load() Q_DECL_OVERRIDE;
     void save() Q_DECL_OVERRIDE;
     void defaults() Q_DECL_OVERRIDE;
-        
     
+
 protected:
-        
-#ifndef NO_SYSTEMD
-    SystemdCommunicator *const m_communicator;
-#endif
     
-    Loader *const m_loader;
+    GUIBase *const m_base;
 };
 
 #endif // FANCONTROLKCM_H

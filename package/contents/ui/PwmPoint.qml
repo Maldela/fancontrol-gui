@@ -27,6 +27,7 @@ Rectangle {
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     property alias drag: pwmMouse.drag
+    property alias size: root.width
 
     id: root
     width: 10
@@ -65,12 +66,12 @@ Rectangle {
         Column {
             Label {
                 id: pwm
-                font.pointSize: 9
+                font.pixelSize: root.size
                 text: Math.round(canvas.scalePwm(root.centerY) / 2.55) + '%'
             }
             Label {
                 id: temp
-                font.pointSize: 9
+                font.pixelSize: root.size
                 text: Math.round(canvas.scaleTemp(root.centerX)) + '°'
             }
         }

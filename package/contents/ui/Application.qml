@@ -36,14 +36,14 @@ ApplicationWindow {
             MenuItem { action: loadAction }
             MenuItem { action: saveAction }
             MenuItem { 
-		text: i18n("Save configuration file as")
-		onTriggered: saveFileDialog.open()
-		shortcut: StandardKey.SaveAs
-	    }
+                text: i18n("Save configuration file as")
+                onTriggered: saveFileDialog.open()
+                shortcut: StandardKey.SaveAs
+            }
             MenuItem {
                 text: i18n("Exit")
                 onTriggered: Qt.quit()
-		shortcut: StandardKey.Quit
+                shortcut: StandardKey.Quit
             }
         }
     }
@@ -55,19 +55,19 @@ ApplicationWindow {
             ToolButton { action: loadAction }
             ToolButton { action: saveAction }
             Loader {
-                active: gui.hasSystemdCommunicator()
+                active: base.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
-                    iconName: gui.systemdCom.serviceActive ? "system-reboot" : "system-run"
-                    onClicked: gui.systemdCom.serviceActive ? gui.systemdCom.restartService() : gui.systemdCom.serviceActive = true;
-		    tooltip: gui.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
+                    iconName: base.systemdCom.serviceActive ? "system-reboot" : "system-run"
+                    onClicked: base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
+                    tooltip: base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
             }
             Loader {
-                active: gui.hasSystemdCommunicator()
+                active: base.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
                     iconName: "system-shutdown"
-                    enabled: gui.systemdCom.serviceActive
-                    onClicked: gui.systemdCom.serviceActive = false;
+                    enabled: base.systemdCom.serviceActive
+                    onClicked: base.systemdCom.serviceActive = false;
                     tooltip: i18n("Stop fancontrol")
                 }
             }
@@ -85,10 +85,6 @@ ApplicationWindow {
     }
 
     TabView {
-        property real minTemp: 30.0
-        property real maxTemp: 90.0
-        property string unit: i18n("Celsius")
-
         id: tabView
         anchors.fill: parent
         anchors.topMargin: 5
@@ -97,45 +93,35 @@ ApplicationWindow {
         Tab {
             title: i18n("Sensors")
             SensorsTab {
-                loader: gui.loader
+                loader: base.loader
             }
         }
         Tab {
             title: i18n("PwmFans")
             PwmFansTab {
                 size: sizeSlider.value
-                minTemp: tabView.minTemp
-                maxTemp: tabView.maxTemp
-                unit: tabView.unit
-                loader: gui.loader
+                baseObject: base
             }
         }
         Tab {
             title: i18n("Configfile")
             ConfigfileTab {
-                loader: gui.loader
+                loader: base.loader
             }
         }
         Tab {
+            id: settingsTab
             title: i18n("Settings")
             SettingsTab {
-                id: settingsTab
-                interval: gui.loader.interval
-                minTemp: tabView.minTemp
-                maxTemp: tabView.maxTemp
-                onMinTempChanged: tabView.minTemp = minTemp
-                onMaxTempChanged: tabView.maxTemp = maxTemp
-                onUnitChanged: tabView.unit = unit
-                loader: gui.loader
-                systemdCom: gui.hasSystemdCommunicator() ? gui.systemdCom : null
+                baseObject: base
             }
         }
     }
 
     statusBar: StatusBar {
         Label {
-            property string systemdError: gui.hasSystemdCommunicator() ? gui.systemdCom.error : ""
-            property string loaderError: gui.loader.error
+            property string systemdError: base.hasSystemdCommunicator() ? base.systemdCom.error : ""
+            property string loaderError: base.loader.error
 
             color: "red"
 

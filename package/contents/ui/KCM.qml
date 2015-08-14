@@ -35,7 +35,7 @@ TabView {
     Tab {
         title: i18n("Sensors")
         SensorsTab {
-            loader: kcm.loader
+            loader: kcm.base.loader
         }
     }
     Tab {
@@ -45,13 +45,13 @@ TabView {
             minTemp: tabView.minTemp
             maxTemp: tabView.maxTemp
             unit: tabView.unit
-            loader: kcm.loader
+            loader: kcm.base.loader
         }
     }
     Tab {
         title: i18n("Configfile")
         ConfigfileTab {
-            loader: kcm.loader
+            loader: kcm.base.loader
         }
     }
     Tab {
@@ -63,8 +63,8 @@ TabView {
             onMinTempChanged: tabView.minTemp = minTemp
             onMaxTempChanged: tabView.maxTemp = maxTemp
             onUnitChanged: tabView.unit = unit
-            loader: kcm.loader
-            systemdCom: kcm.hasSystemdCommunicator() ? kcm.systemdCom : null
+            loader: kcm.base.loader
+            systemdCom: kcm.base.hasSystemdCommunicator() ? kcm.base.systemdCom : null
         }
     }
     
