@@ -28,34 +28,41 @@ import "../scripts/coordinates.js" as Coordinates
 Rectangle {
     property QtObject fan
     property QtObject loader
+    property QtObject systemdCom
     property real minTemp: 30.0
     property real maxTemp: 90.0
     property int margin: 5
     property int minimizeDuration: 400
-    property real hwRatio
     property int unit: 0
+    property bool minimizable: true
 
     id: root
-    height: width * hwRatio
+    implicitWidth: 800
+    implicitHeight: 600
     color: "transparent"
     border.color: "black"
     border.width: 2
     radius: 10
     clip: false
-    state: fan.active ? "" : "minimized"
+    state: fan.active ? "" : minimizable ? "minimized" : ""
 
     function update() {
-        hasTempCheckBox.checked = fan.hasTemp;
-        fanOffCheckBox.checked = (fan.minPwm == 0);
-        minStartInput.text = fan.minStart;
-        hwmonBox.currentIndex = fan.temp ? fan.temp.parent.index : 0;
-        tempBox.currentIndex = fan.temp ? fan.temp.index - 1 : 0;
+        if (fan) {
+            hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
+            fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
+            minStartInput.text = Qt.binding(function() { return fan.minStart; })
+            if (fan.hasTemp) {
+                hwmonBox.currentIndex = fan.temp.parent.index;
+                tempBox.currentIndex = fan.temp.index - 1;
+            }
+        }
         canvas.requestPaint();
     }
     
     onFanChanged: update()
-    onLoaderChanged: update()
     onUnitChanged: update()
+    onMinTempChanged: update()
+    onMaxTempChanged: update()
     
     Connections {
         target: loader
@@ -92,10 +99,6 @@ Rectangle {
 
     SystemPalette {
         id: palette
-    }
-    SystemPalette {
-        id: disabledPalette
-        colorGroup: SystemPalette.Disabled
     }
 
     RowLayout {
@@ -136,6 +139,8 @@ Rectangle {
             Layout.alignment: Qt.AlignTop
             color: collapseMouseArea.containsMouse ? "red" : "transparent"
             radius: width / 2
+            visible: minimizable
+            enabled: minimizable
 
             Label {
                 anchors.fill: parent
@@ -198,7 +203,7 @@ Rectangle {
             drag.minimumY: Math.max(canvas.scaleY(canvas.scalePwm(maxPoint.y)-1), maxPoint.y+1)
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2
             y: canvas.scaleY(fan.minStop) - height/2
-            visible: parent.contains(Coordinates.centerOf(this))
+            visible: parent.contains(Coordinates.centerOf(this)) && parent.height > 0
             drag.onActiveChanged: {
                 if (!drag.active) {
                     fan.minStop = canvas.scalePwm(centerY);
@@ -215,7 +220,7 @@ Rectangle {
             drag.maximumY: stopPoint.y
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2
             y: canvas.scaleY(fan.maxPwm) - height/2
-            visible: parent.contains(Coordinates.centerOf(this))
+            visible: parent.contains(Coordinates.centerOf(this)) && parent.height > 0
             drag.onActiveChanged: {
                 if (!drag.active) {
                     fan.maxPwm = canvas.scalePwm(centerY);
@@ -334,9 +339,6 @@ Rectangle {
         spacing: 2
 
         RowLayout {
-            spacing: 0
-            width: parent.width
-
             CheckBox {
                 id: hasTempCheckBox
                 text: i18n("Controlled by:")
@@ -348,18 +350,17 @@ Rectangle {
                 Layout.fillWidth: true
                 
                 ComboBox {
-                property QtObject hwmon: loader.hwmons[currentIndex]
+                    property QtObject hwmon: loader.hwmons[currentIndex]
 
-                id: hwmonBox
-                width: (parent.width-slash.width) / 2
-                anchors.verticalCenter: parent.verticalCenter
-                model: ArrayFunctions.names(loader.hwmons)
-                enabled: hasTempCheckBox.checked
+                    id: hwmonBox
+                    width: (parent.width-slash.width) / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    model: ArrayFunctions.names(loader.hwmons)
+                    enabled: hasTempCheckBox.checked
                 }
                 Label {
                     id: slash
                     text: "/"
-                    color: enabled ? palette.text : disabledPalette.text
                     anchors.verticalCenter: parent.verticalCenter
                     verticalAlignment: Text.AlignVCenter
                     enabled: hasTempCheckBox.checked
@@ -395,50 +396,54 @@ Rectangle {
         }
 
         RowLayout {
-            anchors.left: parent.left
-            anchors.right: parent.right
-
             Label {
                 text: i18n("Pwm value for fan to start:")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
-                color: enabled ? palette.text : disabledPalette.text
                 renderType: Text.NativeRendering
             }
             OptionInput {
                 id: minStartInput
-                anchors.right: parent.right
-                width: 50
+                Layout.fillWidth: true
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 text: fan.minStart
-                onTextChanged: fan.minStart = text
+                onTextChanged: fan.minStart = parseInt(text)
             }
         }
 
         RowLayout {
-            anchors.left: parent.left
-            anchors.right: parent.right
-
+            visible: systemdCom
+            
             Label {
                 text: i18n("Test start and stop values")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
-                color: enabled ? palette.text : disabledPalette.text
                 renderType: Text.NativeRendering
             }
+            Item {
+                Layout.fillWidth: true
+            }
             Button {
+                id: testButton
+                property bool reactivateAfterTesting
                 text: fan.testing? i18n("Abort") : i18n("Test")
                 anchors.right: parent.right
                 height: hwmonBox.height
                 onClicked: {
                     if (fan.testing) {
-                        systemdCom.dbusAction("StartUnit", [systemdCom.serviceName + ".service", "replace"]);
                         fan.abortTesting();
+                        systemdCom.serviceActive = true;
                     } else {
-                        systemdCom.dbusAction("StopUnit", [systemdCom.serviceName + ".service", "replace"]);
+                        reactivateAfterTesting = systemdCom.serviceActive;
+                        systemdCom.serviceActive = false;
                         minStartInput.text = Qt.binding(function() { return fan.minStart });
                         fan.test();
                     }
+                }
+                
+                Connections {
+                    target: fan
+                    onTestingChanged: if (!fan.testing) systemdCom.serviceActive = testButton.reactivateAfterTesting
                 }
             }
         }

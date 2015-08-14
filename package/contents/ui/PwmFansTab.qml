@@ -24,6 +24,7 @@ import "../scripts/arrayfunctions.js" as ArrayFunctions
 ScrollView {
     property QtObject baseObject
     property QtObject loader: baseObject ? baseObject.loader : null
+    property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
     property real size: 1.0
 
     id: scrollView
@@ -49,9 +50,10 @@ ScrollView {
 
             PwmFan {
                 width: 1000 * size
-                hwRatio: 0.8
+                height: 800 * size
                 fan: repeater.fans[index]
                 loader: scrollView.loader
+                systemdCom: scrollView.systemdCom
                 minTemp: baseObject.minTemp
                 maxTemp: baseObject.maxTemp
                 unit: baseObject.unit
@@ -60,9 +62,9 @@ ScrollView {
     }
     
     Label {
-	anchors.margins: 10
-	visible: repeater.fans.length == 0
-	text: i18n("There are no pwm capable fans in your system.")
-	font.bold: true
+        anchors.margins: 10
+        visible: repeater.fans.length == 0
+        text: i18n("There are no pwm capable fans in your system.")
+        font.bold: true
     }
 }

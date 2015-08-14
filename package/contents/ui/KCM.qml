@@ -20,41 +20,49 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+import QtQuick.Layouts 1.1
 import org.kde.kcm 1.0
+import "../scripts/arrayfunctions.js" as ArrayFunctions
 
-TabView {
-    id: tabView
-    frameVisible: true
-    implicitHeight: 480
-    implicitWidth: 640
+ColumnLayout {
+    id: root
+    implicitWidth: 1024
+    implicitHeight: 768
     
-    Tab {
-        title: i18n("Sensors")
-        SensorsTab {
-            loader: kcm.base.loader
-        }
+    CheckBox {
+        id: enabledBox
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: i18n("Control fans manually")
+        checked: kcm.base.systemdCom.serviceEnabled
+        onCheckedChanged: kcm.base.systemdCom.serviceEnabled = checked
     }
-    Tab {
-        title: i18n("PwmFans")
-        PwmFansTab {
-            size: 0.5
-            baseObject: kcm.base
+    
+    RowLayout {
+        enabled: enabledBox.checked
+        
+        Label {
+            text: i18n("Fan:")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            renderType: Text.NativeRendering
         }
-    }
-    Tab {
-        title: i18n("Configfile")
-        ConfigfileTab {
-            loader: kcm.base.loader
-        }
-    }
-    Tab {
-        title: i18n("Settings")
-        SettingsTab {
-            baseObject: kcm.base
+        ComboBox {
+            id: fanCombobox
+            model: ArrayFunctions.names(kcm.base.loader.allPwmFans)
+            Layout.fillWidth: true
+            Layout.maximumWidth: 300
         }
     }
     
-    SystemPalette {
-        id: palette
+    PwmFan {
+        id: fan
+        enabled: enabledBox.checked
+        minimizable: false
+        fan: kcm.base.loader.allPwmFans[fanCombobox.currentIndex]
+        loader: kcm.base.loader
+        systemdCom: kcm.base.systemdCom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        Layout.fillHeight: true
     }
 }

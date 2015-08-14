@@ -151,7 +151,7 @@ ApplicationWindow {
     Action {
 	id: saveAction
 	text: i18n("Save configuration file")
-        onTriggered: gui.loader.save()
+        onTriggered: base.loader.save()
         iconName: "document-save"
 	tooltip: i18n("Save configuration file")
 	shortcut: StandardKey.Save
@@ -166,7 +166,7 @@ ApplicationWindow {
         modality: Qt.NonModal
 
         onAccepted: {
-            gui.loader.load(fileUrl);
+            base.loader.load(fileUrl);
         }
     }
     FileDialog {
@@ -178,7 +178,7 @@ ApplicationWindow {
         modality: Qt.NonModal
 
         onAccepted: {
-            gui.loader.save(fileUrl);
+            base.loader.save(fileUrl);
         }
     }
 }
