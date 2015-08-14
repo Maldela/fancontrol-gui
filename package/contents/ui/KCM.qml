@@ -19,10 +19,7 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.4
-import QtQuick.Window 2.2
-import QtQuick.Dialogs 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 1.3
 import org.kde.kcm 1.0
 
 TabView {
@@ -31,8 +28,6 @@ TabView {
     property string unit: "Celsius"
 
     id: tabView
-    anchors.fill: parent
-    anchors.margins: 4
     frameVisible: true
     implicitHeight: 480
     implicitWidth: 640
@@ -46,7 +41,7 @@ TabView {
     Tab {
         title: i18n("PwmFans")
         PwmFansTab {
-            size: sizeSlider.value
+            size: 1
             minTemp: tabView.minTemp
             maxTemp: tabView.maxTemp
             unit: tabView.unit
@@ -69,7 +64,7 @@ TabView {
             onMaxTempChanged: tabView.maxTemp = maxTemp
             onUnitChanged: tabView.unit = unit
             loader: kcm.loader
-            systemdCom: kcm.systemdCom
+            systemdCom: kcm.hasSystemdCommunicator() ? kcm.systemdCom : null
         }
     }
     

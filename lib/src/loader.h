@@ -57,8 +57,8 @@ public:
     Hwmon * hwmon(int i) { return m_hwmons.value(i, Q_NULLPTR); }
     QString error() const { return m_error; }
     
-    static int getHwmonNumber(const QString &str) { return str.split('/').value(0).remove("hwmon").toInt(); }
-    static int getSensorNumber(const QString &str) { return str.split('/').value(1).remove(QRegExp("pwm|fan|temp|_input")).toInt() - 1; }
+    static int getHwmonNumber(const QString &str); 
+    static int getSensorNumber(const QString &str);
 
     
 public slots:

@@ -537,3 +537,52 @@ QList< QObject* > Loader::allPwmFans() const
     }
     return list;
 }
+
+int Loader::getHwmonNumber(const QString &str)
+{
+    if (str.isEmpty())
+	return -1;
+    
+    QString hwmon = str.split('/', QString::SkipEmptyParts).at(0);
+    
+    if (!hwmon.startsWith("hwmon"))
+	return -1;
+    
+    bool success;
+    
+    hwmon.remove("hwmon");
+    
+    int result = hwmon.toInt(&success);
+    
+    if (success)
+	return result;
+    
+    return -1;
+}
+
+int Loader::getSensorNumber(const QString &str)
+{
+    if (str.isEmpty())
+	return -1;
+    
+    QStringList list = str.split('/', QString::SkipEmptyParts);
+    
+    if (list.size() != 2)
+	return -1;
+    
+    QString sensor = list.at(1);
+    
+    if (!sensor.contains(QRegExp("pwm|fan|temp|_input")))
+	return -1;
+    
+    bool success;
+    
+    sensor.remove(QRegExp("pwm|fan|temp|_input"));
+    
+    int result = sensor.toInt(&success);
+    
+    if (success)
+	return result - 1;
+    
+    return -1;
+}
