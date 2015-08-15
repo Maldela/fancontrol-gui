@@ -29,8 +29,8 @@ Rectangle {
     property QtObject fan
     property QtObject loader
     property QtObject systemdCom
-    property real minTemp: 30.0
-    property real maxTemp: 90.0
+    property real minTemp: 20.0
+    property real maxTemp: 100.0
     property int margin: 5
     property int minimizeDuration: 400
     property int unit: 0
@@ -163,7 +163,7 @@ Rectangle {
     }
 
     Canvas {
-        property int fontSize: Math.max(9, Math.min(height / 20, 20))
+        property int fontSize: Math.max(9, Math.min(height / 25, 20))
         property int leftPadding: fontSize * 4
         property int rightPadding: fontSize * 2
         property int topPadding: fontSize
@@ -188,14 +188,34 @@ Rectangle {
         }
 
         Rectangle {
+            property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
+            property real unscaledPwm: fan.pwm
+            
             id: currentPwm
-            x: parent.scaleX(fan.temp ? fan.temp.value : minTemp) - width/2
-            y: parent.scaleY(fan.pwm) - height/2
+            x: parent.scaleX(unscaledTemp) - width/2
+            y: parent.scaleY(unscaledPwm) - height/2
             width: canvas.fontSize
             height: width
             radius: width / 2
             color: "black"
-            visible: parent.contains(Coordinates.centerOf(this))
+            visible: parent.contains(Coordinates.centerOf(this)) && fan.hasTemp
+            
+            Behavior on unscaledTemp {
+                SpringAnimation { 
+//                     duration: 2000
+                    epsilon: 0.1
+                    spring: 1.0
+                    damping: 0.5
+                }
+            }
+            Behavior on unscaledPwm {
+                SpringAnimation { 
+//                     duration: 2000
+                    epsilon: 0.1
+                    spring: 1.0
+                    damping: 0.5
+                }
+            }
         }
         PwmPoint {
             id: stopPoint

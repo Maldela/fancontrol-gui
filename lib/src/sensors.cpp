@@ -239,16 +239,21 @@ void PwmFan::continueTest()
     {
     case findingStop1:
         if (m_rpm > 0)
+        {
             setPwm(qMin(m_pwm * 0.95, m_pwm - 5.0));
+            m_zeroRpm = 0;
+        }
         else
         {
             if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
+            {
                 m_zeroRpm++;
+            }
             else
             {
                 m_testStatus = findingStart;
                 m_zeroRpm = 0;
-                m_testTimer.setInterval(250);
+                m_testTimer.setInterval(500);
                 qDebug() << "Start finding start value...";
             }
         }
@@ -272,6 +277,7 @@ void PwmFan::continueTest()
         if (m_rpm > 0)
         {
             setPwm(m_pwm - 1);
+            m_zeroRpm = 0;
             m_testTimer.start();
         }
         else
