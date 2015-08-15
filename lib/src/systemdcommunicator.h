@@ -44,8 +44,8 @@ public:
     bool serviceExists();
     bool serviceEnabled();
     bool serviceActive();
-    void setServiceEnabled(bool enabled);
-    void setServiceActive(bool active);
+    bool setServiceEnabled(bool enabled);
+    bool setServiceActive(bool active);
     QString error() const { return m_error; }
     Q_INVOKABLE bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
     Q_INVOKABLE bool restartService();

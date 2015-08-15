@@ -85,8 +85,8 @@ bool Loader::load(const QUrl &url)
         fileName = url.toLocalFile();
     else
     {
-	setError("Url is not a local file");
-	return false;
+        setError("Url is not a local file");
+        return false;
     }
     
     QTextStream stream;
@@ -95,10 +95,10 @@ bool Loader::load(const QUrl &url)
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         stream.setDevice(&file);
-	m_configFile = stream.readAll();
-	emit configFileChanged();
+        m_configFile = stream.readAll();
+        emit configFileChanged();
     }
-	
+
     else if (file.exists())
     {
         KAuth::Action action("fancontrol.gui.helper.action");
@@ -116,17 +116,14 @@ bool Loader::load(const QUrl &url)
         else
         {
             m_configFile = reply->data()["content"].toString();
-	    emit configFileChanged();
+            emit configFileChanged();
         }
     }
     else
     {
-	setError("File does not exist"); 
-	return false;
+        setError("File does not exist"); 
+        return false;
     }
-    
-    m_configUrl = url;
-    emit configUrlChanged();
 
     foreach (Hwmon *hwmon, m_hwmons)
     {
@@ -152,169 +149,172 @@ bool Loader::load(const QUrl &url)
     foreach (QString line, lines)
     {
         if (line.startsWith("INTERVAL="))
-	{
-	    line.remove("INTERVAL=");
-	    bool success;
-	    int interval = line.toInt(&success);
-	    if (success)
-		setInterval(interval, false);
+        {
+            line.remove("INTERVAL=");
+            bool success;
+            int interval = line.toInt(&success);
+            if (success)
+                setInterval(interval, false);
 	    
-	    else
-	    {
-		setError("Unable to parse interval line");
-		return false;
-	    }
-	}
+            else
+            {
+                setError("Unable to parse interval line");
+                return false;
+            }
+        }
         else if (line.startsWith("FCTEMPS="))
         {
-	    line.remove("FCTEMPS=");
+            line.remove("FCTEMPS=");
             QStringList fctemps = line.split(' ');
             foreach (QString fctemp, fctemps)
             {
-		QStringList nameValuePair = fctemp.split('=');
-		if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    QString temp = nameValuePair.at(1);
-		    int pwmSensorIndex = getSensorNumber(pwm);
-		    int tempSensorIndex = getSensorNumber(temp);
-		    Hwmon *pwmHwmon = m_hwmons.value(getHwmonNumber(pwm), Q_NULLPTR);
+                QStringList nameValuePair = fctemp.split('=');
+                if (nameValuePair.size() == 2)
+                {
+                    QString pwm = nameValuePair.at(0);
+                    QString temp = nameValuePair.at(1);
+                    int pwmSensorIndex = getSensorNumber(pwm);
+                    int tempSensorIndex = getSensorNumber(temp);
+                    Hwmon *pwmHwmon = m_hwmons.value(getHwmonNumber(pwm), Q_NULLPTR);
 
-		    if (pwmHwmon)
-		    {
-			Hwmon *tempHwmon = m_hwmons.value(getHwmonNumber(temp), Q_NULLPTR);
-			PwmFan *pwmPointer = pwmHwmon->pwmFan(pwmSensorIndex);
-			if (tempHwmon)
-			{
-			    Temp *tempPointer = tempHwmon->temp(tempSensorIndex);
+                    if (pwmHwmon)
+                    {
+                        Hwmon *tempHwmon = m_hwmons.value(getHwmonNumber(temp), Q_NULLPTR);
+                        PwmFan *pwmPointer = pwmHwmon->pwmFan(pwmSensorIndex);
+                        if (tempHwmon)
+                        {
+                            Temp *tempPointer = tempHwmon->temp(tempSensorIndex);
 
-			    if (pwmPointer)
-			    {
-				pwmPointer->setTemp(tempPointer);
-				pwmPointer->setMinPwm(0);
-			    }
-			}
-			else if (pwmPointer)
-			    pwmPointer->setTemp(Q_NULLPTR);
-		    }
-		}
+                            if (pwmPointer)
+                            {
+                                pwmPointer->setTemp(tempPointer);
+                                pwmPointer->setMinPwm(0);
+                            }
+                        }
+                        else if (pwmPointer)
+                            pwmPointer->setTemp(Q_NULLPTR);
+                    }
+                }
             }
         }
         else if (line.startsWith("MINTEMP="))
         {
-	    line.remove("MINTEMP=");
+            line.remove("MINTEMP=");
             QStringList mintemps = line.split(' ');
             foreach (QString mintemp, mintemps)
             {
-		QStringList nameValuePair = mintemp.split('=');
+                QStringList nameValuePair = mintemp.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMinTemp(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                    pwmPointer->setMinTemp(value);
+                }
             }
         }
         else if (line.startsWith("MAXTEMP="))
         {
-	    line.remove("MAXTEMP=");
+            line.remove("MAXTEMP=");
             QStringList maxtemps = line.split(' ');
             foreach (QString maxtemp, maxtemps)
             {
-		QStringList nameValuePair = maxtemp.split('=');
+                QStringList nameValuePair = maxtemp.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMaxTemp(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                        pwmPointer->setMaxTemp(value);
+                }
             }
         }
         else if (line.startsWith("MINSTART="))
         {
-	    line.remove("MINSTART=");
+            line.remove("MINSTART=");
             QStringList minstarts = line.split(' ');
             foreach (QString minstart, minstarts)
             {
-		QStringList nameValuePair = minstart.split('=');
+                QStringList nameValuePair = minstart.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMinStart(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                    pwmPointer->setMinStart(value);
+                }
             }
         }
         else if (line.startsWith("MINSTOP="))
         {
-	    line.remove("MINSTOP=");
+            line.remove("MINSTOP=");
             QStringList minstops = line.split(' ');
             foreach (QString minstop, minstops)
             {
-		QStringList nameValuePair = minstop.split('=');
+                QStringList nameValuePair = minstop.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMinStop(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                    pwmPointer->setMinStop(value);
+                }
             }
         }
         else if (line.startsWith("MINPWM="))
         {
-	    line.remove("MINPWM=");
+            line.remove("MINPWM=");
             QStringList minpwms = line.split(' ');
             foreach (QString minpwm, minpwms)
             {
-		QStringList nameValuePair = minpwm.split('=');
+                QStringList nameValuePair = minpwm.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMinPwm(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                    pwmPointer->setMinPwm(value);
+                }
             }
         }
         else if (line.startsWith("MAXPWM="))
         {
-	    line.remove("MAXPWM=");
+            line.remove("MAXPWM=");
             QStringList maxpwms = line.split(' ');
             foreach (QString maxpwm, maxpwms)
             {
-		QStringList nameValuePair = maxpwm.split('=');
+                QStringList nameValuePair = maxpwm.split('=');
                 if (nameValuePair.size() == 2)
-		{
-		    QString pwm = nameValuePair.at(0);
-		    int value = nameValuePair.at(1).toInt();
-		    int pwmHwmon = getHwmonNumber(pwm);
-		    int pwmSensor = getSensorNumber(pwm);
-		    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-		    if (pwmPointer)
-			pwmPointer->setMaxPwm(value);
-		}
+                {
+                    QString pwm = nameValuePair.at(0);
+                    int value = nameValuePair.at(1).toInt();
+                    int pwmHwmon = getHwmonNumber(pwm);
+                    int pwmSensor = getSensorNumber(pwm);
+                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
+                    if (pwmPointer)
+                    pwmPointer->setMaxPwm(value);
+                }
             }
         }
     }
+    
+    m_configUrl = url;
+    emit configUrlChanged();
     
     success();
     return true;
@@ -325,16 +325,16 @@ bool Loader::save(const QUrl &url)
     QString fileName;
     if (url.isEmpty())
     {
-	qDebug() << "Given empty url. Fallback to " << m_configUrl;
-	fileName = m_configUrl.toLocalFile();
+        qDebug() << "Given empty url. Fallback to " << m_configUrl;
+        fileName = m_configUrl.toLocalFile();
     }
     else if (url.isLocalFile())
-	fileName = url.toLocalFile();
+        fileName = url.toLocalFile();
     
     else
     {
-	setError("Url is not a local file");
-	return false;
+        setError("Url is not a local file");
+        return false;
     }
     
     QFile file(fileName);
@@ -391,109 +391,109 @@ void Loader::createConfigFile()
     QString configFile = "# This file was created by Fancontrol-GUI \n";
 
     if (m_interval != 0)
-	configFile += "INTERVAL=" + QString::number(m_interval) + "\n";
+        configFile += "INTERVAL=" + QString::number(m_interval) + "\n";
 
     if (!usedHwmons.isEmpty())
     {
-	configFile += "DEVPATH=";
-	foreach (Hwmon *hwmon, usedHwmons)
-	{
-	    QString sanitizedPath = hwmon->path();
-	    sanitizedPath.remove(QRegExp("^/sys/"));
-	    sanitizedPath.remove(QRegExp("/hwmon/hwmon\\d\\s*$"));
-	    configFile += "hwmon" + QString::number(hwmon->index()) + "=" + sanitizedPath + " ";
-	}
-	configFile += "\n";
+        configFile += "DEVPATH=";
+        foreach (Hwmon *hwmon, usedHwmons)
+        {
+            QString sanitizedPath = hwmon->path();
+            sanitizedPath.remove(QRegExp("^/sys/"));
+            sanitizedPath.remove(QRegExp("/hwmon/hwmon\\d\\s*$"));
+            configFile += "hwmon" + QString::number(hwmon->index()) + "=" + sanitizedPath + " ";
+        }
+        configFile += "\n";
 
-	configFile += "DEVNAME=";
-	foreach (Hwmon *hwmon, usedHwmons)
-	{
-	    configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + " ";
-	}
-	configFile += "\n";
+        configFile += "DEVNAME=";
+        foreach (Hwmon *hwmon, usedHwmons)
+        {
+            configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + " ";
+        }
+        configFile += "\n";
 
-	if (!usedFans.isEmpty())
-	{
-	    configFile += "FCTEMPS=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += "hwmon" + QString::number(pwmFan->temp()->parent()->index()) + "/";
-		configFile += "temp" + QString::number(pwmFan->temp()->index()) + "_input ";
-	    }
-	    configFile += "\n";
+        if (!usedFans.isEmpty())
+        {
+            configFile += "FCTEMPS=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += "hwmon" + QString::number(pwmFan->temp()->parent()->index()) + "/";
+                configFile += "temp" + QString::number(pwmFan->temp()->index()) + "_input ";
+            }
+            configFile += "\n";
 
-	    configFile += "FCFANS=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "fan" + QString::number(pwmFan->index()) + "_input ";
-	    }
-	    configFile += "\n";
+            configFile += "FCFANS=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "fan" + QString::number(pwmFan->index()) + "_input ";
+            }
+            configFile += "\n";
 
-	    configFile += "MINTEMP=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->minTemp()) + " ";
-	    }
-	    configFile += "\n";
+            configFile += "MINTEMP=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minTemp()) + " ";
+            }
+            configFile += "\n";
 
-	    configFile += "MAXTEMP=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->maxTemp()) + " ";
-	    }
-	    configFile += "\n";
+            configFile += "MAXTEMP=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->maxTemp()) + " ";
+            }
+            configFile += "\n";
 
-	    configFile += "MINSTART=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->minStart()) + " ";
-	    }
-	    configFile += "\n";
+            configFile += "MINSTART=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minStart()) + " ";
+            }
+            configFile += "\n";
 
-	    configFile += "MINSTOP=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->minStop()) + " ";
-	    }
-	    configFile += "\n";
+            configFile += "MINSTOP=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minStop()) + " ";
+            }
+            configFile += "\n";
 
-	    configFile += "MINPWM=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->minPwm()) + " ";
-	    }
-	    configFile += "\n";
+            configFile += "MINPWM=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minPwm()) + " ";
+            }
+            configFile += "\n";
 
-	    configFile += "MAXPWM=";
-	    foreach (PwmFan *pwmFan, usedFans)
-	    {
-		configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-		configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-		configFile += QString::number(pwmFan->maxPwm()) + " ";
-	    }
-	    configFile += "\n";
-	}
+            configFile += "MAXPWM=";
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->maxPwm()) + " ";
+            }
+            configFile += "\n";
+        }
     }
 
     if (configFile != m_configFile)
     {
-	m_configFile = configFile;
-	emit configFileChanged();
+        m_configFile = configFile;
+        emit configFileChanged();
     }
 }
 
@@ -501,12 +501,12 @@ void Loader::setInterval(int interval, bool writeNewConfig)
 {
     if (interval != m_interval)
     {
-	m_interval = interval;
-	emit intervalChanged();
-	qDebug() << "Changed interval to" << interval;
-	
-	if (writeNewConfig)
-	    createConfigFile();
+        m_interval = interval;
+        emit intervalChanged();
+        qDebug() << "Changed interval to" << interval;
+
+        if (writeNewConfig)
+            createConfigFile();
     }
 }
 
@@ -541,12 +541,12 @@ QList< QObject* > Loader::allPwmFans() const
 int Loader::getHwmonNumber(const QString &str)
 {
     if (str.isEmpty())
-	return -1;
+        return -1;
     
     QString hwmon = str.split('/', QString::SkipEmptyParts).at(0);
     
     if (!hwmon.startsWith("hwmon"))
-	return -1;
+        return -1;
     
     bool success;
     
@@ -555,7 +555,7 @@ int Loader::getHwmonNumber(const QString &str)
     int result = hwmon.toInt(&success);
     
     if (success)
-	return result;
+        return result;
     
     return -1;
 }
@@ -563,17 +563,17 @@ int Loader::getHwmonNumber(const QString &str)
 int Loader::getSensorNumber(const QString &str)
 {
     if (str.isEmpty())
-	return -1;
+        return -1;
     
     QStringList list = str.split('/', QString::SkipEmptyParts);
     
     if (list.size() != 2)
-	return -1;
+        return -1;
     
     QString sensor = list.at(1);
     
     if (!sensor.contains(QRegExp("pwm|fan|temp|_input")))
-	return -1;
+        return -1;
     
     bool success;
     
@@ -582,7 +582,7 @@ int Loader::getSensorNumber(const QString &str)
     int result = sensor.toInt(&success);
     
     if (success)
-	return result - 1;
+        return result - 1;
     
     return -1;
 }

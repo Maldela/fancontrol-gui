@@ -140,34 +140,51 @@ bool SystemdCommunicator::serviceEnabled()
     return false;
 }
 
-void SystemdCommunicator::setServiceEnabled(bool enabled)
+bool SystemdCommunicator::setServiceEnabled(bool enabled)
 {
-    if (serviceExists() && enabled != serviceEnabled())
+    if (serviceExists())
     {
-	QString action = enabled ? "EnableUnitFiles" : "DisableUnitFiles";
-        QStringList files = QStringList() << m_serviceName + ".service";
-        QVariantList arguments = QVariantList() << files << false;
-	if (enabled)
-	    arguments << true;
+        if (enabled != serviceEnabled())
+        {
+            QString action = enabled ? "EnableUnitFiles" : "DisableUnitFiles";
+            QStringList files = QStringList() << m_serviceName + ".service";
+            QVariantList arguments = QVariantList() << files << false;
+            if (enabled)
+                arguments << true;
 
-	if (dbusAction(action, arguments))
-	{
-	    dbusAction("Reload");
-            emit serviceEnabledChanged();
+            if (dbusAction(action, arguments))
+            {
+                if (dbusAction("Reload"))
+                {
+                    emit serviceEnabledChanged();
+                    return true;
+                }
+            }
+            return false;
         }
+        return true;
     }
+    return false;
 }
 
-void SystemdCommunicator::setServiceActive(bool active)
+bool SystemdCommunicator::setServiceActive(bool active)
 {
-    if (serviceExists() && active != serviceActive())
+    if (serviceExists())
     {
-	QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
-	QString action = active ? "ReloadOrRestartUnit" : "StopUnit";
-	
-	if (dbusAction(action, args))
-		emit serviceActiveChanged();
+        if (active != serviceActive())
+        {
+            QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
+            QString action = active ? "ReloadOrRestartUnit" : "StopUnit";
+            
+            if (dbusAction(action, args))
+            {
+                emit serviceActiveChanged();
+                return true;
+            }
+        }
+        return true;
     }
+    return false;
 }
 
 bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &arguments)

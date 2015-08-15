@@ -32,7 +32,8 @@ K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", register
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args),
-    m_base(new GUIBase(this))
+    m_base(new GUIBase(this)),
+    m_manualControl(m_base->systemdCommunicator()->serviceEnabled())
 {
     KAboutData *about = new KAboutData("kcm_fancontrol",
                                        i18n("Fancontrol-KCM"),
@@ -56,31 +57,39 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 
 void FancontrolKCM::save()
 {
-    qDebug() << "saving...";
-    setNeedsSave(!m_base->loader()->save()
+    bool needsSave = false;
+    needsSave = m_base->loader()->save() ? needsSave : true;
+    
+    if (m_base->systemdCommunicator()->serviceActive() && m_manualControl)
+        needsSave = m_base->systemdCommunicator()->restartService() ? needsSave : true;
+    else 
+        needsSave = m_base->systemdCommunicator()->setServiceActive(m_manualControl) ? needsSave : true;
 
-#ifndef NO_SYSTEMD
-		 || !m_base->systemdCommunicator()->restartService()
-#endif
-
-		);
+    needsSave = m_base->systemdCommunicator()->setServiceEnabled(m_manualControl) ? needsSave : true;
+    setNeedsSave(needsSave);
 }
 
 void FancontrolKCM::load()
 {
     setNeedsSave(!m_base->loader()->load(QUrl::fromLocalFile("/etc/fancontrol")));
-    qDebug() << "Loaded config file";
 }
 
 void FancontrolKCM::defaults() 
 {
-    
-#ifndef NO_SYSTEMD
     m_base->systemdCommunicator()->setServiceEnabled(false);
-    m_base->systemdCommunicator()->setServiceActive(false);    
-#endif
-    
+    m_base->systemdCommunicator()->setServiceActive(false);        
 }
+
+void FancontrolKCM::setManualControl(bool manualControl)
+{
+    if (m_manualControl != manualControl)
+    {
+        m_manualControl = manualControl;
+        emit manualControlChanged();
+        setNeedsSave(true);
+    }
+}
+
 
 
 #include "fancontrolkcm.moc"

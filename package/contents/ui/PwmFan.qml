@@ -60,9 +60,9 @@ Rectangle {
     }
     
     onFanChanged: update()
-    onUnitChanged: update()
-    onMinTempChanged: update()
-    onMaxTempChanged: update()
+    onUnitChanged: canvas.requestPaint()
+    onMinTempChanged: canvas.requestPaint()
+    onMaxTempChanged: canvas.requestPaint()
     
     Connections {
         target: loader
@@ -346,20 +346,16 @@ Rectangle {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 onCheckedChanged: fan.hasTemp = checked
             }
-            Row {    
-                Layout.fillWidth: true
-                
+            RowLayout {                  
                 ComboBox {
                     property QtObject hwmon: loader.hwmons[currentIndex]
 
                     id: hwmonBox
-                    width: (parent.width-slash.width) / 2
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.fillWidth: true
                     model: ArrayFunctions.names(loader.hwmons)
                     enabled: hasTempCheckBox.checked
                 }
                 Label {
-                    id: slash
                     text: "/"
                     anchors.verticalCenter: parent.verticalCenter
                     verticalAlignment: Text.AlignVCenter
@@ -368,8 +364,7 @@ Rectangle {
                 }
                 ComboBox {
                     id: tempBox
-                    width: (parent.width-slash.width) / 2
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.fillWidth: true
                     model: ArrayFunctions.names(hwmonBox.hwmon.temps)
                     enabled: hasTempCheckBox.checked
                     onCurrentIndexChanged: { 
@@ -396,16 +391,16 @@ Rectangle {
         }
 
         RowLayout {
+            enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
+
             Label {
                 text: i18n("Pwm value for fan to start:")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 renderType: Text.NativeRendering
             }
             OptionInput {
                 id: minStartInput
                 Layout.fillWidth: true
-                enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 text: fan.minStart
                 onTextChanged: fan.minStart = parseInt(text)
             }
@@ -413,22 +408,22 @@ Rectangle {
 
         RowLayout {
             visible: systemdCom
+            enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
             
             Label {
                 text: i18n("Test start and stop values")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
                 renderType: Text.NativeRendering
             }
             Item {
                 Layout.fillWidth: true
             }
             Button {
-                id: testButton
                 property bool reactivateAfterTesting
+
+                id: testButton
                 text: fan.testing? i18n("Abort") : i18n("Test")
                 anchors.right: parent.right
-                height: hwmonBox.height
                 onClicked: {
                     if (fan.testing) {
                         fan.abortTesting();

@@ -34,12 +34,15 @@ class FancontrolKCM : public ConfigModule
 {
     Q_OBJECT
     Q_PROPERTY(GUIBase *base READ base CONSTANT)
+    Q_PROPERTY(bool manualControl READ manualControl WRITE setManualControl NOTIFY manualControlChanged)
     
 public:
     
     explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
     
     GUIBase *base() const { return m_base; }
+    bool manualControl() const { return m_manualControl; }
+    void setManualControl(bool manualControl);
     
     
 public slots:
@@ -48,10 +51,16 @@ public slots:
     void save() Q_DECL_OVERRIDE;
     void defaults() Q_DECL_OVERRIDE;
     
+    
+signals:
+    
+    void manualControlChanged();
+    
 
 protected:
     
     GUIBase *const m_base;
+    bool m_manualControl;
 };
 
 #endif // FANCONTROLKCM_H

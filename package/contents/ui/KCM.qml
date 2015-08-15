@@ -31,17 +31,16 @@ ColumnLayout {
     
     CheckBox {
         id: enabledBox
-        anchors.left: parent.left
-        anchors.right: parent.right
         text: i18n("Control fans manually")
-        checked: kcm.base.systemdCom.serviceEnabled
-        onCheckedChanged: kcm.base.systemdCom.serviceEnabled = checked
+        checked: kcm.manualControl
+        onCheckedChanged: kcm.manualControl = checked
     }
     
     RowLayout {
         enabled: enabledBox.checked
         
         Label {
+            id: fanLabel
             text: i18n("Fan:")
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             renderType: Text.NativeRendering
@@ -50,7 +49,7 @@ ColumnLayout {
             id: fanCombobox
             model: ArrayFunctions.names(kcm.base.loader.allPwmFans)
             Layout.fillWidth: true
-            Layout.maximumWidth: 300
+            Layout.maximumWidth: root.width - fanLabel.width - parent.spacing
         }
     }
     

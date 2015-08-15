@@ -70,12 +70,12 @@ endif(BUILD_GUI)
 
 
 #Build the KCM
-if(BUILD_KCM)
+if(BUILD_KCM AND NOT NO_SYSTEMD)
 
     message(STATUS "Build the KCM")
     add_subdirectory(kcm)
     
-endif(BUILD_KCM)
+endif(BUILD_KCM AND NOT NO_SYSTEMD)
 
 
 #summary
