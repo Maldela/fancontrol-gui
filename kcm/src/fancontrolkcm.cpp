@@ -32,9 +32,13 @@ K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", register
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args),
-    m_base(new GUIBase(this)),
-    m_manualControl(m_base->systemdCommunicator()->serviceEnabled())
+    m_base(new GUIBase(this))
 {
+    if (m_base->hasSystemdCommunicator())
+        m_manualControl = m_base->systemdCommunicator()->serviceEnabled();
+    else
+        qFatal("Fancontrol-gui-lib was compiled without systemd support!");
+    
     KAboutData *about = new KAboutData("kcm_fancontrol",
                                        i18n("Fancontrol-KCM"),
                                        "0.1",
