@@ -77,7 +77,7 @@ protected slots:
 
 protected:
     
-    void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
+    void setError(const QString &error);
     void success() { setError("Success"); }
     
     int m_interval;

@@ -81,8 +81,8 @@ void FancontrolKCM::load()
 
 void FancontrolKCM::defaults() 
 {
-    m_base->systemdCommunicator()->setServiceEnabled(false);
-    m_base->systemdCommunicator()->setServiceActive(false);        
+    setManualControl(false);
+    setNeedsSave(true);
 }
 
 void FancontrolKCM::setManualControl(bool manualControl)

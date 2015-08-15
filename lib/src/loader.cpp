@@ -77,6 +77,7 @@ void Loader::parseHwmons()
 
 bool Loader::load(const QUrl &url)
 {
+    qDebug() << "loading";
     QString fileName;
     if (url.isEmpty())
     {
@@ -93,14 +94,13 @@ bool Loader::load(const QUrl &url)
     
     QTextStream stream;
     QFile file(fileName);
+    QString fileContent;
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         stream.setDevice(&file);
-        m_configFile = stream.readAll();
-        emit configFileChanged();
+        fileContent = stream.readAll();
     }
-
     else if (file.exists())
     {
         KAuth::Action action("fancontrol.gui.helper.action");
@@ -117,8 +117,7 @@ bool Loader::load(const QUrl &url)
         }
         else
         {
-            m_configFile = reply->data()["content"].toString();
-            emit configFileChanged();
+            fileContent = reply->data()["content"].toString();
         }
     }
     else
@@ -129,13 +128,15 @@ bool Loader::load(const QUrl &url)
 
     foreach (Hwmon *hwmon, m_hwmons)
     {
+        disconnect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
         foreach (QObject *pwmFan, hwmon->pwmFans())
         {
             qobject_cast<PwmFan *>(pwmFan)->reset();
         }
+        connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
     }
 
-    stream.setString(&m_configFile);
+    stream.setString(&fileContent);
     QStringList lines;
     do
     {
@@ -317,6 +318,9 @@ bool Loader::load(const QUrl &url)
     
     m_configUrl = url;
     emit configUrlChanged();
+    
+    m_configFile = fileContent;
+    emit configFileChanged();
     
     success();
     return true;
@@ -548,6 +552,17 @@ QList< QObject* > Loader::allTemps() const
         list += hwmon->temps();
     }
     return list;
+}
+
+void Loader::setError (const QString &error)
+{
+    if (error != m_error) 
+    {
+        m_error = error;
+        emit errorChanged();
+        
+    }
+    qDebug() << error;
 }
 
 int Loader::getHwmonNumber(const QString &str)
