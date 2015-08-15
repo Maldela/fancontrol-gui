@@ -36,6 +36,7 @@ class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmons NOTIFY hwmonsChanged)
     Q_PROPERTY(QList<QObject *> allPwmFans READ allPwmFans NOTIFY allPwmFansChanged)
+    Q_PROPERTY(QList<QObject *> allTemps READ allTemps NOTIFY allTempsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     
@@ -52,6 +53,7 @@ public:
     QString configFile() const { return m_configFile; }
     QList<QObject *> hwmons() const;
     QList<QObject *> allPwmFans() const;
+    QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
     Hwmon * hwmon(int i) { return m_hwmons.value(i, Q_NULLPTR); }
@@ -70,6 +72,7 @@ protected slots:
 
     void createConfigFile();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
+    void emitAllTempsChanged() { emit allTempsChanged(); }
 
 
 protected:
@@ -94,6 +97,7 @@ signals:
     void errorChanged();
     void sensorsUpdateNeeded();
     void allPwmFansChanged();
+    void allTempsChanged();
 };
 
 #endif // LOADER_H

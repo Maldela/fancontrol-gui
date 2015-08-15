@@ -32,13 +32,12 @@ K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", register
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args),
-    m_base(new GUIBase(this))
+    m_base(new GUIBase(this)),
+    m_manualControl(false)
 {
-    if (m_base->hasSystemdCommunicator())
-        m_manualControl = m_base->systemdCommunicator()->serviceEnabled();
-    else
+    if (!m_base->hasSystemdCommunicator())
         qFatal("Fancontrol-gui-lib was compiled without systemd support!");
-    
+             
     KAboutData *about = new KAboutData("kcm_fancontrol",
                                        i18n("Fancontrol-KCM"),
                                        "0.1",
@@ -61,21 +60,23 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 
 void FancontrolKCM::save()
 {
-    bool needsSave = false;
-    needsSave = m_base->loader()->save() ? needsSave : true;
+    bool save = false;
+    save = m_base->loader()->save() ? save : true;
     
     if (m_base->systemdCommunicator()->serviceActive() && m_manualControl)
-        needsSave = m_base->systemdCommunicator()->restartService() ? needsSave : true;
+        save = m_base->systemdCommunicator()->restartService() ? save : true;
     else 
-        needsSave = m_base->systemdCommunicator()->setServiceActive(m_manualControl) ? needsSave : true;
+        save = m_base->systemdCommunicator()->setServiceActive(m_manualControl) ? save : true;
 
-    needsSave = m_base->systemdCommunicator()->setServiceEnabled(m_manualControl) ? needsSave : true;
-    setNeedsSave(needsSave);
+    save = m_base->systemdCommunicator()->setServiceEnabled(m_manualControl) ? save : true;
+    setNeedsSave(save);
 }
 
 void FancontrolKCM::load()
 {
-    setNeedsSave(!m_base->loader()->load(QUrl::fromLocalFile("/etc/fancontrol")));
+    setManualControl(m_base->systemdCommunicator()->serviceEnabled());
+    m_base->loader()->load(QUrl::fromLocalFile("/etc/fancontrol"));
+    setNeedsSave(false);
 }
 
 void FancontrolKCM::defaults() 

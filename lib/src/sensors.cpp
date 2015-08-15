@@ -25,14 +25,18 @@
 #include <KSharedConfig>
 #include <KF5/KAuth/KAuthExecuteJob>
 
-Sensor::Sensor(Hwmon *parent, uint index) : QObject(parent),
+#define MAX_ERRORS_FOR_RPM_ZERO 10
+
+Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent),
     m_parent(parent),
-    m_index(index)
+    m_index(index),
+    m_path(path)
 {
 }
 
 
-Fan::Fan(Hwmon *parent, uint index) : Sensor(parent, index)
+Fan::Fan(Hwmon *parent, uint index) : 
+    Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index)))
 {
     if (QDir(parent->path()).isReadable())
     {
@@ -90,6 +94,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_maxPwm(255),
     m_minStart(255),
     m_minStop(255),
+    m_zeroRpm(0),
     m_testStatus(notTesting)
 {
     m_testTimer.setSingleShot(true);
@@ -213,7 +218,7 @@ void PwmFan::test()
     m_testStatus = findingStop1;
     setPwmMode(1);
     setPwm(255);
-    m_testTimer.setInterval(2000);
+    m_testTimer.setInterval(500);
     m_testTimer.start();
     qDebug() << "Start testing...";
 }
@@ -234,12 +239,18 @@ void PwmFan::continueTest()
     {
     case findingStop1:
         if (m_rpm > 0)
-            setPwm(qMin(m_pwm * 0.9, m_pwm - 5.0));
+            setPwm(qMin(m_pwm * 0.95, m_pwm - 5.0));
         else
         {
-            m_testStatus = findingStart;
-            m_testTimer.setInterval(500);
-            qDebug() << "Start finding start value...";
+            if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
+                m_zeroRpm++;
+            else
+            {
+                m_testStatus = findingStart;
+                m_zeroRpm = 0;
+                m_testTimer.setInterval(250);
+                qDebug() << "Start finding start value...";
+            }
         }
         m_testTimer.start();
         break;
@@ -265,11 +276,20 @@ void PwmFan::continueTest()
         }
         else
         {
-            m_testStatus = notTesting;
-            m_testing = false;
-            emit testingChanged();
-            setMinStop(m_pwm + 5);
-            qDebug() << "Finished testing!";
+            if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
+            {
+                m_zeroRpm++;
+                m_testTimer.start();
+            }
+            else
+            {
+                m_testStatus = notTesting;
+                m_zeroRpm = 0;
+                m_testing = false;
+                emit testingChanged();
+                setMinStop(m_pwm + 5);
+                qDebug() << "Finished testing!";
+            }
         }
         break;
 
@@ -313,7 +333,8 @@ void PwmFan::setActive(bool a)
 }
 
 
-Temp::Temp(Hwmon *parent, uint index) : Sensor(parent, index)
+Temp::Temp(Hwmon *parent, uint index) : 
+    Sensor(parent, index, QString(parent->name() + QString("/temp") + QString::number(index)))
 {
     if (QDir(parent->path()).isReadable())
     {

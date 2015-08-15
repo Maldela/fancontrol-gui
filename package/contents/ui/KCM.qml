@@ -47,7 +47,7 @@ ColumnLayout {
         }
         ComboBox {
             id: fanCombobox
-            model: ArrayFunctions.names(kcm.base.loader.allPwmFans)
+            model: ArrayFunctions.namesWithPaths(kcm.base.loader.allPwmFans)
             Layout.fillWidth: true
             Layout.maximumWidth: root.width - fanLabel.width - parent.spacing
         }

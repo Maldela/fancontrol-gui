@@ -51,18 +51,18 @@ Rectangle {
             hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
             fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
             minStartInput.text = Qt.binding(function() { return fan.minStart; })
-            if (fan.hasTemp) {
-                hwmonBox.currentIndex = fan.temp.parent.index;
-                tempBox.currentIndex = fan.temp.index - 1;
+            if (fan.hasTemp && loader) {
+                tempBox.currentIndex = loader.allTemps.indexOf(fan.temp);
             }
         }
         canvas.requestPaint();
     }
     
     onFanChanged: update()
-    onUnitChanged: canvas.requestPaint()
-    onMinTempChanged: canvas.requestPaint()
-    onMaxTempChanged: canvas.requestPaint()
+    onLoaderChanged: update()
+    onUnitChanged: if (fan) canvas.requestPaint()
+    onMinTempChanged: if (fan) canvas.requestPaint()
+    onMaxTempChanged: if (fan) canvas.requestPaint()
     
     Connections {
         target: loader
@@ -122,6 +122,8 @@ Rectangle {
             onTextChanged: fan.name = text;
             horizontalAlignment: TextEdit.AlignLeft
             wrapMode: TextEdit.Wrap
+            font.bold: true
+            font.pointSize: 14
             selectByMouse: true
             Layout.fillWidth: true
 
@@ -348,32 +350,13 @@ Rectangle {
             }
             RowLayout {                  
                 ComboBox {
-                    property QtObject hwmon: loader.hwmons[currentIndex]
-
-                    id: hwmonBox
-                    Layout.fillWidth: true
-                    model: ArrayFunctions.names(loader.hwmons)
-                    enabled: hasTempCheckBox.checked
-                }
-                Label {
-                    text: "/"
-                    anchors.verticalCenter: parent.verticalCenter
-                    verticalAlignment: Text.AlignVCenter
-                    enabled: hasTempCheckBox.checked
-                    renderType: Text.NativeRendering
-                }
-                ComboBox {
                     id: tempBox
                     Layout.fillWidth: true
-                    model: ArrayFunctions.names(hwmonBox.hwmon.temps)
+                    model: ArrayFunctions.namesWithPaths(loader.allTemps)
                     enabled: hasTempCheckBox.checked
                     onCurrentIndexChanged: { 
-                        if (hasTempCheckBox.checked && hwmonBox.hwmon)
-                            fan.temp = hwmonBox.hwmon.temps[currentIndex];
-                    }
-                    onModelChanged: {
-                        if (hasTempCheckBox.checked && hwmonBox.hwmon)
-                            fan.temp = hwmonBox.hwmon.temps[currentIndex];
+                        if (hasTempCheckBox.checked)
+                            fan.temp = loader.allTemps[currentIndex];
                     }
                 }
             }
@@ -426,7 +409,7 @@ Rectangle {
                 anchors.right: parent.right
                 onClicked: {
                     if (fan.testing) {
-                        fan.abortTesting();
+                        fan.abortTest();
                         systemdCom.serviceActive = true;
                     } else {
                         reactivateAfterTesting = systemdCom.serviceActive;

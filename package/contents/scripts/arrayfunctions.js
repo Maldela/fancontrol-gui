@@ -25,12 +25,28 @@ function names(array) {
     return names;
 }
 
+function namesWithPaths(array) {
+    var namesWithPaths = [];
+    for (var i=0; i<array.length; i++) {
+        namesWithPaths[i] = array[i].name + "  (" + array[i].path + ")";
+    }
+    return namesWithPaths;
+}
+
 function labels(array) {
     var labels = [];
     for (var i=0; i<array.length; i++) {
         labels[i] = array[i].label;
     }
     return labels;
+}
+
+function labelsWithPaths(array) {
+    var labelsWithPaths = [];
+    for (var i=0; i<array.length; i++) {
+        labelsWithPaths[i] = array[i].label + "  (" + array[i].path + ")";
+    }
+    return labelsWithPaths;
 }
 
 function maxProperty(array, prop) {

@@ -34,14 +34,16 @@ class Sensor : public QObject
     Q_OBJECT
     Q_PROPERTY(uint index READ index CONSTANT)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString path READ path CONSTANT)
     Q_PROPERTY(Hwmon * parent READ parent CONSTANT)
 
 public:
 
-    explicit Sensor(Hwmon *parent, uint index);
+    explicit Sensor(Hwmon *parent, uint index, const QString &path = QString());
 
     virtual QString name() const = 0;
     virtual void setName(const QString &name) = 0;
+    QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
 
@@ -60,6 +62,7 @@ protected:
 
     Hwmon *const m_parent;
     const uint m_index;
+    const QString m_path;
 };
 
 
@@ -218,6 +221,7 @@ protected:
     int m_minStart;
     int m_minStop;
     int m_pwmMode;
+    int m_zeroRpm;
 
     enum
     {

@@ -66,11 +66,13 @@ void Loader::parseHwmons()
         Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)), this);
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
         connect(hwmon, SIGNAL(pwmFansChanged()), this, SLOT(emitAllPwmFansChanged()));
+        connect(hwmon, SIGNAL(tempsChanged()), this, SLOT(emitAllTempsChanged()));
         connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
         m_hwmons << hwmon;
     }
     emit hwmonsChanged();
     emit allPwmFansChanged();
+    emit allTempsChanged();
 }
 
 bool Loader::load(const QUrl &url)
@@ -534,6 +536,16 @@ QList< QObject* > Loader::allPwmFans() const
     foreach (const Hwmon *hwmon, m_hwmons)
     {
         list += hwmon->pwmFans();
+    }
+    return list;
+}
+
+QList< QObject* > Loader::allTemps() const
+{
+    QList<QObject *> list;
+    foreach (const Hwmon *hwmon, m_hwmons)
+    {
+        list += hwmon->temps();
     }
     return list;
 }
