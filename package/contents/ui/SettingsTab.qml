@@ -20,6 +20,7 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
+import QtQml 2.2
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
 
@@ -30,6 +31,7 @@ Item {
     property int interval: loader ? loader.interval : 1
     property int padding: 10
     property real textWidth: 0
+    property var locale: Qt.locale()
 
     id: root
     anchors.fill: parent
@@ -56,8 +58,8 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                text: interval
-                onTextChanged: if (text && text != "0") loader.interval = parseInt(text)
+                text: Number(interval).toLocaleString(locale)
+                onTextChanged: if (text && text != "0") loader.interval = parseInt(Number.fromLocaleString(locale, text))
             }
         }
         RowLayout {
@@ -75,7 +77,7 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) baseObject.minTemp = Units.toCelsius(text, baseObject.unit)
+                onTextChanged: if (activeFocus) baseObject.minTemp = Units.toCelsius(Number.fromLocaleString(locale, text), baseObject.unit)
                 Component.onCompleted: text = Units.fromCelsius(baseObject.minTemp, baseObject.unit)
                 
                 Connections {
@@ -99,7 +101,7 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) baseObject.maxTemp = Units.toCelsius(text, baseObject.unit)
+                onTextChanged: if (activeFocus) baseObject.maxTemp = Units.toCelsius(Number.fromLocaleString(locale, text), baseObject.unit)
                 Component.onCompleted: text = Units.fromCelsius(baseObject.maxTemp, baseObject.unit)
                 
                 Connections {

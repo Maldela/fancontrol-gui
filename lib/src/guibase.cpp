@@ -25,6 +25,7 @@
 #include "hwmon.h"
 
 #include <QtQml>
+#include <QLocale>
 
 GUIBase::GUIBase(QObject *parent) : QObject(parent),    
     
@@ -34,9 +35,12 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 
     m_loader(new Loader(this)),
     m_minTemp(30),
-    m_maxTemp(90),
-    m_unit(0)
+    m_maxTemp(90)
 {
+    QLocale locale = QLocale::system();
+    QLocale::MeasurementSystem system = locale.measurementSystem();
+    m_unit = (system == QLocale::MetricSystem) ? 0 : 2;
+
     qmlRegisterType<Loader>();
     qmlRegisterType<Hwmon>();
     qmlRegisterType<Fan>();

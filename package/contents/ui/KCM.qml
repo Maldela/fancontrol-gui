@@ -57,11 +57,11 @@ ColumnLayout {
         id: fan
         enabled: enabledBox.checked
         minimizable: false
+        unit: kcm.base.unit
         fan: kcm.base.loader.allPwmFans[fanCombobox.currentIndex]
         loader: kcm.base.loader
         systemdCom: kcm.base.systemdCom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        Layout.fillWidth: true
         Layout.fillHeight: true
     }
 }
