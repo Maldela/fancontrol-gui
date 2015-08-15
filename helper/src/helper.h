@@ -28,5 +28,4 @@ class Helper : public QObject
     public Q_SLOTS:
 
         ActionReply action(const QVariantMap &args);
-        ActionReply save(QVariantMap args) { args["action"] = "write"; return action(args); }
 };
