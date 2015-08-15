@@ -10,6 +10,15 @@ option(BUILD_KCM "Build the KCM" OFF)
 option(INSTALL_SHARED "Install the shared parts" ON)
 
 
+#KCM can't be build without systemd support
+if(BUILD_KCM AND NO_SYSTEMD)
+
+    message(WARNING "KCM can't be build without systemd support")
+    set(BUILD_KCM FALSE)
+    
+endif(BUILD_KCM AND NO_SYSTEMD)
+
+
 #Silence warnings
 cmake_policy(SET CMP0037 OLD)
 cmake_policy(SET CMP0063 NEW)
@@ -70,12 +79,12 @@ endif(BUILD_GUI)
 
 
 #Build the KCM
-if(BUILD_KCM AND NOT NO_SYSTEMD)
+if(BUILD_KCM)
 
     message(STATUS "Build the KCM")
     add_subdirectory(kcm)
     
-endif(BUILD_KCM AND NOT NO_SYSTEMD)
+endif(BUILD_KCM)
 
 
 #summary
