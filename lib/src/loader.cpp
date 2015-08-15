@@ -126,6 +126,8 @@ bool Loader::load(const QUrl &url)
         return false;
     }
 
+    //Disconnect hwmons for performance reasons
+    //They get reconnected later
     foreach (Hwmon *hwmon, m_hwmons)
     {
         disconnect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
@@ -133,7 +135,6 @@ bool Loader::load(const QUrl &url)
         {
             qobject_cast<PwmFan *>(pwmFan)->reset();
         }
-        connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
     }
 
     stream.setString(&fileContent);
@@ -314,6 +315,12 @@ bool Loader::load(const QUrl &url)
                 }
             }
         }
+    }
+    
+    //Connect hwmons again
+    foreach (Hwmon *hwmon, m_hwmons)
+    {
+        connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
     }
     
     m_configUrl = url;
