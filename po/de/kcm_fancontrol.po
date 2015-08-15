@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fancontrol-gui\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2015-08-11 14:56+0200\n"
-"PO-Revision-Date: 2015-08-09 21:50+0100\n"
+"POT-Creation-Date: 2015-08-15 14:40+0200\n"
+"PO-Revision-Date: 2015-08-15 14:44+0100\n"
 "Last-Translator: Malte Veerman <maldela@halloarsch.de>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de_DE\n"
@@ -25,19 +25,19 @@ msgstr "Fancontrol-GUI"
 msgid "Graphical user interface for fancontrol"
 msgstr "Graphische Benutzeroberfläche für fanontrol"
 
-#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:49
+#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:47
 msgid "Malte Veerman"
 msgstr "Malte Veerman"
 
-#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:49
+#: fancontrol-gui/src/main.cpp:46 kcm/src/fancontrolkcm.cpp:47
 msgid "Main Developer"
 msgstr "Hauptentwickler"
 
-#: kcm/src/fancontrolkcm.cpp:41
+#: kcm/src/fancontrolkcm.cpp:39
 msgid "Fancontrol-KCM"
 msgstr "Fancontrol-KCM"
 
-#: kcm/src/fancontrolkcm.cpp:43
+#: kcm/src/fancontrolkcm.cpp:41
 msgid "KDE Fancontrol Module"
 msgstr "KDE Fancontrol Modul"
 
@@ -46,7 +46,7 @@ msgid "File"
 msgstr "Datei"
 
 #: package/contents/ui/Application.qml:39
-#: package/contents/ui/Application.qml:188
+#: package/contents/ui/Application.qml:174
 msgid "Save configuration file as"
 msgstr "Konfigurationsdatei speichern unter..."
 
@@ -66,83 +66,113 @@ msgstr "Fancontrol starten"
 msgid "Stop fancontrol"
 msgstr "Fancontrol stoppen"
 
-#: package/contents/ui/Application.qml:90
-#: package/contents/ui/SettingsTab.qml:33
-#: package/contents/ui/SettingsTab.qml:127
-msgid "Celsius"
-msgstr "Celsius"
-
-#: package/contents/ui/Application.qml:98 package/contents/ui/KCM.qml:41
+#: package/contents/ui/Application.qml:94
 msgid "Sensors"
 msgstr "Sensoren"
 
-#: package/contents/ui/Application.qml:104 package/contents/ui/KCM.qml:47
+#: package/contents/ui/Application.qml:100
 msgid "PwmFans"
 msgstr "PwmLüfter"
 
-#: package/contents/ui/Application.qml:114 package/contents/ui/KCM.qml:57
+#: package/contents/ui/Application.qml:107
 msgid "Configfile"
 msgstr "Konfigurationsdatei"
 
-#: package/contents/ui/Application.qml:120 package/contents/ui/KCM.qml:63
+#: package/contents/ui/Application.qml:114
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: package/contents/ui/Application.qml:159
-#: package/contents/ui/Application.qml:162
+#: package/contents/ui/Application.qml:145
+#: package/contents/ui/Application.qml:148
 msgid "Load configuration file"
 msgstr "Konfigurationsdatei öffnen"
 
-#: package/contents/ui/Application.qml:167
-#: package/contents/ui/Application.qml:170
+#: package/contents/ui/Application.qml:153
+#: package/contents/ui/Application.qml:156
 msgid "Save configuration file"
 msgstr "Konfigurationsdatei speichern"
 
-#: package/contents/ui/Application.qml:176
+#: package/contents/ui/Application.qml:162
 msgid "Please choose a configuration file"
 msgstr "Konfigurationsdatei auswählen"
+
+#: package/contents/ui/KCM.qml:34
+msgid "Control fans manually"
+msgstr "Lüfter manuell kontrollieren"
+
+#: package/contents/ui/KCM.qml:44
+msgid "Fan:"
+msgstr "Lüfter:"
+
+#: package/contents/ui/PwmFan.qml:344
+msgid "Controlled by:"
+msgstr "Kontrolliert von:"
+
+#: package/contents/ui/PwmFan.qml:384
+msgid "Turn Fan off if temp < MINTEMP"
+msgstr "Lüfter abschalten, wenn MINTEMP unterschritten"
+
+#: package/contents/ui/PwmFan.qml:397
+msgid "Pwm value for fan to start:"
+msgstr "Wert ab dem der Lüfter startet:"
+
+#: package/contents/ui/PwmFan.qml:414
+msgid "Test start and stop values"
+msgstr "Start und Stopwerte testen"
+
+#: package/contents/ui/PwmFan.qml:425
+msgid "Abort"
+msgstr "Abbrechen"
+
+#: package/contents/ui/PwmFan.qml:425
+msgid "Test"
+msgstr "Testen"
 
 #: package/contents/ui/PwmFansTab.qml:67
 msgid "There are no pwm capable fans in your system."
 msgstr "Es gibt keine pwm-fähigen Lüfter in ihrem System."
 
-#: package/contents/ui/SettingsTab.qml:61
+#: package/contents/ui/SettingsTab.qml:50
 msgid "Interval:"
 msgstr "Intervall:"
 
-#: package/contents/ui/SettingsTab.qml:80
+#: package/contents/ui/SettingsTab.qml:69
 msgid "Minimum temperature for fan graphs:"
 msgstr "Minimale Temperatur für Lüftergraphen:"
 
-#: package/contents/ui/SettingsTab.qml:99
+#: package/contents/ui/SettingsTab.qml:93
 msgid "Maximum temperature for fan graphs:"
 msgstr "Maximale Temperatur für Lüftergraphen:"
 
-#: package/contents/ui/SettingsTab.qml:119
+#: package/contents/ui/SettingsTab.qml:117
 msgid "Unit:"
 msgstr "Einheit:"
 
-#: package/contents/ui/SettingsTab.qml:127
+#: package/contents/ui/SettingsTab.qml:125
+msgid "Celsius"
+msgstr "Celsius"
+
+#: package/contents/ui/SettingsTab.qml:125
 msgid "Kelvin"
 msgstr "Kelvin"
 
-#: package/contents/ui/SettingsTab.qml:127
+#: package/contents/ui/SettingsTab.qml:125
 msgid "Fahrenheit"
 msgstr "Fahrenheit"
 
-#: package/contents/ui/SettingsTab.qml:143
+#: package/contents/ui/SettingsTab.qml:140
 msgid "Name of the fancontrol systemd service:"
 msgstr "Name des fancontrol systemd services:"
 
-#: package/contents/ui/SettingsTab.qml:165
+#: package/contents/ui/SettingsTab.qml:162
 msgid "Fancontrol systemd service autostart:"
 msgstr "Fancontrol systemd service Autostart:"
 
-#: package/contents/ui/SettingsTab.qml:173
+#: package/contents/ui/SettingsTab.qml:170
 msgid "disabled"
 msgstr "deaktiviert"
 
-#: package/contents/ui/SettingsTab.qml:173
+#: package/contents/ui/SettingsTab.qml:170
 msgid "enabled"
 msgstr "aktiviert"
 
@@ -155,3 +185,4 @@ msgstr "Malte Veerman"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "maldela@halloarsch.de"
+
