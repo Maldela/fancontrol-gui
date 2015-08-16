@@ -24,14 +24,14 @@ function round(number, dec) {
 
 function toCelsius(degrees, currentUnit) {
     var float = parseFloat(degrees);
-    if (currentUnit == 1) { return float + 273.15; }
+    if (currentUnit == 1) { return float - 273.15; }
     if (currentUnit == 2) { return (float - 32) * 5 / 9; }
     return float;
 }
 
 function fromCelsius(degrees, newUnit) {
     var float = parseFloat(degrees);
-    if (newUnit == 1) { return round(float - 273.15); }
+    if (newUnit == 1) { return round(float + 273.15); }
     if (newUnit == 2) { return round(float * 9 / 5 + 32); }
     return round(float);
 }
