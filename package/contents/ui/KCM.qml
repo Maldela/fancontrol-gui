@@ -26,21 +26,23 @@ import "../scripts/arrayfunctions.js" as ArrayFunctions
 
 ColumnLayout {
     id: root
-    implicitWidth: 1024
-    implicitHeight: 768
     
     CheckBox {
         id: enabledBox
+        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
         text: i18n("Control fans manually")
         checked: kcm.manualControl
-        onCheckedChanged: kcm.manualControl = checked
+        onCheckedChanged: {
+            kcm.manualControl = checked;
+            fanRow.visible = checked;
+            fan.visible = checked;
+        }
     }
     
-    RowLayout {
-        enabled: enabledBox.checked
+    RowLayout {  
+        id: fanRow
         
         Label {
-            id: fanLabel
             text: i18n("Fan:")
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             renderType: Text.NativeRendering
@@ -49,13 +51,12 @@ ColumnLayout {
             id: fanCombobox
             model: ArrayFunctions.namesWithPaths(kcm.base.loader.allPwmFans)
             Layout.fillWidth: true
-            Layout.maximumWidth: root.width - fanLabel.width - parent.spacing
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         }
     }
     
     PwmFan {
         id: fan
-        enabled: enabledBox.checked
         minimizable: false
         unit: kcm.base.unit
         fan: kcm.base.loader.allPwmFans[fanCombobox.currentIndex]

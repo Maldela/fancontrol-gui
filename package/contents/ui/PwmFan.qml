@@ -163,7 +163,7 @@ Rectangle {
     }
 
     Canvas {
-        property int fontSize: Math.max(9, Math.min(height / 25, 20))
+        property int fontSize: MoreMath.bound(9, height / 20 + 1, 18)
         property int leftPadding: fontSize * 4
         property int rightPadding: fontSize * 2
         property int topPadding: fontSize
@@ -202,7 +202,6 @@ Rectangle {
             
             Behavior on unscaledTemp {
                 SpringAnimation { 
-//                     duration: 2000
                     epsilon: 0.1
                     spring: 1.0
                     damping: 0.5
@@ -210,7 +209,6 @@ Rectangle {
             }
             Behavior on unscaledPwm {
                 SpringAnimation { 
-//                     duration: 2000
                     epsilon: 0.1
                     spring: 1.0
                     damping: 0.5
@@ -221,6 +219,7 @@ Rectangle {
             id: stopPoint
             color: "blue"
             size: canvas.fontSize
+            unit: root.unit
             drag.maximumX: Math.min(canvas.scaleX(canvas.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
             drag.minimumY: Math.max(canvas.scaleY(canvas.scalePwm(maxPoint.y)-1), maxPoint.y+1)
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2
@@ -238,6 +237,7 @@ Rectangle {
             id: maxPoint
             color: "red"
             size: canvas.fontSize
+            unit: root.unit
             drag.minimumX: stopPoint.x
             drag.maximumY: stopPoint.y
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2
@@ -328,9 +328,12 @@ Rectangle {
             c.textBaseline = "top";
             var convertedMinTemp = Units.fromCelsius(minTemp, unit);
             var convertedMaxTemp = Units.fromCelsius(maxTemp, unit);
+            var suffix = (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
+            var lastTemp;
             for (i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
+                lastTemp = i;
                 var x = scaleX(Units.toCelsius(i, unit));
-                c.fillText(i + '°', x, topPadding+plotHeight+fontSize/2);
+                c.fillText(i + suffix, x, topPadding+plotHeight+fontSize/2);
                 if (i != convertedMinTemp) {
                     for (var j=scaleY(255); j<=scaleY(0); j+=20) {
                         c.moveTo(x, j);
@@ -339,7 +342,8 @@ Rectangle {
                     c.stroke();
                 }
             }
-            c.fillText(convertedMaxTemp + '°', scaleX(maxTemp), topPadding+plotHeight+fontSize/2);
+            if ((convertedMaxTemp - lastTemp) > 5)
+                c.fillText(convertedMaxTemp + suffix, scaleX(maxTemp), topPadding+plotHeight+fontSize/2);
         }
     }
 

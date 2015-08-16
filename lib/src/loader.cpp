@@ -77,7 +77,6 @@ void Loader::parseHwmons()
 
 bool Loader::load(const QUrl &url)
 {
-    qDebug() << "loading";
     QString fileName;
     if (url.isEmpty())
     {

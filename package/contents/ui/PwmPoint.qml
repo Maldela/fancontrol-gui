@@ -20,6 +20,8 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.2
 import QtQuick.Controls 1.4
+import QtQml 2.2
+import "../scripts/units.js" as Units
 
 Rectangle {
     property Item canvas: parent
@@ -28,6 +30,7 @@ Rectangle {
     readonly property real centerY: y + height / 2
     property alias drag: pwmMouse.drag
     property alias size: root.width
+    property int unit: 0
 
     id: root
     width: 10
@@ -66,13 +69,15 @@ Rectangle {
         Column {
             Label {
                 id: pwm
-                font.pixelSize: root.size
-                text: Math.round(canvas.scalePwm(root.centerY) / 2.55) + '%'
+                font.pixelSize: root.size * 1.5
+                text: Number(Units.fromCelsius(canvas.scalePwm(root.centerY) / 2.55)).toLocaleString() + '%'
             }
             Label {
+                property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
+                
                 id: temp
-                font.pixelSize: root.size
-                text: Math.round(canvas.scaleTemp(root.centerX)) + '°'
+                font.pixelSize: root.size * 1.5
+                text: Number(Units.fromCelsius(canvas.scaleTemp(root.centerX), unit)).toLocaleString() + suffix                      
             }
         }
     }
