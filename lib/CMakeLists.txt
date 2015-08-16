@@ -27,6 +27,8 @@ include_directories(${Qt5Qml_INCLUDE_DIRS})
 add_library(fancontrol_gui_lib SHARED ${LIB_SRCS})
 target_link_libraries(fancontrol_gui_lib PRIVATE ${LIB_PRIVATE_LIBRARIES} PUBLIC ${LIB_PUBLIC_LIBRARIES})
 
+target_compile_features(fancontrol_gui_lib PRIVATE cxx_lambdas)
+
 generate_export_header(fancontrol_gui_lib)
 
 if(INSTALL_SHARED)
