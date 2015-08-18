@@ -25,7 +25,6 @@
 #include <QTimer>
 
 #include "hwmon.h"
-#include "fancontrol_gui_lib_export.h"
 
 class Hwmon;
 
@@ -66,7 +65,7 @@ protected:
 };
 
 
-class FANCONTROL_GUI_LIB_EXPORT Temp : public Sensor
+class Temp : public Sensor
 {
     Q_OBJECT
     Q_PROPERTY(QString label READ label NOTIFY labelChanged)
@@ -101,7 +100,7 @@ protected:
 };
 
 
-class FANCONTROL_GUI_LIB_EXPORT Fan : public Sensor
+class Fan : public Sensor
 {
     Q_OBJECT
     Q_PROPERTY(int rpm READ rpm NOTIFY rpmChanged)
@@ -135,7 +134,7 @@ protected:
 };
 
 
-class FANCONTROL_GUI_LIB_EXPORT PwmFan : public Fan
+class PwmFan : public Fan
 {
     Q_OBJECT
     Q_PROPERTY(int pwm READ pwm WRITE setPwm NOTIFY pwmChanged)

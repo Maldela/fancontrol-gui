@@ -1,6 +1,6 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  <copyright holder> <email>
+ * Copyright 2015  Malte Veerman maldela@halloarsch.de
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -38,6 +38,8 @@
 #include "fancontrol_gui_lib_export.h"
 
 
+class Config;
+
 class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
 {
     Q_OBJECT
@@ -48,13 +50,16 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
 #endif
     
-    Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
-    Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
+    Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY configChanged)
+    Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY configChanged)
     Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
+    Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY configChanged)
+    Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY configChanged)
 
 public:
     
     explicit GUIBase(QObject *parent = Q_NULLPTR);
+    ~GUIBase() { saveConfig(); }
 
     Loader *loader() const { return m_loader; }
     
@@ -62,31 +67,38 @@ public:
     SystemdCommunicator *systemdCommunicator() const { return m_com; }
 #endif
 
-    qreal minTemp() const { return m_minTemp; }
-    qreal maxTemp() const { return m_maxTemp; }
+    qreal minTemp() const;
+    qreal maxTemp() const;
+    QString serviceName() const;
+    int interval() const;
     int unit() const { return m_unit; }
-    void setMinTemp(qreal minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
-    void setMaxTemp(qreal maxTemp) { if (maxTemp != m_maxTemp) { m_maxTemp = maxTemp; emit maxTempChanged(); } }
-    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }    
+    void setMinTemp(qreal minTemp);
+    void setMaxTemp(qreal maxTemp);
+    void setServiceName(const QString &name);
+    void setInterval(int i);
+    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
+    void saveConfig();
 
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
     
     
 signals:
 
-    void minTempChanged();
-    void maxTempChanged();
+    void configChanged();
     void unitChanged();
     
     
 protected:
     
+    void emitConfigChanged() { emit configChanged(); }
+
+    Config *m_config;
+
 #ifndef NO_SYSTEMD
     SystemdCommunicator *const m_com;
 #endif
     
     Loader *const m_loader; 
-    qreal m_minTemp, m_maxTemp;
     int m_unit;
 };
 

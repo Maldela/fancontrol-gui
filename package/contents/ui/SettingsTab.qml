@@ -25,10 +25,8 @@ import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
 
 Item {
-    property QtObject baseObject
-    property QtObject loader: baseObject ? baseObject.loader : null
-    property QtObject systemdCom: baseObject ? baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null : null
-    property int interval: loader ? loader.interval : 1
+    property QtObject gui
+    property QtObject systemdCom: gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
     property int padding: 10
     property real textWidth: 0
     property var locale: Qt.locale()
@@ -58,8 +56,8 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                text: Number(interval).toLocaleString(locale)
-                onTextChanged: if (text && text != "0") loader.interval = parseInt(Number.fromLocaleString(locale, text))
+                text: Number(gui ? gui.interval : 1).toLocaleString(locale, 'f', 0)
+                onTextChanged: if (text && text != "0") gui.interval = parseInt(Number.fromLocaleString(root.locale, text))
             }
         }
         RowLayout {
@@ -77,12 +75,12 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) baseObject.minTemp = Units.toCelsius(Number.fromLocaleString(locale, text), baseObject.unit)
-                Component.onCompleted: text = Units.fromCelsius(baseObject.minTemp, baseObject.unit)
+                onTextChanged: if (activeFocus) gui.minTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
+                Component.onCompleted: text = Units.fromCelsius(gui.minTemp, gui.unit)
                 
                 Connections {
-                    target: baseObject
-                    onUnitChanged: minTempValue.text = Units.fromCelsius(baseObject.minTemp, baseObject.unit)
+                    target: gui
+                    onUnitChanged: minTempValue.text = Units.fromCelsius(gui.minTemp, gui.unit)
                 }
             }
         }
@@ -101,33 +99,12 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) baseObject.maxTemp = Units.toCelsius(Number.fromLocaleString(locale, text), baseObject.unit)
-                Component.onCompleted: text = Units.fromCelsius(baseObject.maxTemp, baseObject.unit)
+                onTextChanged: if (activeFocus) gui.maxTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
+                Component.onCompleted: text = Units.fromCelsius(gui.maxTemp, gui.unit)
                 
                 Connections {
-                    target: baseObject
-                    onUnitChanged: maxTempValue.text = Units.fromCelsius(baseObject.maxTemp, baseObject.unit)
-                }
-            }
-        }
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Unit:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            ComboBox {
-                id: unitBox
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                model: [i18n("Celsius"), i18n("Kelvin"), i18n("Fahrenheit")]
-                currentIndex: baseObject.unit
-                onCurrentIndexChanged: {
-                    baseObject.unit = currentIndex;
+                    target: gui
+                    onUnitChanged: maxTempValue.text = Units.fromCelsius(gui.maxTemp, gui.unit)
                 }
             }
         }
@@ -148,8 +125,8 @@ Item {
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: systemdCom.serviceExists ? "green" : "red"
-                    text: systemdCom.serviceName
-                    onTextChanged: systemdCom.serviceName = text
+                    text: gui.serviceName
+                    onTextChanged: gui.serviceName = text
                 }
             }
         }
@@ -165,13 +142,12 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
-                ComboBox {
+                CheckBox {
                     id: autostartBox
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
-                    model: [i18n("disabled") , i18n("enabled")]
-                    currentIndex: systemdCom.serviceEnabled ? 1 : 0
-                    onCurrentIndexChanged: systemdCom.serviceEnabled = (currentIndex == 1) ? true : false
+                    checked: systemdCom.serviceEnabled
+                    onCheckedChanged: systemdCom.serviceEnabled = checked
                 }
             }
         }

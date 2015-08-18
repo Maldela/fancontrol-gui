@@ -49,7 +49,7 @@ ColumnLayout {
         }
         ComboBox {
             id: fanCombobox
-            model: ArrayFunctions.namesWithPaths(kcm.base.loader.allPwmFans)
+            model: ArrayFunctions.namesWithPaths(kcm.loader.allPwmFans)
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         }
@@ -58,10 +58,12 @@ ColumnLayout {
     PwmFan {
         id: fan
         minimizable: false
-        unit: kcm.base.unit
-        fan: kcm.base.loader.allPwmFans[fanCombobox.currentIndex]
-        loader: kcm.base.loader
-        systemdCom: kcm.base.systemdCom
+        unit: kcm.unit
+        fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
+        loader: kcm.loader
+        systemdCom: kcm.systemdCom
+        minTemp: kcm.minTemp
+        maxTemp: kcm.maxTemp
         Layout.fillWidth: true
         Layout.fillHeight: true
     }

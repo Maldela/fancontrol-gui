@@ -18,10 +18,13 @@
  */
 
 #include "loader.h"
+#include "hwmon.h"
+#include "sensors.h"
 
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QTimer>
 #include <QDebug>
 
 #include <KF5/KAuth/kauthexecutejob.h>
@@ -31,14 +34,15 @@
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
     m_configUrl(QUrl::fromLocalFile("/etc/fancontrol")),
-    m_error("Success")
+    m_error("Success"),
+    m_timer(new QTimer(this))
 {
     parseHwmons();
     
-    m_timer.setSingleShot(false);
-    m_timer.start(1);
+    m_timer->setSingleShot(false);
+    m_timer->start(1);
     
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateSensors()));
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateSensors()));
 }
 
 void Loader::parseHwmons()

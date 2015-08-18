@@ -58,7 +58,7 @@ Rectangle {
         canvas.requestPaint();
     }
     
-    onFanChanged: update()
+    onFanChanged: update();
     onLoaderChanged: update()
     onUnitChanged: if (fan) canvas.requestPaint()
     onMinTempChanged: if (fan) canvas.requestPaint()
@@ -201,19 +201,19 @@ Rectangle {
             visible: parent.contains(Coordinates.centerOf(this)) && fan.hasTemp
             
             Behavior on unscaledTemp {
-                SpringAnimation { 
+                SpringAnimation {
                     epsilon: 0.1
                     spring: 1.0
-                    damping: 0.5
+                    damping: 0.4
                 }
             }
             Behavior on unscaledPwm {
-                SpringAnimation { 
+                SpringAnimation {
                     epsilon: 0.1
                     spring: 1.0
-                    damping: 0.5
+                    damping: 0.4
                 }
-            }
+            }                
         }
         PwmPoint {
             id: stopPoint
@@ -415,7 +415,6 @@ Rectangle {
 
         RowLayout {
             visible: systemdCom
-            enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
             
             Label {
                 text: i18n("Test start and stop values")

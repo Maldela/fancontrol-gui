@@ -18,6 +18,9 @@
  */
 
 #include "hwmon.h"
+#include "sensors.h"
+#include "loader.h"
+
 #include <QDir>
 #include <QTextStream>
 #include <QtQml>

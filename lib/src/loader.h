@@ -22,12 +22,13 @@
 
 #include <QObject>
 #include <QUrl>
-#include <QTimer>
+#include <QList>
+#include <QString>
 
-#include "hwmon.h"
 #include "fancontrol_gui_lib_export.h"
 
 class Hwmon;
+class QTimer;
 
 class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
 {
@@ -56,7 +57,6 @@ public:
     QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
-    Hwmon * hwmon(int i) { return m_hwmons.value(i, Q_NULLPTR); }
     QString error() const { return m_error; }
     
     static int getHwmonNumber(const QString &str); 
@@ -85,7 +85,7 @@ protected:
     QUrl m_configUrl;
     QString m_configFile;
     QString m_error;
-    QTimer m_timer;
+    QTimer *m_timer;
 
 
 signals:

@@ -22,16 +22,12 @@
 
 #include <QObject>
 
-#include "sensors.h"
-#include "loader.h"
-#include "fancontrol_gui_lib_export.h"
-
 class Fan;
 class PwmFan;
 class Temp;
 class Loader;
 
-class FANCONTROL_GUI_LIB_EXPORT Hwmon : public QObject
+class Hwmon : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name CONSTANT)

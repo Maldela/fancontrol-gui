@@ -19,7 +19,6 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 
@@ -113,48 +112,26 @@ ApplicationWindow {
             id: settingsTab
             title: i18n("Settings")
             SettingsTab {
-                baseObject: base
-            }
-        }
-    }
-
-    statusBar: StatusBar {
-        Label {
-            property string systemdError: base.hasSystemdCommunicator() ? base.systemdCom.error : ""
-            property string loaderError: base.loader.error
-
-            color: "red"
-
-            onSystemdErrorChanged: {
-                if (systemdError !== "Success" && systemdError.search("succeeded") == -1)
-                    text = systemdError;
-                else if (loaderError === "Success" || loaderError === "")
-                    text = ""
-            }
-            onLoaderErrorChanged: {
-                if (loaderError !== "Success")
-                    text = loaderError;
-                else if (systemdError === "Success" || systemdError === "")
-                    text = ""
+                gui: base
             }
         }
     }
     
     Action {
-	id: loadAction
+        id: loadAction
         text: i18n("Load configuration file")
         iconName: "document-open"
-	onTriggered: openFileDialog.open()
-	tooltip: i18n("Load configuration file")
-	shortcut: StandardKey.Open
+        onTriggered: openFileDialog.open()
+        tooltip: i18n("Load configuration file")
+        shortcut: StandardKey.Open
     }
     Action {
-	id: saveAction
-	text: i18n("Save configuration file")
+        id: saveAction
+        text: i18n("Save configuration file")
         onTriggered: base.loader.save()
         iconName: "document-save"
-	tooltip: i18n("Save configuration file")
-	shortcut: StandardKey.Save
+        tooltip: i18n("Save configuration file")
+        shortcut: StandardKey.Save
     }
     
     FileDialog {

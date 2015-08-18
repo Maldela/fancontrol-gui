@@ -21,15 +21,15 @@
 #define SYSTEMDCOMMUNICATOR_H
 
 #include <QObject>
-#include <QtDBus/QDBusArgument>
-#include <QtDBus/QDBusInterface>
 
 #include "fancontrol_gui_lib_export.h"
+
+
+class QDBusInterface;
 
 class FANCONTROL_GUI_LIB_EXPORT SystemdCommunicator : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool serviceExists READ serviceExists NOTIFY serviceNameChanged)
     Q_PROPERTY(bool serviceEnabled READ serviceEnabled WRITE setServiceEnabled NOTIFY serviceEnabledChanged)
@@ -37,7 +37,7 @@ class FANCONTROL_GUI_LIB_EXPORT SystemdCommunicator : public QObject
 
 public:
 
-    explicit SystemdCommunicator(QObject *parent = Q_NULLPTR);
+    explicit SystemdCommunicator(const QString &serviceName = QString(), QObject *parent = Q_NULLPTR);
 
     QString serviceName() const { return m_serviceName; }
     void setServiceName(const QString &name);
@@ -47,7 +47,6 @@ public:
     bool setServiceEnabled(bool enabled);
     bool setServiceActive(bool active);
     QString error() const { return m_error; }
-    Q_INVOKABLE bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
     Q_INVOKABLE bool restartService();
 
 
@@ -66,31 +65,15 @@ protected slots:
     
 protected:
     
+    bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
     void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
     void success() { setError("Success"); }
 
     QString m_serviceName;
     QString m_serviceObjectPath;
     QString m_error;
-    QDBusInterface *m_managerInterface = new QDBusInterface("org.freedesktop.systemd1",
-                                                            "/org/freedesktop/systemd1",
-                                                            "org.freedesktop.systemd1.Manager",
-                                                            QDBusConnection::systemBus(),
-                                                            this);
-    QDBusInterface *m_serviceInterface = Q_NULLPTR;
+    QDBusInterface * const m_managerInterface;
+    QDBusInterface *m_serviceInterface;
 };
-
-typedef struct
-{
-    QString path;
-    QString state;
-} SystemdUnitFile;
-Q_DECLARE_METATYPE(SystemdUnitFile)
-
-typedef QList<SystemdUnitFile> SystemdUnitFileList;
-Q_DECLARE_METATYPE(SystemdUnitFileList)
-
-QDBusArgument &operator <<(QDBusArgument &argument, const SystemdUnitFile &unitFile);
-const QDBusArgument &operator >>(const QDBusArgument &argument, SystemdUnitFile &unitFile);
 
 #endif // SYSTEMDCOMMUNICATOR_H
