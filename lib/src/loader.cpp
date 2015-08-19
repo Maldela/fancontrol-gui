@@ -161,8 +161,9 @@ bool Loader::load(const QUrl &url)
             bool success;
             int interval = line.toInt(&success);
             if (success)
+            {
                 setInterval(interval, false);
-	    
+            }
             else
             {
                 setError("Unable to parse interval line");
@@ -326,7 +327,6 @@ bool Loader::load(const QUrl &url)
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
     }
     
-    m_configUrl = url;
     emit configUrlChanged();
     
     m_configFile = fileContent;
