@@ -20,6 +20,8 @@
 #include "sensors.h"
 #include <QFile>
 #include <QDir>
+#include <QTextStream>
+#include <QTimer>
 #include <QDebug>
 #include <KConfigGroup>
 #include <KSharedConfig>
@@ -36,7 +38,8 @@ Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent)
 
 
 Fan::Fan(Hwmon *parent, uint index) : 
-    Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index)))
+    Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index))),
+    m_rpmStream(new QTextStream)
 {
     if (QDir(parent->path()).isReadable())
     {
@@ -44,14 +47,19 @@ Fan::Fan(Hwmon *parent, uint index) :
 
         if (rpmFile->open(QFile::ReadOnly))
         {
-            m_rpmStream.setDevice(rpmFile);
-            m_rpmStream >> m_rpm;
+            m_rpmStream->setDevice(rpmFile);
+            *m_rpmStream >> m_rpm;
         }
         else
         {
             qDebug() << "Can't open rpmFile " << parent->path() + "/fan" + QString::number(index) + "_input";
         }
     }
+}
+
+Fan::~Fan()
+{
+    delete m_rpmStream;
 }
 
 QString Fan::name() const
@@ -78,13 +86,16 @@ void Fan::setName(const QString &name)
 
 void Fan::update()
 {
-    m_rpmStream.seek(0);
-    m_rpmStream >> m_rpm;
+    m_rpmStream->seek(0);
+    *m_rpmStream >> m_rpm;
     emit rpmChanged();
 }
 
 
 PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
+    m_pwmStream(new QTextStream),
+    m_modeStream(new QTextStream),
+    m_testTimer(new QTimer(this)),
     m_temp(Q_NULLPTR),
     m_hasTemp(false),
     m_testing(false),
@@ -97,7 +108,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_zeroRpm(0),
     m_testStatus(notTesting)
 {
-    m_testTimer.setSingleShot(true);
+    m_testTimer->setSingleShot(true);
 
     connect(this, SIGNAL(tempChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(hasTempChanged()), parent, SLOT(updateConfig()));
@@ -107,20 +118,20 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
-    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(continueTest()));
+    connect(m_testTimer, SIGNAL(timeout()), this, SLOT(continueTest()));
 
     if (QDir(parent->path()).isReadable())
     {
         QFile *pwmFile = new QFile(parent->path() + "/pwm" + QString::number(index), this);
         if (pwmFile->open(QFile::ReadWrite))
         {
-            m_pwmStream.setDevice(pwmFile);
-            m_pwmStream >> m_pwm;
+            m_pwmStream->setDevice(pwmFile);
+            *m_pwmStream >> m_pwm;
         }
         else if (pwmFile->open(QFile::ReadOnly))
         {
-            m_pwmStream.setDevice(pwmFile);
-            m_pwmStream >> m_pwm;
+            m_pwmStream->setDevice(pwmFile);
+            *m_pwmStream >> m_pwm;
         }
         else
             qDebug() << "Can't open pwmFile " << pwmFile->fileName();
@@ -128,28 +139,34 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         QFile *pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
         if (pwmModeFile->open(QFile::ReadWrite))
         {
-            m_modeStream.setDevice(pwmModeFile);
-            m_modeStream >> m_pwmMode;
+            m_modeStream->setDevice(pwmModeFile);
+            *m_modeStream >> m_pwmMode;
         }
         else if (pwmModeFile->open(QFile::ReadOnly))
         {
-            m_modeStream.setDevice(pwmModeFile);
-            m_modeStream >> m_pwmMode;
+            m_modeStream->setDevice(pwmModeFile);
+            *m_modeStream >> m_pwmMode;
         }
         else
             qDebug() << "Can't open pwmModeFile " << pwmModeFile->fileName();
     }
 }
 
+PwmFan::~PwmFan()
+{
+    delete m_pwmStream;
+    delete m_modeStream;
+}
+
 void PwmFan::update()
 {
     Fan::update();
 
-    m_pwmStream.seek(0);
-    setPwm(m_pwmStream.readAll().toInt(), false);
+    m_pwmStream->seek(0);
+    setPwm(m_pwmStream->readAll().toInt(), false);
 
-    m_modeStream.seek(0);
-    setPwmMode(m_modeStream.readAll().toInt(), false);
+    m_modeStream->seek(0);
+    setPwmMode(m_modeStream->readAll().toInt(), false);
 }
 
 void PwmFan::setPwm(int pwm, bool write)
@@ -161,15 +178,15 @@ void PwmFan::setPwm(int pwm, bool write)
 
         if (write)
         {
-            if (m_pwmStream.device()->isWritable())
-                m_pwmStream << pwm;
+            if (m_pwmStream->device()->isWritable())
+                *m_pwmStream << pwm;
             else
             {
                 KAuth::Action action("fancontrol.gui.helper.action");
                 action.setHelperId("fancontrol.gui.helper");
                 QVariantMap map;
                 map["action"] = "write";
-                map["filename"] = qobject_cast<QFile *>(m_pwmStream.device())->fileName();
+                map["filename"] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
                 map["content"] = QString::number(pwm);
                 action.setArguments(map);
                 KAuth::ExecuteJob *reply = action.execute();
@@ -190,15 +207,15 @@ void PwmFan::setPwmMode(int pwmMode, bool write)
 
         if (write)
         {
-            if (m_modeStream.device()->isWritable())
-                m_modeStream << pwmMode;
+            if (m_modeStream->device()->isWritable())
+                *m_modeStream << pwmMode;
             else
             {
                 KAuth::Action action("fancontrol.gui.helper.action");
                 action.setHelperId("fancontrol.gui.helper");
                 QVariantMap map;
                 map["action"] = "write";
-                map["filename"] = qobject_cast<QFile *>(m_modeStream.device())->fileName();
+                map["filename"] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
                 map["content"] = QString::number(pwmMode);
                 action.setArguments(map);
                 KAuth::ExecuteJob *reply = action.execute();
@@ -218,15 +235,15 @@ void PwmFan::test()
     m_testStatus = findingStop1;
     setPwmMode(1);
     setPwm(255);
-    m_testTimer.setInterval(500);
-    m_testTimer.start();
+    m_testTimer->setInterval(500);
+    m_testTimer->start();
     qDebug() << "Start testing...";
 }
 
 void PwmFan::abortTest()
 {
     setPwm(255);
-    m_testTimer.stop();
+    m_testTimer->stop();
 
     m_testing = false;
     emit testingChanged();
@@ -253,11 +270,11 @@ void PwmFan::continueTest()
             {
                 m_testStatus = findingStart;
                 m_zeroRpm = 0;
-                m_testTimer.setInterval(500);
+                m_testTimer->setInterval(500);
                 qDebug() << "Start finding start value...";
             }
         }
-        m_testTimer.start();
+        m_testTimer->start();
         break;
 
     case findingStart:
@@ -266,11 +283,11 @@ void PwmFan::continueTest()
         else
         {
             m_testStatus = findingStop2;
-            m_testTimer.setInterval(1000);
+            m_testTimer->setInterval(1000);
             setMinStart(m_pwm);
             qDebug() << "Start finding stop value...";
         }
-        m_testTimer.start();
+        m_testTimer->start();
         break;
 
     case findingStop2:
@@ -278,14 +295,14 @@ void PwmFan::continueTest()
         {
             setPwm(m_pwm - 1);
             m_zeroRpm = 0;
-            m_testTimer.start();
+            m_testTimer->start();
         }
         else
         {
             if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
             {
                 m_zeroRpm++;
-                m_testTimer.start();
+                m_testTimer->start();
             }
             else
             {
@@ -340,7 +357,8 @@ void PwmFan::setActive(bool a)
 
 
 Temp::Temp(Hwmon *parent, uint index) : 
-    Sensor(parent, index, QString(parent->name() + QString("/temp") + QString::number(index)))
+    Sensor(parent, index, QString(parent->name() + QString("/temp") + QString::number(index))),
+    m_valueStream(new QTextStream)
 {
     if (QDir(parent->path()).isReadable())
     {
@@ -349,8 +367,8 @@ Temp::Temp(Hwmon *parent, uint index) :
 
         if (valueFile->open(QFile::ReadOnly))
         {
-            m_valueStream.setDevice(valueFile);
-            m_valueStream >> m_value;
+            m_valueStream->setDevice(valueFile);
+            *m_valueStream >> m_value;
             m_value /= 1000;
         }
         else
@@ -365,6 +383,11 @@ Temp::Temp(Hwmon *parent, uint index) :
             qDebug() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
         }
     }
+}
+
+Temp::~Temp()
+{
+    delete m_valueStream;
 }
 
 QString Temp::name() const
@@ -395,8 +418,8 @@ void Temp::setName(const QString &name)
 
 void Temp::update()
 {
-    m_valueStream.seek(0);
-    m_valueStream >> m_value;
+    m_valueStream->seek(0);
+    *m_valueStream >> m_value;
     m_value /= 1000;
     emit valueChanged();
 }

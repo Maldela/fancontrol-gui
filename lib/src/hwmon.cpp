@@ -18,7 +18,6 @@
  */
 
 #include "hwmon.h"
-#include "sensors.h"
 #include "loader.h"
 
 #include <QDir>

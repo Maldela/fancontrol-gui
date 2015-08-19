@@ -21,12 +21,13 @@
 #define SENSORS_H
 
 #include <QObject>
-#include <QTextStream>
-#include <QTimer>
+#include <QString>
 
 #include "hwmon.h"
 
 class Hwmon;
+class QTextStream;
+class QTimer;
 
 class Sensor : public QObject
 {
@@ -74,6 +75,7 @@ class Temp : public Sensor
 public:
 
     explicit Temp(Hwmon *parent, uint index);
+    ~Temp();
 
     QString label() const { return m_label; }
     int value() const { return m_value; }
@@ -96,7 +98,7 @@ protected:
 
     QString m_label;
     int m_value;
-    QTextStream m_valueStream;
+    QTextStream *m_valueStream;
 };
 
 
@@ -108,6 +110,7 @@ class Fan : public Sensor
 public:
 
     explicit Fan(Hwmon *parent, uint index);
+    virtual ~Fan();
 
     int rpm() const { return m_rpm; }
     QString name() const;
@@ -130,7 +133,7 @@ public slots:
 protected:
 
     int m_rpm;
-    QTextStream m_rpmStream;
+    QTextStream *m_rpmStream;
 };
 
 
@@ -153,6 +156,7 @@ class PwmFan : public Fan
 public:
 
     explicit PwmFan(Hwmon *parent, uint index);
+    ~PwmFan();
 
     int pwm() const { return m_pwm; }
     Temp * temp() const { return m_temp; }
@@ -207,9 +211,9 @@ protected slots:
 protected:
 
     int m_pwm;
-    QTextStream m_pwmStream;
-    QTextStream m_modeStream;
-    QTimer m_testTimer;
+    QTextStream *m_pwmStream;
+    QTextStream *m_modeStream;
+    QTimer *m_testTimer;
     Temp *m_temp;
     bool m_hasTemp;
     bool m_testing;

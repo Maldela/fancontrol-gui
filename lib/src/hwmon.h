@@ -21,6 +21,10 @@
 #define HWMON_H
 
 #include <QObject>
+#include <QString>
+#include <QList>
+
+#include "sensors.h"
 
 class Fan;
 class PwmFan;
