@@ -27,6 +27,7 @@ import "../scripts/units.js" as Units
 Item {
     property QtObject gui
     property QtObject systemdCom: gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
+    property QtObject loader : gui ? gui.loader : null
     property int padding: 10
     property real textWidth: 0
     property var locale: Qt.locale()
@@ -107,7 +108,7 @@ Item {
                     onUnitChanged: maxTempValue.text = Units.fromCelsius(gui.maxTemp, gui.unit)
                 }
             }
-        }
+        }        
         Loader {
             active: systemdCom
             sourceComponent: RowLayout {
@@ -150,6 +151,12 @@ Item {
                     onCheckedChanged: systemdCom.serviceEnabled = checked
                 }
             }
+        }
+        
+        Button {
+            x: maxTempValue.x
+            text: i18n("Detect fans")
+            onClicked: loader.detectSensors()
         }
     }
 }

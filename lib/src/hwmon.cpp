@@ -35,42 +35,97 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
         m_name = QTextStream(&nameFile).readLine();
     else
         m_name = path.split('/').last();
+    
+    connect(this, SIGNAL(configUpdateNeeded()), parent, SLOT(createConfigFile()));
+    connect(this, SIGNAL(pwmFansChanged()), parent, SLOT(emitAllPwmFansChanged()));
+    connect(this, SIGNAL(tempsChanged()), parent, SLOT(emitAllTempsChanged()));
 
+    initialize();
+}
+
+void Hwmon::initialize()
+{
     QDir dir(m_path);
     QStringList entrys = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
     foreach (QString entry, entrys)
     {
         QString str = entry;
-        int index = str.remove(QRegExp("\\D+")).toInt();
+        uint index = str.remove(QRegExp("\\D+")).toUInt();
         if (entry.contains("fan") && entry.contains("input"))
         {
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
-                PwmFan *newPwmFan = new PwmFan(this, index);
-                connect(this, SIGNAL(sensorsUpdateNeeded()), newPwmFan, SLOT(update()));
-                m_pwmFans << newPwmFan;
-                emit pwmFansChanged();
-                m_fans << qobject_cast<Fan *>(newPwmFan);
-                emit fansChanged();
+                PwmFan *newPwmFan = Q_NULLPTR;
+                
+                foreach (PwmFan *pwmFan, m_pwmFans)
+                {
+                    if (pwmFan->index() == index)
+                    {
+                        newPwmFan = pwmFan;
+                        break;
+                    }
+                }
+                
+                if (!newPwmFan)
+                {
+                    newPwmFan = new PwmFan(this, index);
+                    connect(this, SIGNAL(sensorsUpdateNeeded()), newPwmFan, SLOT(update()));
+                    m_pwmFans << newPwmFan;
+                    emit pwmFansChanged();
+                }
+                
+                Fan *newFan = qobject_cast<Fan *>(newPwmFan);
+                if (!m_fans.contains(newFan))
+                {
+                    m_fans << newFan;
+                    emit fansChanged();
+                }
             }
             else
             {
-                Fan *newFan = new Fan(this, index);
-                connect(this, SIGNAL(sensorsUpdateNeeded()), newFan, SLOT(update()));
-                m_fans << newFan;
-                emit fansChanged();
+                Fan *newFan = Q_NULLPTR;
+                
+                foreach (Fan *fan, m_fans)
+                {
+                    if (fan->index() == index)
+                    {
+                        newFan = fan;
+                        break;
+                    }
+                }
+                
+                if (!newFan)
+                {
+                    newFan = new Fan(this, index);
+                    connect(this, SIGNAL(sensorsUpdateNeeded()), newFan, SLOT(update()));
+                    m_fans << newFan;
+                    emit fansChanged();
+                }
             }
         }
 
         if (entry.contains("temp") && entry.contains("input"))
         {
-            Temp *newTemp = new Temp(this, index);
-            connect(this, SIGNAL(sensorsUpdateNeeded()), newTemp, SLOT(update()));
-            m_temps << newTemp;
-            emit tempsChanged();
+            Temp *newTemp = Q_NULLPTR;
+                
+            foreach (Temp *temp, m_temps)
+            {
+                if (temp->index() == index)
+                {
+                    newTemp = temp;
+                    break;
+                }
+            }
+            
+            if (!newTemp)
+            {
+                newTemp = new Temp(this, index);
+                connect(this, SIGNAL(sensorsUpdateNeeded()), newTemp, SLOT(update()));
+                m_temps << newTemp;
+                emit tempsChanged();
+            }
         }
     }
-//    qDebug() << "New Hwmon" << m_temps.size() << m_pwmFans.size();
 }
 
 QList<QObject *> Hwmon::fans() const

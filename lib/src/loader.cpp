@@ -47,36 +47,54 @@ Loader::Loader(QObject *parent) : QObject(parent),
 
 void Loader::parseHwmons()
 {
-    foreach (Hwmon *hwmon, m_hwmons)
-    {
-        hwmon->deleteLater();
-    }
-    m_hwmons.clear();
-
     QDir hwmonDir(HWMON_PATH);
     QStringList list;
     if (hwmonDir.isReadable())
-    {
         list = hwmonDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
-    }
+
     else
     {
         qDebug() << HWMON_PATH << " is not readable!";
         return;
     }
-
-    foreach (QString hwmonPath, list)
+    
+    QStringList dereferencedList;
+    while (!list.isEmpty())
+        dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
+    
+    foreach (Hwmon *hwmon, m_hwmons)
     {
-        Hwmon *hwmon = new Hwmon(QFile::symLinkTarget(hwmonDir.absoluteFilePath(hwmonPath)), this);
-        connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-        connect(hwmon, SIGNAL(pwmFansChanged()), this, SLOT(emitAllPwmFansChanged()));
-        connect(hwmon, SIGNAL(tempsChanged()), this, SLOT(emitAllTempsChanged()));
-        connect(this, SIGNAL(sensorsUpdateNeeded()), hwmon, SLOT(updateSensors()));
-        m_hwmons << hwmon;
+        if (!dereferencedList.contains(hwmon->path()))
+        {
+            m_hwmons.removeOne(hwmon);
+            emit hwmonsChanged();
+            hwmon->deleteLater();
+        }
+        else
+            hwmon->initialize();
     }
-    emit hwmonsChanged();
-    emit allPwmFansChanged();
-    emit allTempsChanged();
+
+    foreach (const QString &hwmonPath, dereferencedList)
+    {
+        bool hwmonExists = false;
+        
+        foreach (const Hwmon *hwmon, m_hwmons)
+        {
+            if (hwmon->path() == hwmonPath)
+            {
+                hwmonExists = true;
+                break;
+            }
+        }
+
+        if (!hwmonExists)
+        {
+            Hwmon *newHwmon = new Hwmon(hwmonPath, this);
+            connect(this, SIGNAL(sensorsUpdateNeeded()), newHwmon, SLOT(updateSensors()));
+            m_hwmons << newHwmon;
+            emit hwmonsChanged();
+        }
+    }
 }
 
 bool Loader::load(const QUrl &url)
@@ -532,6 +550,25 @@ void Loader::testFans()
     {
         m_hwmons.at(i)->testFans();
     }
+}
+
+void Loader::detectSensors()
+{
+    KAuth::Action action("fancontrol.gui.helper.action");
+    action.setHelperId("fancontrol.gui.helper");
+    QVariantMap map;
+    map["action"] = "detectSensors";
+    
+    action.setArguments(map);
+    KAuth::ExecuteJob *reply = action.execute();
+
+    if (!reply->exec())
+    {
+        setError(reply->errorString());
+        return;
+    }    
+    
+    parseHwmons();
 }
 
 QList<QObject *> Loader::hwmons() const

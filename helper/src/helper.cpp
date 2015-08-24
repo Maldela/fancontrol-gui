@@ -21,6 +21,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QProcess>
 
 #ifndef NO_SYSTEMD
 #include <QtDBus>
@@ -77,10 +78,10 @@ ActionReply Helper::action(const QVariantMap &arguments)
         QTextStream stream(&file);
         QString content = stream.readAll();
 
-        QVariantMap retdata;
-        retdata["content"] = content;
+        QVariantMap returnData;
+        returnData["content"] = content;
 
-        reply.setData(retdata);
+        reply.setData(returnData);
     }
 
     else if (arguments["action"] == "write")
@@ -100,6 +101,31 @@ ActionReply Helper::action(const QVariantMap &arguments)
         stream << arguments["content"].toString();
     }
 
+    else if (arguments["action"] == "detectSensors")
+    {
+        QString program = "sensors-detect";
+        QStringList arguments = QStringList() << "--auto";
+        
+        QProcess process;
+        process.start(program, arguments);
+        
+        if (!process.waitForStarted(10000))
+        {
+            reply = ActionReply::HelperErrorType;
+            reply.addData("errorDescription", process.errorString());
+            
+            return reply;
+        }
+        
+        if (!process.waitForFinished(10000))
+        {
+            reply = ActionReply::HelperErrorType;
+            reply.addData("errorDescription", process.errorString());
+            
+            return reply;
+        }
+    }
+    
     return reply;
 }
 

@@ -67,4 +67,10 @@ ScrollView {
         text: i18n("There are no pwm capable fans in your system.")
         font.bold: true
     }
+    Button {
+        anchors.centerIn: parent
+        visible: repeater.fans.length == 0
+        text: i18n("Detect fans")
+        onClicked: loader.detectSensors()
+    }
 }

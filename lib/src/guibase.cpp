@@ -28,6 +28,7 @@
 #include <QtQml>
 #include <QLocale>
 
+
 GUIBase::GUIBase(QObject *parent) : QObject(parent),    
     m_config(Config::instance()),
 

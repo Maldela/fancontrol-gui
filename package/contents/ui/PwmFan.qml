@@ -37,8 +37,6 @@ Rectangle {
     property bool minimizable: true
 
     id: root
-    implicitWidth: 800
-    implicitHeight: 600
     color: "transparent"
     border.color: "black"
     border.width: 2
