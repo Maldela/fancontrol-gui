@@ -57,8 +57,14 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
+                validator: IntValidator { bottom: 0 }
                 text: Number(gui ? gui.interval : 1).toLocaleString(locale, 'f', 0)
-                onTextChanged: if (text && text != "0") gui.interval = parseInt(Number.fromLocaleString(root.locale, text))
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Number.fromLocaleString(root.locale, text);
+                        if (value) gui.interval = value;
+                    }
+                }
             }
         }
         RowLayout {
@@ -75,9 +81,15 @@ Item {
                 id: minTempValue
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) gui.minTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
-                Component.onCompleted: text = Units.fromCelsius(gui.minTemp, gui.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                validator: DoubleValidator {}
+                Component.onCompleted: text = Number(Units.fromCelsius(gui.minTemp, gui.unit)).toLocaleString()
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
+                        if (value) gui.minTemp = value;
+                    }
+                }
                 
                 Connections {
                     target: gui
@@ -99,9 +111,15 @@ Item {
                 id: maxTempValue
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) gui.maxTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
-                Component.onCompleted: text = Units.fromCelsius(gui.maxTemp, gui.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                validator: DoubleValidator {}
+                Component.onCompleted: text = Number(Units.fromCelsius(gui.maxTemp, gui.unit)).toLocaleString()
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
+                        if (value) gui.maxTemp = value;
+                    }
+                }
                 
                 Connections {
                     target: gui

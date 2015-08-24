@@ -82,12 +82,12 @@ Item {
             active: enabledBox.checked && !!kcm.loader.allPwmFans[fanCombobox.currentIndex]
             sourceComponent: PwmFan {
                 minimizable: false
-                unit: kcm.unit
+                unit: kcm.base.unit
                 fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
                 loader: kcm.loader
                 systemdCom: kcm.systemdCom
-                minTemp: kcm.minTemp
-                maxTemp: kcm.maxTemp
+                minTemp: kcm.base.minTemp
+                maxTemp: kcm.base.maxTemp
             }
         }
     }

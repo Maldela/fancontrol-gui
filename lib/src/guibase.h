@@ -50,11 +50,11 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
 #endif
     
-    Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY configChanged)
-    Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY configChanged)
+    Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
+    Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
     Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
-    Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY configChanged)
-    Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY configChanged)
+    Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
+    Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
 
 public:
     
@@ -84,13 +84,16 @@ public:
     
 signals:
 
-    void configChanged();
+    void minTempChanged();
+    void maxTempChanged();
+    void serviceNameChanged();
     void unitChanged();
+    void intervalChanged();
     
     
 protected:
     
-    void emitConfigChanged() { emit configChanged(); }
+    void emitConfigChanged();
 
     Config *m_config;
 

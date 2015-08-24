@@ -79,13 +79,19 @@ int GUIBase::interval() const
 void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
+    {
         m_config->findItem("MaxTemp")->setProperty(temp);
+        emit maxTempChanged();
+    }
 }
 
 void GUIBase::setMinTemp(qreal temp)
 {
     if (temp != minTemp())
+    {
         m_config->findItem("MinTemp")->setProperty(temp);
+        emit minTempChanged();
+    }
 }
 
 void GUIBase::setServiceName(const QString& name)
@@ -97,7 +103,8 @@ void GUIBase::setServiceName(const QString& name)
 #ifndef NO_SYSTEMD
         m_com->setServiceName(name);
 #endif
-            
+        
+        emit serviceNameChanged();
     }
 }
 
@@ -109,4 +116,12 @@ void GUIBase::setInterval(int i)
 void GUIBase::saveConfig()
 {
     m_config->save();
+}
+
+void GUIBase::emitConfigChanged()
+{
+    emit minTempChanged();
+    emit maxTempChanged();
+    emit intervalChanged();
+    emit serviceNameChanged();
 }

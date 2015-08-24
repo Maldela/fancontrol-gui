@@ -168,8 +168,6 @@ Rectangle {
         property int bottomPadding: fontSize * 2
         property int plotWidth: width - leftPadding - rightPadding
         property int plotHeight: height - topPadding - bottomPadding
-        property alias minTemp: root.minTemp
-        property alias maxTemp: root.maxTemp
 
         id: canvas
         renderTarget: Canvas.FramebufferObject
@@ -328,7 +326,7 @@ Rectangle {
             var convertedMaxTemp = Units.fromCelsius(maxTemp, unit);
             var suffix = (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
             var lastTemp;
-            for (i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
+            for (var i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
                 lastTemp = i;
                 var x = scaleX(Units.toCelsius(i, unit));
                 c.fillText(i + suffix, x, topPadding+plotHeight+fontSize/2);

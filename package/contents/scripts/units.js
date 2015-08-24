@@ -19,7 +19,7 @@
 
 function round(number, dec) {
     if (!dec || dec == 0) return Math.round(number);
-    return Math.round(number*10*dec) / (10*dec);
+    return Math.round(number*Math.pow(10, dec)) / Math.pow(10, dec);
 }
 
 function toCelsius(degrees, currentUnit) {
@@ -31,7 +31,7 @@ function toCelsius(degrees, currentUnit) {
 
 function fromCelsius(degrees, newUnit) {
     var float = parseFloat(degrees);
-    if (newUnit == 1) { return round(float + 273.15); }
-    if (newUnit == 2) { return round(float * 9 / 5 + 32); }
-    return round(float);
+    if (newUnit == 1) { return round(float + 273.15, 2); }
+    if (newUnit == 2) { return round(float * 9 / 5 + 32, 2); }
+    return round(float, 2);
 }

@@ -24,6 +24,7 @@ FocusScope {
     property alias text: value.text
     property alias font: value.font
     property alias inputMethodHints: value.inputMethodHints
+    property alias validator: value.validator
     property alias color: value.color
     property real margin: 6
 

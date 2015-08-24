@@ -54,8 +54,6 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     setAuthActionName("fancontrol.gui.helper.action");
     
     connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
-    connect(m_base, &GUIBase::configChanged, this, &FancontrolKCM::emitConfigChanged);
-    connect(m_base, &GUIBase::unitChanged, this, &FancontrolKCM::emitUnitChanged);
     
     qmlRegisterType<GUIBase>();
 }
