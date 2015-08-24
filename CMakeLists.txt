@@ -8,6 +8,7 @@ option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality signif
 option(BUILD_GUI "Build the standalone application" ON)
 option(BUILD_KCM "Build the KCM" OFF)
 option(INSTALL_SHARED "Install the shared parts" ON)
+option(INSTALL_HELPER "Install the KHelper" ON)
 
 
 #KCM can't be build without systemd support
@@ -66,7 +67,11 @@ add_subdirectory(lib)
 
 
 #KHelper for actions that require superuser rights
-add_subdirectory(helper)
+if(INSTALL_HELPER)
+
+    add_subdirectory(helper)
+    
+endif(INSTALL_HELPER)
 
 
 #Build the standalone application
