@@ -52,6 +52,14 @@ Item {
             checked: kcm.manualControl
         }
         
+        CheckBox {
+            id: enabledBox
+            visible: kcm.loader.allPwmFans.length > 0
+            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+            text: i18n("Control fans manually")
+            checked: kcm.manualControl
+        }
+        
         RowLayout {  
             visible: enabledBox.checked && kcm.loader.allPwmFans.length > 0
             
@@ -71,7 +79,7 @@ Item {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            active: enabledBox.checked
+            active: enabledBox.checked && !!kcm.loader.allPwmFans[fanCombobox.currentIndex]
             sourceComponent: PwmFan {
                 minimizable: false
                 unit: kcm.unit
