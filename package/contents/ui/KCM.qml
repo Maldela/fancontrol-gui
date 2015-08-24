@@ -24,47 +24,57 @@ import QtQuick.Layouts 1.1
 import org.kde.kcm 1.0
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 
-ColumnLayout {
-    id: root
+Item {
+    implicitWidth: 800
+    implicitHeight: 600
     
-    CheckBox {
-        id: enabledBox
-        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-        text: i18n("Control fans manually")
-        checked: kcm.manualControl
-        onCheckedChanged: {
-            kcm.manualControl = checked;
-            fanRow.visible = checked;
-            fan.visible = checked;
+    ColumnLayout {
+        anchors.fill: parent    
+        
+        CheckBox {
+            id: enabledBox
+            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+            text: i18n("Control fans manually")
+            checked: kcm.manualControl
         }
-    }
-    
-    RowLayout {  
-        id: fanRow
         
         Label {
-            text: i18n("Fan:")
-            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            renderType: Text.NativeRendering
+            visible: enabledBox.checked && kcm.loader.allPwmFans.length == 0
+            text: i18n("There are no pwm capable fans in your system.")
+            anchors.top: enabledBox.bottom
+            anchors.margins: 20
         }
-        ComboBox {
-            id: fanCombobox
-            model: ArrayFunctions.namesWithPaths(kcm.loader.allPwmFans)
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+        
+        RowLayout {  
+            visible: enabledBox.checked && kcm.loader.allPwmFans.length > 0
+            
+            Label {
+                text: i18n("Fan:")
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                renderType: Text.NativeRendering
+            }
+            ComboBox {
+                id: fanCombobox
+                model: ArrayFunctions.namesWithPaths(kcm.loader.allPwmFans)
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            }
         }
-    }
-    
-    PwmFan {
-        id: fan
-        minimizable: false
-        unit: kcm.unit
-        fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
-        loader: kcm.loader
-        systemdCom: kcm.systemdCom
-        minTemp: kcm.minTemp
-        maxTemp: kcm.maxTemp
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+        
+        Loader {
+            active: enabledBox.checked && !!kcm.loader.allPwmFans[fanCombobox.currentIndex]
+            sourceComponent: PwmFan {
+                id: fan
+                minimizable: false
+                unit: kcm.unit
+                fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
+                loader: kcm.loader
+                systemdCom: kcm.systemdCom
+                minTemp: kcm.minTemp
+                maxTemp: kcm.maxTemp
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+        }
     }
 }
