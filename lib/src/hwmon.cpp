@@ -62,6 +62,7 @@ void Hwmon::initialize()
                     if (pwmFan->index() == index)
                     {
                         newPwmFan = pwmFan;
+                        newPwmFan->reset();
                         break;
                     }
                 }
@@ -90,6 +91,7 @@ void Hwmon::initialize()
                     if (fan->index() == index)
                     {
                         newFan = fan;
+                        newFan->reset();
                         break;
                     }
                 }
@@ -113,6 +115,7 @@ void Hwmon::initialize()
                 if (temp->index() == index)
                 {
                     newTemp = temp;
+                    newTemp->reset();
                     break;
                 }
             }

@@ -27,6 +27,7 @@ import "../scripts/units.js" as Units
 Item {
     property QtObject gui
     property QtObject systemdCom: gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
+    property QtObject loader : gui ? gui.loader : null
     property int padding: 10
     property real textWidth: 0
     property var locale: Qt.locale()
@@ -56,8 +57,16 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                text: Number(gui ? gui.interval : 1).toLocaleString(locale, 'f', 0)
-                onTextChanged: if (text && text != "0") gui.interval = parseInt(Number.fromLocaleString(root.locale, text))
+                validator: IntValidator { bottom: 0 }
+                value: gui.loader ? gui.loader.interval : 1
+                type: "int"
+                
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Number.fromLocaleString(root.locale, text);
+                        if (value) gui.loader.interval = value;
+                    }
+                }
             }
         }
         RowLayout {
@@ -71,16 +80,18 @@ Item {
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
             OptionInput {
-                id: minTempValue
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) gui.minTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
-                Component.onCompleted: text = Units.fromCelsius(gui.minTemp, gui.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                validator: DoubleValidator { top: gui.maxTemp }
+                value: Units.fromCelsius(gui.minTemp, gui.unit)
+                type: "double"
                 
-                Connections {
-                    target: gui
-                    onUnitChanged: minTempValue.text = Units.fromCelsius(gui.minTemp, gui.unit)
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
+                        if (value) gui.minTemp = value;
+                    }
                 }
             }
         }
@@ -98,16 +109,19 @@ Item {
                 id: maxTempValue
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: if (activeFocus) gui.maxTemp = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit)
-                Component.onCompleted: text = Units.fromCelsius(gui.maxTemp, gui.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                validator: DoubleValidator { bottom: gui.minTemp }
+                value: Units.fromCelsius(gui.maxTemp, gui.unit)
+                type: "double"
                 
-                Connections {
-                    target: gui
-                    onUnitChanged: maxTempValue.text = Units.fromCelsius(gui.maxTemp, gui.unit)
+                onTextChanged: {
+                    if (activeFocus && text && root.locale) {
+                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
+                        if (value) gui.maxTemp = value;
+                    }
                 }
             }
-        }
+        }        
         Loader {
             active: systemdCom
             sourceComponent: RowLayout {
@@ -121,11 +135,11 @@ Item {
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
                 OptionInput {
-                    id: serviceName
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: systemdCom.serviceExists ? "green" : "red"
-                    text: gui.serviceName
+                    value: gui.serviceName
+                    type: "string"
                     onTextChanged: gui.serviceName = text
                 }
             }
@@ -150,6 +164,12 @@ Item {
                     onCheckedChanged: systemdCom.serviceEnabled = checked
                 }
             }
+        }
+        
+        Button {
+            x: maxTempValue.x
+            text: i18n("Detect fans")
+            onClicked: loader.detectSensors()
         }
     }
 }

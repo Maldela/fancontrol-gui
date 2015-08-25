@@ -108,8 +108,8 @@ ActionReply Helper::action(const QVariantMap &arguments)
         
         QProcess process;
         process.start(program, arguments);
-        
-        if (!process.waitForStarted(), 10000)
+
+        if (!process.waitForStarted(10000))
         {
             reply = ActionReply::HelperErrorType;
             reply.addData("errorDescription", process.errorString());
@@ -117,7 +117,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
             return reply;
         }
         
-        if (!process.waitForFinished(), 10000)
+        if (!process.waitForFinished(10000))
         {
             reply = ActionReply::HelperErrorType;
             reply.addData("errorDescription", process.errorString());

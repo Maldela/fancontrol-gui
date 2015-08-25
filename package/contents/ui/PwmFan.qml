@@ -29,8 +29,8 @@ Rectangle {
     property QtObject fan
     property QtObject loader
     property QtObject systemdCom
-    property real minTemp: 20.0
-    property real maxTemp: 100.0
+    property real minTemp: 40.0
+    property real maxTemp: 90.0
     property int margin: 5
     property int minimizeDuration: 400
     property int unit: 0
@@ -48,7 +48,6 @@ Rectangle {
         if (fan) {
             hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
             fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
-            minStartInput.text = Qt.binding(function() { return fan.minStart; })
             if (fan.hasTemp && loader) {
                 tempBox.currentIndex = loader.allTemps.indexOf(fan.temp);
             }
@@ -168,8 +167,8 @@ Rectangle {
         property int bottomPadding: fontSize * 2
         property int plotWidth: width - leftPadding - rightPadding
         property int plotHeight: height - topPadding - bottomPadding
-        property alias minTemp: root.minTemp
-        property alias maxTemp: root.maxTemp
+        property alias minTemp: root.minTemp        //needed for pwmPoints
+        property alias maxTemp: root.maxTemp        //needed for pwmPoints
 
         id: canvas
         renderTarget: Canvas.FramebufferObject
@@ -328,7 +327,7 @@ Rectangle {
             var convertedMaxTemp = Units.fromCelsius(maxTemp, unit);
             var suffix = (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
             var lastTemp;
-            for (i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
+            for (var i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
                 lastTemp = i;
                 var x = scaleX(Units.toCelsius(i, unit));
                 c.fillText(i + suffix, x, topPadding+plotHeight+fontSize/2);
@@ -403,22 +402,19 @@ Rectangle {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 renderType: Text.NativeRendering
             }
-            OptionInput {
+            SpinBox {
                 id: minStartInput
                 Layout.fillWidth: true
-                text: fan.minStart
-                onTextChanged: fan.minStart = parseInt(text)
+                minimumValue: 1
+                maximumValue: 255
+                value: fan.minStart
+                onValueChanged: fan.minStart = value
             }
         }
 
         RowLayout {
             visible: systemdCom
             
-            Label {
-                text: i18n("Test start and stop values")
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                renderType: Text.NativeRendering
-            }
             Item {
                 Layout.fillWidth: true
             }
@@ -426,7 +422,7 @@ Rectangle {
                 property bool reactivateAfterTesting
 
                 id: testButton
-                text: fan.testing? i18n("Abort") : i18n("Test")
+                text: fan.testing ? i18n("Abort test") : i18n("Test start and stop values")
                 anchors.right: parent.right
                 onClicked: {
                     if (fan.testing) {
@@ -435,7 +431,7 @@ Rectangle {
                     } else {
                         reactivateAfterTesting = systemdCom.serviceActive;
                         systemdCom.serviceActive = false;
-                        minStartInput.text = Qt.binding(function() { return fan.minStart });
+                        minStartInput.value = Qt.binding(function() { return fan.minStart });
                         fan.test();
                     }
                 }

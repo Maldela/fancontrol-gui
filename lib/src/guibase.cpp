@@ -56,6 +56,17 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     
 }
 
+void GUIBase::load()
+{
+    m_config->load();
+    emitConfigChanged();
+    m_loader->load();
+    
+#ifndef NO_SYSTEMD
+    m_com->setServiceName(m_config->findItem("ServiceName")->property().toString());
+#endif
+}
+
 qreal GUIBase::maxTemp() const
 {
     return m_config->findItem("MaxTemp")->property().toReal();
@@ -71,21 +82,22 @@ QString GUIBase::serviceName() const
     return m_config->findItem("ServiceName")->property().toString();
 }
 
-int GUIBase::interval() const
-{
-    return m_loader->interval();
-}
-
 void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
+    {
         m_config->findItem("MaxTemp")->setProperty(temp);
+        emit maxTempChanged();
+    }
 }
 
 void GUIBase::setMinTemp(qreal temp)
 {
     if (temp != minTemp())
+    {
         m_config->findItem("MinTemp")->setProperty(temp);
+        emit minTempChanged();
+    }
 }
 
 void GUIBase::setServiceName(const QString& name)
@@ -97,16 +109,14 @@ void GUIBase::setServiceName(const QString& name)
 #ifndef NO_SYSTEMD
         m_com->setServiceName(name);
 #endif
-            
+        
+        emit serviceNameChanged();
     }
 }
 
-void GUIBase::setInterval(int i)
+void GUIBase::emitConfigChanged()
 {
-    m_loader->setInterval(i);
-}
-
-void GUIBase::saveConfig()
-{
-    m_config->save();
+    emit serviceNameChanged();
+    emit minTempChanged();
+    emit maxTempChanged();
 }
