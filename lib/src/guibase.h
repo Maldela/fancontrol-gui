@@ -54,12 +54,10 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
     Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
-    Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
 
 public:
     
     explicit GUIBase(QObject *parent = Q_NULLPTR);
-    ~GUIBase() { saveConfig(); }
 
     Loader *loader() const { return m_loader; }
     
@@ -70,14 +68,12 @@ public:
     qreal minTemp() const;
     qreal maxTemp() const;
     QString serviceName() const;
-    int interval() const;
     int unit() const { return m_unit; }
     void setMinTemp(qreal minTemp);
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
-    void setInterval(int i);
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
-    void saveConfig();
+    void load();
 
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
     
@@ -88,7 +84,6 @@ signals:
     void maxTempChanged();
     void serviceNameChanged();
     void unitChanged();
-    void intervalChanged();
     
     
 protected:

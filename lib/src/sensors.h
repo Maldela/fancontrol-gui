@@ -43,6 +43,7 @@ public:
 
     virtual QString name() const = 0;
     virtual void setName(const QString &name) = 0;
+    virtual void reset() = 0;
     QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
@@ -79,8 +80,9 @@ public:
 
     QString label() const { return m_label; }
     int value() const { return m_value; }
-    QString name() const;
-    void setName(const QString &name);
+    QString name() const Q_DECL_OVERRIDE;
+    void setName(const QString &name) Q_DECL_OVERRIDE;
+    void reset() Q_DECL_OVERRIDE;
 
 
 public slots:
@@ -113,8 +115,9 @@ public:
     virtual ~Fan();
 
     int rpm() const { return m_rpm; }
-    QString name() const;
-    void setName(const QString &name);
+    QString name() const Q_DECL_OVERRIDE;
+    void setName(const QString &name) Q_DECL_OVERRIDE;
+    void reset() Q_DECL_OVERRIDE;
 
     virtual int pwm() const { return 255; }
     virtual void setPwm(int, bool) { }
@@ -181,7 +184,7 @@ public:
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
     void setPwmMode(int pwmMode, bool write = true);
     void setActive(bool active);
-    void reset();
+    void reset() Q_DECL_OVERRIDE;
     Q_INVOKABLE void test();
     Q_INVOKABLE void abortTest();
 

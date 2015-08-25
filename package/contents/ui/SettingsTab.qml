@@ -58,11 +58,13 @@ Item {
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: IntValidator { bottom: 0 }
-                text: Number(gui ? gui.interval : 1).toLocaleString(locale, 'f', 0)
+                value: gui.loader ? gui.loader.interval : 1
+                type: "int"
+                
                 onTextChanged: {
                     if (activeFocus && text && root.locale) {
                         var value = Number.fromLocaleString(root.locale, text);
-                        if (value) gui.interval = value;
+                        if (value) gui.loader.interval = value;
                     }
                 }
             }
@@ -78,22 +80,18 @@ Item {
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
             OptionInput {
-                id: minTempValue
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: DoubleValidator {}
-                Component.onCompleted: text = Number(Units.fromCelsius(gui.minTemp, gui.unit)).toLocaleString()
+                validator: DoubleValidator { top: gui.maxTemp }
+                value: Units.fromCelsius(gui.minTemp, gui.unit)
+                type: "double"
+                
                 onTextChanged: {
                     if (activeFocus && text && root.locale) {
                         var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
                         if (value) gui.minTemp = value;
                     }
-                }
-                
-                Connections {
-                    target: gui
-                    onUnitChanged: minTempValue.text = Units.fromCelsius(gui.minTemp, gui.unit)
                 }
             }
         }
@@ -112,18 +110,15 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: DoubleValidator {}
-                Component.onCompleted: text = Number(Units.fromCelsius(gui.maxTemp, gui.unit)).toLocaleString()
+                validator: DoubleValidator { bottom: gui.minTemp }
+                value: Units.fromCelsius(gui.maxTemp, gui.unit)
+                type: "double"
+                
                 onTextChanged: {
                     if (activeFocus && text && root.locale) {
                         var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
                         if (value) gui.maxTemp = value;
                     }
-                }
-                
-                Connections {
-                    target: gui
-                    onUnitChanged: maxTempValue.text = Units.fromCelsius(gui.maxTemp, gui.unit)
                 }
             }
         }        
@@ -140,11 +135,11 @@ Item {
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
                 OptionInput {
-                    id: serviceName
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: systemdCom.serviceExists ? "green" : "red"
-                    text: gui.serviceName
+                    value: gui.serviceName
+                    type: "string"
                     onTextChanged: gui.serviceName = text
                 }
             }

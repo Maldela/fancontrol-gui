@@ -51,9 +51,7 @@ Fan::Fan(Hwmon *parent, uint index) :
             *m_rpmStream >> m_rpm;
         }
         else
-        {
             qDebug() << "Can't open rpmFile " << parent->path() + "/fan" + QString::number(index) + "_input";
-        }
     }
 }
 
@@ -81,6 +79,26 @@ void Fan::setName(const QString &name)
     {
         localNames.writeEntry("fan" + QString::number(m_index), name);
         emit nameChanged();
+    }
+}
+
+void Fan::reset()
+{
+    QIODevice *oldFile = m_rpmStream->device();
+    delete m_rpmStream;
+    delete oldFile;
+    
+    if (QDir(m_parent->path()).isReadable())
+    {
+        QFile *rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
+
+        if (rpmFile->open(QFile::ReadOnly))
+        {
+            m_rpmStream = new QTextStream(rpmFile);
+            *m_rpmStream >> m_rpm;
+        }
+        else
+            qDebug() << "Can't open rpmFile " << m_parent->path() + "/fan" + QString::number(m_index) + "_input";
     }
 }
 
@@ -167,6 +185,47 @@ void PwmFan::update()
 
     m_modeStream->seek(0);
     setPwmMode(m_modeStream->readAll().toInt(), false);
+}
+
+void PwmFan::reset()
+{
+    Fan::reset();
+    
+    QIODevice *oldFile = m_pwmStream->device();
+    delete m_pwmStream;
+    delete oldFile;
+    
+    oldFile = m_modeStream->device();
+    delete m_modeStream;
+    delete oldFile;
+    
+    QFile *pwmFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index), this);
+        if (pwmFile->open(QFile::ReadWrite))
+        {
+            m_pwmStream = new QTextStream(pwmFile);
+            *m_pwmStream >> m_pwm;
+        }
+        else if (pwmFile->open(QFile::ReadOnly))
+        {
+            m_pwmStream = new QTextStream(pwmFile);
+            *m_pwmStream >> m_pwm;
+        }
+        else
+            qDebug() << "Can't open pwmFile " << pwmFile->fileName();
+
+        QFile *pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
+        if (pwmModeFile->open(QFile::ReadWrite))
+        {
+            m_modeStream = new QTextStream(pwmModeFile);
+            *m_modeStream >> m_pwmMode;
+        }
+        else if (pwmModeFile->open(QFile::ReadOnly))
+        {
+            m_modeStream = new QTextStream(pwmModeFile);
+            *m_modeStream >> m_pwmMode;
+        }
+        else
+            qDebug() << "Can't open pwmModeFile " << pwmModeFile->fileName();
 }
 
 void PwmFan::setPwm(int pwm, bool write)
@@ -326,16 +385,16 @@ void PwmFan::continueTest()
     }
 }
 
-void PwmFan::reset()
-{
-    setTemp(Q_NULLPTR);
-    setMinTemp(0);
-    setMaxTemp(100);
-    setMinPwm(255);
-    setMaxPwm(255);
-    setMinStart(255);
-    setMinStop(255);
-}
+// void PwmFan::reset()
+// {
+//     setTemp(Q_NULLPTR);
+//     setMinTemp(0);
+//     setMaxTemp(100);
+//     setMinPwm(255);
+//     setMaxPwm(255);
+//     setMinStart(255);
+//     setMinStop(255);
+// }
 
 bool PwmFan::active() const
 {
@@ -375,13 +434,10 @@ Temp::Temp(Hwmon *parent, uint index) :
             qDebug() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
 
         if (labelFile.open(QFile::ReadOnly))
-        {
             m_label = QTextStream(&labelFile).readLine();
-        }
+
         else
-        {
             qDebug() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
-        }
     }
 }
 
@@ -413,6 +469,27 @@ void Temp::setName(const QString &name)
     {
         localNames.writeEntry(m_parent->name() + "temp" + QString::number(m_index), name);
         emit nameChanged();
+    }
+}
+
+void Temp::reset()
+{
+    QIODevice *oldFile = m_valueStream->device();
+    delete m_valueStream;
+    delete oldFile;
+    
+    if (QDir(m_parent->path()).isReadable())
+    {
+        QFile *valueFile = new QFile(m_parent->path() + "/temp" + QString::number(m_index) + "_input", this);
+
+        if (valueFile->open(QFile::ReadOnly))
+        {
+            m_valueStream = new QTextStream(valueFile);
+            *m_valueStream >> m_value;
+            m_value /= 1000;
+        }
+        else
+            qDebug() << "Can't open valueFile " << m_parent->path() + "/temp" + QString::number(m_index) + "_input";
     }
 }
 

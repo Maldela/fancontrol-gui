@@ -54,28 +54,30 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     setAuthActionName("fancontrol.gui.helper.action");
     
     connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
+    connect(m_base, &GUIBase::minTempChanged, [this] () { setNeedsSave(true); });
+    connect(m_base, &GUIBase::maxTempChanged, [this] () { setNeedsSave(true); });
+    connect(m_base, &GUIBase::serviceNameChanged, [this] () { setNeedsSave(true); });
     
     qmlRegisterType<GUIBase>();
 }
 
 void FancontrolKCM::save()
 {
-    bool save = false;
-    save = m_base->loader()->save() ? save : true;
+    m_base->loader()->save();
     
     if (m_base->systemdCommunicator()->serviceActive() && m_manualControl)
-        save = m_base->systemdCommunicator()->restartService() ? save : true;
+        m_base->systemdCommunicator()->restartService();
     else 
-        save = m_base->systemdCommunicator()->setServiceActive(m_manualControl) ? save : true;
+        m_base->systemdCommunicator()->setServiceActive(m_manualControl);
 
-    save = m_base->systemdCommunicator()->setServiceEnabled(m_manualControl) ? save : true;
-    setNeedsSave(save);
+    m_base->systemdCommunicator()->setServiceEnabled(m_manualControl);
+    setNeedsSave(false);
 }
 
 void FancontrolKCM::load()
 {
+    m_base->load();
     setManualControl(m_base->systemdCommunicator()->serviceEnabled());
-    m_base->loader()->load(QUrl::fromLocalFile("/etc/fancontrol"));
     setNeedsSave(false);
 }
 
@@ -94,7 +96,6 @@ void FancontrolKCM::setManualControl(bool manualControl)
         setNeedsSave(true);
     }
 }
-
 
 
 #include "fancontrolkcm.moc"

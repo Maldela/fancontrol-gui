@@ -21,15 +21,32 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.1
 
 FocusScope {
-    property alias text: value.text
-    property alias font: value.font
-    property alias inputMethodHints: value.inputMethodHints
-    property alias validator: value.validator
-    property alias color: value.color
+    property alias text: textField.text
+    property alias font: textField.font
+    property alias inputMethodHints: textField.inputMethodHints
+    property alias validator: textField.validator
+    property alias color: textField.color
     property real margin: 6
+    property var value
+    property string type: "int"
+    property var locale: Qt.locale()
 
-    implicitHeight: value.implicitHeight + margin*2
-    implicitWidth: value.implicitWidth + margin*2
+    id: root
+    implicitHeight: textField.implicitHeight + margin*2
+    implicitWidth: textField.implicitWidth + margin*2
+    
+    onValueChanged: {
+        if (type == "int" || type == "double") {
+            if (textField.text != Number(value).toLocaleString()) {
+                textField.text = Number(value).toLocaleString();
+            }
+        }
+        else if (type == "string") {
+            if (textField.text != value) {
+                textField.text = value;
+            }
+        }
+    }
 
     Rectangle {
         id: rect
@@ -39,7 +56,7 @@ FocusScope {
         border.color: enabled ? palette.text : disabledPalette.text
 
         TextInput {
-            id: value
+            id: textField
             anchors.fill: parent
             anchors.leftMargin: margin
             horizontalAlignment: TextEdit.AlignLeft

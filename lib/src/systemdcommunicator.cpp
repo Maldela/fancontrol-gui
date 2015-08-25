@@ -243,15 +243,15 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             ExecuteJob *reply = action.execute();
 
             if (!reply->exec())
-	    {
+            {
                 setError(reply->errorString());
-		return false;
-	    }
+                return false;
+            }
             else
-	    {
+            {
                 success();
-		return true;
-	    }
+                return true;
+            }
         }
         setError(dbusreply.errorMessage());
         return false;
@@ -275,19 +275,12 @@ bool SystemdCommunicator::restartService()
 }
 
 void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchanged, QStringList)
-{ 
-    qDebug() << "Properties changed...";
-    
+{
     if (propchanged.value("ActiveState").isValid())
-    {
         emit serviceActiveChanged();
-        qDebug() << "Active changed...";
-    }
+
     if (propchanged.value("UnitFileState").isValid())
-    {
         emit serviceEnabledChanged();
-        qDebug() << "Enabled changed...";
-    }
 }
 
 
