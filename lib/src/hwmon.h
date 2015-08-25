@@ -46,6 +46,7 @@ public:
 
     explicit Hwmon(const QString &, Loader *parent);
 
+    void initialize();
     QString name() const { return m_name; }
     QString path() const { return m_path; }
     int index() const { return m_index; }
