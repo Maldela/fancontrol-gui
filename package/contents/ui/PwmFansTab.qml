@@ -72,8 +72,7 @@ ColumnLayout {
     
     ColumnLayout {
         id: noFansInfo
-        width: parent.width
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.centerIn: parent
         spacing: 20
         visible: loader.allPwmFans.length == 0
         
@@ -87,6 +86,7 @@ ColumnLayout {
         Button {
             Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
+            iconName: "dialog-password"
             onClicked: loader.detectSensors()
         }
     }
