@@ -224,8 +224,8 @@ Rectangle {
             visible: parent.contains(Coordinates.centerOf(this)) && parent.height > 0
             drag.onActiveChanged: {
                 if (!drag.active) {
-                    fan.minStop = canvas.scalePwm(centerY);
-                    fan.minTemp = canvas.scaleTemp(centerX);
+                    fan.minStop = Math.round(canvas.scalePwm(centerY));
+                    fan.minTemp = Math.round(canvas.scaleTemp(centerX));
                     if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
                 }
             }
@@ -242,8 +242,8 @@ Rectangle {
             visible: parent.contains(Coordinates.centerOf(this)) && parent.height > 0
             drag.onActiveChanged: {
                 if (!drag.active) {
-                    fan.maxPwm = canvas.scalePwm(centerY);
-                    fan.maxTemp = canvas.scaleTemp(centerX);
+                    fan.maxPwm = Math.round(canvas.scalePwm(centerY));
+                    fan.maxTemp = Math.round(canvas.scaleTemp(centerX));
                 }
             }
         }
@@ -423,6 +423,7 @@ Rectangle {
 
                 id: testButton
                 text: fan.testing ? i18n("Abort test") : i18n("Test start and stop values")
+                iconName: "dialog-password"
                 anchors.right: parent.right
                 onClicked: {
                     if (fan.testing) {
