@@ -91,7 +91,6 @@ ApplicationWindow {
         Tab {
             title: i18n("PwmFans")
             PwmFansTab {
-                size: sizeSlider.value
                 baseObject: base
             }
         }

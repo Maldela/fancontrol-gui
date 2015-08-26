@@ -26,7 +26,6 @@ ColumnLayout {
     property QtObject baseObject
     property QtObject loader: baseObject ? baseObject.loader : null
     property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
-    property real size: 1.0
 
     id: root
     anchors.fill: parent
