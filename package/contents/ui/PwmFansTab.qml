@@ -48,9 +48,7 @@ ColumnLayout {
         }
         Button {
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-            text: i18n("Detect fans")
-            iconName: "dialog-password"
-            onClicked: baseObject.loader.detectSensors()
+            action: detectFansAction
         }
     }
     
@@ -84,9 +82,14 @@ ColumnLayout {
         
         Button {
             Layout.alignment: Qt.AlignCenter
-            text: i18n("Detect fans")
-            iconName: "dialog-password"
-            onClicked: loader.detectSensors()
+            action: detectFansAction
         }
+    }
+    
+    Action {
+        id: detectFansAction
+        text: i18n("Detect fans")
+        iconName: "dialog-password"
+        onTriggered: loader.detectSensors()
     }
 }
