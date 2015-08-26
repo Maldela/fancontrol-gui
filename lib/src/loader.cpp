@@ -27,7 +27,7 @@
 #include <QTimer>
 #include <QDebug>
 
-#include <KF5/KAuth/kauthexecutejob.h>
+#include <KF5/KAuth/KAuthExecuteJob>
 
 #define HWMON_PATH "/sys/class/hwmon"
 
