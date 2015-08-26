@@ -61,16 +61,24 @@ ScrollView {
         }
     }
     
-    Label {
-        anchors.margins: 10
+    ColumnLayout {
+        id: noFansInfo
+        width: parent.width
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 20
         visible: repeater.fans.length == 0
-        text: i18n("There are no pwm capable fans in your system.")
-        font.bold: true
-    }
-    Button {
-        anchors.centerIn: parent
-        visible: repeater.fans.length == 0
-        text: i18n("Detect fans")
-        onClicked: loader.detectSensors()
+        
+        Label {
+            Layout.alignment: Qt.AlignCenter
+            text: i18n("There are no pwm capable fans in your system.")
+            font.pointSize: 14
+            font.bold: true
+        }
+        
+        Button {
+            Layout.alignment: Qt.AlignCenter
+            text: i18n("Detect fans")
+            onClicked: loader.detectSensors()
+        }
     }
 }
