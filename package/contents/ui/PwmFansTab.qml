@@ -64,8 +64,7 @@ ScrollView {
     
     ColumnLayout {
         id: noFansInfo
-        width: parent.width
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.centerIn: parent
         spacing: 20
         visible: repeater.fans.length == 0
         
@@ -79,6 +78,7 @@ ScrollView {
         Button {
             Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
+            iconName: "dialog-password"
             onClicked: loader.detectSensors()
         }
     }
