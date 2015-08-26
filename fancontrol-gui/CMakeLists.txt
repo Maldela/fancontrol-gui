@@ -14,5 +14,7 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 add_executable(fancontrol_gui ${Fancontrol_GUI_SRCS})
 target_link_libraries(fancontrol_gui ${LIBRARIES})
 
+target_compile_features(fancontrol_gui_lib PRIVATE cxx_lambdas)
+
 install(TARGETS fancontrol_gui ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES metadata.desktop RENAME "fancontrol_gui.desktop" DESTINATION ${XDG_APPS_INSTALL_DIR})
