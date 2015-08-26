@@ -108,7 +108,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         
         QProcess process;
         process.start(program, arguments);
-        
+
         if (!process.waitForStarted(10000))
         {
             reply = ActionReply::HelperErrorType;

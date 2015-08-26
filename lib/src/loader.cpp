@@ -69,7 +69,6 @@ void Loader::parseHwmons()
             m_hwmons.removeOne(hwmon);
             emit hwmonsChanged();
             hwmon->deleteLater();
-            qDebug() << "delete hwmon";
         }
         else
             hwmon->initialize();
