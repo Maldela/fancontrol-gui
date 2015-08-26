@@ -165,12 +165,5 @@ Item {
                 }
             }
         }
-        
-        Button {
-            x: maxTempValue.x
-            text: i18n("Detect fans")
-            iconName: "dialog-password"
-            onClicked: loader.detectSensors()
-        }
     }
 }

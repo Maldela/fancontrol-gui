@@ -19,45 +19,54 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.2
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 
-ScrollView {
+ColumnLayout {
     property QtObject baseObject
     property QtObject loader: baseObject ? baseObject.loader : null
     property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
     property real size: 1.0
 
-    id: scrollView
+    id: root
     anchors.fill: parent
     anchors.topMargin: 5
 
-    Flow {
-        spacing: 20 * size
-        width: scrollView.viewport.width
-        move: Transition {
-            NumberAnimation {
-                easing.type: Easing.OutQuad
-                properties: "x,y"
-                duration: 300
-            }
+    RowLayout {
+        width: parent.width
+        visible: loader && loader.allPwmFans.length > 0
+        
+        Label {
+            text: i18n("Fan:")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            renderType: Text.NativeRendering
         }
-
-        Repeater {
-            property var fans: loader ? loader.allPwmFans : []
-
-            id: repeater
-            model: fans.length
-
-            PwmFan {
-                width: 1000 * size
-                height: 800 * size
-                fan: repeater.fans[index]
-                loader: scrollView.loader
-                systemdCom: scrollView.systemdCom
-                minTemp: baseObject.minTemp
-                maxTemp: baseObject.maxTemp
-                unit: baseObject.unit
-            }
+        ComboBox {
+            id: fanCombobox
+            model: ArrayFunctions.namesWithPaths(loader.allPwmFans)
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+        }
+        Button {
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            text: i18n("Detect fans")
+            iconName: "dialog-password"
+            onClicked: baseObject.loader.detectSensors()
+        }
+    }
+    
+    Loader {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        active: !!baseObject.loader.allPwmFans[fanCombobox.currentIndex]
+        sourceComponent: PwmFan {
+            minimizable: false
+            unit: baseObject.unit
+            fan: loader.allPwmFans[fanCombobox.currentIndex]
+            loader: root.loader
+            systemdCom: baseObject.systemdCom
+            minTemp: baseObject.minTemp
+            maxTemp: baseObject.maxTemp
         }
     }
     
@@ -66,7 +75,7 @@ ScrollView {
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         spacing: 20
-        visible: repeater.fans.length == 0
+        visible: loader.allPwmFans.length == 0
         
         Label {
             Layout.alignment: Qt.AlignCenter
