@@ -73,13 +73,6 @@ ApplicationWindow {
             Item {
                 Layout.fillWidth: true
             }
-            Slider {
-                id: sizeSlider
-                Layout.alignment: Qt.AlignRight
-                Layout.preferredWidth: 200
-                value: 0.4
-                visible: tabView.currentIndex == 1
-            }
         }
     }
 
