@@ -67,6 +67,14 @@ void GUIBase::load()
 #endif
 }
 
+void GUIBase::save(bool saveLoader)
+{
+    m_config->save();
+    
+    if (saveLoader)
+        m_loader->save();
+}
+
 qreal GUIBase::maxTemp() const
 {
     return m_config->findItem("MaxTemp")->property().toReal();

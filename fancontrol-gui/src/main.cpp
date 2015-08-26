@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
         
     GUIBase base;
     base.loader()->load();
+    QObject::connect(&app, &QApplication::aboutToQuit, [&] () { base.save(false); });
     engine.rootContext()->setContextProperty("base", &base);
     
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");

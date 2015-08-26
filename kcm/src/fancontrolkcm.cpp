@@ -64,7 +64,7 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 
 void FancontrolKCM::save()
 {
-    m_base->loader()->save();
+    m_base->save(true);
     
     if (m_base->systemdCommunicator()->serviceActive() && m_manualControl)
         m_base->systemdCommunicator()->restartService();

@@ -74,6 +74,7 @@ public:
     void setServiceName(const QString &name);
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
     void load();
+    void save(bool saveLoader = false);
 
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
     
