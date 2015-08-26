@@ -34,42 +34,45 @@ Item {
     implicitWidth: 1024
     implicitHeight: 768
        
-    Column {
-        id: header
+    ColumnLayout {
+        id: noFansInfo
         width: parent.width
-        
-        CheckBox {
-            id: enabledBox
-            visible: kcm.loader.allPwmFans.length > 0
-            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-            text: i18n("Control fans manually")
-            checked: kcm.manualControl
-            onCheckedChanged: kcm.manualControl = checked
-            
-            Connections {
-                target: kcm
-                onManualControlChanged: enabledBox.checked = kcm.manualControl
-            }
-        }
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 20
+        visible: kcm.loader.allPwmFans.length == 0
         
         Label {
-            visible: kcm.loader.allPwmFans.length == 0
+            Layout.alignment: Qt.AlignCenter
             text: i18n("There are no pwm capable fans in your system.")
-            anchors.top: enabledBox.bottom
-            anchors.margins: 20
+            font.pointSize: 14
+            font.bold: true
         }
         
         Button {
+            Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
-            visible: kcm.loader.allPwmFans.length == 0
             onClicked: kcm.loader.detectSensors()
+        }
+    }
+    
+    CheckBox {
+        id: enabledBox
+        visible: kcm.loader.allPwmFans.length > 0
+        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+        text: i18n("Control fans manually")
+        checked: kcm.manualControl
+        onCheckedChanged: kcm.manualControl = checked
+        
+        Connections {
+            target: kcm
+            onManualControlChanged: enabledBox.checked = kcm.manualControl
         }
     }
         
     ColumnLayout {
         width: parent.width
         anchors.bottom: parent.bottom
-        anchors.top: header.bottom
+        anchors.top: enabledBox.bottom
         visible: enabledBox.checked
 
         RowLayout {  
@@ -89,6 +92,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 text: i18n("Detect fans")
+                iconName: kcm.needsAuthorization ? "dialog-password" : ""
                 onClicked: kcm.loader.detectSensors()
             }
         }
@@ -108,22 +112,30 @@ Item {
             }
         }
         
-        Label {
+        Row {
             property bool expanded: false
-            property string prefix: expanded ? "v " : "> "
 
-            id: expandLabel
-            text: prefix + i18n("Advanced settings")
-            font.bold: true
-            
-            MouseArea {
-                anchors.fill: parent
-                onClicked: parent.expanded = parent.expanded ? false : true
+            id: expand
+
+            Image {
+                id: arrow
+                source: parent.expanded ? "image://icon/go-down" : "image://icon/go-next"
+                fillMode: Image.PreserveAspectFit
+                height: advancedLabel.implicitHeight
             }
+            Label {
+                id: advancedLabel
+                text: i18n("Advanced settings")
+                font.bold: true
+            }
+        }
+        MouseArea {
+            anchors.fill: expand
+            onClicked: expand.expanded = expand.expanded ? false : true
         }
         
         RowLayout {
-            visible: expandLabel.expanded
+            visible: expand.expanded
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -150,7 +162,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expandLabel.expanded
+            visible: expand.expanded
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -177,7 +189,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expandLabel.expanded
+            visible: expand.expanded
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -204,7 +216,7 @@ Item {
             }
         }        
         RowLayout {
-            visible: expandLabel.expanded
+            visible: expand.expanded
 
             Label {
                 Layout.preferredWidth: root.textWidth

@@ -30,6 +30,7 @@
 
 K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
 
+
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args),
     m_base(new GUIBase(this)),
@@ -52,7 +53,7 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     
     setButtons(Apply | Default);
     setAuthActionName("fancontrol.gui.helper.action");
-    
+      
     connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
     connect(m_base, &GUIBase::minTempChanged, [this] () { setNeedsSave(true); });
     connect(m_base, &GUIBase::maxTempChanged, [this] () { setNeedsSave(true); });
