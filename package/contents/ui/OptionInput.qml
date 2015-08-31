@@ -28,7 +28,6 @@ FocusScope {
     property alias color: textField.color
     property real margin: 6
     property var value
-    property string type: "int"
     property var locale: Qt.locale()
 
     id: root
@@ -36,15 +35,8 @@ FocusScope {
     implicitWidth: textField.implicitWidth + margin*2
     
     onValueChanged: {
-        if (type == "int" || type == "double") {
-            if (textField.text != Number(value).toLocaleString()) {
-                textField.text = Number(value).toLocaleString();
-            }
-        }
-        else if (type == "string") {
-            if (textField.text != value) {
-                textField.text = value;
-            }
+        if (textField.text != value) {
+            textField.text = value;
         }
     }
 

@@ -52,21 +52,13 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
-            OptionInput {
-                id: intervalValue
+            SpinBox {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                validator: IntValidator { bottom: 0 }
                 value: gui.loader ? gui.loader.interval : 1
-                type: "int"
-                
-                onTextChanged: {
-                    if (activeFocus && text && root.locale) {
-                        var value = Number.fromLocaleString(root.locale, text);
-                        if (value) gui.loader.interval = value;
-                    }
-                }
+                suffix: " " + (value > 1 ? i18n("seconds") : i18n("second"))
+                minimumValue: 1.0
+                onValueChanged: gui.loader.interval = value
             }
         }
         RowLayout {
@@ -79,20 +71,16 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
-            OptionInput {
+            SpinBox {
+                id: minTempBox
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: DoubleValidator { top: gui.maxTemp }
+                decimals: 2
+                maximumValue: maxTempBox.value
+                minimumValue: Units.fromKelvin(0, gui.unit)
                 value: Units.fromCelsius(gui.minTemp, gui.unit)
-                type: "double"
-                
-                onTextChanged: {
-                    if (activeFocus && text && root.locale) {
-                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
-                        if (value) gui.minTemp = value;
-                    }
-                }
+                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F") 
+                onValueChanged: gui.minTemp = value
             }
         }
         RowLayout {
@@ -105,21 +93,16 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
-            OptionInput {
-                id: maxTempValue
+            SpinBox {
+                id: maxTempBox
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: DoubleValidator { bottom: gui.minTemp }
+                decimals: 2
+                maximumValue: Number.POSITIVE_INFINITY
+                minimumValue: minTempBox.value
                 value: Units.fromCelsius(gui.maxTemp, gui.unit)
-                type: "double"
-                
-                onTextChanged: {
-                    if (activeFocus && text && root.locale) {
-                        var value = Units.toCelsius(Number.fromLocaleString(locale, text), gui.unit);
-                        if (value) gui.maxTemp = value;
-                    }
-                }
+                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F")
+                onValueChanged: gui.maxTemp = value
             }
         }        
         Loader {
@@ -139,7 +122,6 @@ Item {
                     Layout.fillWidth: true
                     color: systemdCom.serviceExists ? "green" : "red"
                     value: gui.serviceName
-                    type: "string"
                     onTextChanged: gui.serviceName = text
                 }
             }

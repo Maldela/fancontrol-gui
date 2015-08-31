@@ -31,7 +31,14 @@ function toCelsius(degrees, currentUnit) {
 
 function fromCelsius(degrees, newUnit) {
     var float = parseFloat(degrees);
-    if (newUnit == 1) { return round(float + 273.15, 2); }
-    if (newUnit == 2) { return round(float * 9 / 5 + 32, 2); }
-    return round(float, 2);
+    if (newUnit == 1) { return float + 273.15; }
+    if (newUnit == 2) { return float * 9 / 5 + 32; }
+    return float;
+}
+
+function fromKelvin(degrees, newUnit) {
+    var float = parseFloat(degrees);
+    if (newUnit == 0) { return float - 273.15; }
+    if (newUnit == 2) { return float * 9 / 5 - 459.67; }
+    return float;
 }
