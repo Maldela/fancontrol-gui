@@ -406,9 +406,11 @@ Rectangle {
                 id: minStartInput
                 Layout.fillWidth: true
                 minimumValue: 1
-                maximumValue: 255
-                value: fan.minStart
-                onValueChanged: fan.minStart = value
+                maximumValue: 100
+                decimals: 1
+                value: Math.round(fan.minStart / 2.55)
+                suffix: i18n("%")
+                onValueChanged: fan.minStart = Math.round(value * 2.55)
             }
         }
 
