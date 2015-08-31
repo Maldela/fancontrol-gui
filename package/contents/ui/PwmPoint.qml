@@ -64,7 +64,7 @@ Rectangle {
         width: Math.max(pwm.width, temp.width)
         height: pwm.height + temp.height
         radius: 4
-        color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.3)
+        color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
         visible: pwmMouse.containsMouse || drag.active
 
         Column {
