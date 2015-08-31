@@ -71,14 +71,14 @@ Rectangle {
             Label {
                 id: pwm
                 font.pixelSize: root.size * 1.5
-                text: Number(Math.round(Units.fromCelsius(canvas.scalePwm(root.centerY))) / 2.55).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(canvas.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
             }
             Label {
                 property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
                 
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Math.round(Units.fromCelsius(canvas.scaleTemp(root.centerX), unit)) + suffix                      
+                text: Units.fromCelsius(Math.round(canvas.scaleTemp(root.centerX)), unit) + suffix
             }
         }
     }
