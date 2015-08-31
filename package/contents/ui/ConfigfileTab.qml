@@ -30,13 +30,13 @@ ColumnLayout {
 
     Label {
         anchors.top: parent.top
-        text: loader ? decodeURIComponent(loader.configUrl) : ""
+        text: !!loader ? decodeURIComponent(loader.configUrl) : ""
     }
 
     Rectangle {
         Layout.fillHeight: true
         Layout.fillWidth: true
-
+        color: palette.light
         border.width: 1
         radius: 5
 
@@ -48,7 +48,12 @@ ColumnLayout {
             TextEdit {
                 text: loader ? loader.configFile : ""
                 readOnly: true
+                color: palette.text
             }
         }
+    }
+    
+    SystemPalette {
+        id: palette
     }
 }

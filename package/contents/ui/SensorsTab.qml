@@ -31,7 +31,7 @@ RowLayout {
     anchors.topMargin: 10
 
     Repeater {
-        model: loader != null ? loader.hwmons.length : 0
+        model: !!loader ? loader.hwmons.length : 0
 
         Rectangle {
             property QtObject hwmon: loader.hwmons[index]
@@ -40,6 +40,7 @@ RowLayout {
             Layout.preferredWidth: root.width / loader.hwmons.length - root.spacing
             Layout.maximumWidth: 500
             Layout.fillHeight: true
+            color: palette.light
             border.width: 1
             border.color: "black"
             radius: 5
@@ -51,6 +52,7 @@ RowLayout {
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: hwmon.name
+                    font.pointSize: 12
                     horizontalAlignment: Text.horizontalCenter
                 }
 
@@ -98,5 +100,9 @@ RowLayout {
                 }
             }
         }
+    }
+    
+    SystemPalette {
+        id: palette
     }
 }

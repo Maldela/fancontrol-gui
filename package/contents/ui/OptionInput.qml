@@ -45,7 +45,8 @@ FocusScope {
         anchors.fill: parent
         border.width: 1
         radius: 2
-        border.color: enabled ? palette.text : disabledPalette.text
+        color: enabled ? palette.base : disabledPalette.base
+        border.color: enabled ? palette.windowText : disabledPalette.windowText
 
         TextInput {
             id: textField

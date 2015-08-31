@@ -66,34 +66,6 @@ Rectangle {
         onConfigUrlChanged: update()
     }
 
-    states: [
-        State {
-            name: "minimized"
-
-            PropertyChanges {
-                target: root
-                height: header.height + 2*margin
-            }
-        },
-        State {
-            name: "maximized"
-
-//            PropertyChanges {
-//                target: root
-//                height:
-//            }
-        }
-    ]
-    transitions: Transition {
-        NumberAnimation {
-            target: root
-            property: "height"
-            easing.amplitude: 1.5
-            easing.type: Easing.InOutQuad
-            duration: minimizeDuration
-        }
-    }
-
     SystemPalette {
         id: palette
     }
@@ -116,6 +88,7 @@ Rectangle {
             id: nameField
             Layout.alignment: Qt.AlignTop
             text: fan.name
+            color: palette.text
             onTextChanged: fan.name = text;
             horizontalAlignment: TextEdit.AlignLeft
             wrapMode: TextEdit.Wrap
@@ -270,7 +243,8 @@ Rectangle {
             c.font = canvas.fontSize + "px sans-serif";
 
             c.clearRect(0, 0, width, height);
-            c.fillStyle = palette.base;
+            c.fillStyle = palette.light;
+            c.strokeStyle = palette.text
             c.fillRect(leftPadding, topPadding, plotWidth, plotHeight);
 
             var fillGradient = c.createLinearGradient(0, 0, width, 0);
@@ -306,8 +280,8 @@ Rectangle {
 
             c.textAlign = "right";
             c.textBaseline = "middle";
-            c.strokeStyle = palette.dark;
-            c.fillStyle = palette.dark;
+            c.strokeStyle = palette.text;
+            c.fillStyle = palette.text;
             c.lineWidth = 1;
             c.strokeRect(leftPadding-0.5, topPadding-0.5, plotWidth+0.5, plotHeight+1.5);
             for (var i=0; i<=100; i+=20) {
