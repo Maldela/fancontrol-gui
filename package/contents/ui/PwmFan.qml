@@ -208,8 +208,8 @@ Rectangle {
             color: "red"
             size: canvas.fontSize
             unit: root.unit
-            drag.minimumX: stopPoint.x
-            drag.maximumY: stopPoint.y
+            drag.minimumX: Math.max(canvas.scaleX(canvas.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
+            drag.maximumY: Math.min(canvas.scaleY(canvas.scalePwm(stopPoint.y)+1), stopPoint.y-1)
             x: canvas.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2
             y: canvas.scaleY(fan.maxPwm) - height/2
             visible: parent.contains(Coordinates.centerOf(this)) && parent.height > 0
