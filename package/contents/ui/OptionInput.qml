@@ -46,7 +46,7 @@ FocusScope {
         border.width: 1
         radius: 2
         color: enabled ? palette.base : disabledPalette.base
-        border.color: enabled ? palette.windowText : disabledPalette.windowText
+        border.color: enabled ? mouseArea.containsMouse || root.activeFocus ? palette.highlight : palette.windowText : disabledPalette.windowText
 
         TextInput {
             id: textField
@@ -59,7 +59,9 @@ FocusScope {
             color: enabled ? palette.text : disabledPalette.text
 
             MouseArea {
+                id: mouseArea
                 anchors.fill: parent
+                hoverEnabled: true
                 cursorShape: Qt.IBeamCursor
                 acceptedButtons: Qt.NoButton
             }

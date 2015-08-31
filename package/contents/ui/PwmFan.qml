@@ -38,7 +38,7 @@ Rectangle {
 
     id: root
     color: "transparent"
-    border.color: "black"
+    border.color: palette.windowText
     border.width: 2
     radius: 10
     clip: false
