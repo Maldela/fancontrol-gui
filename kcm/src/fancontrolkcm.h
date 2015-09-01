@@ -63,7 +63,7 @@ signals:
     void manualControlChanged();
     
 
-protected:
+private:
     
     GUIBase *const m_base;
     bool m_manualControl;

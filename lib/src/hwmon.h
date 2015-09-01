@@ -17,6 +17,7 @@
  *
  */
 
+
 #ifndef HWMON_H
 #define HWMON_H
 
@@ -24,12 +25,10 @@
 #include <QString>
 #include <QList>
 
-#include "sensors.h"
+#include "temp.h"
+#include "fan.h"
+#include "pwmfan.h"
 
-class Fan;
-class PwmFan;
-class Temp;
-class Loader;
 
 class Hwmon : public QObject
 {
@@ -44,7 +43,7 @@ class Hwmon : public QObject
 
 public:
 
-    explicit Hwmon(const QString &, Loader *parent);
+    explicit Hwmon(const QString &, QObject *parent = Q_NULLPTR);
 
     void initialize();
     QString name() const { return m_name; }
@@ -53,16 +52,16 @@ public:
     QList<QObject *> fans() const;
     QList<QObject *> pwmFans() const;
     QList<QObject *> temps() const;
-    Fan * fan(int i) const { return m_fans.value(i, Q_NULLPTR); }
-    PwmFan * pwmFan(int i) const { return m_pwmFans.value(i, Q_NULLPTR); }
-    Temp * temp(int i) const { return m_temps.value(i, Q_NULLPTR); }
     Q_INVOKABLE void testFans();
-
+    Fan * fan(int i) const;
+    PwmFan * pwmFan(int i) const;
+    Temp * temp(int i) const;
+    
 
 public slots:
 
     void updateConfig() { emit configUpdateNeeded(); }
-    void updateSensors() { emit sensorsUpdateNeeded(); }
+    void updateSensors() { emit sensorsUpdateNeeded(); }    
 
 
 signals:
@@ -74,12 +73,11 @@ signals:
     void sensorsUpdateNeeded();
 
 
-protected:
+private:
 
-    Loader *m_parent;
     QString m_name;
-    QString m_path;
-    int m_index;
+    const QString m_path;
+    const int m_index;
     QList<Fan *> m_fans;
     QList<PwmFan *> m_pwmFans;
     QList<Temp *> m_temps;

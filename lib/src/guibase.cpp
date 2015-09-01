@@ -20,9 +20,10 @@
  *
  */
 
-#include "config.h"
+
 #include "guibase.h"
-#include "sensors.h"
+
+#include "config.h"
 #include "hwmon.h"
 
 #include <QtQml>

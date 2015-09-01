@@ -17,9 +17,13 @@
  *
  */
 
+
 #include "loader.h"
+
 #include "hwmon.h"
-#include "sensors.h"
+#include "fan.h"
+#include "pwmfan.h"
+#include "temp.h"
 
 #include <QFile>
 #include <QDir>

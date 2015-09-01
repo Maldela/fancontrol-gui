@@ -1,6 +1,9 @@
 set(LIB_SRCS src/hwmon.cpp
+             src/sensor.cpp
+             src/temp.cpp
+             src/fan.cpp
+             src/pwmfan.cpp
              src/loader.cpp
-             src/sensors.cpp
              src/guibase.cpp
              src/config.cpp)
                         

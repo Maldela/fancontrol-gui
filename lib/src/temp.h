@@ -21,33 +21,49 @@
  */
 
 
-#ifndef CONFIG_H
-#define CONFIG_H
-
-#include <KF5/KConfigCore/KCoreConfigSkeleton>
+#ifndef TEMP_H
+#define TEMP_H
 
 
-class Config : public KCoreConfigSkeleton
+#include "sensor.h"
+
+
+class QTextStream;
+
+class Temp : public Sensor
 {
-    
-Q_OBJECT
+    Q_OBJECT
+    Q_PROPERTY(QString label READ label NOTIFY labelChanged)
+    Q_PROPERTY(int value READ value NOTIFY valueChanged)
 
 public:
-    
-    static Config *instance();
-    
-    
+
+    explicit Temp(Hwmon *parent, uint index);
+    virtual ~Temp();
+
+    QString label() const { return m_label; }
+    int value() const { return m_value; }
+    QString name() const Q_DECL_OVERRIDE;
+    void setName(const QString &name) Q_DECL_OVERRIDE;
+    void reset() Q_DECL_OVERRIDE;
+
+
+public slots:
+
+    void update();
+
+
+signals:
+
+    void labelChanged();
+    void valueChanged();
+
+
 private:
-    
-    Config(QObject *parent = Q_NULLPTR);
-    ~Config() {}
-    Q_DISABLE_COPY(Config)
-    
-    static Config *m_instance;
-    
-    double m_minTemp;
-    double m_maxTemp;
-    QString m_serviceName;
+
+    QString m_label;
+    int m_value;
+    QTextStream *m_valueStream;
 };
 
-#endif // CONFIG_H
+#endif // TEMP_H

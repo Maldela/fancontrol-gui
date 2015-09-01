@@ -17,6 +17,7 @@
  *
  */
 
+
 #ifndef LOADER_H
 #define LOADER_H
 
@@ -80,6 +81,9 @@ protected:
     
     void setError(const QString &error);
     void success() { setError("Success"); }
+    
+    
+private:
     
     int m_interval;
     QList<Hwmon *> m_hwmons;

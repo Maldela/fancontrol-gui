@@ -20,6 +20,7 @@
  *
  */
 
+
 #include "config.h"
 
 #define CONFIG_NAME "fancontrol-gui"

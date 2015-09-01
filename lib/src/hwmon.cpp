@@ -17,19 +17,18 @@
  *
  */
 
+
 #include "hwmon.h"
-#include "loader.h"
 
 #include <QDir>
 #include <QTextStream>
 #include <QtQml>
 #include <QDebug>
 
-Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
-    m_parent(parent),
-    m_path(path)
+Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
+    m_path(path),
+    m_index(path.split('/').last().remove("hwmon").toInt())
 {
-    m_index = path.split('/').last().remove("hwmon").toInt();
     QFile nameFile(path + "/name");
     if (nameFile.open(QFile::ReadOnly))
         m_name = QTextStream(&nameFile).readLine();
@@ -167,4 +166,19 @@ void Hwmon::testFans()
     {
         m_pwmFans.at(i)->test();
     }
+}
+
+Fan* Hwmon::fan(int i) const
+{
+    return m_fans.value(i, Q_NULLPTR);
+}
+
+PwmFan* Hwmon::pwmFan(int i) const
+{
+    return m_pwmFans.value(i, Q_NULLPTR);
+}
+
+Temp* Hwmon::temp(int i) const
+{
+    return m_temps.value(i, Q_NULLPTR);
 }

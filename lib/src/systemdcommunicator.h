@@ -17,6 +17,7 @@
  *
  */
 
+
 #ifndef SYSTEMDCOMMUNICATOR_H
 #define SYSTEMDCOMMUNICATOR_H
 
@@ -68,6 +69,9 @@ protected:
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
     void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
     void success() { setError("Success"); }
+    
+    
+private:
 
     QString m_serviceName;
     QString m_serviceObjectPath;

@@ -20,6 +20,7 @@
  *
  */
 
+
 #ifndef GUIBASE_H
 #define GUIBASE_H
 
@@ -90,6 +91,9 @@ signals:
 protected:
     
     void emitConfigChanged();
+    
+    
+private:
 
     Config *m_config;
 
