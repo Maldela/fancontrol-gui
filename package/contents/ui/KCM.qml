@@ -102,7 +102,6 @@ Item {
             Layout.fillHeight: true
             active: !!kcm.loader.allPwmFans[fanCombobox.currentIndex]
             sourceComponent: PwmFan {
-                minimizable: false
                 unit: kcm.base.unit
                 fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
                 loader: kcm.loader

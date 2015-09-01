@@ -47,7 +47,7 @@ Rectangle {
     MouseArea {
         id: pwmMouse
         anchors.fill: parent
-        hoverEnabled: canvas.minimized ? false : true
+        hoverEnabled: root.enabled ? true : false
         drag.target: root
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false
@@ -65,7 +65,7 @@ Rectangle {
         height: pwm.height + temp.height
         radius: 4
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
-        visible: pwmMouse.containsMouse || drag.active
+        visible: root.enabled && (pwmMouse.containsMouse || drag.active)
 
         Column {
             Label {

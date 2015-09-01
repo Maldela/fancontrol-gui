@@ -57,7 +57,6 @@ ColumnLayout {
         Layout.fillWidth: true
         active: !!baseObject.loader.allPwmFans[fanCombobox.currentIndex]
         sourceComponent: PwmFan {
-            minimizable: false
             unit: baseObject.unit
             fan: loader.allPwmFans[fanCombobox.currentIndex]
             loader: root.loader
