@@ -31,7 +31,6 @@
 #include <KConfigGroup>
 
 
-
 Fan::Fan(Hwmon *parent, uint index) : 
     Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index))),
     m_rpmStream(new QTextStream)

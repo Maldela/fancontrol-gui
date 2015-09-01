@@ -541,7 +541,6 @@ void Loader::setInterval(int interval, bool writeNewConfig)
     {
         m_interval = interval;
         emit intervalChanged();
-        qDebug() << "Changed interval to" << interval;
 
         if (writeNewConfig)
             createConfigFile();
