@@ -20,10 +20,11 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
 #include <KPackage/PackageLoader>
-#include <KAboutData>
+#include <KCoreAddons/KAboutData>
 
 #include "../lib/src/guibase.h"
 

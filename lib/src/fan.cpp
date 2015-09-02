@@ -27,8 +27,8 @@
 #include <QFile>
 #include <QDebug>
 
-#include <KSharedConfig>
-#include <KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigCore/KConfigGroup>
 
 
 Fan::Fan(Hwmon *parent, uint index) : 

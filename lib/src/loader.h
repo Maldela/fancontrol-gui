@@ -61,7 +61,7 @@ public:
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
     
-    static int getHwmonNumber(const QString &str); 
+    static int getHwmonNumber(const QString &str);
     static int getSensorNumber(const QString &str);
 
     

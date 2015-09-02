@@ -21,9 +21,6 @@
 #include "loader.h"
 
 #include "hwmon.h"
-#include "fan.h"
-#include "pwmfan.h"
-#include "temp.h"
 
 #include <QFile>
 #include <QDir>
@@ -31,9 +28,11 @@
 #include <QTimer>
 #include <QDebug>
 
-#include <KF5/KAuth/KAuthExecuteJob>
+#include <KAuth/KAuthExecuteJob>
+
 
 #define HWMON_PATH "/sys/class/hwmon"
+
 
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
@@ -111,6 +110,7 @@ bool Loader::load(const QUrl &url)
     }
     else if (url.isLocalFile())
         fileName = url.toLocalFile();
+    
     else
     {
         setError("Url is not a local file");

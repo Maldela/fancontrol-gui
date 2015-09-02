@@ -30,8 +30,8 @@
 #include <QDir>
 #include <QDebug>
 
-#include <KSharedConfig>
-#include <KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigCore/KConfigGroup>
 
 
 Temp::Temp(Hwmon *parent, uint index) : 

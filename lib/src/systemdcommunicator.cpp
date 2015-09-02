@@ -20,11 +20,12 @@
 
 #include "systemdcommunicator.h"
 
-#include <KF5/KAuth/kauthexecutejob.h>
 #include <QDebug>
 #include <QVariant>
 #include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusInterface>
+
+#include <KAuth/KAuthExecuteJob>
 
 
 using namespace KAuth;

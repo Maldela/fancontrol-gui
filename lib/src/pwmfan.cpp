@@ -31,9 +31,9 @@
 #include <QFile>
 #include <QDebug>
 
-#include <KConfigGroup>
-#include <KSharedConfig>
-#include <KF5/KAuth/KAuthExecuteJob>
+#include <KConfigCore/KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KAuth/KAuthExecuteJob>
 
 
 #define MAX_ERRORS_FOR_RPM_ZERO 10
