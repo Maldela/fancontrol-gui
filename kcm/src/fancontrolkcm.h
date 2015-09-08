@@ -23,7 +23,7 @@
 #ifndef FANCONTROLKCM_H
 #define FANCONTROLKCM_H
 
-#include <KQuickAddons/ConfigModule>
+#include <KDeclarative/KQuickAddons/ConfigModule>
 
 #include "../lib/src/guibase.h"
 

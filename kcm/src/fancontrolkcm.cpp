@@ -22,10 +22,10 @@
 
 #include "fancontrolkcm.h"
 
-#include <QtQml>
-#include <KAboutData>
-#include <KLocalizedString>
-#include <KPluginFactory>
+#include <QtQml/qqml.h>
+#include <KCoreAddons/KAboutData>
+#include <KCoreAddons/KPluginFactory>
+#include <KI18n/KLocalizedString>
 
 
 K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)

@@ -19,12 +19,13 @@
 
 #include "helper.h"
 
-#include <QFile>
-#include <QTextStream>
-#include <QProcess>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtCore/QProcess>
+#include <KAuth/KAuthHelperSupport>
 
 #ifndef NO_SYSTEMD
-#include <QtDBus>
+#include <QtDBus/QDBusInterface>
 #endif
 
 ActionReply Helper::action(const QVariantMap &arguments)

@@ -20,10 +20,9 @@
 
 #include "hwmon.h"
 
-#include <QDir>
-#include <QTextStream>
-#include <QtQml>
-#include <QDebug>
+#include <QtCore/QDir>
+#include <QtCore/QTextStream>
+#include <QtCore/QDebug>
 
 Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     m_path(path),

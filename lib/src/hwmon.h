@@ -21,9 +21,9 @@
 #ifndef HWMON_H
 #define HWMON_H
 
-#include <QObject>
-#include <QString>
-#include <QList>
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QList>
 
 #include "temp.h"
 #include "fan.h"

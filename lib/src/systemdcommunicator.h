@@ -21,7 +21,7 @@
 #ifndef SYSTEMDCOMMUNICATOR_H
 #define SYSTEMDCOMMUNICATOR_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include "fancontrol_gui_lib_export.h"
 

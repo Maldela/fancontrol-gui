@@ -22,13 +22,13 @@
 
 #include "hwmon.h"
 
-#include <QTextStream>
-#include <QDir>
-#include <QFile>
-#include <QDebug>
+#include <QtCore/QTextStream>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QDebug>
 
-#include <KSharedConfig>
-#include <KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigCore/KConfigGroup>
 
 
 Fan::Fan(Hwmon *parent, uint index) : 

@@ -20,9 +20,9 @@
 
 #include "systemdcommunicator.h"
 
-#include <KF5/KAuth/kauthexecutejob.h>
-#include <QDebug>
-#include <QVariant>
+#include <KAuth/kauthexecutejob.h>
+#include <QtCore/QDebug>
+#include <QtCore/QVariant>
 #include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusInterface>
 

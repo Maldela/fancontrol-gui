@@ -25,13 +25,13 @@
 
 #include "hwmon.h"
 
-#include <QTextStream>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
+#include <QtCore/QTextStream>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+#include <QtCore/QDebug>
 
-#include <KSharedConfig>
-#include <KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigCore/KConfigGroup>
 
 
 Temp::Temp(Hwmon *parent, uint index) : 

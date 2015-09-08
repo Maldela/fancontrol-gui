@@ -17,13 +17,13 @@
  *
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QtWidgets/QApplication>
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
 #include <KPackage/PackageLoader>
-#include <KAboutData>
+#include <KCoreAddons/KAboutData>
 
 #include "../lib/src/guibase.h"
 

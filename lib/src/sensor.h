@@ -21,8 +21,8 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
-#include <QObject>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QString>
 
 
 class Hwmon;

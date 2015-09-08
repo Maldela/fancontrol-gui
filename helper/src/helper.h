@@ -17,7 +17,7 @@
  *
  */
 
-#include <KAuth>
+#include <KAuth/KAuthActionReply>
 
 using namespace KAuth;
 

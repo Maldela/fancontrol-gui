@@ -26,8 +26,8 @@
 #include "config.h"
 #include "hwmon.h"
 
-#include <QtQml>
-#include <QLocale>
+#include <QtQml/qqml.h>
+#include <QtCore/QLocale>
 
 
 GUIBase::GUIBase(QObject *parent) : QObject(parent),    

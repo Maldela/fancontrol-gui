@@ -24,7 +24,7 @@
 #ifndef GUIBASE_H
 #define GUIBASE_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include "loader.h"
 
