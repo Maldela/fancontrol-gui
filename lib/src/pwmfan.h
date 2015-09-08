@@ -29,7 +29,6 @@
 #include "fan.h"
 
 
-class QTimer;
 class QTextStream;
 
 class PwmFan : public Fan
@@ -64,7 +63,7 @@ public:
     int minStop() const { return m_minStop; }
     int pwmMode() const { return m_pwmMode; }
     bool active() const;
-    bool testing() const { return m_testing; }
+    bool testing() const { return m_testStatus != notTesting; }
     void setPwm(int pwm, bool write = true);
     void setTemp(Temp *temp) { setHasTemp(temp != Q_NULLPTR); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
@@ -108,10 +107,8 @@ private:
     int m_pwm;
     QTextStream *m_pwmStream;
     QTextStream *m_modeStream;
-    QTimer *m_testTimer;
     Temp *m_temp;
     bool m_hasTemp;
-    bool m_testing;
     int m_minTemp;
     int m_maxTemp;
     int m_minPwm;

@@ -25,15 +25,15 @@
 
 #include "hwmon.h"
 
-#include <QTextStream>
-#include <QTimer>
-#include <QDir>
-#include <QFile>
-#include <QDebug>
+#include <QtCore/QTextStream>
+#include <QtCore/QTimer>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QDebug>
 
-#include <KConfigGroup>
-#include <KSharedConfig>
-#include <KF5/KAuth/KAuthExecuteJob>
+#include <KConfigCore/KConfigGroup>
+#include <KConfigCore/KSharedConfig>
+#include <KAuth/KAuthExecuteJob>
 
 
 #define MAX_ERRORS_FOR_RPM_ZERO 10
@@ -42,10 +42,8 @@
 PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_pwmStream(new QTextStream),
     m_modeStream(new QTextStream),
-    m_testTimer(new QTimer(this)),
     m_temp(Q_NULLPTR),
     m_hasTemp(false),
-    m_testing(false),
     m_minTemp(0),
     m_maxTemp(100),
     m_minPwm(255),
@@ -55,8 +53,6 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_zeroRpm(0),
     m_testStatus(notTesting)
 {
-    m_testTimer->setSingleShot(true);
-
     connect(this, SIGNAL(tempChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(hasTempChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minTempChanged()), parent, SLOT(updateConfig()));
@@ -65,7 +61,6 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
-    connect(m_testTimer, SIGNAL(timeout()), this, SLOT(continueTest()));
 
     if (QDir(parent->path()).isReadable())
     {
@@ -217,24 +212,23 @@ void PwmFan::setPwmMode(int pwmMode, bool write)
 
 void PwmFan::test()
 {
-    m_testing = true;
+    m_testStatus = findingStop1;
     emit testingChanged();
 
-    m_testStatus = findingStop1;
     setPwmMode(1);
     setPwm(255);
-    m_testTimer->setInterval(500);
-    m_testTimer->start();
+    QTimer::singleShot(500, this, SLOT(continueTest()));
     qDebug() << "Start testing...";
 }
 
 void PwmFan::abortTest()
 {
-    setPwm(255);
-    m_testTimer->stop();
+    disconnect(SLOT(continueTest()));
 
-    m_testing = false;
+    m_testStatus = notTesting;
     emit testingChanged();
+
+    setPwm(255);
 }
 
 void PwmFan::continueTest()
@@ -258,11 +252,10 @@ void PwmFan::continueTest()
             {
                 m_testStatus = findingStart;
                 m_zeroRpm = 0;
-                m_testTimer->setInterval(500);
                 qDebug() << "Start finding start value...";
             }
         }
-        m_testTimer->start();
+        QTimer::singleShot(500, this, SLOT(continueTest()));
         break;
 
     case findingStart:
@@ -271,11 +264,10 @@ void PwmFan::continueTest()
         else
         {
             m_testStatus = findingStop2;
-            m_testTimer->setInterval(1000);
             setMinStart(m_pwm);
             qDebug() << "Start finding stop value...";
         }
-        m_testTimer->start();
+        QTimer::singleShot(1000, this, SLOT(continueTest()));
         break;
 
     case findingStop2:
@@ -283,21 +275,20 @@ void PwmFan::continueTest()
         {
             setPwm(m_pwm - 1);
             m_zeroRpm = 0;
-            m_testTimer->start();
+            QTimer::singleShot(1000, this, SLOT(continueTest()));
         }
         else
         {
             if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
             {
                 m_zeroRpm++;
-                m_testTimer->start();
+                QTimer::singleShot(500, this, SLOT(continueTest()));
             }
             else
             {
                 m_testStatus = notTesting;
-                m_zeroRpm = 0;
-                m_testing = false;
                 emit testingChanged();
+                m_zeroRpm = 0;
                 setMinStop(m_pwm + 5);
                 qDebug() << "Finished testing!";
             }
@@ -305,25 +296,12 @@ void PwmFan::continueTest()
         break;
 
     case notTesting:
-        m_testing = false;
-        emit testingChanged();
         break;
 
     default:
         break;
     }
 }
-
-// void PwmFan::reset()
-// {
-//     setTemp(Q_NULLPTR);
-//     setMinTemp(0);
-//     setMaxTemp(100);
-//     setMinPwm(255);
-//     setMaxPwm(255);
-//     setMinStart(255);
-//     setMinStop(255);
-// }
 
 bool PwmFan::active() const
 {
