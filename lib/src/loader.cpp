@@ -25,15 +25,69 @@
 #include "pwmfan.h"
 #include "temp.h"
 
-#include <QFile>
-#include <QDir>
-#include <QTextStream>
-#include <QTimer>
-#include <QDebug>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+#include <QtCore/QTextStream>
+#include <QtCore/QTimer>
+#include <QtCore/QDebug>
 
-#include <KF5/KAuth/KAuthExecuteJob>
+#include <KAuth/KAuthExecuteJob>
 
 #define HWMON_PATH "/sys/class/hwmon"
+
+
+//function that takes a config file entry and returns the hwmon and sensor numbers
+//returns a pair of <-1, -1> in case an error occurs
+QPair<int, int> getEntryNumbers(const QString &str)
+{
+    qDebug() << "data:" << str;
+    if (str.isEmpty())
+    {
+        qWarning() << "Loader::getHwmonNumber(): given empty string.";
+        return QPair<int, int>(-1, -1);
+    }
+        
+    QStringList list = str.split('/', QString::SkipEmptyParts);
+    if (list.size() != 2)
+    {
+        qWarning() << "Invalid entry to parse:" << str << "Should contain exactly one \'/\'";
+        return QPair<int, int>(-1, -1);
+    }
+    QString hwmon = list.at(0);
+    QString sensor = list.at(1);
+    
+    if (!hwmon.startsWith("hwmon"))
+    {
+        qWarning() << "Invalid entry to parse:" << str << "Should begin with \"hwmon\"";
+        return QPair<int, int>(-1, -1);
+    }
+    if (!sensor.contains(QRegExp("pwm|fan|temp|_input")))
+    {
+        qWarning() << "Invalid entry to parse:" << str << "Should contain \"pwm\" or \"fan\" or \"temp\" or \"_input\"";
+        return QPair<int, int>(-1, -1);
+    }
+        
+    bool success;
+    
+    hwmon.remove("hwmon");
+    sensor.remove(QRegExp("pwm|fan|temp|_input"));
+    
+    int hwmonResult = hwmon.toInt(&success);
+    if (!success)
+    {
+        qWarning() << "Invalid entry to parse:" << str << "Could not convert" << hwmon << "to int";
+        return QPair<int, int>(-1, -1);
+    }
+    int sensorResult = sensor.toInt(&success);
+    if (!success)
+    {
+        qWarning() << "Invalid entry to parse:" << str << "Could not convert" << sensor << "to int";
+        return QPair<int, int>(-1, -1);
+    }
+        
+    return QPair<int, int>(hwmonResult, sensorResult);
+}
+
 
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
@@ -98,6 +152,65 @@ void Loader::parseHwmons()
             m_hwmons << newHwmon;
             emit hwmonsChanged();
         }
+    }
+}
+
+PwmFan * Loader::getPwmFan(const QPair<int, int> &indexPair) const
+{
+    if (indexPair.first >= m_hwmons.size() || indexPair.first < 0 || indexPair.second < 0)
+        return Q_NULLPTR;
+    
+    Hwmon *hwmon = m_hwmons.at(indexPair.first);
+    
+    if (indexPair.second >= hwmon->pwmFans().size())
+        return Q_NULLPTR;
+    
+    return hwmon->pwmFan(indexPair.second);
+}
+
+Temp * Loader::getTemp(const QPair<int, int> &indexPair) const
+{
+    if (indexPair.first >= m_hwmons.size() || indexPair.first < 0 || indexPair.second < 0)
+        return Q_NULLPTR;
+    
+    Hwmon *hwmon = m_hwmons.at(indexPair.first);
+    
+    if (indexPair.second >= hwmon->temps().size())
+        return Q_NULLPTR;
+    
+    return hwmon->temp(indexPair.second);
+}
+
+void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int)) const
+{
+    if (!memberSetFunction)
+    {
+        qWarning() << "Loader::parseConfigLine(): Null for member function pointer";
+        return;
+    }
+    
+    QStringList entries = line.split(' ');
+    
+    foreach (const QString &entry, entries)
+    {
+        QStringList nameValuePair = entry.split('=');
+        if (nameValuePair.size() == 2)
+        {
+            QString fan = nameValuePair.at(0);
+            bool success;
+            int value = nameValuePair.at(1).toInt(&success);
+            
+            if (success)
+            {
+                PwmFan *pwmPointer = getPwmFan(getEntryNumbers(fan));
+                if (pwmPointer)
+                    (pwmPointer->*memberSetFunction)(value);
+            }
+            else
+                qWarning() << nameValuePair.at(1) << "is not an int";
+        }
+        else
+            qWarning() << "Invalid Entry:" << entry;
     }
 }
 
@@ -167,9 +280,11 @@ bool Loader::load(const QUrl &url)
     do
     {
         QString line(stream.readLine());
-        if (line.startsWith('#')) continue;
+        if (line.startsWith('#'))
+            continue;
         int offset = line.indexOf('#');
-        if (offset != -1) line.truncate(offset-1);
+        if (offset != -1)
+            line.truncate(offset-1);
         line = line.simplified();
         lines << line;
     }
@@ -196,151 +311,58 @@ bool Loader::load(const QUrl &url)
         {
             line.remove("FCTEMPS=");
             QStringList fctemps = line.split(' ');
-            foreach (QString fctemp, fctemps)
+            foreach (const QString &fctemp, fctemps)
             {
                 QStringList nameValuePair = fctemp.split('=');
                 if (nameValuePair.size() == 2)
                 {
                     QString pwm = nameValuePair.at(0);
                     QString temp = nameValuePair.at(1);
-                    int pwmSensorIndex = getSensorNumber(pwm);
-                    int tempSensorIndex = getSensorNumber(temp);
-                    Hwmon *pwmHwmon = m_hwmons.value(getHwmonNumber(pwm), Q_NULLPTR);
-
-                    if (pwmHwmon)
+                    PwmFan *pwmPointer = getPwmFan(getEntryNumbers(pwm));
+                    Temp *tempPointer = getTemp(getEntryNumbers(temp));
+                    
+                    if (pwmPointer && tempPointer)
                     {
-                        Hwmon *tempHwmon = m_hwmons.value(getHwmonNumber(temp), Q_NULLPTR);
-                        PwmFan *pwmPointer = pwmHwmon->pwmFan(pwmSensorIndex);
-                        if (tempHwmon)
-                        {
-                            Temp *tempPointer = tempHwmon->temp(tempSensorIndex);
-
-                            if (pwmPointer)
-                            {
-                                pwmPointer->setTemp(tempPointer);
-                                pwmPointer->setMinPwm(0);
-                            }
-                        }
-                        else if (pwmPointer)
-                            pwmPointer->setTemp(Q_NULLPTR);
+                        pwmPointer->setTemp(tempPointer);
+                        pwmPointer->setMinPwm(0);
                     }
                 }
+                else
+                    qWarning() << "Invalid entry:" << fctemp;
             }
         }
         else if (line.startsWith("MINTEMP="))
         {
             line.remove("MINTEMP=");
-            QStringList mintemps = line.split(' ');
-            foreach (QString mintemp, mintemps)
-            {
-                QStringList nameValuePair = mintemp.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                    pwmPointer->setMinTemp(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMinTemp);
         }
         else if (line.startsWith("MAXTEMP="))
         {
             line.remove("MAXTEMP=");
-            QStringList maxtemps = line.split(' ');
-            foreach (QString maxtemp, maxtemps)
-            {
-                QStringList nameValuePair = maxtemp.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                        pwmPointer->setMaxTemp(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMaxTemp);
         }
         else if (line.startsWith("MINSTART="))
         {
             line.remove("MINSTART=");
-            QStringList minstarts = line.split(' ');
-            foreach (QString minstart, minstarts)
-            {
-                QStringList nameValuePair = minstart.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                    pwmPointer->setMinStart(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMinStart);
         }
         else if (line.startsWith("MINSTOP="))
         {
             line.remove("MINSTOP=");
-            QStringList minstops = line.split(' ');
-            foreach (QString minstop, minstops)
-            {
-                QStringList nameValuePair = minstop.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                    pwmPointer->setMinStop(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMinStop);
         }
         else if (line.startsWith("MINPWM="))
         {
             line.remove("MINPWM=");
-            QStringList minpwms = line.split(' ');
-            foreach (QString minpwm, minpwms)
-            {
-                QStringList nameValuePair = minpwm.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                    pwmPointer->setMinPwm(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMinPwm);
         }
         else if (line.startsWith("MAXPWM="))
         {
             line.remove("MAXPWM=");
-            QStringList maxpwms = line.split(' ');
-            foreach (QString maxpwm, maxpwms)
-            {
-                QStringList nameValuePair = maxpwm.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    QString pwm = nameValuePair.at(0);
-                    int value = nameValuePair.at(1).toInt();
-                    int pwmHwmon = getHwmonNumber(pwm);
-                    int pwmSensor = getSensorNumber(pwm);
-                    PwmFan *pwmPointer = m_hwmons.value(pwmHwmon, Q_NULLPTR)->pwmFan(pwmSensor);
-                    if (pwmPointer)
-                    pwmPointer->setMaxPwm(value);
-                }
-            }
+            parseConfigLine(line, &PwmFan::setMaxPwm);
         }
+        else
+            qWarning() << "Unrecognized line in config:" << line;
     }
     
     //Connect hwmons again
@@ -613,53 +635,4 @@ void Loader::setError (const QString &error)
         
     }
     qDebug() << error;
-}
-
-int Loader::getHwmonNumber(const QString &str)
-{
-    if (str.isEmpty())
-        return -1;
-    
-    QString hwmon = str.split('/', QString::SkipEmptyParts).at(0);
-    
-    if (!hwmon.startsWith("hwmon"))
-        return -1;
-    
-    bool success;
-    
-    hwmon.remove("hwmon");
-    
-    int result = hwmon.toInt(&success);
-    
-    if (success)
-        return result;
-    
-    return -1;
-}
-
-int Loader::getSensorNumber(const QString &str)
-{
-    if (str.isEmpty())
-        return -1;
-    
-    QStringList list = str.split('/', QString::SkipEmptyParts);
-    
-    if (list.size() != 2)
-        return -1;
-    
-    QString sensor = list.at(1);
-    
-    if (!sensor.contains(QRegExp("pwm|fan|temp|_input")))
-        return -1;
-    
-    bool success;
-    
-    sensor.remove(QRegExp("pwm|fan|temp|_input"));
-    
-    int result = sensor.toInt(&success);
-    
-    if (success)
-        return result - 1;
-    
-    return -1;
 }

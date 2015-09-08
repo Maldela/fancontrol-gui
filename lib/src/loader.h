@@ -21,14 +21,17 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <QObject>
-#include <QUrl>
-#include <QList>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QPair>
 
 #include "fancontrol_gui_lib_export.h"
 
 class Hwmon;
+class PwmFan;
+class Temp;
 class QTimer;
 
 class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
@@ -60,10 +63,7 @@ public:
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
-    
-    static int getHwmonNumber(const QString &str); 
-    static int getSensorNumber(const QString &str);
-
+        
     
 public slots:
 
@@ -81,9 +81,13 @@ protected:
     
     void setError(const QString &error);
     void success() { setError("Success"); }
+    void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value)) const;
     
     
 private:
+    
+    PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
+    Temp *getTemp(const QPair<int, int> &indexPair) const;
     
     int m_interval;
     QList<Hwmon *> m_hwmons;
