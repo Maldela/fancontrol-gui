@@ -379,8 +379,10 @@ Rectangle {
                     } else {
                         reactivateAfterTesting = systemdCom.serviceActive;
                         systemdCom.serviceActive = false;
-                        minStartInput.value = Qt.binding(function() { return fan.minStart });
-                        fan.test();
+                        minStartInput.value = Qt.binding(function() { return Math.round(fan.minStart / 2.55) });
+                        if (!fan.test()) {
+                            systemdCom.serviceActive = reactivateAfterTesting;
+                        }
                     }
                 }
                 
