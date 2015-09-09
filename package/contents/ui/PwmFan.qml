@@ -35,7 +35,8 @@ Rectangle {
     property int margin: 5
     property int minimizeDuration: 400
     property int unit: 0
-
+    readonly property alias name: nameField.text
+    
     id: root
     color: "transparent"
     border.color: palette.windowText
@@ -86,8 +87,8 @@ Rectangle {
         }
         visible: root.height >= height + margin*2
         text: fan.name
+        onTextChanged: fan.name = text
         color: palette.text
-        onTextChanged: fan.name = text;
         horizontalAlignment: TextEdit.AlignLeft
         wrapMode: TextEdit.Wrap
         font.bold: true

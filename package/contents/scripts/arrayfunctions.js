@@ -25,10 +25,14 @@ function names(array) {
     return names;
 }
 
+function nameWithPath(fan) {
+    return fan.name + "  (" + fan.path + ")";
+}
+
 function namesWithPaths(array) {
     var namesWithPaths = [];
     for (var i=0; i<array.length; i++) {
-        namesWithPaths[i] = array[i].name + "  (" + array[i].path + ")";
+        namesWithPaths[i] = nameWithPath(array[i]);
     }
     return namesWithPaths;
 }
