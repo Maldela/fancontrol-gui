@@ -92,10 +92,6 @@ if(BUILD_KCM)
 endif(BUILD_KCM)
 
 
-#summary
-feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
-
-
 #install the shared parts
 if(INSTALL_SHARED)
 
@@ -109,5 +105,13 @@ if(INSTALL_SHARED)
 
     #translations
     ki18n_install(po)
-	    
+
 endif(INSTALL_SHARED)
+
+
+#run tests
+add_subdirectory(tests)
+
+
+#summary
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

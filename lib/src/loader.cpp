@@ -38,7 +38,6 @@
 //returns a pair of <-1, -1> in case an error occurs
 QPair<int, int> getEntryNumbers(const QString &str)
 {
-    qDebug() << "data:" << str;
     if (str.isEmpty())
     {
         qWarning() << "Loader::getHwmonNumber(): given empty string.";
@@ -83,7 +82,7 @@ QPair<int, int> getEntryNumbers(const QString &str)
         return QPair<int, int>(-1, -1);
     }
         
-    return QPair<int, int>(hwmonResult, sensorResult);
+    return QPair<int, int>(hwmonResult, sensorResult - 1);
 }
 
 
@@ -360,7 +359,9 @@ bool Loader::load(const QUrl &url)
             line.remove("MAXPWM=");
             parseConfigLine(line, &PwmFan::setMaxPwm);
         }
-        else
+        else if (!line.startsWith("DEVNAME=") && 
+                 !line.startsWith("DEVPATH=") &&
+                 !line.startsWith("FCFANS="))
             qWarning() << "Unrecognized line in config:" << line;
     }
     
