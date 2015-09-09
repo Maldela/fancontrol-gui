@@ -23,6 +23,8 @@
 #include <QTextStream>
 #include <QProcess>
 
+#include<KAuth/KAuthHelperSupport>
+
 #ifndef NO_SYSTEMD
 #include <QtDBus>
 #endif
