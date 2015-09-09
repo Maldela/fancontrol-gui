@@ -63,8 +63,8 @@ public:
     int minStop() const { return m_minStop; }
     int pwmMode() const { return m_pwmMode; }
     bool active() const;
-    bool testing() const { return m_testStatus != notTesting; }
-    void setPwm(int pwm, bool write = true);
+    bool testing() const;
+    bool setPwm(int pwm, bool write = true);
     void setTemp(Temp *temp) { setHasTemp(temp != Q_NULLPTR); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
@@ -73,10 +73,10 @@ public:
     void setMaxPwm(int maxPwm) { if (maxPwm != m_maxPwm) { m_maxPwm = maxPwm; emit maxPwmChanged(); } }
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
-    void setPwmMode(int pwmMode, bool write = true);
+    bool setPwmMode(int pwmMode, bool write = true);
     void setActive(bool active);
     void reset() Q_DECL_OVERRIDE;
-    Q_INVOKABLE void test();
+    Q_INVOKABLE bool test();
     Q_INVOKABLE void abortTest();
 
 
@@ -100,6 +100,8 @@ protected slots:
 
     void update();
     void continueTest();
+//     void handlePwmActionReply();
+//     void handlePwmModeActionReply();
 
 
 private:
@@ -120,10 +122,13 @@ private:
 
     enum
     {
-        findingStop1,
-        findingStop2,
-        findingStart,
-        notTesting
+        NotStarted,
+        FindingStop1,
+        FindingStop2,
+        FindingStart,
+        Finished,
+        Cancelled,
+        Error
     } m_testStatus;
 };
 #endif // PWMFAN_H

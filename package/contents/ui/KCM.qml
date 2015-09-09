@@ -84,8 +84,16 @@ Item {
                 renderType: Text.NativeRendering
             }
             ComboBox {
-                id: fanCombobox
-                model: ArrayFunctions.namesWithPaths(kcm.loader.allPwmFans)
+                id: fanComboBox
+                model: ListModel {
+                    property var fans: kcm.loader.allPwmFans
+                    id: fanList
+                    Component.onCompleted: {
+                        for (var i=0; i<fans.length; i++) {
+                            fanList.append({"text": ArrayFunctions.nameWithPath(fans[i])});
+                        }
+                    }
+                }
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
             }
@@ -100,14 +108,19 @@ Item {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            active: !!kcm.loader.allPwmFans[fanCombobox.currentIndex]
+            active: !!kcm.loader.allPwmFans[fanComboBox.currentIndex]
             sourceComponent: PwmFan {
                 unit: kcm.base.unit
-                fan: kcm.loader.allPwmFans[fanCombobox.currentIndex]
+                fan: kcm.loader.allPwmFans[fanComboBox.currentIndex]
                 loader: kcm.loader
                 systemdCom: kcm.systemdCom
                 minTemp: kcm.base.minTemp
                 maxTemp: kcm.base.maxTemp
+                onNameChanged: {
+                    if (fanComboBox.currentText != ArrayFunctions.nameWithPath(fan)) {
+                        fanList.setProperty(fanComboBox.currentIndex, "text", ArrayFunctions.nameWithPath(fan));
+                    }
+                }
             }
         }
         

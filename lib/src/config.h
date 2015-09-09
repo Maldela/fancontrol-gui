@@ -24,7 +24,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <KF5/KConfigCore/KCoreConfigSkeleton>
+#include <KConfigCore/KCoreConfigSkeleton>
 
 
 class Config : public KCoreConfigSkeleton

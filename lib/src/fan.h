@@ -43,7 +43,7 @@ public:
     void reset() Q_DECL_OVERRIDE;
 
     virtual int pwm() const { return 255; }
-    virtual void setPwm(int, bool) { }
+    virtual bool setPwm(int, bool) { return false; }
 
 
 signals:

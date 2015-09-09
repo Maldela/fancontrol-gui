@@ -23,6 +23,7 @@
 #include "fancontrolkcm.h"
 
 #include <QtQml/qqml.h>
+
 #include <KCoreAddons/KAboutData>
 #include <KCoreAddons/KPluginFactory>
 #include <KI18n/KLocalizedString>

@@ -20,6 +20,7 @@
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
 #include <KPackage/PackageLoader>

@@ -24,6 +24,8 @@
 #include <QtCore/QProcess>
 #include <KAuth/KAuthHelperSupport>
 
+#include<KAuth/KAuthHelperSupport>
+
 #ifndef NO_SYSTEMD
 #include <QtDBus/QDBusInterface>
 #endif

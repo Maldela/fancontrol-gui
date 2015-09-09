@@ -63,7 +63,7 @@ public:
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
-        
+    
     
 public slots:
 
