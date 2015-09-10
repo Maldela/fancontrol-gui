@@ -606,7 +606,7 @@ QList<QObject *> Loader::hwmons() const
     return list;
 }
 
-QList< QObject* > Loader::allPwmFans() const
+QList<QObject *> Loader::allPwmFans() const
 {
     QList<QObject *> list;
     foreach (const Hwmon *hwmon, m_hwmons)
@@ -616,7 +616,7 @@ QList< QObject* > Loader::allPwmFans() const
     return list;
 }
 
-QList< QObject* > Loader::allTemps() const
+QList<QObject *> Loader::allTemps() const
 {
     QList<QObject *> list;
     foreach (const Hwmon *hwmon, m_hwmons)
