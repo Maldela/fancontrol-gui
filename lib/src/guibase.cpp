@@ -30,6 +30,9 @@
 #include <QtCore/QLocale>
 
 
+namespace Fancontrol
+{
+
 GUIBase::GUIBase(QObject *parent) : QObject(parent),    
     m_config(Config::instance()),
 
@@ -128,4 +131,6 @@ void GUIBase::emitConfigChanged()
     emit serviceNameChanged();
     emit minTempChanged();
     emit maxTempChanged();
+}
+
 }

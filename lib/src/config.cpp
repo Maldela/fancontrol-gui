@@ -23,7 +23,12 @@
 
 #include "config.h"
 
+
 #define CONFIG_NAME "fancontrol-gui"
+
+
+namespace Fancontrol
+{
 
 Config *Config::m_instance = Q_NULLPTR;
 
@@ -45,5 +50,6 @@ Config* Config::instance()
     return m_instance;
 }
 
+}
 
 // #include "config.moc"

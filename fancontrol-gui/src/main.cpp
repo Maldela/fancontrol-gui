@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
         
-    GUIBase base;
+    Fancontrol::GUIBase base;
     base.loader()->load();
     QObject::connect(&app, &QApplication::aboutToQuit, [&] () { base.save(false); });
     engine.rootContext()->setContextProperty("base", &base);

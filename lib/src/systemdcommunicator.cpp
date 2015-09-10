@@ -28,9 +28,6 @@
 #include <KAuth/KAuthExecuteJob>
 
 
-using namespace KAuth;
-
-
 typedef struct
 {
     QString path;
@@ -41,9 +38,25 @@ Q_DECLARE_METATYPE(SystemdUnitFile)
 typedef QList<SystemdUnitFile> SystemdUnitFileList;
 Q_DECLARE_METATYPE(SystemdUnitFileList)
 
-QDBusArgument &operator <<(QDBusArgument &argument, const SystemdUnitFile &unitFile);
-const QDBusArgument &operator >>(const QDBusArgument &argument, SystemdUnitFile &unitFile);
+QDBusArgument& operator <<(QDBusArgument &argument, const SystemdUnitFile &unitFile)
+{
+    argument.beginStructure();
+    argument << unitFile.path << unitFile.state;
+    argument.endStructure();
+    return argument;
+}
 
+const QDBusArgument& operator >>(const QDBusArgument &argument, SystemdUnitFile &unitFile)
+{
+    argument.beginStructure();
+    argument >> unitFile.path >> unitFile.state;
+    argument.endStructure();
+    return argument;
+}
+
+
+namespace Fancontrol
+{
 
 SystemdCommunicator::SystemdCommunicator(const QString &serviceName, QObject *parent) : QObject(parent),
     m_error("Success"),
@@ -234,7 +247,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     {
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
-            Action action("fancontrol.gui.helper.action");
+            KAuth::Action action("fancontrol.gui.helper.action");
             action.setHelperId("fancontrol.gui.helper");
             QVariantMap map;
             map["action"] = "dbusaction";
@@ -242,7 +255,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             map["arguments"] = arguments;
             action.setArguments(map);
 
-            ExecuteJob *reply = action.execute();
+            KAuth::ExecuteJob *reply = action.execute();
 
             if (!reply->exec())
             {
@@ -285,19 +298,4 @@ void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchang
         emit serviceEnabledChanged();
 }
 
-
-QDBusArgument& operator <<(QDBusArgument &argument, const SystemdUnitFile &unitFile)
-{
-    argument.beginStructure();
-    argument << unitFile.path << unitFile.state;
-    argument.endStructure();
-    return argument;
-}
-
-const QDBusArgument& operator >>(const QDBusArgument &argument, SystemdUnitFile &unitFile)
-{
-    argument.beginStructure();
-    argument >> unitFile.path >> unitFile.state;
-    argument.endStructure();
-    return argument;
 }

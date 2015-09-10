@@ -30,6 +30,9 @@
 
 class QTextStream;
 
+namespace Fancontrol
+{
+
 class Temp : public Sensor
 {
     Q_OBJECT
@@ -65,5 +68,7 @@ private:
     int m_value;
     QTextStream *m_valueStream;
 };
+
+}
 
 #endif // TEMP_H

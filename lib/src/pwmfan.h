@@ -31,6 +31,9 @@
 
 class QTextStream;
 
+namespace Fancontrol
+{
+
 class PwmFan : public Fan
 {
     Q_OBJECT
@@ -131,4 +134,7 @@ private:
         Error
     } m_testStatus;
 };
+
+}
+
 #endif // PWMFAN_H

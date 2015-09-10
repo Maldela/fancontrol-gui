@@ -31,6 +31,9 @@
 #include <KConfigCore/KConfigGroup>
 
 
+namespace Fancontrol
+{
+
 Fan::Fan(Hwmon *parent, uint index) : 
     Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index))),
     m_rpmStream(new QTextStream)
@@ -101,4 +104,6 @@ void Fan::update()
     m_rpmStream->seek(0);
     *m_rpmStream >> m_rpm;
     emit rpmChanged();
+}
+
 }

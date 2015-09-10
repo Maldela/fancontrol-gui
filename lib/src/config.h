@@ -27,6 +27,9 @@
 #include <KConfigCore/KCoreConfigSkeleton>
 
 
+namespace Fancontrol
+{
+
 class Config : public KCoreConfigSkeleton
 {
     
@@ -49,5 +52,7 @@ private:
     double m_maxTemp;
     QString m_serviceName;
 };
+
+}
 
 #endif // CONFIG_H

@@ -39,6 +39,9 @@
 #include "fancontrol_gui_lib_export.h"
 
 
+namespace Fancontrol
+{
+
 class Config;
 
 class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
@@ -104,5 +107,7 @@ private:
     Loader *const m_loader; 
     int m_unit;
 };
+
+}
 
 #endif // GUIBASE_H

@@ -23,9 +23,14 @@
 #include "hwmon.h"
 
 
+namespace Fancontrol
+{
+
 Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent),
     m_parent(parent),
     m_index(index),
     m_path(path)
 {
+}
+
 }

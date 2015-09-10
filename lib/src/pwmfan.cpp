@@ -39,6 +39,9 @@
 #define MAX_ERRORS_FOR_RPM_ZERO 10
 
 
+namespace Fancontrol
+{
+
 PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_pwmStream(new QTextStream),
     m_modeStream(new QTextStream),
@@ -351,4 +354,6 @@ void PwmFan::setActive(bool a)
         localActive.writeEntry("pwmfan" + QString::number(m_index), a);
         emit activeChanged();
     }
+}
+
 }

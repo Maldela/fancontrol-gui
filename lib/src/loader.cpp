@@ -34,6 +34,9 @@
 #define HWMON_PATH "/sys/class/hwmon"
 
 
+namespace Fancontrol
+{
+
 //function that takes a config file entry and returns the hwmon and sensor numbers
 //returns a pair of <-1, -1> in case an error occurs
 QPair<int, int> getEntryNumbers(const QString &str)
@@ -635,4 +638,6 @@ void Loader::setError (const QString &error)
         
     }
     qDebug() << error;
+}
+
 }
