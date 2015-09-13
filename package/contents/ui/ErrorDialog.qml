@@ -17,21 +17,19 @@
  *
  */
 
+import QtQuick 2.4
+import QtQuick.Dialogs 1.2
+import QtQuick.Controls 1.2
 
-#include "sensor.h"
-
-#include "hwmon.h"
-
-
-namespace Fancontrol
-{
-
-Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent),
-    m_parent(parent),
-    m_index(index),
-    m_path(path)
-{
-    connect(this, SIGNAL(errorChanged(QString)), parent, SLOT(setError(QString)));
-}
-
+Dialog {
+    property alias text: text.text
+    
+    title: i18n("Error")
+    standardButtons: StandardButton.Ok
+    onAccepted: close()
+    
+    Label {
+        id: text
+        anchors.centerIn: parent
+    }
 }

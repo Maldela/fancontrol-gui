@@ -228,4 +228,12 @@ Item {
             }
         }
     }
+    
+    ErrorDialog {
+        id: errorDialog
+        visible: !!base.loader.error
+        modality: Qt.ApplicationModal
+        text: base.loader.error
+        onTextChanged: show()
+    }
 }

@@ -37,69 +37,17 @@
 namespace Fancontrol
 {
 
-//function that takes a config file entry and returns the hwmon and sensor numbers
-//returns a pair of <-1, -1> in case an error occurs
-QPair<int, int> getEntryNumbers(const QString &str)
-{
-    if (str.isEmpty())
-    {
-        qWarning() << "Loader::getHwmonNumber(): given empty string.";
-        return QPair<int, int>(-1, -1);
-    }
-        
-    QStringList list = str.split('/', QString::SkipEmptyParts);
-    if (list.size() != 2)
-    {
-        qWarning() << "Invalid entry to parse:" << str << "Should contain exactly one \'/\'";
-        return QPair<int, int>(-1, -1);
-    }
-    QString hwmon = list.at(0);
-    QString sensor = list.at(1);
-    
-    if (!hwmon.startsWith("hwmon"))
-    {
-        qWarning() << "Invalid entry to parse:" << str << "Should begin with \"hwmon\"";
-        return QPair<int, int>(-1, -1);
-    }
-    if (!sensor.contains(QRegExp("pwm|fan|temp|_input")))
-    {
-        qWarning() << "Invalid entry to parse:" << str << "Should contain \"pwm\" or \"fan\" or \"temp\" or \"_input\"";
-        return QPair<int, int>(-1, -1);
-    }
-        
-    bool success;
-    
-    hwmon.remove("hwmon");
-    sensor.remove(QRegExp("pwm|fan|temp|_input"));
-    
-    int hwmonResult = hwmon.toInt(&success);
-    if (!success)
-    {
-        qWarning() << "Invalid entry to parse:" << str << "Could not convert" << hwmon << "to int";
-        return QPair<int, int>(-1, -1);
-    }
-    int sensorResult = sensor.toInt(&success);
-    if (!success)
-    {
-        qWarning() << "Invalid entry to parse:" << str << "Could not convert" << sensor << "to int";
-        return QPair<int, int>(-1, -1);
-    }
-        
-    return QPair<int, int>(hwmonResult, sensorResult - 1);
-}
-
-
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
     m_configUrl(QUrl::fromLocalFile("/etc/fancontrol")),
-    m_error("Success"),
+    m_error(""),
     m_timer(new QTimer(this))
 {
     parseHwmons();
-    
+
     m_timer->setSingleShot(false);
     m_timer->start(1);
-    
+
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateSensors()));
 }
 
@@ -110,16 +58,21 @@ void Loader::parseHwmons()
     if (hwmonDir.isReadable())
         list = hwmonDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
 
-    else
+    else if (hwmonDir.exists())
     {
-        qDebug() << HWMON_PATH << " is not readable!";
+        setError(QString(HWMON_PATH) + " is not readable!");
         return;
     }
-    
+    else
+    {
+        setError(QString(HWMON_PATH) + " does not exist!");
+        return;
+    }
+
     QStringList dereferencedList;
     while (!list.isEmpty())
         dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
-    
+
     foreach (Hwmon *hwmon, m_hwmons)
     {
         if (!dereferencedList.contains(hwmon->path()))
@@ -135,7 +88,7 @@ void Loader::parseHwmons()
     foreach (const QString &hwmonPath, dereferencedList)
     {
         bool hwmonExists = false;
-        
+
         foreach (const Hwmon *hwmon, m_hwmons)
         {
             if (hwmon->path() == hwmonPath)
@@ -148,37 +101,85 @@ void Loader::parseHwmons()
         if (!hwmonExists)
         {
             Hwmon *newHwmon = new Hwmon(hwmonPath, this);
-            connect(this, SIGNAL(sensorsUpdateNeeded()), newHwmon, SLOT(updateSensors()));
-            m_hwmons << newHwmon;
-            emit hwmonsChanged();
+            if (newHwmon->isValid())
+            {
+                connect(this, SIGNAL(sensorsUpdateNeeded()), newHwmon, SLOT(updateSensors()));
+                m_hwmons << newHwmon;
+                emit hwmonsChanged();
+            }
+            else
+                delete newHwmon;
         }
     }
 }
 
 PwmFan * Loader::getPwmFan(const QPair<int, int> &indexPair) const
 {
-    if (indexPair.first >= m_hwmons.size() || indexPair.first < 0 || indexPair.second < 0)
+    Hwmon *hwmon = m_hwmons.value(indexPair.first, Q_NULLPTR);
+
+    if (!hwmon)
         return Q_NULLPTR;
-    
-    Hwmon *hwmon = m_hwmons.at(indexPair.first);
-    
-    if (indexPair.second >= hwmon->pwmFans().size())
-        return Q_NULLPTR;
-    
+
     return hwmon->pwmFan(indexPair.second);
 }
 
 Temp * Loader::getTemp(const QPair<int, int> &indexPair) const
 {
-    if (indexPair.first >= m_hwmons.size() || indexPair.first < 0 || indexPair.second < 0)
+    Hwmon *hwmon = m_hwmons.value(indexPair.first, Q_NULLPTR);
+    
+    if (!hwmon)
         return Q_NULLPTR;
-    
-    Hwmon *hwmon = m_hwmons.at(indexPair.first);
-    
-    if (indexPair.second >= hwmon->temps().size())
-        return Q_NULLPTR;
-    
+
     return hwmon->temp(indexPair.second);
+}
+
+QPair<int, int> Loader::getEntryNumbers(const QString &entry)
+{
+    if (entry.isEmpty())
+    {
+        qWarning() << "Loader::getHwmonNumber(): given empty string.";
+        return QPair<int, int>(-1, -1);
+    }
+
+    QStringList list = entry.split('/', QString::SkipEmptyParts);
+    if (list.size() != 2)
+    {
+        qWarning() << "Invalid entry to parse:" << entry << "Should contain exactly one \'/\'";
+        return QPair<int, int>(-1, -1);
+    }
+    QString hwmon = list.at(0);
+    QString sensor = list.at(1);
+
+    if (!hwmon.startsWith("hwmon"))
+    {
+        qWarning() << "Invalid entry to parse:" << entry << "Should begin with \"hwmon\"";
+        return QPair<int, int>(-1, -1);
+    }
+    if (!sensor.contains(QRegExp("^(pwm|fan|temp|_input)\\d+")))
+    {
+        qWarning() << "Invalid entry to parse:" << entry << "\n Sensor should begin with  pwm|fan|temp|_input followed by a number";
+        return QPair<int, int>(-1, -1);
+    }
+
+    bool success;
+
+    hwmon.remove("hwmon");
+    sensor.remove(QRegExp("^(pwm|fan|temp|_input)"));
+
+    int hwmonResult = hwmon.toInt(&success);
+    if (!success)
+    {
+        qWarning() << "Invalid entry to parse:" << entry << "Could not convert" << hwmon << "to int";
+        return QPair<int, int>(-1, -1);
+    }
+    int sensorResult = sensor.toInt(&success);
+    if (!success)
+    {
+        qWarning() << "Invalid entry to parse:" << entry << "Could not convert" << sensor << "to int";
+        return QPair<int, int>(-1, -1);
+    }
+
+    return QPair<int, int>(hwmonResult, sensorResult - 1);
 }
 
 void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int)) const
@@ -188,26 +189,27 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
         qWarning() << "Loader::parseConfigLine(): Null for member function pointer";
         return;
     }
-    
+
     QStringList entries = line.split(' ');
-    
+
     foreach (const QString &entry, entries)
     {
-        QStringList nameValuePair = entry.split('=');
-        if (nameValuePair.size() == 2)
+        QStringList fanValuePair = entry.split('=');
+        if (fanValuePair.size() == 2)
         {
-            QString fan = nameValuePair.at(0);
+            QString fanString = fanValuePair.at(0);
+            QString valueString = fanValuePair.at(1);
             bool success;
-            int value = nameValuePair.at(1).toInt(&success);
-            
+            int value = valueString.toInt(&success);
+
             if (success)
             {
-                PwmFan *pwmPointer = getPwmFan(getEntryNumbers(fan));
-                if (pwmPointer)
-                    (pwmPointer->*memberSetFunction)(value);
+                PwmFan *fan = getPwmFan(getEntryNumbers(fanString));
+                if (fan)
+                    (fan->*memberSetFunction)(value);
             }
             else
-                qWarning() << nameValuePair.at(1) << "is not an int";
+                qWarning() << valueString << "is not an int";
         }
         else
             qWarning() << "Invalid Entry:" << entry;
@@ -224,13 +226,13 @@ bool Loader::load(const QUrl &url)
     }
     else if (url.isLocalFile())
         fileName = url.toLocalFile();
-    
+
     else
     {
         setError("Url is not a local file");
         return false;
     }
-    
+
     QTextStream stream;
     QFile file(fileName);
     QString fileContent;
@@ -251,7 +253,8 @@ bool Loader::load(const QUrl &url)
         KAuth::ExecuteJob *reply = action.execute();
         if (!reply->exec())
         {
-            setError(reply->errorString());
+            qDebug() << reply->error();
+            setError(reply->errorString() + reply->errorText());
             return false;
         }
         else
@@ -261,7 +264,7 @@ bool Loader::load(const QUrl &url)
     }
     else
     {
-        setError("File does not exist"); 
+        setError("File does not exist");
         return false;
     }
 
@@ -321,7 +324,7 @@ bool Loader::load(const QUrl &url)
                     QString temp = nameValuePair.at(1);
                     PwmFan *pwmPointer = getPwmFan(getEntryNumbers(pwm));
                     Temp *tempPointer = getTemp(getEntryNumbers(temp));
-                    
+
                     if (pwmPointer && tempPointer)
                     {
                         pwmPointer->setTemp(tempPointer);
@@ -362,24 +365,23 @@ bool Loader::load(const QUrl &url)
             line.remove("MAXPWM=");
             parseConfigLine(line, &PwmFan::setMaxPwm);
         }
-        else if (!line.startsWith("DEVNAME=") && 
+        else if (!line.startsWith("DEVNAME=") &&
                  !line.startsWith("DEVPATH=") &&
                  !line.startsWith("FCFANS="))
             qWarning() << "Unrecognized line in config:" << line;
     }
-    
+
     //Connect hwmons again
     foreach (Hwmon *hwmon, m_hwmons)
     {
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
     }
-    
+
     emit configUrlChanged();
-    
+
     m_configFile = fileContent;
     emit configFileChanged();
-    
-    success();
+
     return true;
 }
 
@@ -393,15 +395,15 @@ bool Loader::save(const QUrl &url)
     }
     else if (url.isLocalFile())
         fileName = url.toLocalFile();
-    
+
     else
     {
         setError("Url is not a local file");
         return false;
     }
-    
+
     QFile file(fileName);
-    
+
     if (file.open(QFile::WriteOnly | QFile::Text))
     {
         QTextStream stream(&file);
@@ -422,12 +424,12 @@ bool Loader::save(const QUrl &url)
 
         if (!reply->exec())
         {
-            setError(reply->errorString());
+            qDebug() << reply->error();
+            setError(reply->errorString() + reply->errorText());
             return false;
         }
     }
-    
-    success();
+
     return true;
 }
 
@@ -450,7 +452,7 @@ void Loader::createConfigFile()
             }
         }
     }
-    
+
     QString configFile = "# This file was created by Fancontrol-GUI \n";
 
     if (m_interval != 0)
@@ -586,16 +588,17 @@ void Loader::detectSensors()
     action.setHelperId("fancontrol.gui.helper");
     QVariantMap map;
     map["action"] = "detectSensors";
-    
+
     action.setArguments(map);
     KAuth::ExecuteJob *reply = action.execute();
 
     if (!reply->exec())
     {
-        setError(reply->errorString());
+        qDebug() << reply->error();
+        setError(reply->errorString() + reply->errorText());
         return;
-    }    
-    
+    }
+
     parseHwmons();
 }
 
@@ -631,13 +634,9 @@ QList<QObject *> Loader::allTemps() const
 
 void Loader::setError (const QString &error)
 {
-    if (error != m_error) 
-    {
-        m_error = error;
-        emit errorChanged();
-        
-    }
-    qDebug() << error;
+    m_error = error;
+    emit errorChanged();
+    qCritical() << error;
 }
 
 }

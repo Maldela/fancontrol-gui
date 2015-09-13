@@ -69,6 +69,8 @@ public:
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
     
+    static QPair<int, int> getEntryNumbers(const QString &entry);
+    
     
 public slots:
 
@@ -80,12 +82,11 @@ protected slots:
     void createConfigFile();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
-
+    void setError(const QString &error);
+        
 
 protected:
     
-    void setError(const QString &error);
-    void success() { setError("Success"); }
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value)) const;
     
     

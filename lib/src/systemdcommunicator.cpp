@@ -59,7 +59,7 @@ namespace Fancontrol
 {
 
 SystemdCommunicator::SystemdCommunicator(const QString &serviceName, QObject *parent) : QObject(parent),
-    m_error("Success"),
+    m_error(""),
     m_managerInterface(new QDBusInterface("org.freedesktop.systemd1",
                                           "/org/freedesktop/systemd1",
                                           "org.freedesktop.systemd1.Manager",
@@ -264,7 +264,6 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             }
             else
             {
-                success();
                 return true;
             }
         }
@@ -272,7 +271,6 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         return false;
     }
     
-    success();
     return true;
 }
 

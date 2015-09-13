@@ -26,7 +26,6 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QDebug>
 
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
@@ -53,13 +52,10 @@ Temp::Temp(Hwmon *parent, uint index) :
             m_value /= 1000;
         }
         else
-            qDebug() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
+            emit errorChanged("Can't open valueFile " + parent->path() + "/temp" + QString::number(index) + "_input");
 
         if (labelFile.open(QFile::ReadOnly))
             m_label = QTextStream(&labelFile).readLine();
-
-        else
-            qDebug() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
     }
 }
 
@@ -111,7 +107,7 @@ void Temp::reset()
             m_value /= 1000;
         }
         else
-            qDebug() << "Can't open valueFile " << m_parent->path() + "/temp" + QString::number(m_index) + "_input";
+            emit errorChanged("Can't open valueFile " + m_parent->path() + "/temp" + QString::number(m_index) + "_input");
     }
 }
 

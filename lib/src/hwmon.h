@@ -59,12 +59,18 @@ public:
     Fan * fan(int i) const;
     PwmFan * pwmFan(int i) const;
     Temp * temp(int i) const;
+    bool isValid() const { return m_valid; }
     
 
 public slots:
 
     void updateConfig() { emit configUpdateNeeded(); }
-    void updateSensors() { emit sensorsUpdateNeeded(); }    
+    void updateSensors() { emit sensorsUpdateNeeded(); }
+    
+    
+protected slots:
+    
+    void setError(const QString &error);
 
 
 signals:
@@ -74,13 +80,15 @@ signals:
     void tempsChanged();
     void configUpdateNeeded();
     void sensorsUpdateNeeded();
+    void errorChanged(QString);
 
 
 private:
 
     QString m_name;
     const QString m_path;
-    const int m_index;
+    bool m_valid;
+    int m_index;
     QList<Fan *> m_fans;
     QList<PwmFan *> m_pwmFans;
     QList<Temp *> m_temps;
