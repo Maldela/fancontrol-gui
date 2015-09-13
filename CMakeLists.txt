@@ -110,7 +110,7 @@ endif(INSTALL_SHARED)
 
 
 #run tests
-# add_subdirectory(tests)
+add_subdirectory(tests)
 
 
 #summary
