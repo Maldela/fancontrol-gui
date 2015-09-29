@@ -124,33 +124,11 @@ Rectangle {
             bottom: settingsArea.top
         }
 
-        Rectangle {
-            property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
-            property real unscaledPwm: fan.pwm
-            
+        StatusPoint {
             id: currentPwm
-            x: parent.scaleX(unscaledTemp) - width/2
-            y: parent.scaleY(unscaledPwm) - height/2
-            width: canvas.fontSize
-            height: width
-            radius: width / 2
-            color: "black"
+            size: canvas.fontSize
             visible: canvas.contains(Coordinates.centerOf(this)) && fan.hasTemp && canvas.drawingEnabled
-            
-            Behavior on unscaledTemp {
-                SpringAnimation {
-                    epsilon: 0.1
-                    spring: 1.0
-                    damping: 0.4
-                }
-            }
-            Behavior on unscaledPwm {
-                SpringAnimation {
-                    epsilon: 0.1
-                    spring: 1.0
-                    damping: 0.4
-                }
-            }                
+            fan: root.fan
         }
         PwmPoint {
             id: stopPoint

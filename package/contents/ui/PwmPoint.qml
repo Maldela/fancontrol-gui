@@ -29,14 +29,14 @@ Rectangle {
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     property alias drag: pwmMouse.drag
-    property alias size: root.width
+    property int size: 10
     property int unit: 0
     property var locale: Qt.locale()
 
     id: root
-    width: 10
-    height: width
-    radius: width / 2
+    width: size
+    height: size
+    radius: size / 2
     border.width: pwmMouse.containsMouse || drag.active ? 1 : 0
 
     onXChanged: parent.requestPaint();
