@@ -30,6 +30,9 @@
 #include "pwmfan.h"
 
 
+namespace Fancontrol
+{
+
 class Hwmon : public QObject
 {
     Q_OBJECT
@@ -82,5 +85,7 @@ private:
     QList<PwmFan *> m_pwmFans;
     QList<Temp *> m_temps;
 };
+
+}
 
 #endif // HWMON_H

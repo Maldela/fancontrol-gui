@@ -29,6 +29,7 @@
 
 
 using namespace KQuickAddons;
+using namespace Fancontrol;
 
 class FancontrolKCM : public ConfigModule
 {

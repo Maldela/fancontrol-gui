@@ -25,6 +25,9 @@
 #include <QtCore/QString>
 
 
+namespace Fancontrol
+{
+
 class Hwmon;
 
 class Sensor : public QObject
@@ -63,5 +66,7 @@ protected:
     const uint m_index;
     const QString m_path;
 };
+
+}
 
 #endif // SENSOR_H

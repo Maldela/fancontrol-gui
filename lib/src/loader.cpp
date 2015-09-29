@@ -34,6 +34,9 @@
 #define HWMON_PATH "/sys/class/hwmon"
 
 
+namespace Fancontrol
+{
+
 //function that takes a config file entry and returns the hwmon and sensor numbers
 //returns a pair of <-1, -1> in case an error occurs
 QPair<int, int> getEntryNumbers(const QString &str)
@@ -606,7 +609,7 @@ QList<QObject *> Loader::hwmons() const
     return list;
 }
 
-QList< QObject* > Loader::allPwmFans() const
+QList<QObject *> Loader::allPwmFans() const
 {
     QList<QObject *> list;
     foreach (const Hwmon *hwmon, m_hwmons)
@@ -616,7 +619,7 @@ QList< QObject* > Loader::allPwmFans() const
     return list;
 }
 
-QList< QObject* > Loader::allTemps() const
+QList<QObject *> Loader::allTemps() const
 {
     QList<QObject *> list;
     foreach (const Hwmon *hwmon, m_hwmons)
@@ -635,4 +638,6 @@ void Loader::setError (const QString &error)
         
     }
     qWarning() << error;
+}
+
 }

@@ -23,8 +23,6 @@
 
 #include "temp.h"
 
-#include "hwmon.h"
-
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -33,6 +31,11 @@
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
 
+#include "hwmon.h"
+
+
+namespace Fancontrol
+{
 
 Temp::Temp(Hwmon *parent, uint index) : 
     Sensor(parent, index, QString(parent->name() + QString("/temp") + QString::number(index))),
@@ -118,4 +121,6 @@ void Temp::update()
     *m_valueStream >> m_value;
     m_value /= 1000;
     emit valueChanged();
+}
+
 }

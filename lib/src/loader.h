@@ -29,10 +29,15 @@
 
 #include "fancontrol_gui_lib_export.h"
 
+
+class QTimer;
+
+namespace Fancontrol
+{
+    
 class Hwmon;
 class PwmFan;
 class Temp;
-class QTimer;
 
 class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
 {
@@ -108,5 +113,7 @@ signals:
     void allPwmFansChanged();
     void allTempsChanged();
 };
+
+}
 
 #endif // LOADER_H

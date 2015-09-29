@@ -24,6 +24,10 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
+
+namespace Fancontrol
+{
+
 Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     m_path(path),
     m_index(path.split('/').last().remove("hwmon").toInt())
@@ -180,4 +184,6 @@ PwmFan* Hwmon::pwmFan(int i) const
 Temp* Hwmon::temp(int i) const
 {
     return m_temps.value(i, Q_NULLPTR);
+}
+
 }

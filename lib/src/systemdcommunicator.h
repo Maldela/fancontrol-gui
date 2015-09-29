@@ -28,6 +28,9 @@
 
 class QDBusInterface;
 
+namespace Fancontrol
+{
+
 class FANCONTROL_GUI_LIB_EXPORT SystemdCommunicator : public QObject
 {
     Q_OBJECT
@@ -79,5 +82,7 @@ private:
     QDBusInterface * const m_managerInterface;
     QDBusInterface *m_serviceInterface;
 };
+
+}
 
 #endif // SYSTEMDCOMMUNICATOR_H

@@ -27,6 +27,9 @@
 
 class QTextStream;
 
+namespace Fancontrol
+{
+
 class Fan : public Sensor
 {
     Q_OBJECT
@@ -61,5 +64,7 @@ protected:
     int m_rpm;
     QTextStream *m_rpmStream;
 };
+
+}
 
 #endif // FAN_H
