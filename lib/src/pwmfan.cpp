@@ -76,7 +76,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
             *m_pwmStream >> m_pwm;
         }
         else
-            qDebug() << "Can't open pwmFile " << pwmFile->fileName();
+            qWarning() << "Can't open pwmFile " << pwmFile->fileName();
 
         QFile *pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
         if (pwmModeFile->open(QFile::ReadWrite))
@@ -90,7 +90,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
             *m_modeStream >> m_pwmMode;
         }
         else
-            qDebug() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+            qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
     }
 }
 
@@ -135,7 +135,7 @@ void PwmFan::reset()
             *m_pwmStream >> m_pwm;
         }
         else
-            qDebug() << "Can't open pwmFile " << pwmFile->fileName();
+            qWarning() << "Can't open pwmFile " << pwmFile->fileName();
 
         QFile *pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
         if (pwmModeFile->open(QFile::ReadWrite))
@@ -149,7 +149,7 @@ void PwmFan::reset()
             *m_modeStream >> m_pwmMode;
         }
         else
-            qDebug() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+            qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
 }
 
 bool PwmFan::setPwm(int pwm, bool write)
@@ -169,7 +169,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                 action.setHelperId("fancontrol.gui.helper");
                 if (!action.isValid())
                 {
-                    qDebug() << "setPwm action is invalid";
+                    qCritical() << "setPwm action is invalid";
                     return false;
                 }
                 
@@ -182,7 +182,7 @@ bool PwmFan::setPwm(int pwm, bool write)
 
                 if (!reply->exec())
                 {
-                    qDebug() << "setPwm error:" << reply->errorString() << reply->errorText();
+                    qCritical() << "setPwm error:" << reply->errorString() << reply->errorText();
                     return false;
                 }
             }
@@ -209,7 +209,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                 action.setHelperId("fancontrol.gui.helper");
                 if (!action.isValid())
                 {
-                    qDebug() << "setPwmMode action is invalid";
+                    qCritical() << "setPwmMode action is invalid";
                     return false;
                 }
                 
@@ -222,7 +222,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
 
                 if (!reply->exec())
                 {
-                    qDebug() << "setPwmMode error:" << reply->errorString() << reply->errorText();
+                    qCritical() << "setPwmMode error:" << reply->errorString() << reply->errorText();
                     return false;
                 }
             }
@@ -243,7 +243,7 @@ bool PwmFan::test()
     }
     else
     {
-        qDebug() << "Testing failed";
+        qCritical() << "Testing failed";
         return false;
     }
     

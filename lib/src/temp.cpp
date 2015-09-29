@@ -50,7 +50,7 @@ Temp::Temp(Hwmon *parent, uint index) :
             m_value /= 1000;
         }
         else
-            qDebug() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
+            qCritical() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
 
         if (labelFile.open(QFile::ReadOnly))
             m_label = QTextStream(&labelFile).readLine();
@@ -108,7 +108,7 @@ void Temp::reset()
             m_value /= 1000;
         }
         else
-            qDebug() << "Can't open valueFile " << m_parent->path() + "/temp" + QString::number(m_index) + "_input";
+            qCritical() << "Can't open valueFile " << m_parent->path() + "/temp" + QString::number(m_index) + "_input";
     }
 }
 

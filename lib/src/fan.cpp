@@ -45,7 +45,7 @@ Fan::Fan(Hwmon *parent, uint index) :
             *m_rpmStream >> m_rpm;
         }
         else
-            qDebug() << "Can't open rpmFile " << parent->path() + "/fan" + QString::number(index) + "_input";
+            qWarning() << "Can't open rpmFile " << parent->path() + "/fan" + QString::number(index) + "_input";
     }
 }
 
@@ -92,7 +92,7 @@ void Fan::reset()
             *m_rpmStream >> m_rpm;
         }
         else
-            qDebug() << "Can't open rpmFile " << m_parent->path() + "/fan" + QString::number(m_index) + "_input";
+            qWarning() << "Can't open rpmFile " << m_parent->path() + "/fan" + QString::number(m_index) + "_input";
     }
 }
 

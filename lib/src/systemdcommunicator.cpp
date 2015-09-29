@@ -128,8 +128,7 @@ bool SystemdCommunicator::serviceExists()
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
-        m_error = dbusreply.errorMessage();
-        emit errorChanged();
+        setError(dbusreply.errorMessage());
         return false;
     }
     SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
@@ -138,14 +137,12 @@ bool SystemdCommunicator::serviceExists()
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
         {
-            m_error = "Success";
-            emit errorChanged();
+            setError("Success");
             return true;
         }
     }
 
-    m_error = "Service " + m_serviceName + " doesn't exist";
-    emit errorChanged();
+    setError("Service " + m_serviceName + " doesn't exist");
     qDebug() << "Service does not exist!";
     return false;
 }

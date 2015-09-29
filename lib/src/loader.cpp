@@ -109,7 +109,7 @@ void Loader::parseHwmons()
 
     else
     {
-        qDebug() << HWMON_PATH << " is not readable!";
+        qCritical() << HWMON_PATH << " is not readable!";
         return;
     }
     
@@ -634,5 +634,5 @@ void Loader::setError (const QString &error)
         emit errorChanged();
         
     }
-    qDebug() << error;
+    qWarning() << error;
 }
