@@ -57,9 +57,6 @@ Temp::Temp(Hwmon *parent, uint index) :
 
         if (labelFile.open(QFile::ReadOnly))
             m_label = QTextStream(&labelFile).readLine();
-
-        else
-            qDebug() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
     }
 }
 

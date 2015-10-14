@@ -51,6 +51,7 @@ Item {
         Button {
             Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
+            iconName: kcm.needsAuthorization ? "dialog-password" : ""
             onClicked: kcm.loader.detectSensors()
         }
     }
@@ -227,5 +228,13 @@ Item {
                 onTextChanged: base.serviceName = text
             }
         }
+    }
+    
+    ErrorDialog {
+        id: errorDialog
+        visible: !!base.loader.error
+        modality: Qt.ApplicationModal
+        text: base.loader.error
+        onTextChanged: show()
     }
 }

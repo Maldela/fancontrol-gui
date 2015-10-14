@@ -109,6 +109,14 @@ ApplicationWindow {
         }
     }
     
+    ErrorDialog {
+        id: errorDialog
+        visible: !!base.loader.error
+        modality: Qt.ApplicationModal
+        text: base.loader.error
+        onTextChanged: show()
+    }
+    
     Action {
         id: loadAction
         text: i18n("Load configuration file")

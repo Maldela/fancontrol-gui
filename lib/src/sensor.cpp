@@ -31,6 +31,7 @@ Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent)
     m_index(index),
     m_path(path)
 {
+    connect(this, SIGNAL(errorChanged(QString)), parent, SLOT(setError(QString)));
 }
 
 }

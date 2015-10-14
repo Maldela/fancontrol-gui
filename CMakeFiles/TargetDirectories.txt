@@ -1,0 +1,11 @@
+/home/maldela/Fancontrol-GUI/fancontrol-gui/CMakeFiles/fancontrol_gui_automoc.dir
+/home/maldela/Fancontrol-GUI/CMakeFiles/uninstall.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/kcmfancontrolhelper_automoc.dir
+/home/maldela/Fancontrol-GUI/fancontrol-gui/CMakeFiles/fancontrol_gui.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/fancontrol-gui-helper.dir
+/home/maldela/Fancontrol-GUI/share/CMakeFiles/fancontrol_gui_share_automoc.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/fancontrol-gui-helper_automoc.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/org.kde.kcontrol.kcmfancontrol.policy.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/fancontrol.gui.helper.policy.dir
+/home/maldela/Fancontrol-GUI/share/CMakeFiles/fancontrol_gui_share.dir
+/home/maldela/Fancontrol-GUI/helper/CMakeFiles/kcmfancontrolhelper.dir

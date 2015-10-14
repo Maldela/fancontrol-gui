@@ -22,7 +22,6 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
-#include <QtCore/QDebug>
 
 
 namespace Fancontrol
@@ -30,8 +29,23 @@ namespace Fancontrol
 
 Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     m_path(path),
-    m_index(path.split('/').last().remove("hwmon").toInt())
+    m_valid(true)
 {
+    QDir dir(path);
+    if (!dir.isReadable())
+    {
+        emit errorChanged(path + " is not readable!");
+        m_valid = false;
+    }
+    
+    bool success;
+    m_index = path.split('/').last().remove("hwmon").toInt(&success);
+    if (!success)
+    {
+        emit errorChanged(path + "is invalid!");
+        m_valid = false;
+    }
+    
     QFile nameFile(path + "/name");
     if (nameFile.open(QFile::ReadOnly))
         m_name = QTextStream(&nameFile).readLine();
@@ -41,8 +55,10 @@ Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     connect(this, SIGNAL(configUpdateNeeded()), parent, SLOT(createConfigFile()));
     connect(this, SIGNAL(pwmFansChanged()), parent, SLOT(emitAllPwmFansChanged()));
     connect(this, SIGNAL(tempsChanged()), parent, SLOT(emitAllTempsChanged()));
+    connect(this, SIGNAL(errorChanged(QString)), parent, SLOT(setError(QString)));
 
-    initialize();
+    if (m_valid)
+        initialize();
 }
 
 void Hwmon::initialize()
@@ -184,6 +200,11 @@ PwmFan* Hwmon::pwmFan(int i) const
 Temp* Hwmon::temp(int i) const
 {
     return m_temps.value(i, Q_NULLPTR);
+}
+
+void Hwmon::setError(const QString &error)
+{
+    emit errorChanged(error);
 }
 
 }

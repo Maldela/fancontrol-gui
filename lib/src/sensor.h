@@ -58,6 +58,7 @@ public slots:
 signals:
 
     void nameChanged();
+    void errorChanged(QString);
 
 
 protected:

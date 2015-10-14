@@ -103,8 +103,6 @@ protected slots:
 
     void update();
     void continueTest();
-//     void handlePwmActionReply();
-//     void handlePwmModeActionReply();
 
 
 private:

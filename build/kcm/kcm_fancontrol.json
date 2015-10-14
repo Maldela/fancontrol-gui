@@ -1,0 +1,14 @@
+{
+    "Categories": "Qt;KDE;X-KDE-settings-hardware;",
+    "KPlugin": {
+        "Description": "Control PWM-fans",
+        "Icon": "fancontrol_gui",
+        "Name": "Fancontrol",
+        "ServiceTypes": [
+            "KCModule"
+        ]
+    },
+    "X-KDE-Keywords": "Fans,PWM,Temperature",
+    "X-KDE-ParentApp": "kcontrol",
+    "X-KDE-System-Settings-Parent-Category": "hardware"
+}

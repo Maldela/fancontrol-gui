@@ -1,0 +1,16 @@
+/home/maldela/projects/fancontrol-gui.git/build/kcm/CMakeFiles/kcm_fancontrol_automoc.dir
+/home/maldela/projects/fancontrol-gui.git/build/helper/CMakeFiles/fancontrol-gui-helper_automoc.dir
+/home/maldela/projects/fancontrol-gui.git/build/lib/CMakeFiles/fancontrol_gui_lib_automoc.dir
+/home/maldela/projects/fancontrol-gui.git/build/tests/CMakeFiles/loadertest.dir
+/home/maldela/projects/fancontrol-gui.git/build/helper/CMakeFiles/fancontrol-gui-helper.dir
+/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles/uninstall.dir
+/home/maldela/projects/fancontrol-gui.git/build/fancontrol-gui/CMakeFiles/fancontrol_gui.dir
+/home/maldela/projects/fancontrol-gui.git/build/lib/CMakeFiles/fancontrol_gui_lib.dir
+/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles/pofiles_1.dir
+/home/maldela/projects/fancontrol-gui.git/build/helper/CMakeFiles/fancontrol.gui.helper.policy-customtarget.dir
+/home/maldela/projects/fancontrol-gui.git/build/kcm/CMakeFiles/kcm_fancontrol.dir
+/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles/pofiles.dir
+/home/maldela/projects/fancontrol-gui.git/build/fancontrol-gui/CMakeFiles/fancontrol_gui_automoc.dir
+/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles/pofiles_2.dir
+/home/maldela/projects/fancontrol-gui.git/build/tests/CMakeFiles/loadertest_automoc.dir
+/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles/pofiles_3.dir

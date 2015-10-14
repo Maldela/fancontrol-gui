@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=fancontrol.gui.helper
+Exec=/usr/lib/kauth/fancontrol-gui-helper
+User=root
