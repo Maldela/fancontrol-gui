@@ -49,7 +49,6 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/maldela/projects/fancontrol-gui.git/build/lib/cmake_install.cmake")
   include("/home/maldela/projects/fancontrol-gui.git/build/helper/cmake_install.cmake")
   include("/home/maldela/projects/fancontrol-gui.git/build/fancontrol-gui/cmake_install.cmake")
-  include("/home/maldela/projects/fancontrol-gui.git/build/kcm/cmake_install.cmake")
   include("/home/maldela/projects/fancontrol-gui.git/build/tests/cmake_install.cmake")
 
 endif()

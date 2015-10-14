@@ -28,7 +28,7 @@ BUILD_COVERAGE:BOOL=OFF
 BUILD_GUI:BOOL=ON
 
 //Build the KCM
-BUILD_KCM:BOOL=ON
+BUILD_KCM:BOOL=OFF
 
 //If enabled, shared libs will be built by default, otherwise static
 // libs
@@ -396,9 +396,6 @@ fancontroller_BINARY_DIR:STATIC=/home/maldela/projects/fancontrol-gui.git/build
 //Value Computed by CMake
 fancontroller_SOURCE_DIR:STATIC=/home/maldela/projects/fancontrol-gui.git
 
-//Dependencies for the target
-kcm_fancontrol_LIB_DEPENDS:STATIC=general;KF5::QuickAddons;general;KF5::I18n;general;fancontrol_gui_lib;
-
 
 ########################
 # INTERNAL cache entries
@@ -492,7 +489,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=6
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=5
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

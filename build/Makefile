@@ -322,32 +322,6 @@ fancontrol_gui_automoc/fast:
 .PHONY : fancontrol_gui_automoc/fast
 
 #=============================================================================
-# Target rules for targets named kcm_fancontrol
-
-# Build rule for target.
-kcm_fancontrol: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 kcm_fancontrol
-.PHONY : kcm_fancontrol
-
-# fast build rule for target.
-kcm_fancontrol/fast:
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol.dir/build.make kcm/CMakeFiles/kcm_fancontrol.dir/build
-.PHONY : kcm_fancontrol/fast
-
-#=============================================================================
-# Target rules for targets named kcm_fancontrol_automoc
-
-# Build rule for target.
-kcm_fancontrol_automoc: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 kcm_fancontrol_automoc
-.PHONY : kcm_fancontrol_automoc
-
-# fast build rule for target.
-kcm_fancontrol_automoc/fast:
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build.make kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build
-.PHONY : kcm_fancontrol_automoc/fast
-
-#=============================================================================
 # Target rules for targets named loadertest
 
 # Build rule for target.
@@ -398,8 +372,6 @@ help:
 	@echo "... fancontrol-gui-helper_automoc"
 	@echo "... fancontrol_gui_automoc"
 	@echo "... fancontrol_gui"
-	@echo "... kcm_fancontrol"
-	@echo "... kcm_fancontrol_automoc"
 	@echo "... loadertest"
 	@echo "... loadertest_automoc"
 .PHONY : help

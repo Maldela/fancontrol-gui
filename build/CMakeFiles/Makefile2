@@ -63,9 +63,9 @@ CMAKE_BINARY_DIR = /home/maldela/projects/fancontrol-gui.git/build
 # Target rules for target CMakeFiles/pofiles.dir
 
 # All Build rule for target.
+CMakeFiles/pofiles.dir/all: CMakeFiles/pofiles_1.dir/all
 CMakeFiles/pofiles.dir/all: CMakeFiles/pofiles_2.dir/all
 CMakeFiles/pofiles.dir/all: CMakeFiles/pofiles_3.dir/all
-CMakeFiles/pofiles.dir/all: CMakeFiles/pofiles_1.dir/all
 	$(MAKE) -f CMakeFiles/pofiles.dir/build.make CMakeFiles/pofiles.dir/depend
 	$(MAKE) -f CMakeFiles/pofiles.dir/build.make CMakeFiles/pofiles.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num= "Built target pofiles"
@@ -100,7 +100,7 @@ clean: CMakeFiles/pofiles.dir/clean
 CMakeFiles/pofiles_1.dir/all:
 	$(MAKE) -f CMakeFiles/pofiles_1.dir/build.make CMakeFiles/pofiles_1.dir/depend
 	$(MAKE) -f CMakeFiles/pofiles_1.dir/build.make CMakeFiles/pofiles_1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=32 "Built target pofiles_1"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=27 "Built target pofiles_1"
 .PHONY : CMakeFiles/pofiles_1.dir/all
 
 # Include target in all.
@@ -474,8 +474,8 @@ fancontrol-gui/preinstall:
 # Target rules for target fancontrol-gui/CMakeFiles/fancontrol_gui.dir
 
 # All Build rule for target.
-fancontrol-gui/CMakeFiles/fancontrol_gui.dir/all: fancontrol-gui/CMakeFiles/fancontrol_gui_automoc.dir/all
 fancontrol-gui/CMakeFiles/fancontrol_gui.dir/all: lib/CMakeFiles/fancontrol_gui_lib.dir/all
+fancontrol-gui/CMakeFiles/fancontrol_gui.dir/all: fancontrol-gui/CMakeFiles/fancontrol_gui_automoc.dir/all
 	$(MAKE) -f fancontrol-gui/CMakeFiles/fancontrol_gui.dir/build.make fancontrol-gui/CMakeFiles/fancontrol_gui.dir/depend
 	$(MAKE) -f fancontrol-gui/CMakeFiles/fancontrol_gui.dir/build.make fancontrol-gui/CMakeFiles/fancontrol_gui.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=7,8,9 "Built target fancontrol_gui"
@@ -541,95 +541,6 @@ clean: fancontrol-gui/CMakeFiles/fancontrol_gui_automoc.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Directory level rules for directory kcm
-
-# Convenience name for "all" pass in the directory.
-kcm/all: kcm/CMakeFiles/kcm_fancontrol.dir/all
-
-.PHONY : kcm/all
-
-# Convenience name for "clean" pass in the directory.
-kcm/clean: kcm/CMakeFiles/kcm_fancontrol.dir/clean
-kcm/clean: kcm/CMakeFiles/kcm_fancontrol_automoc.dir/clean
-
-.PHONY : kcm/clean
-
-# Convenience name for "preinstall" pass in the directory.
-kcm/preinstall:
-
-.PHONY : kcm/preinstall
-
-#=============================================================================
-# Target rules for target kcm/CMakeFiles/kcm_fancontrol.dir
-
-# All Build rule for target.
-kcm/CMakeFiles/kcm_fancontrol.dir/all: lib/CMakeFiles/fancontrol_gui_lib.dir/all
-kcm/CMakeFiles/kcm_fancontrol.dir/all: kcm/CMakeFiles/kcm_fancontrol_automoc.dir/all
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol.dir/build.make kcm/CMakeFiles/kcm_fancontrol.dir/depend
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol.dir/build.make kcm/CMakeFiles/kcm_fancontrol.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=23,24,25 "Built target kcm_fancontrol"
-.PHONY : kcm/CMakeFiles/kcm_fancontrol.dir/all
-
-# Include target in all.
-all: kcm/CMakeFiles/kcm_fancontrol.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-kcm/CMakeFiles/kcm_fancontrol.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maldela/projects/fancontrol-gui.git/build/CMakeFiles 17
-	$(MAKE) -f CMakeFiles/Makefile2 kcm/CMakeFiles/kcm_fancontrol.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maldela/projects/fancontrol-gui.git/build/CMakeFiles 0
-.PHONY : kcm/CMakeFiles/kcm_fancontrol.dir/rule
-
-# Convenience name for target.
-kcm_fancontrol: kcm/CMakeFiles/kcm_fancontrol.dir/rule
-
-.PHONY : kcm_fancontrol
-
-# clean rule for target.
-kcm/CMakeFiles/kcm_fancontrol.dir/clean:
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol.dir/build.make kcm/CMakeFiles/kcm_fancontrol.dir/clean
-.PHONY : kcm/CMakeFiles/kcm_fancontrol.dir/clean
-
-# clean rule for target.
-clean: kcm/CMakeFiles/kcm_fancontrol.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target kcm/CMakeFiles/kcm_fancontrol_automoc.dir
-
-# All Build rule for target.
-kcm/CMakeFiles/kcm_fancontrol_automoc.dir/all:
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build.make kcm/CMakeFiles/kcm_fancontrol_automoc.dir/depend
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build.make kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=26,27 "Built target kcm_fancontrol_automoc"
-.PHONY : kcm/CMakeFiles/kcm_fancontrol_automoc.dir/all
-
-# Build rule for subdir invocation for target.
-kcm/CMakeFiles/kcm_fancontrol_automoc.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maldela/projects/fancontrol-gui.git/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 kcm/CMakeFiles/kcm_fancontrol_automoc.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maldela/projects/fancontrol-gui.git/build/CMakeFiles 0
-.PHONY : kcm/CMakeFiles/kcm_fancontrol_automoc.dir/rule
-
-# Convenience name for target.
-kcm_fancontrol_automoc: kcm/CMakeFiles/kcm_fancontrol_automoc.dir/rule
-
-.PHONY : kcm_fancontrol_automoc
-
-# clean rule for target.
-kcm/CMakeFiles/kcm_fancontrol_automoc.dir/clean:
-	$(MAKE) -f kcm/CMakeFiles/kcm_fancontrol_automoc.dir/build.make kcm/CMakeFiles/kcm_fancontrol_automoc.dir/clean
-.PHONY : kcm/CMakeFiles/kcm_fancontrol_automoc.dir/clean
-
-# clean rule for target.
-clean: kcm/CMakeFiles/kcm_fancontrol_automoc.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
 # Directory level rules for directory tests
 
 # Convenience name for "all" pass in the directory.
@@ -652,11 +563,11 @@ tests/preinstall:
 # Target rules for target tests/CMakeFiles/loadertest.dir
 
 # All Build rule for target.
-tests/CMakeFiles/loadertest.dir/all: lib/CMakeFiles/fancontrol_gui_lib.dir/all
 tests/CMakeFiles/loadertest.dir/all: tests/CMakeFiles/loadertest_automoc.dir/all
+tests/CMakeFiles/loadertest.dir/all: lib/CMakeFiles/fancontrol_gui_lib.dir/all
 	$(MAKE) -f tests/CMakeFiles/loadertest.dir/build.make tests/CMakeFiles/loadertest.dir/depend
 	$(MAKE) -f tests/CMakeFiles/loadertest.dir/build.make tests/CMakeFiles/loadertest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=28,29,30 "Built target loadertest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=23,24,25 "Built target loadertest"
 .PHONY : tests/CMakeFiles/loadertest.dir/all
 
 # Include target in all.
@@ -693,7 +604,7 @@ clean: tests/CMakeFiles/loadertest.dir/clean
 tests/CMakeFiles/loadertest_automoc.dir/all:
 	$(MAKE) -f tests/CMakeFiles/loadertest_automoc.dir/build.make tests/CMakeFiles/loadertest_automoc.dir/depend
 	$(MAKE) -f tests/CMakeFiles/loadertest_automoc.dir/build.make tests/CMakeFiles/loadertest_automoc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=31 "Built target loadertest_automoc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maldela/projects/fancontrol-gui.git/build/CMakeFiles --progress-num=26 "Built target loadertest_automoc"
 .PHONY : tests/CMakeFiles/loadertest_automoc.dir/all
 
 # Build rule for subdir invocation for target.

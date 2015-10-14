@@ -7,5 +7,4 @@
 subdirs(lib)
 subdirs(helper)
 subdirs(fancontrol-gui)
-subdirs(kcm)
 subdirs(tests)
