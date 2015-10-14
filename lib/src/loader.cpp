@@ -325,6 +325,7 @@ bool Loader::load(const QUrl &url)
                     if (pwmPointer && tempPointer)
                     {
                         pwmPointer->setTemp(tempPointer);
+                        pwmPointer->setHasTemp(true);
                         pwmPointer->setMinPwm(0);
                     }
                 }
