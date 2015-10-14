@@ -109,8 +109,8 @@ if(INSTALL_SHARED)
 endif(INSTALL_SHARED)
 
 
-#run tests
-# add_subdirectory(tests)
+#add tests
+add_subdirectory(tests)
 
 
 #summary
