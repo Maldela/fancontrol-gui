@@ -155,16 +155,17 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
         qWarning() << "Invalid entry to parse:" << entry << "Should begin with \"hwmon\"";
         return QPair<int, int>(-1, -1);
     }
-    if (!sensor.contains(QRegExp("^(pwm|fan|temp|_input)\\d+")))
+    if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
-        qWarning() << "Invalid entry to parse:" << entry << "\n Sensor should begin with  pwm|fan|temp|_input followed by a number";
+        qWarning() << "Invalid entry to parse:" << entry << "\n Sensor should begin with  pwm|fan|temp followed by a number";
         return QPair<int, int>(-1, -1);
     }
 
     bool success;
 
     hwmon.remove("hwmon");
-    sensor.remove(QRegExp("^(pwm|fan|temp|_input)"));
+    sensor.remove(QRegExp("^(pwm|fan|temp)"));
+    sensor.remove("_input");
 
     int hwmonResult = hwmon.toInt(&success);
     if (!success)
