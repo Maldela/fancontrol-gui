@@ -1,4 +1,0 @@
-[D-BUS Service]
-Name=org.kde.kcontrol.kcmfancontrol
-Exec=/usr/lib/kauth/kcmfancontrolhelper
-User=root
