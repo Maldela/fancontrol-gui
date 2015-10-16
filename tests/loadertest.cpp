@@ -58,7 +58,7 @@ void LoaderTest::getEntryNumbersTest_data()
     
     QTest::newRow("valid1")     << "hwmon0/temp1"       << QPair<int, int>(0, 0);
     QTest::newRow("valid2")     << "hwmon1/pwm2"        << QPair<int, int>(1, 1);
-    QTest::newRow("valid3")     << "hwmon2/_input2"     << QPair<int, int>(2, 1);
+    QTest::newRow("valid3")     << "hwmon2/temp8_input" << QPair<int, int>(2, 7);
     QTest::newRow("valid4")     << "hwmon3/fan1"        << QPair<int, int>(3, 0);
     QTest::newRow("invalid1")   << "hwmo0/temp1"        << QPair<int, int>(-1, -1);
     QTest::newRow("invalid2")   << "hwmonn0/temp1"      << QPair<int, int>(-1, -1);
