@@ -26,7 +26,7 @@
 #include <KPackage/PackageLoader>
 #include <KCoreAddons/KAboutData>
 
-#include "../lib/src/guibase.h"
+#include "lib/src/guibase.h"
 
 
 int main(int argc, char *argv[])

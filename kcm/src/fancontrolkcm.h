@@ -25,7 +25,7 @@
 
 #include <KDeclarative/KQuickAddons/ConfigModule>
 
-#include "../lib/src/guibase.h"
+#include "lib/src/guibase.h"
 
 
 using namespace KQuickAddons;

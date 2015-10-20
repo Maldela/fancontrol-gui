@@ -45,6 +45,8 @@ include(KDECMakeSettings)
 include(KDECompilerSettings)
 include(FeatureSummary)
 
+include_directories (${CMAKE_SOURCE_DIR})
+
 
 #Systemd
 if(NOT NO_SYSTEMD)
