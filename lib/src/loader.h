@@ -31,6 +31,7 @@
 
 
 class QTimer;
+class KJob;
 
 namespace Fancontrol
 {
@@ -83,7 +84,8 @@ protected slots:
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
     void setError(const QString &error);
-        
+    void handleDetectSensorsResult(KJob *job);
+
 
 protected:
     

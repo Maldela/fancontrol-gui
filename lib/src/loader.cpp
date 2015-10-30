@@ -42,7 +42,7 @@ Loader::Loader(QObject *parent) : QObject(parent),
     m_configUrl(QUrl::fromLocalFile("/etc/fancontrol")),
     m_error(""),
     m_timer(new QTimer(this))
-{
+{   
     parseHwmons();
 
     m_timer->setSingleShot(false);
@@ -592,16 +592,21 @@ void Loader::detectSensors()
     map["action"] = "detectSensors";
 
     action.setArguments(map);
-    KAuth::ExecuteJob *reply = action.execute();
+    KAuth::ExecuteJob *job = action.execute();
+    
+    connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDetectSensorsResult(KJob*)));
+    job->start();
+}
 
-    if (!reply->exec())
+void Loader::handleDetectSensorsResult(KJob *job)
+{
+    if (job->error())
     {
-        qDebug() << reply->error();
-        setError(reply->errorString() + reply->errorText());
-        return;
+        qDebug() << job->error();
+        setError(job->errorString() + job->errorText());
     }
-
-    parseHwmons();
+    else
+        parseHwmons();
 }
 
 QList<QObject *> Loader::hwmons() const

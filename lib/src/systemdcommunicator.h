@@ -27,6 +27,7 @@
 
 
 class QDBusInterface;
+class KJob;
 
 namespace Fancontrol
 {
@@ -65,6 +66,7 @@ signals:
 protected slots:
     
     void updateServiceProperties(QString, QVariantMap, QStringList);
+    void handleDbusActionReply(KJob *job);
     
     
 protected:

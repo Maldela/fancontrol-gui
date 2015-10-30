@@ -55,7 +55,7 @@ public:
     explicit PwmFan(Hwmon *parent, uint index);
     virtual ~PwmFan();
 
-    int pwm() const { return m_pwm; }
+    int pwm() const Q_DECL_OVERRIDE { return m_pwm; }
     Temp * temp() const { return m_temp; }
     bool hasTemp() const { return m_hasTemp; }
     int minTemp() const { return m_minTemp; }
@@ -67,7 +67,7 @@ public:
     int pwmMode() const { return m_pwmMode; }
     bool active() const;
     bool testing() const;
-    bool setPwm(int pwm, bool write = true);
+    bool setPwm(int pwm, bool write = true) Q_DECL_OVERRIDE;
     void setTemp(Temp *temp) { setHasTemp(temp != Q_NULLPTR); if (temp != m_temp) { m_temp = temp; emit tempChanged(); } }
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
@@ -101,7 +101,7 @@ signals:
 
 protected slots:
 
-    void update();
+    void update() Q_DECL_OVERRIDE;
     void continueTest();
 
 

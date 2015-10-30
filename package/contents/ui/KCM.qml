@@ -86,7 +86,7 @@ Item {
             }
             ComboBox {
                 id: fanComboBox
-                model: ListModel {
+                model: ListModel {    //ListModel because array of names would reset currentIndex to 0 if a name changes
                     property var fans: kcm.loader.allPwmFans
                     id: fanList
                     Component.onCompleted: {

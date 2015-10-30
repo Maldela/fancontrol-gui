@@ -252,23 +252,23 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             map["arguments"] = arguments;
             action.setArguments(map);
 
-            KAuth::ExecuteJob *reply = action.execute();
-
-            if (!reply->exec())
-            {
-                setError(reply->errorString());
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            KAuth::ExecuteJob *job = action.execute();
+            connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
+            job->start();
+            
+            return true;
         }
         setError(dbusreply.errorMessage());
         return false;
     }
     
     return true;
+}
+
+void SystemdCommunicator::handleDbusActionReply(KJob *job)
+{
+    if (job->error())
+        setError(job->errorString() + job->errorText());
 }
 
 bool SystemdCommunicator::restartService()

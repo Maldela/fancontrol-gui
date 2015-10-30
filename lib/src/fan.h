@@ -56,7 +56,7 @@ signals:
 
 public slots:
 
-    void update();
+    void update() Q_DECL_OVERRIDE;
 
 
 protected:
