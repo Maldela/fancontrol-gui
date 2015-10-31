@@ -265,7 +265,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     return true;
 }
 
-void SystemdCommunicator::handleDbusActionReply(KJob *job)
+void SystemdCommunicator::handleDbusActionResult(KJob *job)
 {
     if (job->error())
         setError(job->errorString() + job->errorText());

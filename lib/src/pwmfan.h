@@ -30,6 +30,7 @@
 
 
 class QTextStream;
+class KJob;
 
 namespace Fancontrol
 {
@@ -103,6 +104,9 @@ protected slots:
 
     void update() Q_DECL_OVERRIDE;
     void continueTest();
+    void handleSetPwmResult(KJob *job);
+    void handleSetPwmModeResult(KJob *job);
+    void handleTestAuthReply(int authStatus);
 
 
 private:

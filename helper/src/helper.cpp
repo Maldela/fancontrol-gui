@@ -24,6 +24,7 @@
 #include <QtCore/QProcess>
 
 #include <KAuth/KAuthHelperSupport>
+#include <KI18n/KLocalizedString>
 
 #ifndef NO_SYSTEMD
 #include <QtDBus/QDBusInterface>
@@ -72,7 +73,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!file.open(QIODevice::ReadOnly))
         {
            reply = ActionReply::HelperErrorType;
-           reply.setErrorCode(ActionReply::AuthorizationDeniedError);
+           reply.setErrorDescription(file.errorString());
 
            return reply;
         }
@@ -94,7 +95,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!file.open(QIODevice::WriteOnly))
         {
            reply = ActionReply::HelperErrorType;
-           reply.addData("errorDescription", file.errorString());
+           reply.setErrorDescription(file.errorString());
 
            return reply;
         }
@@ -114,7 +115,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!process.waitForStarted(10000))
         {
             reply = ActionReply::HelperErrorType;
-            reply.addData("errorDescription", process.errorString());
+            reply.setErrorDescription(process.errorString());
             
             return reply;
         }
@@ -122,10 +123,16 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!process.waitForFinished(10000))
         {
             reply = ActionReply::HelperErrorType;
-            reply.addData("errorDescription", process.errorString());
+            reply.setErrorDescription(process.errorString());
             
             return reply;
         }
+    }
+    else
+    {
+        reply.setType(ActionReply::HelperErrorType);
+        reply.setErrorCode(ActionReply::NoSuchActionError);
+        reply.setErrorDescription(i18n("This action does not exist!"));
     }
     
     return reply;

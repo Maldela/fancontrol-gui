@@ -1,4 +1,5 @@
-set(LIBRARIES KF5::Auth)
+set(LIBRARIES KF5::Auth
+              KF5::I18n)
 
 if(NOT NO_SYSTEMD)
 

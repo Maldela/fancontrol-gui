@@ -66,7 +66,7 @@ signals:
 protected slots:
     
     void updateServiceProperties(QString, QVariantMap, QStringList);
-    void handleDbusActionReply(KJob *job);
+    void handleDbusActionResult(KJob *job);
     
     
 protected:
