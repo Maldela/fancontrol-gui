@@ -34,6 +34,7 @@
 #include <KConfigCore/KConfigGroup>
 #include <KConfigCore/KSharedConfig>
 #include <KAuth/KAuthExecuteJob>
+#include <KI18n/KLocalizedString>
 
 
 #define MAX_ERRORS_FOR_RPM_ZERO 10
@@ -172,7 +173,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                 action.setHelperId("fancontrol.gui.helper");
                 if (!action.isValid())
                 {
-                    emit errorChanged("setPwm action is invalid");
+                    emit errorChanged(i18n("Action is invalid"));
                     return false;
                 }
                 
@@ -194,7 +195,7 @@ void PwmFan::handleSetPwmResult(KJob *job)
 {
     if (job->error())
     {
-        emit errorChanged(QString("setPwm error:" + job->errorString() + job->errorText()));
+        emit errorChanged(i18n("Could not set pwm:") + job->errorString() + job->errorText());
         return;
     }
     update();
@@ -218,7 +219,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                 action.setHelperId("fancontrol.gui.helper");
                 if (!action.isValid())
                 {
-                    emit errorChanged("setPwmMode action is invalid");
+                    emit errorChanged(i18n("Action is invalid"));
                     return false;
                 }
                 
@@ -240,7 +241,7 @@ void PwmFan::handleSetPwmModeResult(KJob *job)
 {
     if (job->error())
     {
-        emit errorChanged(QString("setPwmMode error:" + job->errorString() + job->errorText()));
+        emit errorChanged(i18n("Could not set pwm mode:") + job->errorString() + job->errorText());
         return;
     }
     update();
@@ -266,7 +267,21 @@ void PwmFan::handleTestAuthReply(KJob *job)
 {
     if (job->error())
     {
-        emit errorChanged(QString("test error:" + job->errorString() + job->errorText()));
+        m_testStatus = Error;
+        emit testingChanged();
+        
+        emit errorChanged(i18n("Test job error:") + job->errorString() + job->errorText());
+        return;
+    }
+    
+    KAuth::Action action("fancontrol.gui.helper.action");
+    action.setHelperId("fancontrol.gui.helper");
+    if (action.status() != KAuth::Action::AuthorizedStatus)
+    {
+        m_testStatus = Error;
+        emit testingChanged();
+        
+        emit errorChanged(i18n("Authentication error"));
         return;
     }
        
