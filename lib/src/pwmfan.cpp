@@ -256,34 +256,28 @@ bool PwmFan::test()
         return false;
     }
     KAuth::ExecuteJob *job = action.execute(KAuth::Action::AuthorizeOnlyMode);
-    connect(job, SIGNAL(statusChanged(int)), this, SLOT(handleTestAuthReply(int)));
+    connect(job, SIGNAL(result(KJob*)), this, SLOT(handleTestAuthReply(KJob*)));
     job->start();
     
     return true;
 }
 
-void PwmFan::handleTestAuthReply(int authStatus)
+void PwmFan::handleTestAuthReply(KJob *job)
 {
-    switch (authStatus)
+    if (job->error())
     {
-        case KAuth::Action::AuthorizedStatus:
-        {
-            setPwmMode(1);
-            setPwm(255);
-            
-            m_testStatus = FindingStop1;
-            emit testingChanged();
-            
-            QTimer::singleShot(500, this, SLOT(continueTest()));
-            qDebug() << "Start testing...";
-            break;
-        }
-        case KAuth::Action::ErrorStatus:
-        {
-            emit errorChanged("Test action error");
-            break;
-        }
+        emit errorChanged(QString("test error:" + job->errorString() + job->errorText()));
+        return;
     }
+       
+    setPwmMode(1);
+    setPwm(255);
+    
+    m_testStatus = FindingStop1;
+    emit testingChanged();
+    
+    QTimer::singleShot(500, this, SLOT(continueTest()));
+    qDebug() << "Start testing...";
 }
 
 void PwmFan::abortTest()

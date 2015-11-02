@@ -33,6 +33,7 @@ Rectangle {
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     property int size: 10
+    property int unit: 0 
     
     width: size
     height: size
@@ -67,12 +68,19 @@ Rectangle {
         x: parent.width
         y: - height
         width: Math.max(pwm.width, rpm.width)
-        height: pwm.height + rpm.height
+        height: temp.height + pwm.height + rpm.height
         radius: 4
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
         visible: root.enabled && pwmMouse.containsMouse
         
         Column {
+            Label {
+                property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
+                
+                id: temp
+                font.pixelSize: root.height * 1.5
+                text: (fan.hasTemp ? fan.temp.value : "0") + suffix
+            }
             Label {
                 id: pwm
                 font.pixelSize: root.height * 1.5

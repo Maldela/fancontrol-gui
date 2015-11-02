@@ -106,7 +106,7 @@ protected slots:
     void continueTest();
     void handleSetPwmResult(KJob *job);
     void handleSetPwmModeResult(KJob *job);
-    void handleTestAuthReply(int authStatus);
+    void handleTestAuthReply(KJob *job);
 
 
 private:

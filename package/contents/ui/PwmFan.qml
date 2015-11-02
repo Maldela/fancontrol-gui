@@ -129,6 +129,7 @@ Rectangle {
             size: canvas.fontSize
             visible: canvas.contains(Coordinates.centerOf(this)) && fan.hasTemp && canvas.drawingEnabled
             fan: root.fan
+            unit: root.unit
         }
         PwmPoint {
             id: stopPoint
@@ -291,7 +292,13 @@ Rectangle {
                 text: i18n("Controlled by:")
                 checked: fan.hasTemp
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                onCheckedChanged: fan.hasTemp = checked
+                onCheckedChanged: {
+                    fan.hasTemp = checked;
+                    if (checked) {
+                        fan.temp = loader.allTemps[tempBox.currentIndex];
+                    }
+                    canvas.requestPaint();
+                }
             }
             RowLayout {                  
                 ComboBox {
