@@ -72,7 +72,7 @@ protected slots:
 protected:
     
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
-    void setError(const QString &error) { if (error != m_error) { m_error = error; emit errorChanged(); } }
+    void setError(const QString &error);
     
     
 private:

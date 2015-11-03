@@ -25,6 +25,7 @@ Dialog {
     property alias text: text.text
     
     title: i18n("Error")
+    width: text.implicitWidth + 20
     standardButtons: StandardButton.Ok
     onAccepted: close()
     

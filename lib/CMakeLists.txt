@@ -9,7 +9,8 @@ set(LIB_SRCS src/hwmon.cpp
                         
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
                           KF5::Auth
-                          KF5::ConfigCore)
+                          KF5::ConfigCore
+                          KF5::I18n)
 
 set(LIB_PUBLIC_LIBRARIES Qt5::Core)
               

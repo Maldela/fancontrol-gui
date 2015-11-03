@@ -165,6 +165,8 @@ bool PwmFan::setPwm(int pwm, bool write)
 
         if (write)
         {
+            setPwmMode(1);
+            
             if (m_pwmStream->device()->isWritable())
                 *m_pwmStream << pwm;
             else
@@ -195,7 +197,15 @@ void PwmFan::handleSetPwmResult(KJob *job)
 {
     if (job->error())
     {
-        emit errorChanged(i18n("Could not set pwm:") + job->errorString() + job->errorText());
+        if (job->error() == KAuth::ActionReply::HelperBusyError)
+        {
+            qDebug() << "Helper busy...";
+            
+            QTimer::singleShot(50, this, [this] (){ setPwm(m_pwm); });
+            return;
+        }
+        
+        emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
         return;
     }
     update();
@@ -241,7 +251,15 @@ void PwmFan::handleSetPwmModeResult(KJob *job)
 {
     if (job->error())
     {
-        emit errorChanged(i18n("Could not set pwm mode:") + job->errorString() + job->errorText());
+        if (job->error() == KAuth::ActionReply::HelperBusyError)
+        {
+            qDebug() << "Helper busy...";
+            
+            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+            return;
+        }
+        
+        emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
         return;
     }
     update();
@@ -256,7 +274,7 @@ bool PwmFan::test()
         emit errorChanged("Test action is invalid");
         return false;
     }
-    KAuth::ExecuteJob *job = action.execute(KAuth::Action::AuthorizeOnlyMode);
+    KAuth::ExecuteJob *job = action.execute();
     connect(job, SIGNAL(result(KJob*)), this, SLOT(handleTestAuthReply(KJob*)));
     job->start();
     
@@ -264,28 +282,23 @@ bool PwmFan::test()
 }
 
 void PwmFan::handleTestAuthReply(KJob *job)
-{
+{  
     if (job->error())
     {
+        if (job->error() == KAuth::ActionReply::HelperBusyError)
+        {
+            qDebug() << "Helper busy...";
+            
+            QTimer::singleShot(100, this, &PwmFan::test);
+            return;
+        }
+        
+        emit errorChanged(i18n("Authorization error: ") + job->errorText());
         m_testStatus = Error;
         emit testingChanged();
-        
-        emit errorChanged(i18n("Test job error:") + job->errorString() + job->errorText());
         return;
     }
     
-    KAuth::Action action("fancontrol.gui.helper.action");
-    action.setHelperId("fancontrol.gui.helper");
-    if (action.status() != KAuth::Action::AuthorizedStatus)
-    {
-        m_testStatus = Error;
-        emit testingChanged();
-        
-        emit errorChanged(i18n("Authentication error"));
-        return;
-    }
-       
-    setPwmMode(1);
     setPwm(255);
     
     m_testStatus = FindingStop1;
@@ -299,8 +312,9 @@ void PwmFan::abortTest()
 {
     if (m_testStatus >= FindingStop1 && m_testStatus <= FindingStart)
     {
-        setPwm(255);
-        disconnect(0, 0, this, SLOT(continueTest()));
+        qDebug() << "Abort testing";
+        
+        disconnect(this, 0, this, SLOT(continueTest()));
 
         m_testStatus = Cancelled;
         emit testingChanged();
@@ -311,6 +325,20 @@ void PwmFan::abortTest()
 
 void PwmFan::continueTest()
 {
+    KAuth::Action action("fancontrol.gui.helper.action");
+    action.setHelperId("fancontrol.gui.helper");
+    if (!action.isValid())
+    {
+        emit errorChanged("Test action is invalid");
+        return;
+    }
+    if (action.status() != KAuth::Action::AuthorizedStatus)
+    {
+        m_testStatus = Error;
+        emit testingChanged();
+        return;
+    }
+    
     update();
     switch (m_testStatus)
     {

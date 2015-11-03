@@ -360,21 +360,14 @@ Rectangle {
                 anchors.right: parent.right
                 onClicked: {
                     if (fan.testing) {
+                        systemdCom.serviceActive = reactivateAfterTesting;
                         fan.abortTest();
-                        systemdCom.serviceActive = true;
                     } else {
                         reactivateAfterTesting = systemdCom.serviceActive;
                         systemdCom.serviceActive = false;
                         minStartInput.value = Qt.binding(function() { return Math.round(fan.minStart / 2.55) });
-                        if (!fan.test()) {
-                            systemdCom.serviceActive = reactivateAfterTesting;
-                        }
+                        fan.test();
                     }
-                }
-                
-                Connections {
-                    target: fan
-                    onTestingChanged: if (!fan.testing) systemdCom.serviceActive = testButton.reactivateAfterTesting
                 }
             }
         }

@@ -128,6 +128,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
             return reply;
         }
     }
+    
     else
     {
         reply.setType(ActionReply::HelperErrorType);

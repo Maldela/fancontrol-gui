@@ -22,6 +22,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
+#include <QtCore/QTimer>
 #include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusInterface>
 
@@ -210,6 +211,7 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
 
 bool SystemdCommunicator::setServiceActive(bool active)
 {
+    qDebug() << "Set service active:" << active;
     if (serviceExists())
     {
         if (active != serviceActive())
@@ -223,6 +225,7 @@ bool SystemdCommunicator::setServiceActive(bool active)
                 return true;
             }
         }
+        
         return true;
     }
     return false;
@@ -239,9 +242,14 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         else
             dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
     }
+    else
+    {
+        qDebug() << "Invalid manager interface!";
+        return false;
+    }
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
-    {
+    {      
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
             KAuth::Action action("fancontrol.gui.helper.action");
@@ -266,9 +274,26 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 }
 
 void SystemdCommunicator::handleDbusActionResult(KJob *job)
-{
+{   
     if (job->error())
-        setError(job->errorString() + job->errorText());
+    {
+        if (job->error() == KAuth::ActionReply::HelperBusyError)
+        {
+            qDebug() << "Helper busy...";
+            
+            KAuth::ExecuteJob *executeJob = static_cast<KAuth::ExecuteJob *>(job);
+            if (executeJob)
+            {
+                KAuth::ExecuteJob *newJob = executeJob->action().execute();
+                connect(newJob, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
+                
+                QTimer::singleShot(50, this, [newJob] (){ newJob->start(); });
+                return;
+            }
+        }
+        
+        setError(job->errorText());
+    }
 }
 
 bool SystemdCommunicator::restartService()
@@ -291,6 +316,17 @@ void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchang
 
     if (propchanged.value("UnitFileState").isValid())
         emit serviceEnabledChanged();
+}
+
+void SystemdCommunicator::setError(const QString &error)
+{
+    qCritical() << error;
+    
+    if (error != m_error)
+    {
+        m_error = error; 
+        emit errorChanged();
+    }
 }
 
 }
