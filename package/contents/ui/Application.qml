@@ -57,7 +57,10 @@ ApplicationWindow {
                 active: base.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
                     iconName: base.systemdCom.serviceActive ? "system-reboot" : "system-run"
-                    onClicked: base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
+                    onClicked: {
+                        base.loader.abortTestingFans();
+                        base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
+                    }
                     tooltip: base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
             }

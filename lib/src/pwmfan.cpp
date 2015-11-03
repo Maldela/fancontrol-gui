@@ -65,6 +65,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
     connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
+    connect(this, SIGNAL(testingChanged()), parent, SLOT(updateConfig()));
 
     if (QDir(parent->path()).isReadable())
     {
@@ -265,20 +266,18 @@ void PwmFan::handleSetPwmModeResult(KJob *job)
     update();
 }
 
-bool PwmFan::test()
+void PwmFan::test()
 {
     KAuth::Action action("fancontrol.gui.helper.action");
     action.setHelperId("fancontrol.gui.helper");
     if (!action.isValid())
     {
         emit errorChanged("Test action is invalid");
-        return false;
+        return;
     }
     KAuth::ExecuteJob *job = action.execute();
     connect(job, SIGNAL(result(KJob*)), this, SLOT(handleTestAuthReply(KJob*)));
     job->start();
-    
-    return true;
 }
 
 void PwmFan::handleTestAuthReply(KJob *job)

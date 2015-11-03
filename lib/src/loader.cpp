@@ -446,7 +446,7 @@ void Loader::createConfigFile()
         foreach (QObject *fan, hwmon->pwmFans())
         {
             PwmFan *pwmFan = qobject_cast<PwmFan *>(fan);
-            if (pwmFan->hasTemp() && pwmFan->temp())
+            if (pwmFan->hasTemp() && pwmFan->temp() && !pwmFan->testing())
             {
                 usedFans << pwmFan;
                 if (!usedHwmons.contains(pwmFan->temp()->parent()))
@@ -581,6 +581,14 @@ void Loader::testFans()
     for (int i=0; i<m_hwmons.size(); i++)
     {
         m_hwmons.at(i)->testFans();
+    }
+}
+
+void Loader::abortTestingFans()
+{
+    for (int i=0; i<m_hwmons.size(); i++)
+    {
+        m_hwmons.at(i)->abortTestingFans();
     }
 }
 

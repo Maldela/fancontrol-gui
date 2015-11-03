@@ -80,7 +80,7 @@ public:
     bool setPwmMode(int pwmMode, bool write = true);
     void setActive(bool active);
     void reset() Q_DECL_OVERRIDE;
-    Q_INVOKABLE bool test();
+    Q_INVOKABLE void test();
     Q_INVOKABLE void abortTest();
 
 

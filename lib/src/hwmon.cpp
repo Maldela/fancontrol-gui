@@ -181,9 +181,17 @@ QList<QObject *> Hwmon::temps() const
 
 void Hwmon::testFans()
 {
-    for (int i=0; i<m_pwmFans.size(); i++)
+    foreach (PwmFan *const fan, m_pwmFans)
     {
-        m_pwmFans.at(i)->test();
+        fan->test();
+    }
+}
+
+void Hwmon::abortTestingFans()
+{
+    foreach (PwmFan *const fan, m_pwmFans)
+    {
+        fan->abortTest();
     }
 }
 

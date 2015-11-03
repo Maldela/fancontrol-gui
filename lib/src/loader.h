@@ -60,6 +60,7 @@ public:
     Q_INVOKABLE bool load(const QUrl & = QUrl());
     Q_INVOKABLE bool save(const QUrl & = QUrl());
     Q_INVOKABLE void testFans();
+    Q_INVOKABLE void abortTestingFans();
     Q_INVOKABLE void detectSensors();
     QUrl configUrl() const { return m_configUrl; }
     QString configFile() const { return m_configFile; }

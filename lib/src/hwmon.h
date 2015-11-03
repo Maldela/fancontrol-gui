@@ -56,6 +56,7 @@ public:
     QList<QObject *> pwmFans() const;
     QList<QObject *> temps() const;
     Q_INVOKABLE void testFans();
+    Q_INVOKABLE void abortTestingFans();
     Fan * fan(int i) const;
     PwmFan * pwmFan(int i) const;
     Temp * temp(int i) const;

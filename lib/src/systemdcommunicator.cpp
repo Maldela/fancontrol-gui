@@ -212,6 +212,7 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
 bool SystemdCommunicator::setServiceActive(bool active)
 {
     qDebug() << "Set service active:" << active;
+       
     if (serviceExists())
     {
         if (active != serviceActive())
