@@ -21,6 +21,7 @@
 #include "loader.h"
 
 #include "hwmon.h"
+#include "fancontrolaction.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -245,8 +246,7 @@ bool Loader::load(const QUrl &url)
     }
     else if (file.exists())
     {
-        KAuth::Action action("fancontrol.gui.helper.action");
-        action.setHelperId("fancontrol.gui.helper");
+        KAuth::Action action = newFancontrolAction();
         QVariantMap map;
         map["action"] = "read";
         map["filename"] = fileName;
@@ -413,9 +413,7 @@ bool Loader::save(const QUrl &url)
     }
     else
     {
-        KAuth::Action action("fancontrol.gui.helper.action");
-        action.setHelperId("fancontrol.gui.helper");
-
+        KAuth::Action action = newFancontrolAction();
         QVariantMap map;
         map["action"] = "write";
         map["filename"] = fileName;
@@ -594,8 +592,7 @@ void Loader::abortTestingFans()
 
 void Loader::detectSensors()
 {
-    KAuth::Action action("fancontrol.gui.helper.action");
-    action.setHelperId("fancontrol.gui.helper");
+    KAuth::Action action = newFancontrolAction();
     QVariantMap map;
     map["action"] = "detectSensors";
 

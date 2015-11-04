@@ -24,6 +24,7 @@
 #include "pwmfan.h"
 
 #include "hwmon.h"
+#include "fancontrolaction.h"
 
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
@@ -172,14 +173,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                 *m_pwmStream << pwm;
             else
             {
-                KAuth::Action action("fancontrol.gui.helper.action");
-                action.setHelperId("fancontrol.gui.helper");
-                if (!action.isValid())
-                {
-                    emit errorChanged(i18n("Action is invalid"));
-                    return false;
-                }
-                
+                KAuth::Action action = newFancontrolAction();
                 QVariantMap map;
                 map["action"] = "write";
                 map["filename"] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
@@ -226,13 +220,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
 
             else
             {
-                KAuth::Action action("fancontrol.gui.helper.action");
-                action.setHelperId("fancontrol.gui.helper");
-                if (!action.isValid())
-                {
-                    emit errorChanged(i18n("Action is invalid"));
-                    return false;
-                }
+                KAuth::Action action = newFancontrolAction();
                 
                 QVariantMap map;
                 map["action"] = "write";
@@ -268,13 +256,7 @@ void PwmFan::handleSetPwmModeResult(KJob *job)
 
 void PwmFan::test()
 {
-    KAuth::Action action("fancontrol.gui.helper.action");
-    action.setHelperId("fancontrol.gui.helper");
-    if (!action.isValid())
-    {
-        emit errorChanged("Test action is invalid");
-        return;
-    }
+    KAuth::Action action = newFancontrolAction();
     KAuth::ExecuteJob *job = action.execute();
     connect(job, SIGNAL(result(KJob*)), this, SLOT(handleTestAuthReply(KJob*)));
     job->start();
@@ -324,13 +306,8 @@ void PwmFan::abortTest()
 
 void PwmFan::continueTest()
 {
-    KAuth::Action action("fancontrol.gui.helper.action");
-    action.setHelperId("fancontrol.gui.helper");
-    if (!action.isValid())
-    {
-        emit errorChanged("Test action is invalid");
-        return;
-    }
+    KAuth::Action action = newFancontrolAction();
+    
     if (action.status() != KAuth::Action::AuthorizedStatus)
     {
         m_testStatus = Error;

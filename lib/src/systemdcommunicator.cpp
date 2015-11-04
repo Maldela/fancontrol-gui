@@ -20,6 +20,8 @@
 
 #include "systemdcommunicator.h"
 
+#include "fancontrolaction.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QTimer>
@@ -253,8 +255,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     {      
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
-            KAuth::Action action("fancontrol.gui.helper.action");
-            action.setHelperId("fancontrol.gui.helper");
+            KAuth::Action action = newFancontrolAction();
             QVariantMap map;
             map["action"] = "dbusaction";
             map["method"] = method;
