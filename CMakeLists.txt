@@ -12,7 +12,9 @@ option(INSTALL_HELPER "Install the KHelper" ON)
 
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
+set(STANDARD_CONFIG_FILE "/etc/fancontrol" CACHE STRING "The location of the standard config file for the fancontrol script")
 add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
+add_definitions(-DSTANDARD_CONFIG_FILE="${STANDARD_CONFIG_FILE}")
 
 
 #KCM can't be build without systemd support

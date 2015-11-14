@@ -34,13 +34,17 @@
 
 #define HWMON_PATH "/sys/class/hwmon"
 
+#ifndef STANDARD_CONFIG_FILE
+#define STANDARD_CONFIG_FILE "/etc/fancontrol"
+#endif
+
 
 namespace Fancontrol
 {
 
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
-    m_configUrl(QUrl::fromLocalFile("/etc/fancontrol")),
+    m_configUrl(QUrl::fromLocalFile(STANDARD_CONFIG_FILE)),
     m_error(""),
     m_timer(new QTimer(this))
 {   
