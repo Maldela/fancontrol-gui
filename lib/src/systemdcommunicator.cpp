@@ -31,6 +31,11 @@
 #include <KAuth/KAuthExecuteJob>
 
 
+#ifndef STANDARD_SERVICE_NAME
+#define STANDARD_SERVICE_NAME "fancontrol"
+#endif
+
+
 typedef struct
 {
     QString path;
@@ -71,7 +76,7 @@ SystemdCommunicator::SystemdCommunicator(const QString &serviceName, QObject *pa
     m_serviceInterface(Q_NULLPTR)
 {
     if (serviceName.isEmpty())
-        setServiceName("fancontrol");
+        setServiceName(STANDARD_SERVICE_NAME);
     else 
         setServiceName(serviceName);
 }

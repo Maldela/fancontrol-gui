@@ -10,6 +10,10 @@ option(BUILD_KCM "Build the KCM" OFF)
 option(INSTALL_SHARED "Install the shared parts" ON)
 option(INSTALL_HELPER "Install the KHelper" ON)
 
+#variables
+set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
+add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
+
 
 #KCM can't be build without systemd support
 if(BUILD_KCM AND NO_SYSTEMD)
