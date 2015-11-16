@@ -269,7 +269,7 @@ bool Loader::load(const QUrl &url)
     }
     else
     {
-        setError("File does not exist");
+        setError(file.fileName() + " does not exist!");
         return false;
     }
 
