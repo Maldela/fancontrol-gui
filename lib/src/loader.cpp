@@ -235,7 +235,7 @@ bool Loader::load(const QUrl &url)
 
     else
     {
-        setError("Url is not a local file");
+        setError(url.toDisplayString() + " is not a local file!");
         return false;
     }
 
