@@ -116,6 +116,7 @@ signals:
     void sensorsUpdateNeeded();
     void allPwmFansChanged();
     void allTempsChanged();
+    void invalidConfigUrl();
 };
 
 }

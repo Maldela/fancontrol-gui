@@ -133,7 +133,7 @@ ApplicationWindow {
         text: i18n("Save configuration file")
         onTriggered: base.loader.save()
         iconName: "document-save"
-        tooltip: i18n("Save configuration file")
+        tooltip: i18n("Save configuration file") + " (" + base.loader.configUrl.toString() + ")"
         shortcut: StandardKey.Save
     }
     

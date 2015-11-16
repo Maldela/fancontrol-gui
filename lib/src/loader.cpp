@@ -245,6 +245,12 @@ bool Loader::load(const QUrl &url)
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
+        if (!url.isEmpty())
+        {
+            m_configUrl = url;
+            emit configUrlChanged();
+        }
+        
         stream.setDevice(&file);
         fileContent = stream.readAll();
     }
@@ -264,12 +270,23 @@ bool Loader::load(const QUrl &url)
         }
         else
         {
+            if (!url.isEmpty())
+            {
+                m_configUrl = url;
+                emit configUrlChanged();
+            }
+            
             fileContent = reply->data()["content"].toString();
         }
     }
     else
-    {
-        setError(file.fileName() + " does not exist!");
+    {     
+        if (!url.isEmpty())
+        {
+            emit invalidConfigUrl();
+            setError(file.fileName() + " does not exist!");
+        }
+        
         return false;
     }
 
@@ -404,7 +421,7 @@ bool Loader::save(const QUrl &url)
 
     else
     {
-        setError("Url is not a local file");
+        setError(url.toDisplayString() + " is not a local file!");
         return false;
     }
 
