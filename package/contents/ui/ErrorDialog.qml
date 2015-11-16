@@ -26,8 +26,8 @@ Dialog {
     
     title: i18n("Error")
     width: text.implicitWidth + 20
-    standardButtons: StandardButton.Ok
-    onAccepted: close()
+    standardButtons: StandardButton.Close
+    onRejected: close()
     
     Label {
         id: text
