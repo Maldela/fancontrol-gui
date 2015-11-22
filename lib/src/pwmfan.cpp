@@ -121,6 +121,9 @@ void PwmFan::reset()
 {
     Fan::reset();
     
+    setHasTemp(false);
+    setTemp(Q_NULLPTR);
+    
     QIODevice *oldFile = m_pwmStream->device();
     delete m_pwmStream;
     delete oldFile;

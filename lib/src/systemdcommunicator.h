@@ -42,7 +42,7 @@ class FANCONTROL_GUI_LIB_EXPORT SystemdCommunicator : public QObject
 
 public:
 
-    explicit SystemdCommunicator(const QString &serviceName = QString(), QObject *parent = Q_NULLPTR);
+    explicit SystemdCommunicator(QObject *parent = Q_NULLPTR, const QString &serviceName = QString());
 
     QString serviceName() const { return m_serviceName; }
     void setServiceName(const QString &name);

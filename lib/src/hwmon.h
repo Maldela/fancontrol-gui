@@ -46,7 +46,7 @@ class Hwmon : public QObject
 
 public:
 
-    explicit Hwmon(const QString &, QObject *parent = Q_NULLPTR);
+    explicit Hwmon(const QString &path, QObject *parent = Q_NULLPTR);
 
     void initialize();
     QString name() const { return m_name; }

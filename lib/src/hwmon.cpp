@@ -37,7 +37,7 @@ Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
         emit errorChanged(path + " is not readable!");
         m_valid = false;
     }
-    
+
     bool success;
     m_index = path.split('/').last().remove("hwmon").toInt(&success);
     if (!success)
@@ -45,13 +45,13 @@ Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
         emit errorChanged(path + "is invalid!");
         m_valid = false;
     }
-    
+
     QFile nameFile(path + "/name");
     if (nameFile.open(QFile::ReadOnly))
         m_name = QTextStream(&nameFile).readLine();
     else
         m_name = path.split('/').last();
-    
+
     connect(this, SIGNAL(configUpdateNeeded()), parent, SLOT(createConfigFile()));
     connect(this, SIGNAL(pwmFansChanged()), parent, SLOT(emitAllPwmFansChanged()));
     connect(this, SIGNAL(tempsChanged()), parent, SLOT(emitAllTempsChanged()));
@@ -74,7 +74,7 @@ void Hwmon::initialize()
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
                 PwmFan *newPwmFan = Q_NULLPTR;
-                
+
                 foreach (PwmFan *pwmFan, m_pwmFans)
                 {
                     if (pwmFan->index() == index)
@@ -84,7 +84,7 @@ void Hwmon::initialize()
                         break;
                     }
                 }
-                
+
                 if (!newPwmFan)
                 {
                     newPwmFan = new PwmFan(this, index);
@@ -92,7 +92,7 @@ void Hwmon::initialize()
                     m_pwmFans << newPwmFan;
                     emit pwmFansChanged();
                 }
-                
+
                 Fan *newFan = qobject_cast<Fan *>(newPwmFan);
                 if (!m_fans.contains(newFan))
                 {
@@ -103,7 +103,7 @@ void Hwmon::initialize()
             else
             {
                 Fan *newFan = Q_NULLPTR;
-                
+
                 foreach (Fan *fan, m_fans)
                 {
                     if (fan->index() == index)
@@ -113,7 +113,7 @@ void Hwmon::initialize()
                         break;
                     }
                 }
-                
+
                 if (!newFan)
                 {
                     newFan = new Fan(this, index);
@@ -127,7 +127,7 @@ void Hwmon::initialize()
         if (entry.contains("temp") && entry.contains("input"))
         {
             Temp *newTemp = Q_NULLPTR;
-                
+
             foreach (Temp *temp, m_temps)
             {
                 if (temp->index() == index)
@@ -137,7 +137,7 @@ void Hwmon::initialize()
                     break;
                 }
             }
-            
+
             if (!newTemp)
             {
                 newTemp = new Temp(this, index);

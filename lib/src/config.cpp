@@ -26,6 +26,14 @@
 
 #define CONFIG_NAME "fancontrol-gui"
 
+#ifndef STANDARD_CONFIG_FILE
+#define STANDARD_CONFIG_FILE "/etc/fancontrol"
+#endif
+
+#ifndef STANDARD_SERVICE_NAME
+#define STANDARD_SERVICE_NAME "fancontrol"
+#endif
+
 
 namespace Fancontrol
 {
@@ -37,7 +45,8 @@ Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(
     setCurrentGroup("preferences");
     addItemDouble("MinTemp", m_minTemp, 30.0);
     addItemDouble("MaxTemp", m_maxTemp, 90.0);
-    addItemString("ServiceName", m_serviceName, "fancontrol");
+    addItemString("ServiceName", m_serviceName, QString(STANDARD_SERVICE_NAME));
+    addItemPath("ConfigUrl", m_configUrl, QString("file://") + QString(STANDARD_CONFIG_FILE));
     
     load();
 }

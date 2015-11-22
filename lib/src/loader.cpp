@@ -65,12 +65,12 @@ void Loader::parseHwmons()
 
     else if (hwmonDir.exists())
     {
-        setError(QString(HWMON_PATH) + " is not readable!");
+        setError(QString(HWMON_PATH) + " is not readable!", true);
         return;
     }
     else
     {
-        qCritical() << HWMON_PATH << " is not readable!";
+        setError(QString(HWMON_PATH) + " does not exist!", true);
         return;
     }
 
@@ -230,12 +230,20 @@ bool Loader::load(const QUrl &url)
         qDebug() << "Given empty url. Fallback to " << m_configUrl;
         fileName = m_configUrl.toLocalFile();
     }
-    else if (url.isLocalFile())
-        fileName = url.toLocalFile();
+    else if (url.isValid())
+    {
+        if (url.isLocalFile())
+            fileName = url.toLocalFile();
 
+        else
+        {
+            setError(url.toDisplayString() + " is not a local file!");
+            return false;
+        }
+    }
     else
     {
-        setError(url.toDisplayString() + " is not a local file!");
+        setError(url.toDisplayString() + " is not a valid url!");
         return false;
     }
 
@@ -265,7 +273,7 @@ bool Loader::load(const QUrl &url)
         if (!reply->exec())
         {
             qDebug() << reply->error();
-            setError(reply->errorString() + reply->errorText());
+            setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
         else
@@ -300,6 +308,8 @@ bool Loader::load(const QUrl &url)
             qobject_cast<PwmFan *>(pwmFan)->reset();
         }
     }
+    
+    createConfigFile();
 
     stream.setString(&fileContent);
     QStringList lines;
@@ -329,7 +339,7 @@ bool Loader::load(const QUrl &url)
             }
             else
             {
-                setError("Unable to parse interval line");
+                setError("Unable to parse interval line", true);
                 return false;
             }
         }
@@ -346,7 +356,7 @@ bool Loader::load(const QUrl &url)
                     QString temp = nameValuePair.at(1);
                     PwmFan *pwmPointer = getPwmFan(getEntryNumbers(pwm));
                     Temp *tempPointer = getTemp(getEntryNumbers(temp));
-
+                    
                     if (pwmPointer && tempPointer)
                     {
                         pwmPointer->setTemp(tempPointer);
@@ -421,7 +431,7 @@ bool Loader::save(const QUrl &url)
 
     else
     {
-        setError(url.toDisplayString() + " is not a local file!");
+        setError(url.toDisplayString() + " is not a local file!", true);
         return false;
     }
 
@@ -446,7 +456,7 @@ bool Loader::save(const QUrl &url)
         if (!reply->exec())
         {
             qDebug() << reply->error();
-            setError(reply->errorString() + reply->errorText());
+            setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
     }
@@ -629,7 +639,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
     if (job->error())
     {
         qDebug() << job->error();
-        setError(job->errorString() + job->errorText());
+        setError(job->errorString() + job->errorText(), true);
     }
     else
         parseHwmons();
@@ -665,11 +675,18 @@ QList<QObject *> Loader::allTemps() const
     return list;
 }
 
-void Loader::setError (const QString &error)
+void Loader::setError (const QString &error, bool critical)
 {
     m_error = error;
     emit errorChanged();
-    qCritical() << error;
+    
+    if (critical)
+    {
+        qCritical() << error;
+        emit criticalError();
+    }
+    else
+        qWarning() << error;
 }
 
 }

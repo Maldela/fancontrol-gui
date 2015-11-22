@@ -229,26 +229,56 @@ Item {
                 onTextChanged: base.serviceName = text
             }
         }
+        RowLayout {
+            visible: expand.expanded
+            
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Path to the fancontrol config file:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            OptionInput {
+                Layout.minimumWidth: implicitWidth
+                Layout.fillWidth: true
+                text: base.configUrl.toString().replace("file://", "")
+                color: base.configValid ? "green" : "red"
+                onTextChanged: base.configUrl = text
+            }
+            Button {
+                action: loadAction 
+            }
+        }
     }
     
-//     FileDialog {
-//         id: openFileDialog
-//         title: i18n("Please choose a configuration file")
-//         folder: "file:///etc"
-//         selectExisting: true
-//         selectMultiple: false
-//         modality: Qt.NonModal
-//         
-//         onAccepted: {
-//             base.loader.load(fileUrl);
-//         }
-//     }
+    Action {
+        id: loadAction
+        iconName: "document-open"
+        onTriggered: openFileDialog.open()
+        tooltip: i18n("Load configuration file")
+        shortcut: StandardKey.Open
+    }
+    
+    FileDialog {
+        id: openFileDialog
+        title: i18n("Please choose a configuration file")
+        folder: "file:///etc"
+        selectExisting: true
+        selectMultiple: false
+        
+        onAccepted: {
+            base.configUrl = fileUrl;
+        }
+    }
     
     ErrorDialog {
         id: errorDialog
-        visible: !!base.loader.error
         modality: Qt.ApplicationModal
         text: base.loader.error
-        onTextChanged: show()
+    }
+    Connections {
+        target: base.loader
+        onCriticalError: errorDialog.open()
     }
 }

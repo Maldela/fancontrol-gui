@@ -79,7 +79,7 @@ void FancontrolKCM::save()
 void FancontrolKCM::load()
 {
     m_base->load();
-    setManualControl(m_base->systemdCommunicator()->serviceEnabled());
+    setManualControl(m_base->systemdCommunicator()->serviceEnabled() || m_base->systemdCommunicator()->serviceActive());
     setNeedsSave(false);
 }
 

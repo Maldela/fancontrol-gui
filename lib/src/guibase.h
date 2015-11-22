@@ -58,6 +58,8 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
     Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
+    Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
+    Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
 
 public:
     
@@ -72,10 +74,13 @@ public:
     qreal minTemp() const;
     qreal maxTemp() const;
     QString serviceName() const;
+    QUrl configUrl() const;
+    bool configValid() const { return m_configValid; }
     int unit() const { return m_unit; }
     void setMinTemp(qreal minTemp);
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
+    void setConfigUrl(const QUrl &url);
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
     void load();
     void save(bool saveLoader = false);
@@ -88,6 +93,7 @@ signals:
     void minTempChanged();
     void maxTempChanged();
     void serviceNameChanged();
+    void configUrlChanged();
     void unitChanged();
     
     
@@ -106,6 +112,7 @@ private:
     
     Loader *const m_loader; 
     int m_unit;
+    bool m_configValid;
 };
 
 }

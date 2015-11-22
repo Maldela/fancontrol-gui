@@ -66,7 +66,7 @@ const QDBusArgument& operator >>(const QDBusArgument &argument, SystemdUnitFile 
 namespace Fancontrol
 {
 
-SystemdCommunicator::SystemdCommunicator(const QString &serviceName, QObject *parent) : QObject(parent),
+SystemdCommunicator::SystemdCommunicator(QObject *parent, const QString &serviceName) : QObject(parent),
     m_error(""),
     m_managerInterface(new QDBusInterface("org.freedesktop.systemd1",
                                           "/org/freedesktop/systemd1",
@@ -77,7 +77,7 @@ SystemdCommunicator::SystemdCommunicator(const QString &serviceName, QObject *pa
 {
     if (serviceName.isEmpty())
         setServiceName(STANDARD_SERVICE_NAME);
-    else 
+    else
         setServiceName(serviceName);
 }
 
@@ -96,7 +96,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
             m_serviceInterface->deleteLater();
             m_serviceInterface = Q_NULLPTR;
         }
-        
+
         m_serviceName = name;
 
         if (serviceExists())
@@ -127,7 +127,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
                                                      SLOT(updateServiceProperties(QString, QVariantMap, QStringList)));
             }
         }
-    
+
         emit serviceNameChanged();
         emit serviceEnabledChanged();
         emit serviceActiveChanged();
@@ -141,7 +141,7 @@ bool SystemdCommunicator::serviceExists()
         if (m_serviceInterface->isValid())
             return true;
     }
-    
+
     QDBusMessage dbusreply;
 
     if (m_managerInterface && m_managerInterface->isValid())
@@ -219,21 +219,21 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
 bool SystemdCommunicator::setServiceActive(bool active)
 {
     qDebug() << "Set service active:" << active;
-       
+
     if (serviceExists())
     {
         if (active != serviceActive())
         {
             QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
             QString action = active ? "ReloadOrRestartUnit" : "StopUnit";
-            
+
             if (dbusAction(action, args))
             {
                 emit serviceActiveChanged();
                 return true;
             }
         }
-        
+
         return true;
     }
     return false;
@@ -257,7 +257,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     }
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
-    {      
+    {
         if (dbusreply.errorMessage() == "Interactive authentication required.")
         {
             KAuth::Action action = newFancontrolAction();
@@ -270,35 +270,35 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             KAuth::ExecuteJob *job = action.execute();
             connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
             job->start();
-            
+
             return true;
         }
         setError(dbusreply.errorMessage());
         return false;
     }
-    
+
     return true;
 }
 
 void SystemdCommunicator::handleDbusActionResult(KJob *job)
-{   
+{
     if (job->error())
     {
         if (job->error() == KAuth::ActionReply::HelperBusyError)
         {
             qDebug() << "Helper busy...";
-            
+
             KAuth::ExecuteJob *executeJob = static_cast<KAuth::ExecuteJob *>(job);
             if (executeJob)
             {
                 KAuth::ExecuteJob *newJob = executeJob->action().execute();
                 connect(newJob, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
-                
+
                 QTimer::singleShot(50, this, [newJob] (){ newJob->start(); });
                 return;
             }
         }
-        
+
         setError(job->errorText());
     }
 }
@@ -311,7 +311,7 @@ bool SystemdCommunicator::restartService()
         args << m_serviceName + ".service" << "replace";
         return dbusAction("ReloadOrRestartUnit", args);
     }
-    
+
     setError("Service doesn't exist");
     return false;
 }
@@ -328,10 +328,10 @@ void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchang
 void SystemdCommunicator::setError(const QString &error)
 {
     qCritical() << error;
-    
+
     if (error != m_error)
     {
-        m_error = error; 
+        m_error = error;
         emit errorChanged();
     }
 }

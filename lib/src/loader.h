@@ -84,7 +84,7 @@ protected slots:
     void createConfigFile();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
-    void setError(const QString &error);
+    void setError(const QString &error, bool critical = false);
     void handleDetectSensorsResult(KJob *job);
 
 
@@ -117,6 +117,7 @@ signals:
     void allPwmFansChanged();
     void allTempsChanged();
     void invalidConfigUrl();
+    void criticalError();
 };
 
 }

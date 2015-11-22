@@ -37,10 +37,11 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_config(Config::instance()),
 
 #ifndef NO_SYSTEMD
-    m_com(new SystemdCommunicator(m_config->findItem("ServiceName")->property().toString(), this)),
+    m_com(new SystemdCommunicator(this)),
 #endif
 
-    m_loader(new Loader(this))
+    m_loader(new Loader(this)),
+    m_configValid(false)
 {
     connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
         
@@ -63,12 +64,13 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 void GUIBase::load()
 {
     m_config->load();
-    emitConfigChanged();
-    m_loader->load();
+    m_configValid = m_loader->load(configUrl());
     
 #ifndef NO_SYSTEMD
-    m_com->setServiceName(m_config->findItem("ServiceName")->property().toString());
+    m_com->setServiceName(serviceName());
 #endif
+
+    emitConfigChanged();
 }
 
 void GUIBase::save(bool saveLoader)
@@ -92,6 +94,11 @@ qreal GUIBase::minTemp() const
 QString GUIBase::serviceName() const
 {
     return m_config->findItem("ServiceName")->property().toString();
+}
+
+QUrl GUIBase::configUrl() const
+{
+    return QUrl::fromLocalFile(m_config->findItem("ConfigUrl")->property().toString());
 }
 
 void GUIBase::setMaxTemp(qreal temp)
@@ -126,11 +133,22 @@ void GUIBase::setServiceName(const QString& name)
     }
 }
 
+void GUIBase::setConfigUrl(const QUrl &url)
+{
+    if (url != configUrl())
+    {
+        m_config->findItem("ConfigUrl")->setProperty(url.toString(QUrl::PreferLocalFile));
+        m_configValid = m_loader->load(url);
+        emit configUrlChanged();
+    }
+}
+
 void GUIBase::emitConfigChanged()
 {
     emit serviceNameChanged();
     emit minTempChanged();
     emit maxTempChanged();
+    emit configUrlChanged();
 }
 
 }
