@@ -35,8 +35,10 @@ Rectangle {
     property int margin: 5
     property int minimizeDuration: 400
     property int unit: 0
+    property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
+    property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
     readonly property alias name: nameField.text
-    
+
     id: root
     color: "transparent"
     border.color: palette.windowText
@@ -52,15 +54,14 @@ Rectangle {
                 tempBox.currentIndex = loader.allTemps.indexOf(fan.temp);
             }
         }
-        canvas.requestPaint();
+        bgCanvas.requestPaint();
     }
-    
+
     onFanChanged: update();
     onLoaderChanged: update()
-    onUnitChanged: if (fan) canvas.requestPaint()
-    onMinTempChanged: if (fan) canvas.requestPaint()
-    onMaxTempChanged: if (fan) canvas.requestPaint()
-    
+    onConvertedMinTempChanged: if (fan) bgCanvas.requestPaint()
+    onConvertedMaxTempChanged: if (fan) bgCanvas.requestPaint()
+
     Connections {
         target: loader
         onConfigUrlChanged: update()
@@ -102,169 +103,216 @@ Rectangle {
         }
     }
 
-    Canvas {
-        property int fontSize: MoreMath.bound(9, height / 20 + 1, 18)
-        property int leftPadding: fontSize * 4
-        property int rightPadding: fontSize * 2
-        property int topPadding: fontSize
-        property int bottomPadding: fontSize * 2
-        property bool drawingEnabled: height > bottomPadding + topPadding && width > leftPadding + rightPadding
-        property int plotWidth: width - leftPadding - rightPadding
-        property int plotHeight: height - topPadding - bottomPadding
-        property alias minTemp: root.minTemp        //needed for pwmPoints
-        property alias maxTemp: root.maxTemp        //needed for pwmPoints
-        property QtObject pal: fan.hasTemp ? palette : disabledPalette
+    Item {
+        id: graph
 
-        id: canvas
-        renderTarget: Canvas.FramebufferObject
+        property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
+        property QtObject pal: fan.hasTemp ? palette : disabledPalette
+        property string suffix: (root.unit == 0) ? "°C" : (root.unit == 1) ? "K" : "°F"
+        property int verticalScalaCount: 6
+        property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
+
         anchors {
             left: parent.left
             right: parent.right
             top: nameField.bottom
             bottom: settingsArea.top
         }
+        visible: background.height > 0 && background.width > 0
 
-        StatusPoint {
-            id: currentPwm
-            size: canvas.fontSize
-            visible: canvas.contains(Coordinates.centerOf(this)) && fan.hasTemp && canvas.drawingEnabled
-            fan: root.fan
-            unit: root.unit
-        }
-        PwmPoint {
-            id: stopPoint
-            color: fan.hasTemp ? "blue" : Qt.tint(canvas.pal.light, Qt.rgba(0, 0, 1, 0.5))
-            size: canvas.fontSize
-            unit: root.unit
-            enabled: fan.hasTemp
-            drag.maximumX: Math.min(canvas.scaleX(canvas.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
-            drag.minimumY: Math.max(canvas.scaleY(canvas.scalePwm(maxPoint.y)-1), maxPoint.y+1)
-            x: fan.hasTemp ? canvas.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : canvas.leftPadding - width/2
-            y: fan.hasTemp ? canvas.scaleY(fan.minStop) - height/2 : canvas.topPadding -height/2
-            visible: canvas.contains(Coordinates.centerOf(this)) && canvas.drawingEnabled
-            drag.onActiveChanged: {
-                if (!drag.active) {
-                    fan.minStop = Math.round(canvas.scalePwm(centerY));
-                    fan.minTemp = Math.round(canvas.scaleTemp(centerX));
-                    if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
+        Item {
+            id: verticalScala
+
+            anchors {
+                top: background.top
+                bottom: background.bottom
+                left: parent.left
+            }
+            width: graph.fontSize * 3
+
+            Repeater {
+                model: graph.verticalScalaCount
+
+                Label {
+                    x: 0
+                    width: verticalScala.width - graph.fontSize / 3
+                    y: background.scaleY(255 / (graph.verticalScalaCount - 1) * index) - graph.fontSize / 2
+                    horizontalAlignment: Text.AlignRight
+                    color: graph.pal.text
+                    text: index * (100 / (graph.verticalScalaCount - 1)) + "%"
+                    font.pixelSize: graph.fontSize
                 }
             }
         }
-        PwmPoint {
-            id: maxPoint
-            color: fan.hasTemp ? "red" : Qt.tint(canvas.pal.light, Qt.rgba(1, 0, 0, 0.5))
-            size: canvas.fontSize
-            unit: root.unit
-            enabled: fan.hasTemp
-            drag.minimumX: Math.max(canvas.scaleX(canvas.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
-            drag.maximumY: Math.min(canvas.scaleY(canvas.scalePwm(stopPoint.y)+1), stopPoint.y-1)
-            x: fan.hasTemp ? canvas.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : canvas.width - canvas.rightPadding - width/2
-            y: fan.hasTemp ? canvas.scaleY(fan.maxPwm) - height/2 : canvas.topPadding - height/2
-            visible: canvas.contains(Coordinates.centerOf(this)) && canvas.drawingEnabled
-            drag.onActiveChanged: {
-                if (!drag.active) {
-                    fan.maxPwm = Math.round(canvas.scalePwm(centerY));
-                    fan.maxTemp = Math.round(canvas.scaleTemp(centerX));
+        Item {
+            id: horizontalScala
+
+            anchors {
+                right: background.right
+                bottom: parent.bottom
+                left: background.left
+            }
+            height: graph.fontSize * 2
+
+            Repeater {
+                model: graph.horIntervals.length;
+
+                Label {
+                    x: Math.min(horizontalScala.width, background.scaleX(Units.toCelsius(graph.horIntervals[index]), root.unit)) - width / 2
+                    y: graph.fontSize / 2
+                    color: graph.pal.text
+                    text: graph.horIntervals[index] + graph.suffix
+                    font.pixelSize: graph.fontSize
                 }
             }
         }
 
-        function scaleX(temp) {
-            var scaledX = (temp - minTemp) * plotWidth / (maxTemp - minTemp);
-            return leftPadding + scaledX;
-        }
-        function scaleY(pwm) {
-            var scaledY = pwm * plotHeight / 255;
-            return height - bottomPadding - scaledY;
-        }
-        function scaleTemp(x) {
-            var scaledTemp = (x - leftPadding) / plotWidth * (maxTemp - minTemp);
-            return  minTemp + scaledTemp;
-        }
-        function scalePwm(y) {
-            var scaledPwm = (y - topPadding) / plotHeight * 255;
-            return 255 - scaledPwm;
-        }
+        Rectangle {
+            id: background
 
-        onPaint: {
-            var c = canvas.getContext("2d");
-            c.clearRect(0, 0, width, height);
+            property alias pal: graph.pal
 
-            if (canvas.drawingEnabled) {
-                c.font = canvas.fontSize + "px sans-serif";
+            color: pal.light
+            border.color: pal.text
+            border.width: 2
+            radius: 1
 
-                c.fillStyle = pal.light;
-                c.strokeStyle = pal.text;
-                c.fillRect(leftPadding, topPadding, plotWidth, plotHeight);
+            anchors {
+                top: parent.top
+                left: verticalScala.right
+                bottom: horizontalScala.top
+                right: parent.right
+                topMargin: parent.fontSize
+                bottomMargin: 0
+                rightMargin: parent.fontSize * 2
+                leftMargin: 0
+            }
 
-                var fillGradient = c.createLinearGradient(0, 0, width, 0);
-                fillGradient.addColorStop(0, "rgb(0, 0, 255)");
-                fillGradient.addColorStop(1, "rgb(255, 0, 0)");
-                var strokeGradient = c.createLinearGradient(0, 0, width, 0);
-                strokeGradient.addColorStop(0, "rgb(0, 0, 255)");
-                strokeGradient.addColorStop(1, "rgb(255, 0, 0)");
-                c.fillStyle = fillGradient;
-                c.strokeStyle = strokeGradient;
-                c.lineWidth = 2;
-                c.lineJoin = "round";
-                c.beginPath();
-                if (fanOffCheckBox.checked) {
-                    c.moveTo(scaleX(minTemp), scaleY(0));
-                    c.lineTo(stopPoint.centerX, scaleY(0));
-                } else {
-                    c.moveTo(scaleX(minTemp), stopPoint.centerY);
-                }
-                c.lineTo(stopPoint.centerX, stopPoint.centerY);
-                c.lineTo(maxPoint.centerX, maxPoint.centerY);
-                c.lineTo(scaleX(maxTemp), maxPoint.centerY);
-                c.stroke();
-                c.lineTo(scaleX(maxTemp), height - bottomPadding);
-                c.lineTo(leftPadding, height - bottomPadding);
-                c.fill();
-                fillGradient = c.createLinearGradient(0, 0, 0, height);
-                fillGradient.addColorStop(0, Colors.setAlpha(canvas.pal.light, 0.6));
-                fillGradient.addColorStop(1, Colors.setAlpha(canvas.pal.light, 0.9));
-                c.fillStyle = fillGradient;
-                c.fill();
-                c.closePath();
+            function scaleX(temp) {
+                return (temp - minTemp) * width / (maxTemp - minTemp);
+            }
+            function scaleY(pwm) {
+                return height - pwm * height / 255;
+            }
+            function scaleTemp(x) {
+                return x / width * (maxTemp - minTemp) + minTemp;
+            }
+            function scalePwm(y) {
+                return 255 - y / height * 255;
+            }
 
-                c.textAlign = "right";
-                c.textBaseline = "middle";
-                c.strokeStyle = pal.text;
-                c.fillStyle = pal.text;
-                c.lineWidth = 1;
-                c.strokeRect(leftPadding-0.5, topPadding-0.5, plotWidth+0.5, plotHeight+1.5);
-                for (var i=0; i<=100; i+=20) {
-                    var y = scaleY(i*2.55);
-                    c.fillText(i + '%', leftPadding - 2, y);
-                    if (i != 0 && i != 100) {
-                        for (var j=leftPadding; j<=width-rightPadding; j+=15) {
-                            c.moveTo(j, y);
-                            c.lineTo(Math.min(j+5, width-rightPadding), y);
+            Canvas {
+                id: bgCanvas
+
+                anchors.fill: parent
+                anchors.margins: parent.border.width
+                renderStrategy: Canvas.Cooperative
+
+                property alias pal: background.pal
+
+                onPaint: {
+                    var c = bgCanvas.getContext("2d");
+                    c.clearRect(0, 0, width, height);
+                    var fillGradient = c.createLinearGradient(0, 0, width, 0);
+                    fillGradient.addColorStop(0, "rgb(0, 0, 255)");
+                    fillGradient.addColorStop(1, "rgb(255, 0, 0)");
+                    c.fillStyle = fillGradient;
+                    c.lineWidth = 2;
+                    var strokeGradient = c.createLinearGradient(0, 0, width, 0);
+                    strokeGradient.addColorStop(0, "rgb(0, 0, 255)");
+                    strokeGradient.addColorStop(1, "rgb(255, 0, 0)");
+                    c.strokeStyle = strokeGradient;
+                    c.lineJoin = "round";
+                    c.beginPath();
+                    if (fanOffCheckBox.checked) {
+                        c.moveTo(0, height);
+                        c.lineTo(stopPoint.centerX, height);
+                    } else {
+                        c.moveTo(0, stopPoint.centerY);
+                    }
+                    c.lineTo(stopPoint.centerX, stopPoint.centerY);
+                    c.lineTo(maxPoint.centerX, maxPoint.centerY);
+                    c.lineTo(width, maxPoint.centerY);
+                    c.stroke();
+                    c.lineTo(width, height);
+                    c.lineTo(0, height);
+                    c.fill();
+
+                    //blend background
+                    fillGradient = c.createLinearGradient(0, 0, 0, height);
+                    fillGradient.addColorStop(0, Colors.setAlpha(background.color, 0.5));
+                    fillGradient.addColorStop(1, Colors.setAlpha(background.color, 0.9));
+                    c.fillStyle = fillGradient;
+                    c.fill();
+
+                    //draw mesh
+                    c.strokeStyle = Colors.setAlpha(pal.text, 0.3);
+                    for (var i=0; i<=100; i+=20) {
+                        var y = background.scaleY(i*2.55);
+                        if (i != 0 && i != 100) {
+                            for (var j=0; j<=width; j+=15) {
+                                c.moveTo(j, y);
+                                c.lineTo(Math.min(j+5, width), y);
+                            }
                         }
-                        c.stroke();
+                    }
+                    if (graph.horIntervals.length > 1) {
+                        for (var i=1; i<graph.horIntervals.length; i++) {
+                            var x = background.scaleX(Units.toCelsius(graph.horIntervals[i], unit));
+                            for (var j=0; j<=height; j+=20) {
+                                c.moveTo(x, j);
+                                c.lineTo(x, Math.min(j+5, width));
+                            }
+                        }
+                    }
+                    c.stroke();
+                }
+            }
+            StatusPoint {
+                id: currentPwm
+                size: graph.fontSize
+                visible: background.contains(Coordinates.centerOf(this)) && fan.hasTemp
+                fan: root.fan
+                unit: root.unit
+            }
+            PwmPoint {
+                id: stopPoint
+                color: fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5))
+                size: graph.fontSize
+                unit: root.unit
+                enabled: fan.hasTemp
+                drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
+                drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
+                x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
+                y: fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
+                visible: background.contains(Coordinates.centerOf(this))
+                drag.onActiveChanged: {
+                    if (!drag.active) {
+                        fan.minStop = Math.round(background.scalePwm(centerY));
+                        fan.minTemp = Math.round(background.scaleTemp(centerX));
+                        if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
                     }
                 }
-                c.textAlign = "center";
-                c.textBaseline = "top";
-                var convertedMinTemp = Units.fromCelsius(minTemp, unit);
-                var convertedMaxTemp = Units.fromCelsius(maxTemp, unit);
-                var suffix = (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
-                var lastTemp;
-                for (var i=convertedMinTemp; i<convertedMaxTemp; i+= 10) {
-                    lastTemp = i;
-                    var x = scaleX(Units.toCelsius(i, unit));
-                    c.fillText(i + suffix, x, topPadding+plotHeight+fontSize/2);
-                    if (i != convertedMinTemp) {
-                        for (var j=scaleY(255); j<=scaleY(0); j+=20) {
-                            c.moveTo(x, j);
-                            c.lineTo(x, Math.min(j+5, width-rightPadding));
-                        }
-                        c.stroke();
+                onPositionChanged: bgCanvas.requestPaint()
+            }
+            PwmPoint {
+                id: maxPoint
+                color: fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5))
+                size: graph.fontSize
+                unit: root.unit
+                enabled: fan.hasTemp
+                drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
+                drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
+                x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
+                y: fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
+                visible: background.contains(Coordinates.centerOf(this))
+                drag.onActiveChanged: {
+                    if (!drag.active) {
+                        fan.maxPwm = Math.round(background.scalePwm(centerY));
+                        fan.maxTemp = Math.round(background.scaleTemp(centerX));
                     }
                 }
-                if ((convertedMaxTemp - lastTemp) > 5)
-                    c.fillText(convertedMaxTemp + suffix, scaleX(maxTemp), topPadding+plotHeight+fontSize/2);
+                onPositionChanged: bgCanvas.requestPaint()
             }
         }
     }
@@ -282,7 +330,6 @@ Rectangle {
             bottomMargin: padding
         }
         visible: root.height >= nameField.height + height + 2*margin
-        opacity: canvas.opacity
         clip: true
         spacing: 2
 
@@ -297,16 +344,16 @@ Rectangle {
                     if (checked) {
                         fan.temp = loader.allTemps[tempBox.currentIndex];
                     }
-                    canvas.requestPaint();
+                    bgCanvas.requestPaint();
                 }
             }
-            RowLayout {                  
+            RowLayout {
                 ComboBox {
                     id: tempBox
                     Layout.fillWidth: true
                     model: ArrayFunctions.namesWithPaths(loader.allTemps)
                     enabled: hasTempCheckBox.checked
-                    onCurrentIndexChanged: { 
+                    onCurrentIndexChanged: {
                         if (hasTempCheckBox.checked)
                             fan.temp = loader.allTemps[currentIndex];
                     }
@@ -321,7 +368,7 @@ Rectangle {
             checked: fan.minPwm == 0
             onCheckedChanged: {
                 fan.minPwm = checked ? 0 : fan.minStop;
-                canvas.requestPaint();
+                bgCanvas.requestPaint();
             }
         }
 
@@ -347,7 +394,7 @@ Rectangle {
 
         RowLayout {
             visible: systemdCom
-            
+
             Item {
                 Layout.fillWidth: true
             }

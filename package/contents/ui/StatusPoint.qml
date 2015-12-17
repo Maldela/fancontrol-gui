@@ -24,24 +24,24 @@ import QtQuick.Controls 1.2
 
 Rectangle {
     id: root
-    
+
     property QtObject fan
-    property Item canvas: parent
+    property Item background: parent
     property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
     property real unscaledPwm: fan.pwm
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     property int size: 10
-    property int unit: 0 
-    
+    property int unit: 0
+
     width: size
     height: size
     radius: size / 2
-    x: canvas.scaleX(unscaledTemp) - width/2
-    y: canvas.scaleY(unscaledPwm) - height/2
+    x: background.scaleX(unscaledTemp) - width/2
+    y: background.scaleY(unscaledPwm) - height/2
     color: "black"
-    
+
     Behavior on unscaledTemp {
         SpringAnimation {
             epsilon: 0.1
@@ -56,13 +56,13 @@ Rectangle {
             damping: 0.4
         }
     }
-    
+
     MouseArea {
         id: pwmMouse
         anchors.fill: parent
         hoverEnabled: root.enabled ? true : false
     }
-    
+
     Rectangle {
         id: tooltip
         x: parent.width
@@ -72,11 +72,11 @@ Rectangle {
         radius: 4
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
         visible: root.enabled && pwmMouse.containsMouse
-        
+
         Column {
             Label {
                 property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
-                
+
                 id: temp
                 font.pixelSize: root.height * 1.5
                 text: (fan.hasTemp ? fan.temp.value : "0") + suffix
@@ -84,7 +84,7 @@ Rectangle {
             Label {
                 id: pwm
                 font.pixelSize: root.height * 1.5
-                text: Number(Math.round(canvas.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
             }
             Label {
                 id: rpm

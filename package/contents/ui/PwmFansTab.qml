@@ -34,7 +34,7 @@ ColumnLayout {
     RowLayout {
         width: parent.width
         visible: loader && loader.allPwmFans.length > 0
-        
+
         Label {
             text: i18n("Fan:")
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
@@ -59,7 +59,7 @@ ColumnLayout {
             action: detectFansAction
         }
     }
-    
+
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
@@ -78,26 +78,26 @@ ColumnLayout {
             }
         }
     }
-    
+
     ColumnLayout {
         id: noFansInfo
         anchors.centerIn: parent
         spacing: 20
         visible: loader.allPwmFans.length == 0
-        
+
         Label {
             Layout.alignment: Qt.AlignCenter
             text: i18n("There are no pwm capable fans in your system.")
             font.pointSize: 14
             font.bold: true
         }
-        
+
         Button {
             Layout.alignment: Qt.AlignCenter
             action: detectFansAction
         }
     }
-    
+
     Action {
         id: detectFansAction
         text: i18n("Detect fans")

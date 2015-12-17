@@ -24,7 +24,7 @@ import QtQml 2.2
 import "../scripts/units.js" as Units
 
 Rectangle {
-    property Item canvas: parent
+    property Item background: parent
     property point center: Qt.point(x + width / 2, y + height / 2);
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
@@ -33,14 +33,16 @@ Rectangle {
     property int unit: 0
     property var locale: Qt.locale()
 
+    signal positionChanged()
+
     id: root
     width: size
     height: size
     radius: size / 2
     border.width: pwmMouse.containsMouse || drag.active ? 1 : 0
 
-    onXChanged: parent.requestPaint();
-    onYChanged: parent.requestPaint();
+    onXChanged: positionChanged()
+    onYChanged: positionChanged()
 
     Drag.dragType: Drag.Automatic
 
@@ -51,10 +53,10 @@ Rectangle {
         drag.target: root
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false
-        drag.minimumX: canvas.scaleX(canvas.minTemp) - root.width/2
-        drag.maximumX: canvas.scaleX(canvas.maxTemp) - root.width/2
-        drag.minimumY: canvas.scaleY(255) - root.height/2
-        drag.maximumY: canvas.scaleY(0) - root.height/2
+        drag.minimumX: - root.width/2
+        drag.maximumX: background.width - root.width/2
+        drag.minimumY: - root.height/2
+        drag.maximumY: background.height - root.height/2
     }
 
     Rectangle {
@@ -71,14 +73,14 @@ Rectangle {
             Label {
                 id: pwm
                 font.pixelSize: root.size * 1.5
-                text: Number(Math.round(canvas.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
             }
             Label {
                 property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
-                
+
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Units.fromCelsius(Math.round(canvas.scaleTemp(root.centerX)), unit) + suffix
+                text: Units.fromCelsius(Math.round(background.scaleTemp(root.centerX)), unit) + suffix
             }
         }
     }

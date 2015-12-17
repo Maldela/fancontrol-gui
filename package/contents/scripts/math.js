@@ -25,3 +25,13 @@ function bound(floor, value, ceiling) {
     return floor;
 }
 
+function intervals(lower, upper, delta) {
+    var array = [lower];
+    for (var i=lower+1; i<upper; i++) {
+        if (i % delta == 0) {
+            array.push(i);
+        }
+    }
+    array.push(upper);
+    return array;
+}
