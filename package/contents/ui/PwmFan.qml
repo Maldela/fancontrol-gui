@@ -24,7 +24,6 @@ import QtQuick.Layouts 1.1
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/math.js" as MoreMath
 import "../scripts/units.js" as Units
-import "../scripts/coordinates.js" as Coordinates
 import "../scripts/colors.js" as Colors
 
 
@@ -215,20 +214,16 @@ Rectangle {
                 onPaint: {
                     var c = bgCanvas.getContext("2d");
                     c.clearRect(0, 0, width, height);
-                    var fillGradient = c.createLinearGradient(0, 0, width, 0);
-                    fillGradient.addColorStop(0, "rgb(0, 0, 255)");
-                    fillGradient.addColorStop(1, "rgb(255, 0, 0)");
-                    c.fillStyle = fillGradient;
+                    var gradient = c.createLinearGradient(0, 0, width, 0);
+                    gradient.addColorStop(0, "rgb(0, 0, 255)");
+                    gradient.addColorStop(1, "rgb(255, 0, 0)");
+                    c.fillStyle = gradient;
                     c.lineWidth = 2;
-                    var strokeGradient = c.createLinearGradient(0, 0, width, 0);
-                    strokeGradient.addColorStop(0, "rgb(0, 0, 255)");
-                    strokeGradient.addColorStop(1, "rgb(255, 0, 0)");
-                    c.strokeStyle = strokeGradient;
+                    c.strokeStyle = gradient;
                     c.lineJoin = "round";
                     c.beginPath();
                     if (fanOffCheckBox.checked) {
-                        c.moveTo(0, height);
-                        c.lineTo(stopPoint.centerX, height);
+                        c.moveTo(stopPoint.centerX, height);
                     } else {
                         c.moveTo(0, stopPoint.centerY);
                     }
@@ -237,14 +232,18 @@ Rectangle {
                     c.lineTo(width, maxPoint.centerY);
                     c.stroke();
                     c.lineTo(width, height);
-                    c.lineTo(0, height);
+                    if (fanOffCheckBox.checked) {
+                        c.lineTo(stopPoint.centerX, height);
+                    } else {
+                        c.lineTo(0, height);
+                    }
                     c.fill();
 
                     //blend background
-                    fillGradient = c.createLinearGradient(0, 0, 0, height);
-                    fillGradient.addColorStop(0, Colors.setAlpha(background.color, 0.5));
-                    fillGradient.addColorStop(1, Colors.setAlpha(background.color, 0.9));
-                    c.fillStyle = fillGradient;
+                    gradient = c.createLinearGradient(0, 0, 0, height);
+                    gradient.addColorStop(0, Colors.setAlpha(background.color, 0.5));
+                    gradient.addColorStop(1, Colors.setAlpha(background.color, 0.9));
+                    c.fillStyle = gradient;
                     c.fill();
 
                     //draw mesh
@@ -273,7 +272,7 @@ Rectangle {
             StatusPoint {
                 id: currentPwm
                 size: graph.fontSize
-                visible: background.contains(Coordinates.centerOf(this)) && fan.hasTemp
+                visible: background.contains(center) && fan.hasTemp
                 fan: root.fan
                 unit: root.unit
             }
@@ -287,7 +286,6 @@ Rectangle {
                 drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
                 x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
                 y: fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
-                visible: background.contains(Coordinates.centerOf(this))
                 drag.onActiveChanged: {
                     if (!drag.active) {
                         fan.minStop = Math.round(background.scalePwm(centerY));
@@ -307,7 +305,6 @@ Rectangle {
                 drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
                 x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
                 y: fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
-                visible: background.contains(Coordinates.centerOf(this))
                 drag.onActiveChanged: {
                     if (!drag.active) {
                         fan.maxPwm = Math.round(background.scalePwm(centerY));

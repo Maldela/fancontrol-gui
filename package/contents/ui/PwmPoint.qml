@@ -27,9 +27,9 @@ Rectangle {
     id: root
 
     property Item background: parent
-    property point center: Qt.point(x + width / 2, y + height / 2);
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
+    readonly property point center: Qt.point(centerX, centerY)
     property alias drag: pwmMouse.drag
     property int size: 10
     property int unit: 0

@@ -32,6 +32,7 @@ Rectangle {
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
+    readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
     property int unit: 0
 
