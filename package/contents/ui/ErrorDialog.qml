@@ -17,18 +17,20 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls 1.2
 
+
 Dialog {
     property alias text: text.text
-    
+
     title: i18n("Error")
     width: text.implicitWidth + 20
     standardButtons: StandardButton.Close
     onRejected: close()
-    
+
     Label {
         id: text
         anchors.centerIn: parent

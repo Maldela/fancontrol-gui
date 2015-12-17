@@ -17,6 +17,7 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
@@ -25,6 +26,7 @@ import "../scripts/math.js" as MoreMath
 import "../scripts/units.js" as Units
 import "../scripts/coordinates.js" as Coordinates
 import "../scripts/colors.js" as Colors
+
 
 Rectangle {
     property QtObject fan

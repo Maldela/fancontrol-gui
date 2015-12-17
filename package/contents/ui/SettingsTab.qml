@@ -17,12 +17,14 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import QtQml 2.2
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
+
 
 Item {
     property QtObject gui
@@ -79,7 +81,7 @@ Item {
                 maximumValue: maxTempBox.value
                 minimumValue: Units.fromKelvin(0, gui.unit)
                 value: Units.fromCelsius(gui.minTemp, gui.unit)
-                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F") 
+                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F")
                 onValueChanged: gui.minTemp = value
             }
         }
@@ -104,7 +106,7 @@ Item {
                 suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F")
                 onValueChanged: gui.maxTemp = value
             }
-        }        
+        }
         Loader {
             active: systemdCom
             sourceComponent: RowLayout {

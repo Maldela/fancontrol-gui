@@ -17,13 +17,15 @@
  *
  */
 
+
 import QtQuick 2.4
-import QtQuick.Layouts 1.2
 import QtQuick.Controls 1.4
-import QtQml 2.2
 import "../scripts/units.js" as Units
 
+
 Rectangle {
+    id: root
+
     property Item background: parent
     property point center: Qt.point(x + width / 2, y + height / 2);
     readonly property real centerX: x + width / 2
@@ -35,7 +37,6 @@ Rectangle {
 
     signal positionChanged()
 
-    id: root
     width: size
     height: size
     radius: size / 2
@@ -48,8 +49,10 @@ Rectangle {
 
     MouseArea {
         id: pwmMouse
+
         anchors.fill: parent
         hoverEnabled: root.enabled ? true : false
+        cursorShape: containsPress || drag.active ? Qt.DragMoveCursor : Qt.PointingHandCursor
         drag.target: root
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false

@@ -26,29 +26,30 @@ import org.kde.kcm 1.0
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
 
+
 Item {
     property QtObject base: kcm.base
     property var locale: Qt.locale()
     property real textWidth: 0
-    
+
     id: root
     implicitWidth: 1024
     implicitHeight: 768
-       
+
     ColumnLayout {
         id: noFansInfo
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         spacing: 20
         visible: kcm.loader.allPwmFans.length == 0
-        
+
         Label {
             Layout.alignment: Qt.AlignCenter
             text: i18n("There are no pwm capable fans in your system.")
             font.pointSize: 14
             font.bold: true
         }
-        
+
         Button {
             Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
@@ -56,7 +57,7 @@ Item {
             onClicked: kcm.loader.detectSensors()
         }
     }
-    
+
     CheckBox {
         id: enabledBox
         visible: kcm.loader.allPwmFans.length > 0
@@ -64,22 +65,22 @@ Item {
         text: i18n("Control fans manually")
         checked: kcm.manualControl
         onCheckedChanged: kcm.manualControl = checked
-        
+
         Connections {
             target: kcm
             onManualControlChanged: enabledBox.checked = kcm.manualControl
         }
     }
-        
+
     ColumnLayout {
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.top: enabledBox.bottom
         visible: enabledBox.checked
 
-        RowLayout {  
+        RowLayout {
             visible: enabledBox.checked && kcm.loader.allPwmFans.length > 0
-            
+
             Label {
                 text: i18n("Fan:")
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
@@ -106,7 +107,7 @@ Item {
                 onClicked: kcm.loader.detectSensors()
             }
         }
-        
+
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -125,7 +126,7 @@ Item {
                 }
             }
         }
-        
+
         Row {
             property bool expanded: false
 
@@ -147,7 +148,7 @@ Item {
             anchors.fill: expand
             onClicked: expand.expanded = expand.expanded ? false : true
         }
-        
+
         RowLayout {
             visible: expand.expanded
 
@@ -185,7 +186,7 @@ Item {
                 maximumValue: maxTempBox.value
                 minimumValue: Units.fromKelvin(0, base.unit)
                 value: Units.fromCelsius(base.minTemp, base.unit)
-                suffix: base.unit == 0 ? i18n("°C") : base.unit == 1 ? i18n("K") : i18n("°F") 
+                suffix: base.unit == 0 ? i18n("°C") : base.unit == 1 ? i18n("K") : i18n("°F")
                 onValueChanged: base.minTemp = value
             }
         }
@@ -210,7 +211,7 @@ Item {
                 suffix: base.unit == 0 ? i18n("°C") : base.unit == 1 ? i18n("K") : i18n("°F")
                 onValueChanged: base.maxTemp = value
             }
-        }        
+        }
         RowLayout {
             visible: expand.expanded
 
@@ -231,7 +232,7 @@ Item {
         }
         RowLayout {
             visible: expand.expanded
-            
+
             Label {
                 Layout.preferredWidth: root.textWidth
                 clip: true
@@ -247,11 +248,11 @@ Item {
                 onTextChanged: base.configUrl = text
             }
             Button {
-                action: loadAction 
+                action: loadAction
             }
         }
     }
-    
+
     Action {
         id: loadAction
         iconName: "document-open"
@@ -259,19 +260,19 @@ Item {
         tooltip: i18n("Load configuration file")
         shortcut: StandardKey.Open
     }
-    
+
     FileDialog {
         id: openFileDialog
         title: i18n("Please choose a configuration file")
         folder: "file:///etc"
         selectExisting: true
         selectMultiple: false
-        
+
         onAccepted: {
             base.configUrl = fileUrl;
         }
     }
-    
+
     ErrorDialog {
         id: errorDialog
         modality: Qt.ApplicationModal

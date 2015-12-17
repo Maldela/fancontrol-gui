@@ -17,8 +17,10 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
+
 
 FocusScope {
     property alias text: textField.text
@@ -33,7 +35,7 @@ FocusScope {
     id: root
     implicitHeight: textField.implicitHeight + margin*2
     implicitWidth: textField.implicitWidth + margin*2
-    
+
     onValueChanged: {
         if (textField.text != value) {
             textField.text = value;

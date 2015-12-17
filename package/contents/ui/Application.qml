@@ -17,12 +17,14 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 
-ApplicationWindow {    
+
+ApplicationWindow {
     id: window
     title: i18n("Fancontrol-GUI")
     width: 1024
@@ -34,7 +36,7 @@ ApplicationWindow {
             title: i18n("File")
             MenuItem { action: loadAction }
             MenuItem { action: saveAction }
-            MenuItem { 
+            MenuItem {
                 text: i18n("Save configuration file as")
                 onTriggered: saveFileDialog.open()
                 shortcut: StandardKey.SaveAs
@@ -111,7 +113,7 @@ ApplicationWindow {
             }
         }
     }
-    
+
     ErrorDialog {
         id: errorDialog
         visible: !!base.loader.error
@@ -119,7 +121,7 @@ ApplicationWindow {
         text: base.loader.error
         onTextChanged: show()
     }
-    
+
     Action {
         id: loadAction
         text: i18n("Load configuration file")
@@ -136,7 +138,7 @@ ApplicationWindow {
         tooltip: i18n("Save configuration file") + " (" + base.loader.configUrl.toString() + ")"
         shortcut: StandardKey.Save
     }
-    
+
     FileDialog {
         id: openFileDialog
         title: i18n("Please choose a configuration file")

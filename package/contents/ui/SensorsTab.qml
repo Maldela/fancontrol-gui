@@ -17,14 +17,16 @@
  *
  */
 
+
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import "../scripts/arrayfunctions.js" as ArrayFunctions
 
+
 RowLayout {
     property QtObject loader
-    
+
     id: root
     anchors.fill: parent
     anchors.margins: 2
@@ -101,7 +103,7 @@ RowLayout {
             }
         }
     }
-    
+
     SystemPalette {
         id: palette
     }
