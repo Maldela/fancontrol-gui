@@ -83,7 +83,7 @@ Rectangle {
 
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Units.fromCelsius(Math.round(background.scaleTemp(root.centerX)), unit) + suffix
+                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + suffix
             }
         }
     }

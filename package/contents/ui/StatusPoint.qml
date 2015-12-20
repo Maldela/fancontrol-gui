@@ -20,6 +20,8 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.2
+import "../scripts/units.js" as Units
+import "../scripts/math.js" as MoreMath
 
 
 Rectangle {
@@ -27,7 +29,8 @@ Rectangle {
 
     property QtObject fan
     property Item background: parent
-    property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
+    property real unsmoothedTemp: fan.temp ? fan.temp.value : minTemp
+    property real unscaledTemp: unsmoothedTemp
     property real unscaledPwm: fan.pwm
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
@@ -35,13 +38,19 @@ Rectangle {
     readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
     property int unit: 0
+    property int smoothing: 2
 
     width: size
     height: size
     radius: size / 2
-    x: background.scaleX(unscaledTemp) - width/2
+    x: MoreMath.bound(-width/2, background.scaleX(unscaledTemp) - width/2, background.width-width/2)
     y: background.scaleY(unscaledPwm) - height/2
     color: "black"
+
+    onUnsmoothedTempChanged: {
+        root.unscaledTemp = (root.unscaledTemp * smoothing + root.unsmoothedTemp) / (smoothing + 1);
+        console.log(root.unscaledTemp);
+    }
 
     Behavior on unscaledTemp {
         SpringAnimation {
@@ -80,12 +89,13 @@ Rectangle {
 
                 id: temp
                 font.pixelSize: root.height * 1.5
-                text: (fan.hasTemp ? fan.temp.value : "0") + suffix
+                text: (fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + suffix
+
             }
             Label {
                 id: pwm
                 font.pixelSize: root.height * 1.5
-                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(unscaledPwm / 2.55)).toLocaleString(locale, 'f', 1) + '%'
             }
             Label {
                 id: rpm

@@ -37,7 +37,7 @@
 namespace Fancontrol
 {
 
-Temp::Temp(Hwmon *parent, uint index) : 
+Temp::Temp(Hwmon *parent, uint index) :
     Sensor(parent, index, QString(parent->name() + QString("/temp") + QString::number(index))),
     m_valueStream(new QTextStream)
 {
@@ -96,7 +96,7 @@ void Temp::reset()
     QIODevice *oldFile = m_valueStream->device();
     delete m_valueStream;
     delete oldFile;
-    
+
     if (QDir(m_parent->path()).isReadable())
     {
         QFile *valueFile = new QFile(m_parent->path() + "/temp" + QString::number(m_index) + "_input", this);
@@ -115,9 +115,14 @@ void Temp::reset()
 void Temp::update()
 {
     m_valueStream->seek(0);
-    *m_valueStream >> m_value;
-    m_value /= 1000;
-    emit valueChanged();
+    int value;
+    *m_valueStream >> value;
+    value /= 1000;
+    if (value != m_value)
+    {
+        m_value = value;
+        emit valueChanged();
+    }
 }
 
 }

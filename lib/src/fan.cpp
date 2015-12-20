@@ -34,7 +34,7 @@
 namespace Fancontrol
 {
 
-Fan::Fan(Hwmon *parent, uint index) : 
+Fan::Fan(Hwmon *parent, uint index) :
     Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index))),
     m_rpmStream(new QTextStream)
 {
@@ -84,7 +84,7 @@ void Fan::reset()
     QIODevice *oldFile = m_rpmStream->device();
     delete m_rpmStream;
     delete oldFile;
-    
+
     if (QDir(m_parent->path()).isReadable())
     {
         QFile *rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
@@ -102,8 +102,13 @@ void Fan::reset()
 void Fan::update()
 {
     m_rpmStream->seek(0);
-    *m_rpmStream >> m_rpm;
-    emit rpmChanged();
+    int rpm;
+    *m_rpmStream >> rpm;
+    if (rpm != m_rpm)
+    {
+        m_rpm = rpm;
+        emit rpmChanged();
+    }
 }
 
 }
