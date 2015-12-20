@@ -30,6 +30,8 @@ ApplicationWindow {
     width: 1024
     height: 768
     visible: true
+    
+    onClosing: base.save()
 
     menuBar: MenuBar {
         Menu {
@@ -148,7 +150,7 @@ ApplicationWindow {
         modality: Qt.NonModal
 
         onAccepted: {
-            base.loader.load(fileUrl);
+            base.configUrl = fileUrl;
         }
     }
     FileDialog {
