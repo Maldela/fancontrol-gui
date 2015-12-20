@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2015-11-29 23:42+0100\n"
+"POT-Creation-Date: 2015-12-20 14:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: fancontrol-gui/src/main.cpp:39 package/contents/ui/Application.qml:27
+#: fancontrol-gui/src/main.cpp:39 package/contents/ui/Application.qml:29
 msgid "Fancontrol-GUI"
 msgstr ""
 
@@ -45,6 +45,36 @@ msgstr ""
 msgid "KDE Fancontrol Module"
 msgstr ""
 
+#: lib/src/loader.cpp:69
+msgid "%1 is not readable!"
+msgstr ""
+
+#: lib/src/loader.cpp:74 lib/src/loader.cpp:296
+msgid "%1 does not exist!"
+msgstr ""
+
+#: lib/src/loader.cpp:241 lib/src/loader.cpp:470
+msgid "%1 is not a local file!"
+msgstr ""
+
+#: lib/src/loader.cpp:247
+msgid "%1 is not a valid url!"
+msgstr ""
+
+#: lib/src/loader.cpp:345
+msgid ""
+"Unable to parse interval line: \n"
+" %1"
+msgstr ""
+
+#: lib/src/loader.cpp:393
+msgid "Can not parse %1"
+msgstr ""
+
+#: lib/src/loader.cpp:403
+msgid "Invalid config file!"
+msgstr ""
+
 #: lib/src/pwmfan.cpp:206
 msgid "Could not set pwm: "
 msgstr ""
@@ -57,161 +87,161 @@ msgstr ""
 msgid "Authorization error: "
 msgstr ""
 
-#: package/contents/ui/Application.qml:34
+#: package/contents/ui/Application.qml:36
 msgid "File"
 msgstr ""
 
-#: package/contents/ui/Application.qml:38
-#: package/contents/ui/Application.qml:154
+#: package/contents/ui/Application.qml:40
+#: package/contents/ui/Application.qml:156
 msgid "Save configuration file as"
 msgstr ""
 
-#: package/contents/ui/Application.qml:43
+#: package/contents/ui/Application.qml:45
 msgid "Exit"
 msgstr ""
 
-#: package/contents/ui/Application.qml:64
+#: package/contents/ui/Application.qml:66
 msgid "Restart fancontrol"
 msgstr ""
 
-#: package/contents/ui/Application.qml:64
+#: package/contents/ui/Application.qml:66
 msgid "Start fancontrol"
 msgstr ""
 
-#: package/contents/ui/Application.qml:73
+#: package/contents/ui/Application.qml:75
 msgid "Stop fancontrol"
 msgstr ""
 
-#: package/contents/ui/Application.qml:89
+#: package/contents/ui/Application.qml:91
 msgid "Sensors"
 msgstr ""
 
-#: package/contents/ui/Application.qml:95
+#: package/contents/ui/Application.qml:97
 msgid "PwmFans"
 msgstr ""
 
-#: package/contents/ui/Application.qml:101
+#: package/contents/ui/Application.qml:103
 msgid "Configfile"
 msgstr ""
 
-#: package/contents/ui/Application.qml:108
+#: package/contents/ui/Application.qml:110
 msgid "Settings"
 msgstr ""
 
-#: package/contents/ui/Application.qml:125
-#: package/contents/ui/Application.qml:128 package/contents/ui/KCM.qml:259
+#: package/contents/ui/Application.qml:127
+#: package/contents/ui/Application.qml:130 package/contents/ui/KCM.qml:260
 msgid "Load configuration file"
 msgstr ""
 
-#: package/contents/ui/Application.qml:133
-#: package/contents/ui/Application.qml:136
+#: package/contents/ui/Application.qml:135
+#: package/contents/ui/Application.qml:138
 msgid "Save configuration file"
 msgstr ""
 
-#: package/contents/ui/Application.qml:142 package/contents/ui/KCM.qml:265
+#: package/contents/ui/Application.qml:144 package/contents/ui/KCM.qml:266
 msgid "Please choose a configuration file"
 msgstr ""
 
-#: package/contents/ui/ErrorDialog.qml:27
+#: package/contents/ui/ErrorDialog.qml:29
 msgid "Error"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:47 package/contents/ui/PwmFansTab.qml:90
+#: package/contents/ui/KCM.qml:48 package/contents/ui/PwmFansTab.qml:92
 msgid "There are no pwm capable fans in your system."
 msgstr ""
 
-#: package/contents/ui/KCM.qml:54 package/contents/ui/KCM.qml:104
-#: package/contents/ui/PwmFansTab.qml:103
+#: package/contents/ui/KCM.qml:55 package/contents/ui/KCM.qml:105
+#: package/contents/ui/PwmFansTab.qml:105
 msgid "Detect fans"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:64
+#: package/contents/ui/KCM.qml:65
 msgid "Control fans manually"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:84 package/contents/ui/PwmFansTab.qml:39
+#: package/contents/ui/KCM.qml:85 package/contents/ui/PwmFansTab.qml:41
 msgid "Fan:"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:142
+#: package/contents/ui/KCM.qml:143
 msgid "Advanced settings"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:157 package/contents/ui/SettingsTab.qml:51
+#: package/contents/ui/KCM.qml:158 package/contents/ui/SettingsTab.qml:53
 msgid "Interval:"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:165 package/contents/ui/SettingsTab.qml:59
+#: package/contents/ui/KCM.qml:166 package/contents/ui/SettingsTab.qml:61
 msgid "seconds"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:165 package/contents/ui/SettingsTab.qml:59
+#: package/contents/ui/KCM.qml:166 package/contents/ui/SettingsTab.qml:61
 msgid "second"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:176 package/contents/ui/SettingsTab.qml:70
+#: package/contents/ui/KCM.qml:177 package/contents/ui/SettingsTab.qml:72
 msgid "Minimum temperature for fan graphs:"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:188 package/contents/ui/KCM.qml:210
-#: package/contents/ui/SettingsTab.qml:82
-#: package/contents/ui/SettingsTab.qml:104
+#: package/contents/ui/KCM.qml:189 package/contents/ui/KCM.qml:211
+#: package/contents/ui/SettingsTab.qml:84
+#: package/contents/ui/SettingsTab.qml:106
 msgid "°C"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:188 package/contents/ui/KCM.qml:210
-#: package/contents/ui/SettingsTab.qml:82
-#: package/contents/ui/SettingsTab.qml:104
+#: package/contents/ui/KCM.qml:189 package/contents/ui/KCM.qml:211
+#: package/contents/ui/SettingsTab.qml:84
+#: package/contents/ui/SettingsTab.qml:106
 msgid "K"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:188 package/contents/ui/KCM.qml:210
-#: package/contents/ui/SettingsTab.qml:82
-#: package/contents/ui/SettingsTab.qml:104
+#: package/contents/ui/KCM.qml:189 package/contents/ui/KCM.qml:211
+#: package/contents/ui/SettingsTab.qml:84
+#: package/contents/ui/SettingsTab.qml:106
 msgid "°F"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:198 package/contents/ui/SettingsTab.qml:92
+#: package/contents/ui/KCM.qml:199 package/contents/ui/SettingsTab.qml:94
 msgid "Maximum temperature for fan graphs:"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:220 package/contents/ui/SettingsTab.qml:116
+#: package/contents/ui/KCM.qml:221 package/contents/ui/SettingsTab.qml:118
 msgid "Name of the fancontrol systemd service:"
 msgstr ""
 
-#: package/contents/ui/KCM.qml:238
+#: package/contents/ui/KCM.qml:239
 msgid "Path to the fancontrol config file:"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:292
+#: package/contents/ui/PwmFan.qml:338
 msgid "Controlled by:"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:319
+#: package/contents/ui/PwmFan.qml:365
 msgid "Turn Fan off if temp < MINTEMP"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:332
+#: package/contents/ui/PwmFan.qml:378
 msgid "Pwm value for fan to start:"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:343
+#: package/contents/ui/PwmFan.qml:389
 msgid "%"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:358
+#: package/contents/ui/PwmFan.qml:404
 msgid "Abort test"
 msgstr ""
 
-#: package/contents/ui/PwmFan.qml:358
+#: package/contents/ui/PwmFan.qml:404
 msgid "Test start and stop values"
 msgstr ""
 
-#: package/contents/ui/SettingsTab.qml:137
+#: package/contents/ui/SettingsTab.qml:139
 msgid "Fancontrol systemd service autostart:"
 msgstr ""
 
-#: package/contents/ui/StatusPoint.qml:92
+#: package/contents/ui/StatusPoint.qml:103
 msgid "rpm"
 msgstr ""
 
