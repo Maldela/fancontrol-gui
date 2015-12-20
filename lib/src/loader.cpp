@@ -315,7 +315,7 @@ bool Loader::load(const QUrl &url)
     do
     {
         QString line(stream.readLine());
-        if (line.startsWith('#'))
+        if (line.startsWith('#') || line.trimmed().isEmpty())
             continue;
         int offset = line.indexOf('#');
         if (offset != -1)
@@ -326,7 +326,7 @@ bool Loader::load(const QUrl &url)
     while(!stream.atEnd());
 
     foreach (QString line, lines)
-    {
+    {        
         if (line.startsWith("INTERVAL="))
         {
             line.remove("INTERVAL=");
@@ -438,16 +438,21 @@ bool Loader::load(const QUrl &url)
         }
         else if (!line.startsWith("DEVPATH=") &&
                  !line.startsWith("FCFANS="))
-            qWarning() << "Unrecognized line in config:" << line;
+        {
+            //Connect hwmons again
+            foreach (Hwmon *hwmon, m_hwmons)
+                connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+            
+            setError(i18n("Unrecognized line in config:\n%1", line), true);
+            return false;
+        }
     }
 
     createConfigFile();
 
     //Connect hwmons again
     foreach (Hwmon *hwmon, m_hwmons)
-    {
         connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-    }
 
     emit configUrlChanged();
 
