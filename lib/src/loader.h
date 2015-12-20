@@ -35,7 +35,7 @@ class KJob;
 
 namespace Fancontrol
 {
-    
+
 class Hwmon;
 class PwmFan;
 class Temp;
@@ -50,12 +50,12 @@ class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
     Q_PROPERTY(QList<QObject *> allTemps READ allTemps NOTIFY allTempsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
-    
+
 
 public:
 
     explicit Loader(QObject *parent = Q_NULLPTR);
-    
+
     Q_INVOKABLE void parseHwmons();
     Q_INVOKABLE bool load(const QUrl & = QUrl());
     Q_INVOKABLE bool save(const QUrl & = QUrl());
@@ -70,10 +70,10 @@ public:
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
-    
+
     static QPair<int, int> getEntryNumbers(const QString &entry);
-    
-    
+
+
 public slots:
 
     void updateSensors() { emit sensorsUpdateNeeded(); }
@@ -89,15 +89,15 @@ protected slots:
 
 
 protected:
-    
+
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value)) const;
-    
-    
+
+
 private:
-    
+
     PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
     Temp *getTemp(const QPair<int, int> &indexPair) const;
-    
+
     int m_interval;
     QList<Hwmon *> m_hwmons;
     QUrl m_configUrl;

@@ -30,6 +30,7 @@
 #include <QtCore/QDebug>
 
 #include <KAuth/KAuthExecuteJob>
+#include <KI18n/KLocalizedString>
 
 
 #define HWMON_PATH "/sys/class/hwmon"
@@ -47,7 +48,7 @@ Loader::Loader(QObject *parent) : QObject(parent),
     m_configUrl(QUrl::fromLocalFile(STANDARD_CONFIG_FILE)),
     m_error(""),
     m_timer(new QTimer(this))
-{   
+{
     parseHwmons();
 
     m_timer->setSingleShot(false);
@@ -65,12 +66,12 @@ void Loader::parseHwmons()
 
     else if (hwmonDir.exists())
     {
-        setError(QString(HWMON_PATH) + " is not readable!", true);
+        setError(i18n("%1 is not readable!", QString(HWMON_PATH)), true);
         return;
     }
     else
     {
-        setError(QString(HWMON_PATH) + " does not exist!", true);
+        setError(i18n("%1 does not exist!", QString(HWMON_PATH)), true);
         return;
     }
 
@@ -131,7 +132,7 @@ PwmFan * Loader::getPwmFan(const QPair<int, int> &indexPair) const
 Temp * Loader::getTemp(const QPair<int, int> &indexPair) const
 {
     Hwmon *hwmon = m_hwmons.value(indexPair.first, Q_NULLPTR);
-    
+
     if (!hwmon)
         return Q_NULLPTR;
 
@@ -237,13 +238,13 @@ bool Loader::load(const QUrl &url)
 
         else
         {
-            setError(url.toDisplayString() + " is not a local file!");
+            setError(i18n("%1 is not a local file!", url.toDisplayString()));
             return false;
         }
     }
     else
     {
-        setError(url.toDisplayString() + " is not a valid url!");
+        setError(i18n("%1 is not a valid url!", url.toDisplayString()));
         return false;
     }
 
@@ -258,7 +259,7 @@ bool Loader::load(const QUrl &url)
             m_configUrl = url;
             emit configUrlChanged();
         }
-        
+
         stream.setDevice(&file);
         fileContent = stream.readAll();
     }
@@ -283,18 +284,18 @@ bool Loader::load(const QUrl &url)
                 m_configUrl = url;
                 emit configUrlChanged();
             }
-            
+
             fileContent = reply->data()["content"].toString();
         }
     }
     else
-    {     
+    {
         if (!url.isEmpty())
         {
             emit invalidConfigUrl();
-            setError(file.fileName() + " does not exist!");
+            setError(i18n("%1 does not exist!", file.fileName()));
         }
-        
+
         return false;
     }
 
@@ -308,8 +309,6 @@ bool Loader::load(const QUrl &url)
             qobject_cast<PwmFan *>(pwmFan)->reset();
         }
     }
-    
-    createConfigFile();
 
     stream.setString(&fileContent);
     QStringList lines;
@@ -339,7 +338,11 @@ bool Loader::load(const QUrl &url)
             }
             else
             {
-                setError("Unable to parse interval line", true);
+                //Connect hwmons again
+                foreach (Hwmon *hwmon, m_hwmons)
+                    connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+
+                setError(i18n("Unable to parse interval line: \n %1", line), true);
                 return false;
             }
         }
@@ -356,7 +359,7 @@ bool Loader::load(const QUrl &url)
                     QString temp = nameValuePair.at(1);
                     PwmFan *pwmPointer = getPwmFan(getEntryNumbers(pwm));
                     Temp *tempPointer = getTemp(getEntryNumbers(temp));
-                    
+
                     if (pwmPointer && tempPointer)
                     {
                         pwmPointer->setTemp(tempPointer);
@@ -366,6 +369,41 @@ bool Loader::load(const QUrl &url)
                 }
                 else
                     qWarning() << "Invalid entry:" << fctemp;
+            }
+        }
+        else if (line.startsWith("DEVNAME="))
+        {
+            line.remove("DEVNAME=");
+            QStringList devnames = line.split(' ');
+            foreach (const QString &devname, devnames)
+            {
+                QStringList indexNamePair = devname.split('=');
+                if (indexNamePair.size() == 2)
+                {
+                    QString hwmon = indexNamePair.at(0);
+                    QString name = indexNamePair.at(1);
+                    bool success;
+                    Hwmon *hwmonPointer = m_hwmons.value(hwmon.remove("hwmon").toInt(&success), Q_NULLPTR);
+                    if (!success)
+                    {
+                        //Connect hwmons again
+                        foreach (Hwmon *hwmon, m_hwmons)
+                            connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+
+                        setError(i18n("Can not parse %1", devname), true);
+                        return false;
+                    }
+
+                    if (!hwmonPointer || hwmonPointer->name().split('.').first() != name)
+                    {
+                        //Connect hwmons again
+                        foreach (Hwmon *hwmon, m_hwmons)
+                            connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+
+                        setError(i18n("Invalid config file!"), true);
+                        return false;
+                    }
+                }
             }
         }
         else if (line.startsWith("MINTEMP="))
@@ -398,11 +436,12 @@ bool Loader::load(const QUrl &url)
             line.remove("MAXPWM=");
             parseConfigLine(line, &PwmFan::setMaxPwm);
         }
-        else if (!line.startsWith("DEVNAME=") &&
-                 !line.startsWith("DEVPATH=") &&
+        else if (!line.startsWith("DEVPATH=") &&
                  !line.startsWith("FCFANS="))
             qWarning() << "Unrecognized line in config:" << line;
     }
+
+    createConfigFile();
 
     //Connect hwmons again
     foreach (Hwmon *hwmon, m_hwmons)
@@ -411,9 +450,6 @@ bool Loader::load(const QUrl &url)
     }
 
     emit configUrlChanged();
-
-    m_configFile = fileContent;
-    emit configFileChanged();
 
     return true;
 }
@@ -431,7 +467,7 @@ bool Loader::save(const QUrl &url)
 
     else
     {
-        setError(url.toDisplayString() + " is not a local file!", true);
+        setError(i18n("%1 is not a local file!", url.toDisplayString()), true);
         return false;
     }
 
@@ -629,7 +665,7 @@ void Loader::detectSensors()
 
     action.setArguments(map);
     KAuth::ExecuteJob *job = action.execute();
-    
+
     connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDetectSensorsResult(KJob*)));
     job->start();
 }
@@ -679,7 +715,7 @@ void Loader::setError (const QString &error, bool critical)
 {
     m_error = error;
     emit errorChanged();
-    
+
     if (critical)
     {
         qCritical() << error;
