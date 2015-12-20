@@ -29,6 +29,7 @@
 #include <QtDBus/QDBusInterface>
 
 #include <KAuth/KAuthExecuteJob>
+#include <KI18n/KLocalizedString>
 
 
 #ifndef STANDARD_SERVICE_NAME
@@ -79,6 +80,10 @@ SystemdCommunicator::SystemdCommunicator(QObject *parent, const QString &service
         setServiceName(STANDARD_SERVICE_NAME);
     else
         setServiceName(serviceName);
+
+    emit serviceNameChanged();
+    emit serviceEnabledChanged();
+    emit serviceActiveChanged();
 }
 
 void SystemdCommunicator::setServiceName(const QString &name)
@@ -157,14 +162,10 @@ bool SystemdCommunicator::serviceExists()
     foreach (const SystemdUnitFile &unitFile, list)
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
-        {
-            setError("Success");
             return true;
-        }
     }
 
-    setError("Service " + m_serviceName + " doesn't exist");
-    qDebug() << "Service does not exist!";
+    setError(i18n("Service %1 doesn't exist", m_serviceName));
     return false;
 }
 
@@ -312,7 +313,7 @@ bool SystemdCommunicator::restartService()
         return dbusAction("ReloadOrRestartUnit", args);
     }
 
-    setError("Service doesn't exist");
+    setError(i18n("Service does not exist"));
     return false;
 }
 
@@ -329,11 +330,8 @@ void SystemdCommunicator::setError(const QString &error)
 {
     qCritical() << error;
 
-    if (error != m_error)
-    {
-        m_error = error;
-        emit errorChanged();
-    }
+    m_error = error;
+    emit errorChanged();
 }
 
 }

@@ -32,9 +32,9 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    
+
     KLocalizedString::setApplicationDomain("kcm_fancontrol");
-    
+
     KAboutData about("fancontrol_gui",
                     i18n("Fancontrol-GUI"),
                     "0.1",
@@ -44,20 +44,20 @@ int main(int argc, char *argv[])
                     QString(),
                     "http://github.com/maldela/fancontrol-gui",
                     "http://github.com/maldela/fancontrol-gui/issues");
-    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de"); 
+    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de");
     KAboutData::setApplicationData(about);
 
     QQmlApplicationEngine engine;
-    
+
     KDeclarative::KDeclarative decl;
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
-        
+
     Fancontrol::GUIBase base;
-    base.loader()->load();
+    base.load();
     QObject::connect(&app, &QApplication::aboutToQuit, [&] () { base.save(false); });
     engine.rootContext()->setContextProperty("base", &base);
-    
+
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");
     package.setDefaultPackageRoot("kpackage/kcms");
     package.setPath("kcm_fancontrol");
