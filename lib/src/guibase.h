@@ -47,13 +47,13 @@ class Config;
 class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
 {
     Q_OBJECT
-    
+
     Q_PROPERTY(Loader* loader READ loader CONSTANT)
-    
+
 #ifndef NO_SYSTEMD
     Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
 #endif
-    
+
     Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
     Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
@@ -62,11 +62,11 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
 
 public:
-    
+
     explicit GUIBase(QObject *parent = Q_NULLPTR);
 
     Loader *loader() const { return m_loader; }
-    
+
 #ifndef NO_SYSTEMD
     SystemdCommunicator *systemdCommunicator() const { return m_com; }
 #endif
@@ -83,11 +83,11 @@ public:
     void setConfigUrl(const QUrl &url);
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
     void load();
-    
-    Q_INVOKABLE void save(bool saveLoader = false);
+
+    Q_INVOKABLE void save(bool saveLoader = false, const QUrl &url = QUrl());
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
-    
-    
+
+
 signals:
 
     void minTempChanged();
@@ -95,13 +95,13 @@ signals:
     void serviceNameChanged();
     void configUrlChanged();
     void unitChanged();
-    
-    
+
+
 protected:
-    
+
     void emitConfigChanged();
-    
-    
+
+
 private:
 
     Config *m_config;
@@ -109,8 +109,8 @@ private:
 #ifndef NO_SYSTEMD
     SystemdCommunicator *const m_com;
 #endif
-    
-    Loader *const m_loader; 
+
+    Loader *const m_loader;
     int m_unit;
     bool m_configValid;
 };

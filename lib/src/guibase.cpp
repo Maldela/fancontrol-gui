@@ -33,7 +33,7 @@
 namespace Fancontrol
 {
 
-GUIBase::GUIBase(QObject *parent) : QObject(parent),    
+GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_config(Config::instance()),
 
 #ifndef NO_SYSTEMD
@@ -44,7 +44,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_configValid(false)
 {
     connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
-        
+
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
     m_unit = (system == QLocale::MetricSystem) ? 0 : 2;
@@ -54,18 +54,18 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     qmlRegisterType<Fan>();
     qmlRegisterType<PwmFan>();
     qmlRegisterType<Temp>();
-    
+
 #ifndef NO_SYSTEMD
     qmlRegisterType<SystemdCommunicator>();
 #endif
-    
+
 }
 
 void GUIBase::load()
 {
     m_config->load();
     m_configValid = m_loader->load(configUrl());
-    
+
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
 #endif
@@ -73,12 +73,12 @@ void GUIBase::load()
     emitConfigChanged();
 }
 
-void GUIBase::save(bool saveLoader)
+void GUIBase::save(bool saveLoader, const QUrl &url)
 {
     m_config->save();
-    
+
     if (saveLoader)
-        m_loader->save();
+        m_loader->save(url);
 }
 
 qreal GUIBase::maxTemp() const
@@ -128,7 +128,7 @@ void GUIBase::setServiceName(const QString& name)
 #ifndef NO_SYSTEMD
         m_com->setServiceName(name);
 #endif
-        
+
         emit serviceNameChanged();
     }
 }

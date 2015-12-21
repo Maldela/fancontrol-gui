@@ -30,7 +30,7 @@ ApplicationWindow {
     width: 1024
     height: 768
     visible: true
-    
+
     onClosing: base.save()
 
     menuBar: MenuBar {
@@ -135,7 +135,7 @@ ApplicationWindow {
     Action {
         id: saveAction
         text: i18n("Save configuration file")
-        onTriggered: base.loader.save()
+        onTriggered: base.save(true)
         iconName: "document-save"
         tooltip: i18n("Save configuration file") + " (" + base.loader.configUrl.toString() + ")"
         shortcut: StandardKey.Save
@@ -149,9 +149,7 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
 
-        onAccepted: {
-            base.configUrl = fileUrl;
-        }
+        onAccepted: base.configUrl = fileUrl;
     }
     FileDialog {
         id: saveFileDialog
@@ -161,8 +159,6 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
 
-        onAccepted: {
-            base.loader.save(fileUrl);
-        }
+        onAccepted: base.save(true, fileUrl);
     }
 }

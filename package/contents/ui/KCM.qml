@@ -268,9 +268,7 @@ Item {
         selectExisting: true
         selectMultiple: false
 
-        onAccepted: {
-            base.configUrl = fileUrl;
-        }
+        onAccepted: base.configUrl = fileUrl;
     }
 
     ErrorDialog {
