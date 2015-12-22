@@ -326,7 +326,7 @@ bool Loader::load(const QUrl &url)
     while(!stream.atEnd());
 
     foreach (QString line, lines)
-    {        
+    {
         if (line.startsWith("INTERVAL="))
         {
             line.remove("INTERVAL=");
@@ -442,7 +442,7 @@ bool Loader::load(const QUrl &url)
             //Connect hwmons again
             foreach (Hwmon *hwmon, m_hwmons)
                 connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-            
+
             setError(i18n("Unrecognized line in config:\n%1", line), true);
             return false;
         }
@@ -686,7 +686,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
         parseHwmons();
 }
 
-QList<QObject *> Loader::hwmons() const
+QList<QObject *> Loader::hwmonsAsObjects() const
 {
     QList<QObject *> list;
     foreach (Hwmon *hwmon, m_hwmons)
@@ -696,22 +696,12 @@ QList<QObject *> Loader::hwmons() const
     return list;
 }
 
-QList<QObject *> Loader::allPwmFans() const
-{
-    QList<QObject *> list;
-    foreach (const Hwmon *hwmon, m_hwmons)
-    {
-        list += hwmon->pwmFans();
-    }
-    return list;
-}
-
 QList<QObject *> Loader::allTemps() const
 {
     QList<QObject *> list;
     foreach (const Hwmon *hwmon, m_hwmons)
     {
-        list += hwmon->temps();
+        list += hwmon->tempsAsObjects();
     }
     return list;
 }

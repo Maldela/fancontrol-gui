@@ -25,8 +25,11 @@
 #define GUIBASE_H
 
 #include <QtCore/QObject>
+#include <QtCore/QStringListModel>
 
 #include "loader.h"
+#include "pwmfanmodel.h"
+#include "tempmodel.h"
 
 #ifndef NO_SYSTEMD
 #include "systemdcommunicator.h"
@@ -60,6 +63,8 @@ class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
+    Q_PROPERTY(PwmFanModel *pwmFanModel READ pwmFanModel CONSTANT)
+    Q_PROPERTY(TempModel *tempModel READ tempModel CONSTANT)
 
 public:
 
@@ -81,8 +86,11 @@ public:
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
-    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); } }
+    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); m_tempModel->setUnit(unit); } }
     void load();
+    PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
+    TempModel *tempModel() const { return m_tempModel; };
+
 
     Q_INVOKABLE void save(bool saveLoader = false, const QUrl &url = QUrl());
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
@@ -113,6 +121,8 @@ private:
     Loader *const m_loader;
     int m_unit;
     bool m_configValid;
+    PwmFanModel *m_pwmFanModel;
+    TempModel *m_tempModel;
 };
 
 }

@@ -39,9 +39,9 @@ class Hwmon : public QObject
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString path READ path CONSTANT)
     Q_PROPERTY(int index READ index CONSTANT)
-    Q_PROPERTY(QList<QObject *> fans READ fans NOTIFY fansChanged)
-    Q_PROPERTY(QList<QObject *> pwmFans READ pwmFans NOTIFY pwmFansChanged)
-    Q_PROPERTY(QList<QObject *> temps READ temps NOTIFY tempsChanged)
+    Q_PROPERTY(QList<QObject *> fans READ fansAsObjects NOTIFY fansChanged)
+    Q_PROPERTY(QList<QObject *> pwmFans READ pwmFansAsObjects NOTIFY pwmFansChanged)
+    Q_PROPERTY(QList<QObject *> temps READ tempsAsObjects NOTIFY tempsChanged)
 
 
 public:
@@ -52,25 +52,28 @@ public:
     QString name() const { return m_name; }
     QString path() const { return m_path; }
     int index() const { return m_index; }
-    QList<QObject *> fans() const;
-    QList<QObject *> pwmFans() const;
-    QList<QObject *> temps() const;
+    QList<Fan *> fans() const { return m_fans; }
+    QList<PwmFan *> pwmFans() const { return m_pwmFans; }
+    QList<Temp *> temps() const { return m_temps; }
+    QList<QObject *> fansAsObjects() const;
+    QList<QObject *> pwmFansAsObjects() const;
+    QList<QObject *> tempsAsObjects() const;
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
     Fan * fan(int i) const;
     PwmFan * pwmFan(int i) const;
     Temp * temp(int i) const;
     bool isValid() const { return m_valid; }
-    
+
 
 public slots:
 
     void updateConfig() { emit configUpdateNeeded(); }
     void updateSensors() { emit sensorsUpdateNeeded(); }
-    
-    
+
+
 protected slots:
-    
+
     void setError(const QString &error);
 
 

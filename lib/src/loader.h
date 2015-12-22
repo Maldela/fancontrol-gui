@@ -45,8 +45,7 @@ class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
     Q_OBJECT
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
-    Q_PROPERTY(QList<QObject *> hwmons READ hwmons NOTIFY hwmonsChanged)
-    Q_PROPERTY(QList<QObject *> allPwmFans READ allPwmFans NOTIFY allPwmFansChanged)
+    Q_PROPERTY(QList<QObject *> hwmons READ hwmonsAsObjects NOTIFY hwmonsChanged)
     Q_PROPERTY(QList<QObject *> allTemps READ allTemps NOTIFY allTempsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
@@ -64,8 +63,8 @@ public:
     Q_INVOKABLE void detectSensors();
     QUrl configUrl() const { return m_configUrl; }
     QString configFile() const { return m_configFile; }
-    QList<QObject *> hwmons() const;
-    QList<QObject *> allPwmFans() const;
+    QList<Hwmon *> hwmons() const { return m_hwmons; }
+    QList<QObject *> hwmonsAsObjects() const;
     QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);

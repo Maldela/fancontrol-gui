@@ -21,7 +21,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
-import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/math.js" as MoreMath
 import "../scripts/units.js" as Units
 import "../scripts/colors.js" as Colors
@@ -29,16 +28,14 @@ import "../scripts/colors.js" as Colors
 
 Rectangle {
     property QtObject fan
-    property QtObject loader
     property QtObject systemdCom
+    property QtObject tempModel
     property real minTemp: 40.0
     property real maxTemp: 90.0
     property int margin: 5
-    property int minimizeDuration: 400
     property int unit: 0
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
-    readonly property alias name: nameField.text
 
     id: root
     color: "transparent"
@@ -51,22 +48,14 @@ Rectangle {
         if (fan) {
             hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
             fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
-            if (fan.hasTemp && loader) {
-                tempBox.currentIndex = loader.allTemps.indexOf(fan.temp);
-            }
         }
         bgCanvas.requestPaint();
     }
 
     onFanChanged: update();
-    onLoaderChanged: update()
-    onConvertedMinTempChanged: if (fan) bgCanvas.requestPaint()
-    onConvertedMaxTempChanged: if (fan) bgCanvas.requestPaint()
-
-    Connections {
-        target: loader
-        onConfigUrlChanged: update()
-    }
+    onMinTempChanged: if (fan) bgCanvas.requestPaint()
+    onMaxTempChanged: if (fan) bgCanvas.requestPaint()
+    onUnitChanged: if (fan) bgCanvas.requestRepaint()
 
     SystemPalette {
         id: palette
@@ -341,7 +330,7 @@ Rectangle {
                 onCheckedChanged: {
                     fan.hasTemp = checked;
                     if (checked) {
-                        fan.temp = loader.allTemps[tempBox.currentIndex];
+                        fan.temp = tempModel.temps[tempBox.currentIndex];
                     }
                     bgCanvas.requestPaint();
                 }
@@ -350,11 +339,12 @@ Rectangle {
                 ComboBox {
                     id: tempBox
                     Layout.fillWidth: true
-                    model: ArrayFunctions.namesWithPaths(loader.allTemps)
+                    model: tempModel
+                    textRole: "display"
                     enabled: hasTempCheckBox.checked
                     onCurrentIndexChanged: {
                         if (hasTempCheckBox.checked)
-                            fan.temp = loader.allTemps[currentIndex];
+                            fan.temp = tempModel.temps[currentIndex];
                     }
                 }
             }

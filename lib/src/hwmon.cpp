@@ -149,7 +149,7 @@ void Hwmon::initialize()
     }
 }
 
-QList<QObject *> Hwmon::fans() const
+QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
     foreach (Fan *fan, m_fans)
@@ -159,7 +159,7 @@ QList<QObject *> Hwmon::fans() const
     return list;
 }
 
-QList<QObject *> Hwmon::pwmFans() const
+QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
     foreach (PwmFan *pwmFan, m_pwmFans)
@@ -169,7 +169,7 @@ QList<QObject *> Hwmon::pwmFans() const
     return list;
 }
 
-QList<QObject *> Hwmon::temps() const
+QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
     foreach (Temp *temp, m_temps)

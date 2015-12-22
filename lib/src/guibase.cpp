@@ -41,7 +41,9 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 #endif
 
     m_loader(new Loader(this)),
-    m_configValid(false)
+    m_configValid(false),
+    m_pwmFanModel(new PwmFanModel(this)),
+    m_tempModel(new TempModel(this))
 {
     connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
 
@@ -59,6 +61,12 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     qmlRegisterType<SystemdCommunicator>();
 #endif
 
+    m_tempModel->setUnit(m_unit);
+    foreach (Hwmon *hwmon, m_loader->hwmons())
+    {
+        m_pwmFanModel->addPwmFans(hwmon->pwmFans());
+        m_tempModel->addTemps(hwmon->temps());
+    }
 }
 
 void GUIBase::load()

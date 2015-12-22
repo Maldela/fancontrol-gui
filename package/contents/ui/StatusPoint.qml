@@ -29,8 +29,7 @@ Rectangle {
 
     property QtObject fan
     property Item background: parent
-    property real unsmoothedTemp: fan.temp ? fan.temp.value : minTemp
-    property real unscaledTemp: unsmoothedTemp
+    property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
     property real unscaledPwm: fan.pwm
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
@@ -38,7 +37,6 @@ Rectangle {
     readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
     property int unit: 0
-    property int smoothing: 2
 
     width: size
     height: size
@@ -46,11 +44,6 @@ Rectangle {
     x: MoreMath.bound(-width/2, background.scaleX(unscaledTemp) - width/2, background.width-width/2)
     y: background.scaleY(unscaledPwm) - height/2
     color: "black"
-
-    onUnsmoothedTempChanged: {
-        root.unscaledTemp = (root.unscaledTemp * smoothing + root.unsmoothedTemp) / (smoothing + 1);
-        console.log(root.unscaledTemp);
-    }
 
     Behavior on unscaledTemp {
         SpringAnimation {

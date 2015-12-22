@@ -5,15 +5,17 @@ set(LIB_SRCS src/hwmon.cpp
              src/pwmfan.cpp
              src/loader.cpp
              src/guibase.cpp
-             src/config.cpp)
-                        
+             src/config.cpp
+             src/pwmfanmodel.cpp
+             src/tempmodel.cpp)
+
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
                           KF5::Auth
                           KF5::ConfigCore
                           KF5::I18n)
 
 set(LIB_PUBLIC_LIBRARIES Qt5::Core)
-              
+
 if(NOT NO_SYSTEMD)
 
     set(LIB_SRCS ${LIB_SRCS}
@@ -39,5 +41,5 @@ generate_export_header(fancontrol_gui_lib)
 if(INSTALL_SHARED)
 
     install(TARGETS fancontrol_gui_lib ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-    
+
 endif(INSTALL_SHARED)

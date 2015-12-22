@@ -23,7 +23,6 @@ import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import org.kde.kcm 1.0
-import "../scripts/arrayfunctions.js" as ArrayFunctions
 import "../scripts/units.js" as Units
 
 

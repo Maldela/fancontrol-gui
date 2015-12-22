@@ -21,13 +21,15 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
-import "../scripts/arrayfunctions.js" as ArrayFunctions
 
 
 ColumnLayout {
     property QtObject baseObject
     property QtObject loader: baseObject ? baseObject.loader : null
     property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
+    property QtObject pwmFanModel: baseObject ? baseObject.pwmFanModel : null
+    property QtObject tempModel: baseObject ? baseObject.tempModel : null
+    property var pwmFans: pwmFanModel ? pwmFanModel.fans : null
 
     id: root
     anchors.fill: parent
@@ -35,7 +37,7 @@ ColumnLayout {
 
     RowLayout {
         width: parent.width
-        visible: loader && loader.allPwmFans.length > 0
+        visible: loader && pwmFanModel.count > 0
 
         Label {
             text: i18n("Fan:")
@@ -44,15 +46,8 @@ ColumnLayout {
         }
         ComboBox {
             id: fanComboBox
-            model: ListModel {
-                property var fans: loader.allPwmFans
-                id: fanList
-                Component.onCompleted: {
-                    for (var i=0; i<fans.length; i++) {
-                        fanList.append({"text": ArrayFunctions.nameWithPath(fans[i])});
-                    }
-                }
-            }
+            model: pwmFanModel
+            textRole: "display"
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         }
@@ -65,19 +60,15 @@ ColumnLayout {
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        active: !!baseObject.loader.allPwmFans[fanComboBox.currentIndex]
+        active: !!loader && !!systemdCom && !!pwmFans[fanComboBox.currentIndex]
+
         sourceComponent: PwmFan {
             unit: baseObject.unit
-            fan: loader.allPwmFans[fanComboBox.currentIndex]
-            loader: root.loader
-            systemdCom: baseObject.systemdCom
+            fan: pwmFans[fanComboBox.currentIndex]
+            tempModel: root.tempModel
+            systemdCom: root.systemdCom
             minTemp: baseObject.minTemp
             maxTemp: baseObject.maxTemp
-            onNameChanged: {
-                if (fanComboBox.currentText != ArrayFunctions.nameWithPath(fan)) {
-                    fanList.setProperty(fanComboBox.currentIndex, "text", ArrayFunctions.nameWithPath(fan));
-                }
-            }
         }
     }
 
@@ -85,7 +76,7 @@ ColumnLayout {
         id: noFansInfo
         anchors.centerIn: parent
         spacing: 20
-        visible: loader.allPwmFans.length == 0
+        visible: pwmFanModel.count == 0
 
         Label {
             Layout.alignment: Qt.AlignCenter
