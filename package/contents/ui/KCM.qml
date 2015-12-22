@@ -30,6 +30,9 @@ Item {
     property QtObject base: kcm.base
     property var locale: Qt.locale()
     property real textWidth: 0
+    property QtObject pwmFanModel: base ? base.pwmFanModel : null
+    property QtObject tempModel: base ? base.tempModel : null
+    property var pwmFans: pwmFanModel ? pwmFanModel.fans : null
 
     id: root
     implicitWidth: 1024
@@ -40,7 +43,7 @@ Item {
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         spacing: 20
-        visible: kcm.loader.allPwmFans.length == 0
+        visible: pwmFanModel.count == 0
 
         Label {
             Layout.alignment: Qt.AlignCenter
@@ -59,7 +62,7 @@ Item {
 
     CheckBox {
         id: enabledBox
-        visible: kcm.loader.allPwmFans.length > 0
+        visible: pwmFanModel.count > 0
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
         text: i18n("Control fans manually")
         checked: kcm.manualControl
@@ -78,7 +81,7 @@ Item {
         visible: enabledBox.checked
 
         RowLayout {
-            visible: enabledBox.checked && kcm.loader.allPwmFans.length > 0
+            visible: enabledBox.checked && pwmFanModel.count > 0
 
             Label {
                 text: i18n("Fan:")
@@ -87,15 +90,8 @@ Item {
             }
             ComboBox {
                 id: fanComboBox
-                model: ListModel {    //ListModel because array of names would reset currentIndex to 0 if a name changes
-                    property var fans: kcm.loader.allPwmFans
-                    id: fanList
-                    Component.onCompleted: {
-                        for (var i=0; i<fans.length; i++) {
-                            fanList.append({"text": ArrayFunctions.nameWithPath(fans[i])});
-                        }
-                    }
-                }
+                model: pwmFanModel
+                textRole: "display"
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
             }
@@ -110,19 +106,14 @@ Item {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            active: !!kcm.loader.allPwmFans[fanComboBox.currentIndex]
+            active: !!pwmFans[fanComboBox.currentIndex]
             sourceComponent: PwmFan {
                 unit: kcm.base.unit
-                fan: kcm.loader.allPwmFans[fanComboBox.currentIndex]
-                loader: kcm.loader
+                fan: pwmFans[fanComboBox.currentIndex]
                 systemdCom: kcm.systemdCom
+                tempModel: root.tempModel
                 minTemp: kcm.base.minTemp
                 maxTemp: kcm.base.maxTemp
-                onNameChanged: {
-                    if (fanComboBox.currentText != ArrayFunctions.nameWithPath(fan)) {
-                        fanList.setProperty(fanComboBox.currentIndex, "text", ArrayFunctions.nameWithPath(fan));
-                    }
-                }
             }
         }
 
