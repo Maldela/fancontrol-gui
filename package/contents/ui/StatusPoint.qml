@@ -49,7 +49,6 @@ Rectangle {
 
     onUnsmoothedTempChanged: {
         root.unscaledTemp = (root.unscaledTemp * smoothing + root.unsmoothedTemp) / (smoothing + 1);
-        console.log(root.unscaledTemp);
     }
 
     Behavior on unscaledTemp {
