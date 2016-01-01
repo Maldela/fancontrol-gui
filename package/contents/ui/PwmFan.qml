@@ -49,13 +49,12 @@ Rectangle {
             hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
             fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
         }
-        bgCanvas.requestPaint();
     }
 
     onFanChanged: update();
-    onMinTempChanged: if (fan) bgCanvas.requestPaint()
-    onMaxTempChanged: if (fan) bgCanvas.requestPaint()
-    onUnitChanged: if (fan) bgCanvas.requestRepaint()
+    onMinTempChanged: if (fan) meshCanvas.requestPaint()
+    onMaxTempChanged: if (fan) meshCanvas.requestPaint()
+    onUnitChanged: if (fan) meshCanvas.requestRepaint()
 
     SystemPalette {
         id: palette
@@ -207,7 +206,7 @@ Rectangle {
                     gradient.addColorStop(0, "rgb(0, 0, 255)");
                     gradient.addColorStop(1, "rgb(255, 0, 0)");
                     c.fillStyle = gradient;
-                    c.lineWidth = 2;
+                    c.lineWidth = graph.fontSize / 3;
                     c.strokeStyle = gradient;
                     c.lineJoin = "round";
                     c.beginPath();
@@ -234,9 +233,26 @@ Rectangle {
                     gradient.addColorStop(1, Colors.setAlpha(background.color, 0.9));
                     c.fillStyle = gradient;
                     c.fill();
+                }
+            }
+            Canvas {
+                id: meshCanvas
+
+                anchors.fill: parent
+                anchors.margins: parent.border.width
+                renderStrategy: Canvas.Cooperative
+
+                property alias pal: background.pal
+
+                onPaint: {
+                    var c = meshCanvas.getContext("2d");
+                    c.clearRect(0, 0, width, height);
 
                     //draw mesh
+                    c.beginPath();
                     c.strokeStyle = Colors.setAlpha(pal.text, 0.3);
+
+                    //horizontal lines
                     for (var i=0; i<=100; i+=20) {
                         var y = background.scaleY(i*2.55);
                         if (i != 0 && i != 100) {
@@ -246,12 +262,14 @@ Rectangle {
                             }
                         }
                     }
+
+                    //vertical lines
                     if (graph.horIntervals.length > 1) {
                         for (var i=1; i<graph.horIntervals.length; i++) {
                             var x = background.scaleX(Units.toCelsius(graph.horIntervals[i], unit));
                             for (var j=0; j<=height; j+=20) {
                                 c.moveTo(x, j);
-                                c.lineTo(x, Math.min(j+5, width));
+                                c.lineTo(x, Math.min(j+5, height));
                             }
                         }
                     }
@@ -282,7 +300,12 @@ Rectangle {
                         if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
                     }
                 }
-                onPositionChanged: bgCanvas.requestPaint()
+                onPositionChanged: {
+                    var left = fanOffCheckBox.checked ? x : 0;
+                    var width = maxPoint.x - left;
+                    var height = y - maxPoint.y;
+                    bgCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
+                }
             }
             PwmPoint {
                 id: maxPoint
@@ -300,7 +323,11 @@ Rectangle {
                         fan.maxTemp = Math.round(background.scaleTemp(centerX));
                     }
                 }
-                onPositionChanged: bgCanvas.requestPaint()
+                onPositionChanged: {
+                    var width = x - stopPoint.x;
+                    var height = stopPoint.y - y;
+                    bgCanvas.markDirty(Qt.rect(stopPoint.x, y, width, height));
+                }
             }
         }
     }
