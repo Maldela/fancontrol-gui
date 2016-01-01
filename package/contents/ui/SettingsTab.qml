@@ -27,9 +27,10 @@ import "../scripts/units.js" as Units
 
 Item {
     property QtObject gui
-    property QtObject systemdCom: gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
-    property QtObject loader : gui ? gui.loader : null
+    property QtObject systemdCom: !!gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
+    property QtObject loader : !!gui ? gui.loader : null
     property int padding: 10
+    property int unit: !!gui ? gui.unit : 0
     property real textWidth: 0
     property var locale: Qt.locale()
 
@@ -56,7 +57,7 @@ Item {
             SpinBox {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                value: gui.loader ? gui.loader.interval : 1
+                value: !!loader ? loader.interval : 1
                 suffix: " " + (value > 1 ? i18n("seconds") : i18n("second"))
                 minimumValue: 1.0
                 onValueChanged: gui.loader.interval = value
@@ -78,10 +79,14 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, gui.unit)
-                value: Units.fromCelsius(gui.minTemp, gui.unit)
-                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: gui.minTemp = value
+                minimumValue: Units.fromKelvin(0, unit)
+                value: !!gui ? Units.fromCelsius(gui.minTemp, unit) : 0
+                suffix: unit == 0 ? i18n("°C") : unit == 1 ? i18n("K") : i18n("°F")
+                onValueChanged: {
+                    if (!!gui) {
+                        gui.minTemp = value;
+                    }
+                }
             }
         }
         RowLayout {
@@ -101,9 +106,13 @@ Item {
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
                 minimumValue: minTempBox.value
-                value: Units.fromCelsius(gui.maxTemp, gui.unit)
-                suffix: gui.unit == 0 ? i18n("°C") : gui.unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: gui.maxTemp = value
+                value: !!gui ? Units.fromCelsius(gui.maxTemp, unit) : 0
+                suffix: unit == 0 ? i18n("°C") : unit == 1 ? i18n("K") : i18n("°F")
+                onValueChanged: {
+                    if (!!gui) {
+                        gui.maxTemp = value;
+                    }
+                }
             }
         }
         Loader {
@@ -121,9 +130,13 @@ Item {
                 OptionInput {
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
-                    color: systemdCom.serviceExists ? "green" : "red"
-                    value: gui.serviceName
-                    onTextChanged: gui.serviceName = text
+                    color: !!systemdCom && systemdCom.serviceExists ? "green" : "red"
+                    value: !!gui ? gui.serviceName : ""
+                    onTextChanged: {
+                        if (!!gui) {
+                            gui.serviceName = text;
+                        }
+                    }
                 }
             }
         }
@@ -143,8 +156,12 @@ Item {
                     id: autostartBox
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
-                    checked: systemdCom.serviceEnabled
-                    onCheckedChanged: systemdCom.serviceEnabled = checked
+                    checked: !!systemdCom ? systemdCom.serviceEnabled : false
+                    onCheckedChanged: {
+                        if (!!systemdCom) {
+                            systemdCom.serviceEnabled = checked;
+                        }
+                    }
                 }
             }
         }

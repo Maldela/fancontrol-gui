@@ -44,14 +44,6 @@ Rectangle {
     radius: 10
     clip: false
 
-    function update() {
-        if (fan) {
-            hasTempCheckBox.checked = Qt.binding(function() { return fan.hasTemp; })
-            fanOffCheckBox.checked = Qt.binding(function() { return (fan.minPwm == 0); })
-        }
-    }
-
-    onFanChanged: update();
     onMinTempChanged: if (fan) meshCanvas.requestPaint()
     onMaxTempChanged: if (fan) meshCanvas.requestPaint()
     onUnitChanged: if (fan) meshCanvas.requestRepaint()
@@ -76,14 +68,19 @@ Rectangle {
             topMargin: margin
         }
         visible: root.height >= height + margin*2
-        text: fan.name
-        onTextChanged: fan.name = text
+        text: !!fan ? fan.name : ""
         color: palette.text
         horizontalAlignment: TextEdit.AlignLeft
         wrapMode: TextEdit.Wrap
         font.bold: true
         font.pointSize: 14
         selectByMouse: true
+
+        onTextChanged: {
+            if (!!fan) {
+                fan.name = text;
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
@@ -96,7 +93,7 @@ Rectangle {
         id: graph
 
         property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
-        property QtObject pal: fan.hasTemp ? palette : disabledPalette
+        property QtObject pal: !!fan ? fan.hasTemp ? palette : disabledPalette : disabledPalette
         property string suffix: (root.unit == 0) ? "°C" : (root.unit == 1) ? "K" : "°F"
         property int verticalScalaCount: 6
         property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
@@ -279,22 +276,22 @@ Rectangle {
             StatusPoint {
                 id: currentPwm
                 size: graph.fontSize
-                visible: background.contains(center) && fan.hasTemp
+                visible: background.contains(center) && !!fan && fan.hasTemp
                 fan: root.fan
                 unit: root.unit
             }
             PwmPoint {
                 id: stopPoint
-                color: fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5))
+                color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
                 unit: root.unit
-                enabled: fan.hasTemp
+                enabled: !!fan ? fan.hasTemp : false
                 drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
                 drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
-                x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
-                y: fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
+                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
+                y: !!fan && fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
                 drag.onActiveChanged: {
-                    if (!drag.active) {
+                    if (!drag.active && !!fan) {
                         fan.minStop = Math.round(background.scalePwm(centerY));
                         fan.minTemp = Math.round(background.scaleTemp(centerX));
                         if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
@@ -309,14 +306,14 @@ Rectangle {
             }
             PwmPoint {
                 id: maxPoint
-                color: fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5))
+                color: !!fan ? fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
                 unit: root.unit
-                enabled: fan.hasTemp
+                enabled: !!fan ? fan.hasTemp : false
                 drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
                 drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
-                x: fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
-                y: fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
+                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
+                y: !!fan && fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
                 drag.onActiveChanged: {
                     if (!drag.active) {
                         fan.maxPwm = Math.round(background.scalePwm(centerY));
@@ -352,14 +349,21 @@ Rectangle {
             CheckBox {
                 id: hasTempCheckBox
                 text: i18n("Controlled by:")
-                checked: fan.hasTemp
+                checked: !!fan ? fan.hasTemp : false
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 onCheckedChanged: {
-                    fan.hasTemp = checked;
-                    if (checked) {
-                        fan.temp = tempModel.temps[tempBox.currentIndex];
+                    if (!!fan) {
+                        fan.hasTemp = checked;
+                        if (checked && !!tempModel.temps[tempBox.currentIndex]) {
+                            fan.temp = tempModel.temps[tempBox.currentIndex];
+                        }
+                        bgCanvas.requestPaint();
                     }
-                    bgCanvas.requestPaint();
+                }
+
+                Connections {
+                    target: fan
+                    onHasTempChanged: hasTempCheckBox.checked = fan.hasTemp;
                 }
             }
             RowLayout {
@@ -381,10 +385,17 @@ Rectangle {
             id: fanOffCheckBox
             text: i18n("Turn Fan off if temp < MINTEMP")
             enabled: hasTempCheckBox.checked
-            checked: fan.minPwm == 0
+            checked: !!fan ? fan.minPwm == 0 : false
             onCheckedChanged: {
-                fan.minPwm = checked ? 0 : fan.minStop;
-                bgCanvas.requestPaint();
+                if (!!fan) {
+                    fan.minPwm = checked ? 0 : fan.minStop;
+                    bgCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
+                }
+            }
+
+            Connections {
+                target: fan
+                onMinPwmChanged: fanOffCheckBox.checked = fan.minPwm == 0;
             }
         }
 
@@ -402,9 +413,13 @@ Rectangle {
                 minimumValue: 1
                 maximumValue: 100
                 decimals: 1
-                value: Math.round(fan.minStart / 2.55)
+                value: !!fan ? Math.round(fan.minStart / 2.55) : 0
                 suffix: i18n("%")
-                onValueChanged: fan.minStart = Math.round(value * 2.55)
+                onValueChanged: {
+                    if (!!fan) {
+                        fan.minStart = Math.round(value * 2.55)
+                    }
+                }
             }
         }
 
@@ -418,7 +433,7 @@ Rectangle {
                 property bool reactivateAfterTesting
 
                 id: testButton
-                text: fan.testing ? i18n("Abort test") : i18n("Test start and stop values")
+                text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
                 iconName: "dialog-password"
                 anchors.right: parent.right
                 onClicked: {

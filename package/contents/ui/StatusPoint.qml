@@ -29,8 +29,8 @@ Rectangle {
 
     property QtObject fan
     property Item background: parent
-    property real unscaledTemp: fan.temp ? fan.temp.value : minTemp
-    property real unscaledPwm: fan.pwm
+    property real unscaledTemp: !!fan && fan.hasTemp ? fan.temp.value : 0
+    property real unscaledPwm: !!fan ? fan.pwm : 0
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
@@ -82,7 +82,7 @@ Rectangle {
 
                 id: temp
                 font.pixelSize: root.height * 1.5
-                text: (fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + suffix
+                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + suffix
 
             }
             Label {
@@ -93,7 +93,7 @@ Rectangle {
             Label {
                 id: rpm
                 font.pixelSize: root.height * 1.5
-                text: fan.rpm + i18n("rpm")
+                text: (!!fan ? fan.rpm : "0") + i18n("rpm")
             }
         }
     }

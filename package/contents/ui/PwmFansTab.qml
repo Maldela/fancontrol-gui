@@ -63,12 +63,12 @@ ColumnLayout {
         active: !!loader && !!systemdCom && !!pwmFans[fanComboBox.currentIndex]
 
         sourceComponent: PwmFan {
-            unit: baseObject.unit
-            fan: pwmFans[fanComboBox.currentIndex]
+            unit: !!baseObject ? baseObject.unit : 0
+            fan: !!pwmFans ? pwmFans[fanComboBox.currentIndex] : null
             tempModel: root.tempModel
             systemdCom: root.systemdCom
-            minTemp: baseObject.minTemp
-            maxTemp: baseObject.maxTemp
+            minTemp: !!baseObject ? baseObject.minTemp : 30
+            maxTemp: !!baseObject ? baseObject.maxTemp : 100
         }
     }
 
@@ -76,7 +76,7 @@ ColumnLayout {
         id: noFansInfo
         anchors.centerIn: parent
         spacing: 20
-        visible: pwmFanModel.count == 0
+        visible: !!pwmFanModel ? pwmFanModel.count == 0 : false
 
         Label {
             Layout.alignment: Qt.AlignCenter
