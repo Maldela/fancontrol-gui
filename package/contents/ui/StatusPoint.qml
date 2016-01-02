@@ -29,7 +29,7 @@ Rectangle {
 
     property QtObject fan
     property Item background: parent
-    property real unscaledTemp: !!fan && fan.hasTemp ? fan.temp.value : 0
+    property real unscaledTemp: !!fan && fan.hasTemp && !!fan.temp ? fan.temp.value : 0
     property real unscaledPwm: !!fan ? fan.pwm : 0
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2

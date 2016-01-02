@@ -363,7 +363,7 @@ Rectangle {
 
                 Connections {
                     target: fan
-                    onHasTempChanged: hasTempCheckBox.checked = fan.hasTemp;
+                    onHasTempChanged: hasTempCheckBox.checked = Qt.binding(function() { return !!fan ? fan.hasTemp : null })
                 }
             }
             RowLayout {
@@ -395,7 +395,7 @@ Rectangle {
 
             Connections {
                 target: fan
-                onMinPwmChanged: fanOffCheckBox.checked = fan.minPwm == 0;
+                onMinPwmChanged: fanOffCheckBox.checked = hasTempCheckBox.checked = Qt.binding(function() { return !!fan ? fan.minPwm == 0 : false })
             }
         }
 
