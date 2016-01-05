@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman maldela@halloarsch.de
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +23,9 @@
 #include "config.h"
 
 
+#ifndef CONFIG_NAME
 #define CONFIG_NAME "fancontrol-gui"
+#endif
 
 #ifndef STANDARD_CONFIG_FILE
 #define STANDARD_CONFIG_FILE "/etc/fancontrol"
@@ -60,5 +61,3 @@ Config* Config::instance()
 }
 
 }
-
-// #include "config.moc"

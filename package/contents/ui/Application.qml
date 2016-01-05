@@ -31,7 +31,12 @@ ApplicationWindow {
     height: 768
     visible: true
 
-    onClosing: base.save()
+    onClosing: {
+        base.save();
+        windowConfig.save(window);
+    }
+    
+    Component.onCompleted: windowConfig.restore(window)
 
     menuBar: MenuBar {
         Menu {

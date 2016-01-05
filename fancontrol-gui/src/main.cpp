@@ -27,6 +27,7 @@
 #include <KCoreAddons/KAboutData>
 
 #include "lib/src/guibase.h"
+#include "windowconfig.h"
 
 
 int main(int argc, char *argv[])
@@ -47,21 +48,25 @@ int main(int argc, char *argv[])
     about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de");
     KAboutData::setApplicationData(about);
 
-    QQmlApplicationEngine engine;
-
+    QScopedPointer<QQmlApplicationEngine> engine(new QQmlApplicationEngine);
+    QQmlContext *context = engine->rootContext();
+    
     KDeclarative::KDeclarative decl;
-    decl.setDeclarativeEngine(&engine);
+    decl.setDeclarativeEngine(engine.data());
     decl.setupBindings();
 
     Fancontrol::GUIBase base;
     base.load();
-    engine.rootContext()->setContextProperty("base", &base);
+    context->setContextProperty("base", &base);
+    
+    WindowConfig *windowConfig = WindowConfig::instance();
+    context->setContextProperty("windowConfig", windowConfig);
 
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");
     package.setDefaultPackageRoot("kpackage/kcms");
     package.setPath("kcm_fancontrol");
 
-    engine.load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
+    engine->load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
 
     return app.exec();
 }

@@ -87,15 +87,18 @@ public:
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); m_tempModel->setUnit(unit); } }
-    void load();
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
     TempModel *tempModel() const { return m_tempModel; };
-
-
-    Q_INVOKABLE void save(bool saveLoader = false, const QUrl &url = QUrl());
+    
     Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
 
 
+public slots:
+    
+    void save(bool saveLoader = false, const QUrl &url = QUrl());
+    void load();
+    
+    
 signals:
 
     void minTempChanged();

@@ -1,12 +1,14 @@
-set(Fancontrol_GUI_SRCS src/main.cpp)
+set(Fancontrol_GUI_SRCS src/main.cpp
+                        src/windowconfig.cpp)
 
 set(LIBRARIES fancontrol_gui_lib
               Qt5::Widgets
               KF5::Declarative
-              KF5::I18n)
+              KF5::I18n
+              KF5::ConfigGui)
               
-find_package(Qt5Widgets REQUIRED)
-find_package(KF5Declarative REQUIRED)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(KF5 COMPONENTS Declarative Config REQUIRED)
 
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 add_definitions(${Qt5Widgets_DEFINITIONS})

@@ -21,7 +21,6 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
-import QtQml 2.2
 import "../scripts/units.js" as Units
 
 
@@ -58,9 +57,13 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 value: !!loader ? loader.interval : 1
-                suffix: " " + (value > 1 ? i18n("seconds") : i18n("second"))
+                suffix: " " + i18np("second", "seconds", Math.round(value))
                 minimumValue: 1.0
-                onValueChanged: gui.loader.interval = value
+                onValueChanged: {
+                    if (!!loader) {
+                        loader.interval = value;
+                    }
+                }
             }
         }
         RowLayout {
@@ -116,7 +119,7 @@ Item {
             }
         }
         Loader {
-            active: systemdCom
+            active: !!systemdCom
             sourceComponent: RowLayout {
                 width: column.width
 
@@ -141,7 +144,7 @@ Item {
             }
         }
         Loader {
-            active: systemdCom
+            active: !!systemdCom
             sourceComponent: RowLayout {
                 width: column.width
 
