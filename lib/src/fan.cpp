@@ -35,7 +35,7 @@ namespace Fancontrol
 {
 
 Fan::Fan(Hwmon *parent, uint index) :
-    Sensor(parent, index, QString(parent->name() + QString("/fan") + QString::number(index))),
+    Sensor(parent, index, QString(parent->name() + QStringLiteral("/fan") + QString::number(index))),
     m_rpmStream(new QTextStream)
 {
     if (QDir(parent->path()).isReadable())
@@ -59,7 +59,7 @@ Fan::~Fan()
 
 QString Fan::name() const
 {
-    KConfigGroup names = KSharedConfig::openConfig("fancontrol-gui")->group("names");
+    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
     QString name = localNames.readEntry("fan" + QString::number(m_index), QString());
     if (name.isEmpty())
@@ -69,7 +69,7 @@ QString Fan::name() const
 
 void Fan::setName(const QString &name)
 {
-    KConfigGroup names = KSharedConfig::openConfig("fancontrol-gui")->group("names");
+    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
     if (name != localNames.readEntry("fan" + QString::number(m_index), QString())
         && !name.isEmpty())

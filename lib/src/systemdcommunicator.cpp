@@ -68,16 +68,15 @@ namespace Fancontrol
 {
 
 SystemdCommunicator::SystemdCommunicator(QObject *parent, const QString &serviceName) : QObject(parent),
-    m_error(""),
-    m_managerInterface(new QDBusInterface("org.freedesktop.systemd1",
-                                          "/org/freedesktop/systemd1",
-                                          "org.freedesktop.systemd1.Manager",
+    m_managerInterface(new QDBusInterface(QStringLiteral("org.freedesktop.systemd1"),
+                                          QStringLiteral("/org/freedesktop/systemd1"),
+                                          QStringLiteral("org.freedesktop.systemd1.Manager"),
                                           QDBusConnection::systemBus(),
                                           this)),
     m_serviceInterface(Q_NULLPTR)
 {
     if (serviceName.isEmpty())
-        setServiceName(STANDARD_SERVICE_NAME);
+        setServiceName(QStringLiteral(STANDARD_SERVICE_NAME));
     else
         setServiceName(serviceName);
 
@@ -92,10 +91,10 @@ void SystemdCommunicator::setServiceName(const QString &name)
     {
         if (m_serviceInterface)
         {
-            QDBusConnection::systemBus().disconnect("org.freedesktop.systemd1",
+            QDBusConnection::systemBus().disconnect(QStringLiteral("org.freedesktop.systemd1"),
                                                     m_serviceObjectPath,
-                                                    "org.freedesktop.DBus.Properties",
-                                                    "PropertiesChanged",
+                                                    QStringLiteral("org.freedesktop.DBus.Properties"),
+                                                    QStringLiteral("PropertiesChanged"),
                                                     this,
                                                     SLOT(updateServiceProperties(QString, QVariantMap, QStringList)));
             m_serviceInterface->deleteLater();
@@ -108,7 +107,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
         {
             QVariantList arguments;
             arguments << QVariant(m_serviceName + ".service");
-            QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, "LoadUnit", arguments);
+            QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, QStringLiteral("LoadUnit"), arguments);
             if (dbusreply.type() == QDBusMessage::ErrorMessage)
             {
                 m_error = dbusreply.errorMessage();
@@ -119,15 +118,15 @@ void SystemdCommunicator::setServiceName(const QString &name)
             {
                 m_serviceObjectPath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().at(0)).path();
 
-                m_serviceInterface = new QDBusInterface("org.freedesktop.systemd1",
+                m_serviceInterface = new QDBusInterface(QStringLiteral("org.freedesktop.systemd1"),
                                                         m_serviceObjectPath,
-                                                        "org.freedesktop.systemd1.Unit",
+                                                        QStringLiteral("org.freedesktop.systemd1.Unit"),
                                                         QDBusConnection::systemBus(),
                                                         this);
-                QDBusConnection::systemBus().connect("org.freedesktop.systemd1",
+                QDBusConnection::systemBus().connect(QStringLiteral("org.freedesktop.systemd1"),
                                                      m_serviceObjectPath,
-                                                     "org.freedesktop.DBus.Properties",
-                                                     "PropertiesChanged",
+                                                     QStringLiteral("org.freedesktop.DBus.Properties"),
+                                                     QStringLiteral("PropertiesChanged"),
                                                      this,
                                                      SLOT(updateServiceProperties(QString, QVariantMap, QStringList)));
             }
@@ -150,7 +149,7 @@ bool SystemdCommunicator::serviceExists()
     QDBusMessage dbusreply;
 
     if (m_managerInterface && m_managerInterface->isValid())
-        dbusreply = m_managerInterface->call(QDBus::AutoDetect, "ListUnitFiles");
+        dbusreply = m_managerInterface->call(QDBus::AutoDetect, QStringLiteral("ListUnitFiles"));
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
@@ -173,7 +172,7 @@ bool SystemdCommunicator::serviceActive()
 {
     if (serviceExists() && m_serviceInterface)
     {
-        if (m_serviceInterface->property("ActiveState").toString() == "active")
+        if (m_serviceInterface->property("ActiveState").toString() == QStringLiteral("active"))
             return true;
     }
     return false;
@@ -183,7 +182,7 @@ bool SystemdCommunicator::serviceEnabled()
 {
     if (serviceExists() && m_serviceInterface)
     {
-        if (m_serviceInterface->property("UnitFileState").toString() == "enabled")
+        if (m_serviceInterface->property("UnitFileState").toString() == QStringLiteral("enabled"))
             return true;
 
     }
@@ -196,7 +195,7 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
     {
         if (enabled != serviceEnabled())
         {
-            QString action = enabled ? "EnableUnitFiles" : "DisableUnitFiles";
+            QString action = enabled ? QStringLiteral("EnableUnitFiles") : QStringLiteral("DisableUnitFiles");
             QStringList files = QStringList() << m_serviceName + ".service";
             QVariantList arguments = QVariantList() << files << false;
             if (enabled)
@@ -204,7 +203,7 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
 
             if (dbusAction(action, arguments))
             {
-                if (dbusAction("Reload"))
+                if (dbusAction(QStringLiteral("Reload")))
                 {
                     emit serviceEnabledChanged();
                     return true;
@@ -226,7 +225,7 @@ bool SystemdCommunicator::setServiceActive(bool active)
         if (active != serviceActive())
         {
             QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
-            QString action = active ? "ReloadOrRestartUnit" : "StopUnit";
+            QString action = active ? QStringLiteral("ReloadOrRestartUnit") : QStringLiteral("StopUnit");
 
             if (dbusAction(action, args))
             {
@@ -259,13 +258,13 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
-        if (dbusreply.errorMessage() == "Interactive authentication required.")
+        if (dbusreply.errorMessage() == QStringLiteral("Interactive authentication required."))
         {
             KAuth::Action action = newFancontrolAction();
             QVariantMap map;
-            map["action"] = "dbusaction";
-            map["method"] = method;
-            map["arguments"] = arguments;
+            map[QStringLiteral("action")] = "dbusaction";
+            map[QStringLiteral("method")] = method;
+            map[QStringLiteral("arguments")] = arguments;
             action.setArguments(map);
 
             KAuth::ExecuteJob *job = action.execute();
@@ -310,7 +309,7 @@ bool SystemdCommunicator::restartService()
     {
         QVariantList args;
         args << m_serviceName + ".service" << "replace";
-        return dbusAction("ReloadOrRestartUnit", args);
+        return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 
     setError(i18n("Service does not exist"));
@@ -319,10 +318,10 @@ bool SystemdCommunicator::restartService()
 
 void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchanged, QStringList)
 {
-    if (propchanged.value("ActiveState").isValid())
+    if (propchanged.value(QStringLiteral("ActiveState")).isValid())
         emit serviceActiveChanged();
 
-    if (propchanged.value("UnitFileState").isValid())
+    if (propchanged.value(QStringLiteral("UnitFileState")).isValid())
         emit serviceEnabledChanged();
 }
 

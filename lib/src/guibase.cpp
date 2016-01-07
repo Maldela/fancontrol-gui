@@ -91,29 +91,29 @@ void GUIBase::save(bool saveLoader, const QUrl &url)
 
 qreal GUIBase::maxTemp() const
 {
-    return m_config->findItem("MaxTemp")->property().toReal();
+    return m_config->findItem(QStringLiteral("MaxTemp"))->property().toReal();
 }
 
 qreal GUIBase::minTemp() const
 {
-    return m_config->findItem("MinTemp")->property().toReal();
+    return m_config->findItem(QStringLiteral("MinTemp"))->property().toReal();
 }
 
 QString GUIBase::serviceName() const
 {
-    return m_config->findItem("ServiceName")->property().toString();
+    return m_config->findItem(QStringLiteral("ServiceName"))->property().toString();
 }
 
 QUrl GUIBase::configUrl() const
 {
-    return QUrl::fromLocalFile(m_config->findItem("ConfigUrl")->property().toString());
+    return QUrl::fromLocalFile(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
 }
 
 void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
     {
-        m_config->findItem("MaxTemp")->setProperty(temp);
+        m_config->findItem(QStringLiteral("MaxTemp"))->setProperty(temp);
         emit maxTempChanged();
     }
 }
@@ -122,7 +122,7 @@ void GUIBase::setMinTemp(qreal temp)
 {
     if (temp != minTemp())
     {
-        m_config->findItem("MinTemp")->setProperty(temp);
+        m_config->findItem(QStringLiteral("MinTemp"))->setProperty(temp);
         emit minTempChanged();
     }
 }
@@ -131,7 +131,7 @@ void GUIBase::setServiceName(const QString& name)
 {
     if(name != serviceName())
     {
-        m_config->findItem("ServiceName")->setProperty(name);
+        m_config->findItem(QStringLiteral("ServiceName"))->setProperty(name);
 
 #ifndef NO_SYSTEMD
         m_com->setServiceName(name);
@@ -145,7 +145,7 @@ void GUIBase::setConfigUrl(const QUrl &url)
 {
     if (url != configUrl())
     {
-        m_config->findItem("ConfigUrl")->setProperty(url.toString(QUrl::PreferLocalFile));
+        m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString(QUrl::PreferLocalFile));
         m_configValid = m_loader->load(url);
         emit configUrlChanged();
     }

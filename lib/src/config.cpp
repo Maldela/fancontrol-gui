@@ -41,13 +41,13 @@ namespace Fancontrol
 
 Config *Config::m_instance = Q_NULLPTR;
 
-Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(CONFIG_NAME), parent)
+Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), parent)
 {
-    setCurrentGroup("preferences");
-    addItemDouble("MinTemp", m_minTemp, 30.0);
-    addItemDouble("MaxTemp", m_maxTemp, 90.0);
-    addItemString("ServiceName", m_serviceName, QString(STANDARD_SERVICE_NAME));
-    addItemPath("ConfigUrl", m_configUrl, QString("file://") + QString(STANDARD_CONFIG_FILE));
+    setCurrentGroup(QStringLiteral("preferences"));
+    addItemDouble(QStringLiteral("MinTemp"), m_minTemp, 30.0);
+    addItemDouble(QStringLiteral("MaxTemp"), m_maxTemp, 90.0);
+    addItemString(QStringLiteral("ServiceName"), m_serviceName, QStringLiteral(STANDARD_SERVICE_NAME));
+    addItemPath(QStringLiteral("ConfigUrl"), m_configUrl, QStringLiteral("file://") + QStringLiteral(STANDARD_CONFIG_FILE));
     
     load();
 }

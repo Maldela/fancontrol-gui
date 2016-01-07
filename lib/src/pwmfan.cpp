@@ -178,9 +178,9 @@ bool PwmFan::setPwm(int pwm, bool write)
             {
                 KAuth::Action action = newFancontrolAction();
                 QVariantMap map;
-                map["action"] = "write";
-                map["filename"] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
-                map["content"] = QString::number(pwm);
+                map[QStringLiteral("action")] = "write";
+                map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
+                map[QStringLiteral("content")] = QString::number(pwm);
                 action.setArguments(map);
                 KAuth::ExecuteJob *job = action.execute();
                 connect(job, SIGNAL(result(KJob*)), this, SLOT(handleSetPwmResult(KJob*)));
@@ -226,9 +226,9 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                 KAuth::Action action = newFancontrolAction();
                 
                 QVariantMap map;
-                map["action"] = "write";
-                map["filename"] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
-                map["content"] = QString::number(pwmMode);
+                map[QStringLiteral("action")] = QVariant("write");
+                map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
+                map[QStringLiteral("content")] = QString::number(pwmMode);
                 action.setArguments(map);
                 KAuth::ExecuteJob *job = action.execute();
                 connect(job, SIGNAL(result(KJob*)), this, SLOT(handleSetPwmModeResult(KJob*)));
@@ -392,14 +392,14 @@ bool PwmFan::testing() const
 
 bool PwmFan::active() const
 {
-    KConfigGroup active = KSharedConfig::openConfig("fancontrol-gui")->group("active");
+    KConfigGroup active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
     KConfigGroup localActive = active.group(m_parent->name());
     return localActive.readEntry("pwmfan" + QString::number(m_index), true);
 }
 
 void PwmFan::setActive(bool a)
 {
-    KConfigGroup active = KSharedConfig::openConfig("fancontrol-gui")->group("active");
+    KConfigGroup active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
     KConfigGroup localActive = active.group(m_parent->name());
     if (a != localActive.readEntry("pwmfan" + QString::number(m_index), true))
     {

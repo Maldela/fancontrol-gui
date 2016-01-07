@@ -36,16 +36,16 @@ int main(int argc, char *argv[])
 
     KLocalizedString::setApplicationDomain("kcm_fancontrol");
 
-    KAboutData about("fancontrol_gui",
-                    i18n("Fancontrol-GUI"),
-                    "0.1",
-                    i18n("Graphical user interface for fancontrol"),
-                    KAboutLicense::KAboutLicense::GPL_V2,
-                    "Copyright (C) 2015 Malte Veerman",
-                    QString(),
-                    "http://github.com/maldela/fancontrol-gui",
-                    "http://github.com/maldela/fancontrol-gui/issues");
-    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de");
+    KAboutData about(QStringLiteral("fancontrol_gui"),
+                     i18n("Fancontrol-GUI"),
+                     QStringLiteral("0.1"),
+                     i18n("Graphical user interface for fancontrol"),
+                     KAboutLicense::KAboutLicense::GPL_V2,
+                     QStringLiteral("Copyright (C) 2015 Malte Veerman"),
+                     QString(),
+                     QStringLiteral("http://github.com/maldela/fancontrol-gui"),
+                     QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
+    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
     KAboutData::setApplicationData(about);
 
     QScopedPointer<QQmlApplicationEngine> engine(new QQmlApplicationEngine);
@@ -57,14 +57,14 @@ int main(int argc, char *argv[])
 
     Fancontrol::GUIBase base;
     base.load();
-    context->setContextProperty("base", &base);
+    context->setContextProperty(QStringLiteral("base"), &base);
     
     WindowConfig *windowConfig = WindowConfig::instance();
-    context->setContextProperty("windowConfig", windowConfig);
+    context->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
 
-    KPackage::Package package = KPackage::PackageLoader::self()->loadPackage("KPackage/GenericQML");
-    package.setDefaultPackageRoot("kpackage/kcms");
-    package.setPath("kcm_fancontrol");
+    KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
+    package.setDefaultPackageRoot(QStringLiteral("kpackage/kcms"));
+    package.setPath(QStringLiteral("kcm_fancontrol"));
 
     engine->load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
 

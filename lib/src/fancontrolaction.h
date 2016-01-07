@@ -34,8 +34,8 @@ namespace Fancontrol
 
 inline KAuth::Action newFancontrolAction()
 {
-    KAuth::Action action("fancontrol.gui.helper.action");
-    action.setHelperId("fancontrol.gui.helper");
+    KAuth::Action action(QStringLiteral("fancontrol.gui.helper.action"));
+    action.setHelperId(QStringLiteral("fancontrol.gui.helper"));
     
     if (!action.isValid())
         qDebug() << "Action is invalid!";

@@ -40,20 +40,20 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     if (!m_base->hasSystemdCommunicator())
         qFatal("Fancontrol-gui-lib was compiled without systemd support!");
 
-    KAboutData *about = new KAboutData("kcm_fancontrol",
+    KAboutData *about = new KAboutData(QStringLiteral("kcm_fancontrol"),
                                        i18n("Fancontrol-KCM"),
-                                       "0.1",
+                                       QStringLiteral("0.1"),
                                        i18n("KDE Fancontrol Module"),
                                        KAboutLicense::KAboutLicense::GPL_V2,
-                                       "Copyright (C) 2015 Malte Veerman",
+                                       QStringLiteral("Copyright (C) 2015 Malte Veerman"),
                                        QString(),
-                                       "http://github.com/maldela/fancontrol-gui",
-                                       "http://github.com/maldela/fancontrol-gui/issues");
-    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), "maldela@halloarsch.de");
+                                       QStringLiteral("http://github.com/maldela/fancontrol-gui"),
+                                       QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
+    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
     setAboutData(about);
 
     setButtons(Apply | Default);
-    setAuthActionName("fancontrol.gui.helper.action");
+    setAuthActionName(QStringLiteral("fancontrol.gui.helper.action"));
 
     connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
     connect(m_base, &GUIBase::minTempChanged, [this] () { setNeedsSave(true); });

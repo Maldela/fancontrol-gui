@@ -39,7 +39,7 @@ Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     }
 
     bool success;
-    m_index = path.split('/').last().remove("hwmon").toInt(&success);
+    m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toInt(&success);
     if (!success)
     {
         emit errorChanged(path + "is invalid!");
@@ -65,11 +65,11 @@ void Hwmon::initialize()
 {
     QDir dir(m_path);
     QStringList entrys = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach (QString entry, entrys)
+    foreach (const QString &entry, entrys)
     {
         QString str = entry;
         uint index = str.remove(QRegExp("\\D+")).toUInt();
-        if (entry.contains("fan") && entry.contains("input"))
+        if (entry.contains(QStringLiteral("fan")) && entry.contains(QStringLiteral("input")))
         {
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
@@ -124,7 +124,7 @@ void Hwmon::initialize()
             }
         }
 
-        if (entry.contains("temp") && entry.contains("input"))
+        if (entry.contains(QStringLiteral("temp")) && entry.contains(QStringLiteral("input")))
         {
             Temp *newTemp = Q_NULLPTR;
 

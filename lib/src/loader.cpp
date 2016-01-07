@@ -45,8 +45,7 @@ namespace Fancontrol
 
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
-    m_configUrl(QUrl::fromLocalFile(STANDARD_CONFIG_FILE)),
-    m_error(""),
+    m_configUrl(QUrl::fromLocalFile(QStringLiteral(STANDARD_CONFIG_FILE))),
     m_timer(new QTimer(this))
 {
     parseHwmons();
@@ -59,19 +58,19 @@ Loader::Loader(QObject *parent) : QObject(parent),
 
 void Loader::parseHwmons()
 {
-    QDir hwmonDir(HWMON_PATH);
+    QDir hwmonDir(QStringLiteral(HWMON_PATH));
     QStringList list;
     if (hwmonDir.isReadable())
         list = hwmonDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
 
     else if (hwmonDir.exists())
     {
-        setError(i18n("%1 is not readable!", QString(HWMON_PATH)), true);
+        setError(i18n("%1 is not readable!", QStringLiteral(HWMON_PATH)), true);
         return;
     }
     else
     {
-        setError(i18n("%1 does not exist!", QString(HWMON_PATH)), true);
+        setError(i18n("%1 does not exist!", QStringLiteral(HWMON_PATH)), true);
         return;
     }
 
@@ -156,7 +155,7 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     QString hwmon = list.at(0);
     QString sensor = list.at(1);
 
-    if (!hwmon.startsWith("hwmon"))
+    if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
         qWarning() << "Invalid entry to parse:" << entry << "Should begin with \"hwmon\"";
         return QPair<int, int>(-1, -1);
@@ -169,9 +168,9 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 
     bool success;
 
-    hwmon.remove("hwmon");
+    hwmon.remove(QStringLiteral("hwmon"));
     sensor.remove(QRegExp("^(pwm|fan|temp)"));
-    sensor.remove("_input");
+    sensor.remove(QStringLiteral("_input"));
 
     int hwmonResult = hwmon.toInt(&success);
     if (!success)
@@ -267,8 +266,8 @@ bool Loader::load(const QUrl &url)
     {
         KAuth::Action action = newFancontrolAction();
         QVariantMap map;
-        map["action"] = "read";
-        map["filename"] = fileName;
+        map[QStringLiteral("action")] = QVariant("read");
+        map[QStringLiteral("filename")] = fileName;
         action.setArguments(map);
         KAuth::ExecuteJob *reply = action.execute();
         if (!reply->exec())
@@ -285,7 +284,7 @@ bool Loader::load(const QUrl &url)
                 emit configUrlChanged();
             }
 
-            fileContent = reply->data()["content"].toString();
+            fileContent = reply->data().value(QStringLiteral("content")).toString();
         }
     }
     else
@@ -327,9 +326,9 @@ bool Loader::load(const QUrl &url)
 
     foreach (QString line, lines)
     {
-        if (line.startsWith("INTERVAL="))
+        if (line.startsWith(QStringLiteral("INTERVAL=")))
         {
-            line.remove("INTERVAL=");
+            line.remove(QStringLiteral("INTERVAL="));
             bool success;
             int interval = line.toInt(&success);
             if (success)
@@ -346,9 +345,9 @@ bool Loader::load(const QUrl &url)
                 return false;
             }
         }
-        else if (line.startsWith("FCTEMPS="))
+        else if (line.startsWith(QStringLiteral("FCTEMPS=")))
         {
-            line.remove("FCTEMPS=");
+            line.remove(QStringLiteral("FCTEMPS="));
             QStringList fctemps = line.split(' ');
             foreach (const QString &fctemp, fctemps)
             {
@@ -371,9 +370,9 @@ bool Loader::load(const QUrl &url)
                     qWarning() << "Invalid entry:" << fctemp;
             }
         }
-        else if (line.startsWith("DEVNAME="))
+        else if (line.startsWith(QStringLiteral("DEVNAME=")))
         {
-            line.remove("DEVNAME=");
+            line.remove(QStringLiteral("DEVNAME="));
             QStringList devnames = line.split(' ');
             foreach (const QString &devname, devnames)
             {
@@ -383,7 +382,7 @@ bool Loader::load(const QUrl &url)
                     QString hwmon = indexNamePair.at(0);
                     QString name = indexNamePair.at(1);
                     bool success;
-                    Hwmon *hwmonPointer = m_hwmons.value(hwmon.remove("hwmon").toInt(&success), Q_NULLPTR);
+                    Hwmon *hwmonPointer = m_hwmons.value(hwmon.remove(QStringLiteral("hwmon")).toInt(&success), Q_NULLPTR);
                     if (!success)
                     {
                         //Connect hwmons again
@@ -406,38 +405,38 @@ bool Loader::load(const QUrl &url)
                 }
             }
         }
-        else if (line.startsWith("MINTEMP="))
+        else if (line.startsWith(QStringLiteral("MINTEMP=")))
         {
-            line.remove("MINTEMP=");
+            line.remove(QStringLiteral("MINTEMP="));
             parseConfigLine(line, &PwmFan::setMinTemp);
         }
-        else if (line.startsWith("MAXTEMP="))
+        else if (line.startsWith(QStringLiteral("MAXTEMP=")))
         {
-            line.remove("MAXTEMP=");
+            line.remove(QStringLiteral("MAXTEMP="));
             parseConfigLine(line, &PwmFan::setMaxTemp);
         }
-        else if (line.startsWith("MINSTART="))
+        else if (line.startsWith(QStringLiteral("MINSTART=")))
         {
-            line.remove("MINSTART=");
+            line.remove(QStringLiteral("MINSTART="));
             parseConfigLine(line, &PwmFan::setMinStart);
         }
-        else if (line.startsWith("MINSTOP="))
+        else if (line.startsWith(QStringLiteral("MINSTOP=")))
         {
-            line.remove("MINSTOP=");
+            line.remove(QStringLiteral("MINSTOP="));
             parseConfigLine(line, &PwmFan::setMinStop);
         }
-        else if (line.startsWith("MINPWM="))
+        else if (line.startsWith(QStringLiteral("MINPWM=")))
         {
-            line.remove("MINPWM=");
+            line.remove(QStringLiteral("MINPWM="));
             parseConfigLine(line, &PwmFan::setMinPwm);
         }
-        else if (line.startsWith("MAXPWM="))
+        else if (line.startsWith(QStringLiteral("MAXPWM=")))
         {
-            line.remove("MAXPWM=");
+            line.remove(QStringLiteral("MAXPWM="));
             parseConfigLine(line, &PwmFan::setMaxPwm);
         }
-        else if (!line.startsWith("DEVPATH=") &&
-                 !line.startsWith("FCFANS="))
+        else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
+            !line.startsWith(QStringLiteral("FCFANS=")))
         {
             //Connect hwmons again
             foreach (Hwmon *hwmon, m_hwmons)
@@ -487,9 +486,9 @@ bool Loader::save(const QUrl &url)
     {
         KAuth::Action action = newFancontrolAction();
         QVariantMap map;
-        map["action"] = "write";
-        map["filename"] = fileName;
-        map["content"] = m_configFile;
+        map[QStringLiteral("action")] = QVariant("write");
+        map[QStringLiteral("filename")] = fileName;
+        map[QStringLiteral("content")] = m_configFile;
 
         action.setArguments(map);
         KAuth::ExecuteJob *reply = action.execute();
@@ -525,105 +524,105 @@ void Loader::createConfigFile()
         }
     }
 
-    QString configFile = "# This file was created by Fancontrol-GUI \n";
+    QString configFile = QStringLiteral("# This file was created by Fancontrol-GUI") + QChar(QChar::LineFeed);
 
     if (m_interval != 0)
-        configFile += "INTERVAL=" + QString::number(m_interval) + "\n";
+        configFile += QStringLiteral("INTERVAL=") + QString::number(m_interval) + QChar(QChar::LineFeed);
 
     if (!usedHwmons.isEmpty())
     {
-        configFile += "DEVPATH=";
+        configFile += QStringLiteral("DEVPATH=");
         foreach (Hwmon *hwmon, usedHwmons)
         {
             QString sanitizedPath = hwmon->path();
             sanitizedPath.remove(QRegExp("^/sys/"));
             sanitizedPath.remove(QRegExp("/hwmon/hwmon\\d\\s*$"));
-            configFile += "hwmon" + QString::number(hwmon->index()) + "=" + sanitizedPath + " ";
+            configFile += QStringLiteral("hwmon") + QString::number(hwmon->index()) + "=" + sanitizedPath + QChar(QChar::Space);
         }
-        configFile += "\n";
-
-        configFile += "DEVNAME=";
+        configFile += QChar(QChar::LineFeed);
+        
+        configFile += QStringLiteral("DEVNAME=");
         foreach (Hwmon *hwmon, usedHwmons)
         {
-            configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + " ";
+            configFile += QStringLiteral("hwmon") + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + QChar(QChar::Space);
         }
-        configFile += "\n";
-
+        configFile += QChar(QChar::LineFeed);
+        
         if (!usedFans.isEmpty())
         {
-            configFile += "FCTEMPS=";
+            configFile += QStringLiteral("FCTEMPS=");
             foreach (PwmFan *pwmFan, usedFans)
             {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += "hwmon" + QString::number(pwmFan->temp()->parent()->index()) + "/";
-                configFile += "temp" + QString::number(pwmFan->temp()->index()) + "_input ";
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->temp()->parent()->index()) + "/";
+                configFile += QStringLiteral("temp") + QString::number(pwmFan->temp()->index()) + QStringLiteral("_input ");
             }
-            configFile += "\n";
+            configFile += QChar(QChar::LineFeed);
+            
+            configFile += QStringLiteral("FCFANS=");
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("fan") + QString::number(pwmFan->index()) + QStringLiteral("_input ");
+            }
+            configFile += QChar(QChar::LineFeed);
+            
+            configFile += QStringLiteral("MINTEMP=");
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minTemp()) + QChar(QChar::Space);
+            }
+            configFile += QChar(QChar::LineFeed);
+            
+            configFile += QStringLiteral("MAXTEMP=");
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->maxTemp()) + QChar(QChar::Space);
+            }
+            configFile += QChar(QChar::LineFeed);
+            
+            configFile += QStringLiteral("MINSTART=");
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minStart()) + QChar(QChar::Space);
+            }
+            configFile += QChar(QChar::LineFeed);
+            
+            configFile += QStringLiteral("MINSTOP=");
+            foreach (PwmFan *pwmFan, usedFans)
+            {
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minStop()) + QChar(QChar::Space);
+            }
+            configFile += QChar(QChar::LineFeed);
 
-            configFile += "FCFANS=";
+            configFile += QStringLiteral("MINPWM=");
             foreach (PwmFan *pwmFan, usedFans)
             {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "fan" + QString::number(pwmFan->index()) + "_input ";
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->minPwm()) + QChar(QChar::Space);
             }
-            configFile += "\n";
+            configFile += QChar(QChar::LineFeed);
 
-            configFile += "MINTEMP=";
+            configFile += QStringLiteral("MAXPWM=");
             foreach (PwmFan *pwmFan, usedFans)
             {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->minTemp()) + " ";
+                configFile += QStringLiteral("hwmon") + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += QStringLiteral("pwm") + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->maxPwm()) + QChar(QChar::Space);
             }
-            configFile += "\n";
-
-            configFile += "MAXTEMP=";
-            foreach (PwmFan *pwmFan, usedFans)
-            {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->maxTemp()) + " ";
-            }
-            configFile += "\n";
-
-            configFile += "MINSTART=";
-            foreach (PwmFan *pwmFan, usedFans)
-            {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->minStart()) + " ";
-            }
-            configFile += "\n";
-
-            configFile += "MINSTOP=";
-            foreach (PwmFan *pwmFan, usedFans)
-            {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->minStop()) + " ";
-            }
-            configFile += "\n";
-
-            configFile += "MINPWM=";
-            foreach (PwmFan *pwmFan, usedFans)
-            {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->minPwm()) + " ";
-            }
-            configFile += "\n";
-
-            configFile += "MAXPWM=";
-            foreach (PwmFan *pwmFan, usedFans)
-            {
-                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
-                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
-                configFile += QString::number(pwmFan->maxPwm()) + " ";
-            }
-            configFile += "\n";
+            configFile += QChar(QChar::LineFeed);
         }
     }
 
@@ -666,7 +665,7 @@ void Loader::detectSensors()
 {
     KAuth::Action action = newFancontrolAction();
     QVariantMap map;
-    map["action"] = "detectSensors";
+    map[QStringLiteral("action")] = QVariant("detectSensors");
 
     action.setArguments(map);
     KAuth::ExecuteJob *job = action.execute();

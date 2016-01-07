@@ -37,7 +37,7 @@ m_unit(0)
 
 QString TempModel::composeText(Temp *temp)
 {
-    QString suffix = m_unit == 0 ? "°C" : m_unit == 2 ? "°F" : "K";
+    QString suffix = m_unit == 0 ? QStringLiteral("°C") : m_unit == 2 ? QStringLiteral("°F") : QStringLiteral("K");
 
     return temp->name() + ": " + QString::number(temp->value()) + suffix + "   (" + temp->path() + ")";
 }
