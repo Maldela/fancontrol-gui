@@ -47,7 +47,6 @@ Rectangle {
     onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
     onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
     onUnitChanged: if (!!fan) meshCanvas.requestRepaint()
-    onFanChanged: if (!!fan && fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
 
     SystemPalette {
         id: palette
@@ -211,7 +210,8 @@ Rectangle {
                     if (fanOffCheckBox.checked) {
                         c.moveTo(stopPoint.centerX, height);
                     } else {
-                        c.moveTo(0, stopPoint.centerY);
+                        c.moveTo(0, scaleY(fan.minPwm));
+                        c.lineTo(stopPoint.centerX, scaleY(fan.minPwm));
                     }
                     c.lineTo(stopPoint.centerX, stopPoint.centerY);
                     c.lineTo(maxPoint.centerX, maxPoint.centerY);
@@ -363,8 +363,12 @@ Rectangle {
                 }
 
                 Connections {
+                    target: root
+                    onFanChanged: hasTempCheckBox.checked = !!fan ? fan.hasTemp : false
+                }
+                Connections {
                     target: fan
-                    onHasTempChanged: hasTempCheckBox.checked = Qt.binding(function() { return !!fan ? fan.hasTemp : null })
+                    onHasTempChanged: hasTempCheckBox.checked = fan.hasTemp
                 }
             }
             RowLayout {
@@ -378,6 +382,15 @@ Rectangle {
                         if (hasTempCheckBox.checked)
                             fan.temp = tempModel.temps[currentIndex];
                     }
+                }
+
+                Connections {
+                    target: root
+                    onFanChanged: if (!!fan && fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
+                }
+                Connections {
+                    target: fan
+                    onTempChanged: if (fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
                 }
             }
         }
@@ -395,8 +408,12 @@ Rectangle {
             }
 
             Connections {
+                target: root
+                onFanChanged: if (!!fan) fanOffCheckBox.checked = fan.minPwm == 0
+            }
+            Connections {
                 target: fan
-                onMinPwmChanged: fanOffCheckBox.checked = Qt.binding(function() { return !!fan ? fan.minPwm == 0 : false })
+                onMinPwmChanged: fanOffCheckBox.checked = fan.minPwm == 0
             }
         }
 
