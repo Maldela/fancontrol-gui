@@ -23,8 +23,7 @@
 #include "windowconfig.h"
 
 #include <QtGui/QWindow>
-#include <QtCore/QDebug>
-#include <QScreen>
+#include <QtGui/QScreen>
 
 #include <KConfigCore/KSharedConfig>
 #include <KConfigGui/KWindowConfig>
@@ -34,7 +33,7 @@
 #define CONFIG_NAME "fancontrol-gui"
 #endif
 
-   
+
 WindowConfig *WindowConfig::m_instance = Q_NULLPTR;
 
 WindowConfig::WindowConfig(QObject *parent) : QObject(parent)
@@ -45,7 +44,7 @@ WindowConfig* WindowConfig::instance()
 {
     if (!m_instance)
         m_instance = new WindowConfig;
-    
+
     return m_instance;
 }
 
@@ -53,7 +52,7 @@ void WindowConfig::save(QWindow *window)
 {
     if (!window)
         return;
-    
+
     KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
     KWindowConfig::saveWindowSize(window, configGroup);
     configGroup.sync();
@@ -63,7 +62,7 @@ void WindowConfig::restore(QWindow *window)
 {
     if (!window)
         return;
-    
+
     KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
     KWindowConfig::restoreWindowSize(window, configGroup);
 }

@@ -44,9 +44,9 @@ Rectangle {
     radius: 10
     clip: false
 
-    onMinTempChanged: if (fan) meshCanvas.requestPaint()
-    onMaxTempChanged: if (fan) meshCanvas.requestPaint()
-    onUnitChanged: if (fan) meshCanvas.requestRepaint()
+    onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
+    onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
+    onUnitChanged: if (!!fan) meshCanvas.requestRepaint()
 
     SystemPalette {
         id: palette
