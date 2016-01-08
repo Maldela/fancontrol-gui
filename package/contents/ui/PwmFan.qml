@@ -47,6 +47,7 @@ Rectangle {
     onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
     onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
     onUnitChanged: if (!!fan) meshCanvas.requestRepaint()
+    onFanChanged: if (!!fan && fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
 
     SystemPalette {
         id: palette
