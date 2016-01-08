@@ -395,7 +395,7 @@ Rectangle {
 
             Connections {
                 target: fan
-                onMinPwmChanged: fanOffCheckBox.checked = hasTempCheckBox.checked = Qt.binding(function() { return !!fan ? fan.minPwm == 0 : false })
+                onMinPwmChanged: fanOffCheckBox.checked = Qt.binding(function() { return !!fan ? fan.minPwm == 0 : false })
             }
         }
 
