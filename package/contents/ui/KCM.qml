@@ -28,10 +28,12 @@ import "../scripts/units.js" as Units
 
 Item {
     property QtObject base: kcm.base
+    property QtObject loader: !!base ? base.loader : null
+    property QtObject systemdCom: !!base ? base.systemdCom : null
+    property QtObject pwmFanModel: !!base ? base.pwmFanModel : null
+    property QtObject tempModel: !!base ? base.tempModel : null
     property var locale: Qt.locale()
     property real textWidth: 0
-    property QtObject pwmFanModel: base ? base.pwmFanModel : null
-    property QtObject tempModel: base ? base.tempModel : null
     property var pwmFans: pwmFanModel ? pwmFanModel.fans : null
 
     id: root
@@ -56,7 +58,7 @@ Item {
             Layout.alignment: Qt.AlignCenter
             text: i18n("Detect fans")
             iconName: kcm.needsAuthorization ? "dialog-password" : ""
-            onClicked: kcm.loader.detectSensors()
+            onClicked: loader.detectSensors()
         }
     }
 
@@ -99,7 +101,7 @@ Item {
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 text: i18n("Detect fans")
                 iconName: kcm.needsAuthorization ? "dialog-password" : ""
-                onClicked: kcm.loader.detectSensors()
+                onClicked: loader.detectSensors()
             }
         }
 
@@ -108,12 +110,12 @@ Item {
             Layout.fillHeight: true
             active: !!pwmFans[fanComboBox.currentIndex]
             sourceComponent: PwmFan {
-                unit: kcm.base.unit
+                unit: base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
-                systemdCom: kcm.systemdCom
+                systemdCom: root.systemdCom
                 tempModel: root.tempModel
-                minTemp: kcm.base.minTemp
-                maxTemp: kcm.base.maxTemp
+                minTemp: base.minTemp
+                maxTemp: base.maxTemp
             }
         }
 
@@ -152,10 +154,10 @@ Item {
             SpinBox {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                value: base.loader ? base.loader.interval : 1
-                suffix: " " + (value > 1 ? i18n("seconds") : i18n("second"))
+                value: !!loader ? loader.interval : 1
+                suffix: " " + i18np("second", "seconds", loader.interval)
                 minimumValue: 1.0
-                onValueChanged: base.loader.interval = value
+                onValueChanged: loader.interval = value
             }
         }
         RowLayout {
@@ -215,7 +217,7 @@ Item {
             OptionInput {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                color: base.systemdCom.serviceExists ? "green" : "red"
+                color: systemdCom.serviceExists ? "green" : "red"
                 value: base.serviceName
                 onTextChanged: base.serviceName = text
             }
@@ -264,10 +266,10 @@ Item {
     ErrorDialog {
         id: errorDialog
         modality: Qt.ApplicationModal
-        text: base.loader.error
+        text: loader.error
     }
     Connections {
-        target: base.loader
+        target: loader
         onCriticalError: errorDialog.open()
     }
 }

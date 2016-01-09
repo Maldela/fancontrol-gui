@@ -57,7 +57,7 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 value: !!loader ? loader.interval : 1
-                suffix: " " + i18np("second", "seconds", Math.round(value))
+                suffix: !!loader ? " " + i18np("second", "seconds", loader.interval): ""
                 minimumValue: 1.0
                 onValueChanged: {
                     if (!!loader) {
