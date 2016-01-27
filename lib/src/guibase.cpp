@@ -49,7 +49,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
-    m_unit = (system == QLocale::MetricSystem) ? 0 : 2;
+    m_unit = (system != QLocale::ImperialUSSystem) ? 0 : 2;
 
     qmlRegisterType<Loader>();
     qmlRegisterType<Hwmon>();
