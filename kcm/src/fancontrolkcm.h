@@ -36,8 +36,6 @@ class FancontrolKCM : public ConfigModule
     Q_OBJECT
     Q_PROPERTY(GUIBase *base READ base CONSTANT)
     Q_PROPERTY(bool manualControl READ manualControl WRITE setManualControl NOTIFY manualControlChanged)
-    Q_PROPERTY(Loader* loader READ loader CONSTANT)
-    Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
     
 public:
     
@@ -46,10 +44,6 @@ public:
     GUIBase *base() const { return m_base; }
     bool manualControl() const { return m_manualControl; }
     void setManualControl(bool manualControl);
-    
-    //wrap base
-    Loader *loader() const { return m_base->loader(); }
-    SystemdCommunicator *systemdCommunicator() const { return m_base->systemdCommunicator(); }
     
     
 public slots:
