@@ -22,6 +22,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QProcess>
+#include <QtCore/QFileInfo>
 
 #include <KAuth/KAuthHelperSupport>
 #include <KI18n/KLocalizedString>
@@ -108,34 +109,34 @@ ActionReply Helper::action(const QVariantMap &arguments)
     {
         QString program = QStringLiteral("sensors-detect");
         QStringList arguments = QStringList() << QStringLiteral("--auto");
-        
+
         QProcess process;
         process.start(program, arguments);
 
-        if (!process.waitForStarted(10000))
+        if (!process.waitForStarted(1000))
         {
             reply = ActionReply::HelperErrorType;
             reply.setErrorDescription(process.errorString());
-            
+
             return reply;
         }
-        
+
         if (!process.waitForFinished(10000))
         {
             reply = ActionReply::HelperErrorType;
             reply.setErrorDescription(process.errorString());
-            
+
             return reply;
         }
     }
-    
+
     else
     {
         reply.setType(ActionReply::HelperErrorType);
         reply.setErrorCode(ActionReply::NoSuchActionError);
         reply.setErrorDescription(i18n("This action does not exist!"));
     }
-    
+
     return reply;
 }
 
