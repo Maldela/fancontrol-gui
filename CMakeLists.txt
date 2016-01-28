@@ -118,7 +118,7 @@ endif(INSTALL_SHARED)
 
 
 #add tests
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
 
 #summary

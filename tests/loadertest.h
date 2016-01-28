@@ -22,9 +22,9 @@
 #ifndef LOADERTEST_H
 #define LOADERTEST_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
-#include <../lib/src/loader.h>
+#include "lib/src/loader.h"
 
 
 using namespace Fancontrol;
@@ -51,7 +51,5 @@ private:
     
     Loader *m_loader;
 };
-
-// #define 
 
 #endif // LOADERTEST_H

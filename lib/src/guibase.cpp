@@ -106,7 +106,7 @@ QString GUIBase::serviceName() const
 
 QUrl GUIBase::configUrl() const
 {
-    return QUrl::fromLocalFile(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
+    return QUrl(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
 }
 
 void GUIBase::setMaxTemp(qreal temp)

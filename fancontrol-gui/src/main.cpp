@@ -30,6 +30,11 @@
 #include "windowconfig.h"
 
 
+#ifndef INSTALL_PREFIX
+#define INSTALL_PREFIX "/usr"
+#endif
+
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -63,7 +68,7 @@ int main(int argc, char *argv[])
     context->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
 
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
-    package.setDefaultPackageRoot(QStringLiteral("kpackage/kcms"));
+    package.setDefaultPackageRoot(QStringLiteral(INSTALL_PREFIX) + "/share/kpackage/kcms");
     package.setPath(QStringLiteral("kcm_fancontrol"));
 
     engine->load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
