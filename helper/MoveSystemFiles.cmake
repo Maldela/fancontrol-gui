@@ -8,9 +8,9 @@ set(helper_service_file "share/dbus-1/system-services/fancontrol.gui.helper.serv
 set(helper_conf_file_destination "/${helper_conf_file}")
 set(helper_bin_file_destination "/usr/${helper_bin_file}")
 set(helper_service_file_destination "/usr/${helper_service_file}")
+set(install_manifest_path "${CMAKE_SOURCE_DIR}/install_manifest.txt")
 
 execute_process(COMMAND ln -sf ${CMAKE_INSTALL_PREFIX}/${helper_conf_file} ${helper_conf_file_destination} RESULT_VARIABLE result OUTPUT_VARIABLE output)
-file(APPEND "${CMAKE_SOURCE_DIR}/install_manifest.txt" "${helper_conf_file_destination}")
 message(STATUS "Creating symlink: ${helper_conf_file_destination} -> ${CMAKE_INSTALL_PREFIX}/${helper_conf_file}")
 
 if(${result})
@@ -19,7 +19,6 @@ if(${result})
 endif(${result})
 
 execute_process(COMMAND ln -sf ${CMAKE_INSTALL_PREFIX}/${helper_bin_file} ${helper_bin_file_destination} RESULT_VARIABLE result OUTPUT_VARIABLE output)
-file(APPEND "${CMAKE_SOURCE_DIR}/install_manifest.txt" "${helper_bin_file_destination}")
 message(STATUS "Creating symlink: ${helper_bin_file_destination} -> ${CMAKE_INSTALL_PREFIX}/${helper_bin_file}")
 
 if(${result})
@@ -28,7 +27,6 @@ if(${result})
 endif(${result})
 
 execute_process(COMMAND ln -sf ${CMAKE_INSTALL_PREFIX}/${helper_service_file} ${helper_service_file_destination} RESULT_VARIABLE result OUTPUT_VARIABLE output)
-file(APPEND "${CMAKE_SOURCE_DIR}/install_manifest.txt" "${helper_service_file_destination}")
 message(STATUS "Creating symlink: ${helper_service_file_destination} -> ${CMAKE_INSTALL_PREFIX}/${helper_service_file}")
 
 if(${result})
