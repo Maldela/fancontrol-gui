@@ -80,7 +80,6 @@ void Hwmon::initialize()
                     if (pwmFan->index() == index)
                     {
                         newPwmFan = pwmFan;
-                        newPwmFan->reset();
                         break;
                     }
                 }

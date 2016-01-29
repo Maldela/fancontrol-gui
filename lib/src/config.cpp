@@ -47,8 +47,8 @@ Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(
     addItemDouble(QStringLiteral("MinTemp"), m_minTemp, 30.0);
     addItemDouble(QStringLiteral("MaxTemp"), m_maxTemp, 90.0);
     addItemString(QStringLiteral("ServiceName"), m_serviceName, QStringLiteral(STANDARD_SERVICE_NAME));
-    addItemPath(QStringLiteral("ConfigUrl"), m_configUrl, QStringLiteral("file://") + QStringLiteral(STANDARD_CONFIG_FILE));
-    
+    addItemPath(QStringLiteral("ConfigUrl"), m_configUrl, QStringLiteral("file://") + STANDARD_CONFIG_FILE);
+
     load();
 }
 
@@ -56,7 +56,7 @@ Config* Config::instance()
 {
     if (!m_instance)
         m_instance = new Config;
-    
+
     return m_instance;
 }
 

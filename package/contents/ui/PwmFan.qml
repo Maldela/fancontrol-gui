@@ -210,8 +210,8 @@ Rectangle {
                     if (fanOffCheckBox.checked) {
                         c.moveTo(stopPoint.centerX, height);
                     } else {
-                        c.moveTo(0, scaleY(fan.minPwm));
-                        c.lineTo(stopPoint.centerX, scaleY(fan.minPwm));
+                        c.moveTo(0, stopPoint.centerY);
+                        c.lineTo(stopPoint.centerX, stopPoint.centerY);
                     }
                     c.lineTo(stopPoint.centerX, stopPoint.centerY);
                     c.lineTo(maxPoint.centerX, maxPoint.centerY);
