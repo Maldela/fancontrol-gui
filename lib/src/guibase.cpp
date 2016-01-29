@@ -145,7 +145,7 @@ void GUIBase::setConfigUrl(const QUrl &url)
 {
     if (url != configUrl())
     {
-        m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString(QUrl::PreferLocalFile));
+        m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
         m_configValid = m_loader->load(url);
         emit configUrlChanged();
     }
