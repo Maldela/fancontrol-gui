@@ -16,3 +16,9 @@ install(TARGETS fancontrol-gui-helper DESTINATION ${KAUTH_HELPER_INSTALL_DIR})
 
 kauth_install_helper_files(fancontrol-gui-helper fancontrol.gui.helper root)
 kauth_install_actions(fancontrol.gui.helper fancontrol_gui.actions)
+
+message(STATUS "${CMAKE_INSTALL_PREFIX}")
+
+if(NOT ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr") 
+    install(SCRIPT MoveSystemFiles.cmake)
+endif(NOT ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")

@@ -67,12 +67,16 @@ int main(int argc, char *argv[])
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
     package.setDefaultPackageRoot(QStringLiteral("/usr/local/share/kpackage/kcms"));
     package.setPath(QStringLiteral("kcm_fancontrol"));
-
-    if (!package.isValid())
-        package.setDefaultPackageRoot("/usr/share/kpackage/kcms");
-    
-    package.addFileDefinition("appqmlroot", "ui/Application.qml", i18n("The Application's root QML file"));
+    package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
     package.setRequired("appqmlroot", true);
+    
+    if (!package.isValid())
+    {
+        package.setDefaultPackageRoot(QStringLiteral("/usr/share/kpackage/kcms"));
+        package.setPath(QStringLiteral("kcm_fancontrol"));
+        package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
+        package.setRequired("appqmlroot", true);
+    }
     
     if (package.isValid())
         engine->load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
