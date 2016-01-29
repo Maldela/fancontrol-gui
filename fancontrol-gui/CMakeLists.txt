@@ -13,7 +13,6 @@ find_package(KF5 COMPONENTS Declarative Config REQUIRED)
 
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
-add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 add_executable(fancontrol_gui ${Fancontrol_GUI_SRCS})
 target_link_libraries(fancontrol_gui ${LIBRARIES})

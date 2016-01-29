@@ -20,6 +20,8 @@
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+#include <QtCore/QFileInfo>
+#include <QDebug>
 
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
@@ -28,11 +30,6 @@
 
 #include "lib/src/guibase.h"
 #include "windowconfig.h"
-
-
-#ifndef INSTALL_PREFIX
-#define INSTALL_PREFIX "/usr"
-#endif
 
 
 int main(int argc, char *argv[])
@@ -68,10 +65,17 @@ int main(int argc, char *argv[])
     context->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
 
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
-    package.setDefaultPackageRoot(QStringLiteral(INSTALL_PREFIX) + "/share/kpackage/kcms");
+    package.setDefaultPackageRoot(QStringLiteral("/usr/local/share/kpackage/kcms"));
     package.setPath(QStringLiteral("kcm_fancontrol"));
 
-    engine->load(QUrl::fromLocalFile(package.path() + "/contents/ui/Application.qml"));
+    if (!package.isValid())
+        package.setDefaultPackageRoot("/usr/share/kpackage/kcms");
+    
+    package.addFileDefinition("appqmlroot", "ui/Application.qml", i18n("The Application's root QML file"));
+    package.setRequired("appqmlroot", true);
+    
+    if (package.isValid())
+        engine->load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
 
     return app.exec();
 }
