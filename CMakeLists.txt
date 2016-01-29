@@ -22,7 +22,7 @@ if(BUILD_KCM AND NO_SYSTEMD)
 
     message(WARNING "KCM can't be build without systemd support")
     set(BUILD_KCM FALSE)
-    
+
 endif(BUILD_KCM AND NO_SYSTEMD)
 
 
@@ -44,7 +44,7 @@ find_package(Qt5Core REQUIRED)
 find_package(KF5 COMPONENTS I18n Package REQUIRED)
 
 
-#includes 
+#includes
 include(GenerateExportHeader)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
@@ -78,7 +78,7 @@ add_subdirectory(lib)
 if(INSTALL_HELPER)
 
     add_subdirectory(helper)
-    
+
 endif(INSTALL_HELPER)
 
 
@@ -87,17 +87,17 @@ if(BUILD_GUI)
 
     message(STATUS "Build the standalone application")
     add_subdirectory(fancontrol-gui)
-    
+
 endif(BUILD_GUI)
 
 
 #Build the KCM
-if(BUILD_KCM)
+if(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
 
     message(STATUS "Build the KCM")
     add_subdirectory(kcm)
-    
-endif(BUILD_KCM)
+
+endif(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
 
 
 #install the shared parts
