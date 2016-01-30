@@ -272,7 +272,13 @@ bool Loader::load(const QUrl &url)
         KAuth::ExecuteJob *reply = action.execute();
         if (!reply->exec())
         {
-            qDebug() << reply->error();
+            if (reply->error() == 4)
+            {
+                qDebug() << "Aborted by user";
+                return false;
+            }
+            
+            qDebug() << "Error while loading:" << reply->error();
             setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
@@ -495,7 +501,13 @@ bool Loader::save(const QUrl &url)
 
         if (!reply->exec())
         {
-            qDebug() << reply->error();
+            if (reply->error() == 4)
+            {
+                qDebug() << "Aborted by user";
+                return false;
+            }
+            
+            qDebug() << "Error while saving:" << reply->error();
             setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
@@ -678,7 +690,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
 {
     if (job->error())
     {
-        qDebug() << job->error();
+        qDebug() << "Error while detecting sensors:" << job->error();
         setError(job->errorString() + job->errorText(), true);
     }
     else
