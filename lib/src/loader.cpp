@@ -690,6 +690,12 @@ void Loader::handleDetectSensorsResult(KJob *job)
 {
     if (job->error())
     {
+        if (job->error() == 4)
+        {
+            qDebug() << "Aborted by user";
+            return;
+        }
+            
         qDebug() << "Error while detecting sensors:" << job->error();
         setError(job->errorString() + job->errorText(), true);
     }
