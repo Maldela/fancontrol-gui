@@ -227,7 +227,7 @@ bool Loader::load(const QUrl &url)
     QString fileName;
     if (url.isEmpty())
     {
-        qDebug() << "Given empty url. Fallback to " << m_configUrl;
+        qDebug() << "Given empty url. Fallback to" << m_configUrl;
         fileName = m_configUrl.toLocalFile();
     }
     else if (url.isValid())

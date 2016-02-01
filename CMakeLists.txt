@@ -92,12 +92,12 @@ endif(BUILD_GUI)
 
 
 #Build the KCM
-if(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
+if(BUILD_KCM)
 
     message(STATUS "Build the KCM")
     add_subdirectory(kcm)
 
-endif(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
+endif(BUILD_KCM)
 
 
 #install the shared parts

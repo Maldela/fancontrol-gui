@@ -21,7 +21,6 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 #include <QtCore/QFileInfo>
-#include <QDebug>
 
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
