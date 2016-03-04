@@ -47,7 +47,7 @@ ColumnLayout {
             anchors.margins: 5
 
             TextEdit {
-                text: loader ? loader.configFile : ""
+                text: !!loader ? loader.configFile : ""
                 readOnly: true
                 color: palette.text
             }

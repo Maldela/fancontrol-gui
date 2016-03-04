@@ -64,7 +64,7 @@ ColumnLayout {
 
         sourceComponent: PwmFan {
             unit: !!baseObject ? baseObject.unit : 0
-            fan: !!pwmFans ? pwmFans[fanComboBox.currentIndex] : null
+            fan: pwmFans[fanComboBox.currentIndex]
             tempModel: root.tempModel
             systemdCom: root.systemdCom
             minTemp: !!baseObject ? baseObject.minTemp : 30
@@ -76,7 +76,7 @@ ColumnLayout {
         id: noFansInfo
         anchors.centerIn: parent
         spacing: 20
-        visible: !!pwmFanModel ? pwmFanModel.count == 0 : false
+        visible: pwmFans.length === 0
 
         Label {
             Layout.alignment: Qt.AlignCenter
