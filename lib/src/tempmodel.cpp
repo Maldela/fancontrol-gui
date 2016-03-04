@@ -97,15 +97,7 @@ void TempModel::updateTemp()
 {
     Temp *temp = qobject_cast<Temp *>(sender());
 
-    if (!temp)
-        return;
-
-    int i = m_temps.indexOf(temp);
-    if (i == -1)
-        return;
-
-    setData(index(i, 0), composeText(temp));
-    emit dataChanged(index(i, 0), index(i, 0));
+    updateTemp(temp);
 }
 
 void TempModel::updateAll()

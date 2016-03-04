@@ -28,7 +28,6 @@
 #include <QtCore/QStringListModel>
 
 
-
 namespace Fancontrol {
 
 

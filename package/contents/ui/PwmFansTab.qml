@@ -37,7 +37,7 @@ ColumnLayout {
 
     RowLayout {
         width: parent.width
-        visible: loader && pwmFanModel.count > 0
+        visible: !!loader && !!pwmFanModel && pwmFanModel.count > 0
 
         Label {
             text: i18n("Fan:")
@@ -60,7 +60,7 @@ ColumnLayout {
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        active: !!loader && !!systemdCom && !!pwmFans[fanComboBox.currentIndex]
+        active: !!loader && !!systemdCom && !!pwmFans && !!pwmFans[fanComboBox.currentIndex]
 
         sourceComponent: PwmFan {
             unit: !!baseObject ? baseObject.unit : 0
