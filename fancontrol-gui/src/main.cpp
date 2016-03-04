@@ -75,34 +75,25 @@ int main(int argc, char *argv[])
     context->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
 
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
-    package.setDefaultPackageRoot(QStringLiteral("/usr/share/kpackage/kcms"));
-    package.setPath(QStringLiteral("kcm_fancontrol"));
-    package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
-    package.setRequired("appqmlroot", true);
 
-    if (!package.isValid())
+    QStringList possiblePackageLocations = QStringList() << QStringLiteral("/usr/share/kpackage/kcms")
+                                                            << QStringLiteral("/usr/local/share/kpackage/kcms")
+                                                            << QStringLiteral("kpackage/kcms")
+                                                            << QStringLiteral("/opt/share/kpackage/kcms");
+
+    foreach (const QString location, possiblePackageLocations)
     {
-        QStringList possiblePackageLocations = QStringList() << QStringLiteral("/usr/local/share/kpackage/kcms")
-                                                             << QStringLiteral("kpackage/kcms")
-                                                             << QStringLiteral("/opt/share/kpackage/kcms");
+        package.setDefaultPackageRoot(location);
+        package.setPath(QStringLiteral("kcm_fancontrol"));
+        package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
+        package.setRequired("appqmlroot", true);
 
-        for (int i=0; i<possiblePackageLocations.size(); i++)
+        if (package.isValid())
         {
-            package.setDefaultPackageRoot(possiblePackageLocations.at(i));
-            package.setPath(QStringLiteral("kcm_fancontrol"));
-            package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
-            package.setRequired("appqmlroot", true);
-
-            if (package.isValid())
-            {
-                engine.load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
-                break;
-            }
+            engine.load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
+            return app.exec();
         }
-    }
-
-    if (package.isValid())
-        engine.load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
-
-    return app.exec();
+    }   
+    
+    return 1;
 }
