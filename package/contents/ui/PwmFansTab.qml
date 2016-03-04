@@ -29,7 +29,7 @@ ColumnLayout {
     property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
     property QtObject pwmFanModel: baseObject ? baseObject.pwmFanModel : null
     property QtObject tempModel: baseObject ? baseObject.tempModel : null
-    property var pwmFans: pwmFanModel ? pwmFanModel.fans : null
+    property var pwmFans: pwmFanModel ? pwmFanModel.fans : []
 
     id: root
     anchors.fill: parent
@@ -37,7 +37,7 @@ ColumnLayout {
 
     RowLayout {
         width: parent.width
-        visible: !!loader && !!pwmFanModel && pwmFanModel.count > 0
+        visible: !!pwmFanModel && pwmFans.length > 0
 
         Label {
             text: i18n("Fan:")
@@ -60,7 +60,7 @@ ColumnLayout {
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        active: !!loader && !!systemdCom && !!pwmFans && !!pwmFans[fanComboBox.currentIndex]
+        active: !!tempModel && !!systemdCom && pwmFans.length < fanComboBox.currentIndex
 
         sourceComponent: PwmFan {
             unit: !!baseObject ? baseObject.unit : 0

@@ -77,9 +77,9 @@ int main(int argc, char *argv[])
     KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
 
     QStringList possiblePackageLocations = QStringList() << QStringLiteral("/usr/share/kpackage/kcms")
-                                                            << QStringLiteral("/usr/local/share/kpackage/kcms")
-                                                            << QStringLiteral("kpackage/kcms")
-                                                            << QStringLiteral("/opt/share/kpackage/kcms");
+                                                         << QStringLiteral("/usr/local/share/kpackage/kcms")
+                                                         << QStringLiteral("kpackage/kcms")
+                                                         << QStringLiteral("/opt/share/kpackage/kcms");
 
     foreach (const QString location, possiblePackageLocations)
     {

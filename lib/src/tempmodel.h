@@ -38,7 +38,6 @@ class TempModel : public QStringListModel
 {
     Q_OBJECT
     Q_PROPERTY(QList<QObject *> temps READ temps NOTIFY tempsChanged)
-    Q_PROPERTY(int count READ count NOTIFY tempsChanged)
 
 public:
 
@@ -46,7 +45,6 @@ public:
     void setTemps(const QList<Temp *> &temps);
     void addTemps(const QList<Temp *> &temps);
     QList<QObject *> temps() const;
-    int count() const { return m_temps.size(); }
     void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
 
 

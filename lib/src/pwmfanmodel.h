@@ -37,7 +37,6 @@ class PwmFanModel : public QStringListModel
 {
     Q_OBJECT
     Q_PROPERTY(QList<QObject *> fans READ fans NOTIFY fansChanged)
-    Q_PROPERTY(int count READ count NOTIFY fansChanged)
 
 public:
 
@@ -45,7 +44,6 @@ public:
     void setPwmFans(const QList<PwmFan *> &fans);
     void addPwmFans(const QList<PwmFan *> &fans);
     QList<QObject *> fans() const;
-    int count() const { return m_fans.size(); }
 
 
 public slots:

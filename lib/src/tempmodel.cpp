@@ -107,7 +107,7 @@ void TempModel::updateAll()
         Temp *temp = m_temps.at(i);
         setData(index(i, 0), composeText(temp));
     }
-    emit dataChanged(index(0, 0), index(count(), 0));
+    emit dataChanged(index(0, 0), index(m_temps.size(), 0));
 }
 
 QList<QObject *> TempModel::temps() const
