@@ -42,6 +42,7 @@ Item {
 
     ColumnLayout {
         id: noFansInfo
+
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         spacing: 20
@@ -64,8 +65,9 @@ Item {
 
     CheckBox {
         id: enabledBox
+
+        anchors.top: parent.top
         visible: pwmFanModel.count > 0
-        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
         text: i18n("Control fans manually")
         checked: kcm.manualControl
         onCheckedChanged: kcm.manualControl = checked
@@ -77,9 +79,12 @@ Item {
     }
 
     ColumnLayout {
+        id: bodyLayout
+
         width: parent.width
-        anchors.bottom: parent.bottom
+        anchors.bottom: advancedButton.top
         anchors.top: enabledBox.bottom
+        anchors.bottomMargin: advancedButton.height / 4
         visible: enabledBox.checked
 
         RowLayout {
@@ -118,31 +123,74 @@ Item {
                 maxTemp: base.maxTemp
             }
         }
+    }
 
-        Row {
-            property bool expanded: false
+    Item {
+        id: advancedButton
 
-            id: expand
+        property bool expanded: false
 
-            Image {
-                id: arrow
-                source: parent.expanded ? "image://icon/go-down" : "image://icon/go-next"
-                fillMode: Image.PreserveAspectFit
-                height: advancedLabel.implicitHeight
-            }
-            Label {
-                id: advancedLabel
-                text: i18n("Advanced settings")
-                font.bold: true
-            }
+        anchors.bottom: settingsArea.top
+        width: parent.width
+        height: advancedArrow.height
+
+        Image {
+            id: advancedArrow
+
+            source: parent.expanded ? "image://icon/go-down" : "image://icon/go-next"
+            fillMode: Image.PreserveAspectFit
+            height: advancedLabel.implicitHeight
+        }
+        Label {
+            id: advancedLabel
+
+            anchors.left: advancedArrow.right
+            text: i18n("Advanced settings")
+            font.bold: true
         }
         MouseArea {
-            anchors.fill: expand
-            onClicked: expand.expanded = expand.expanded ? false : true
+            anchors.fill: parent
+            onClicked: parent.expanded = !parent.expanded
+        }
+    }
+
+    ColumnLayout {
+        id: settingsArea
+
+        visible: enabledBox.checked && parent.height - enabledBox.height - bodyLayout.height > height
+        width: parent.width
+        anchors.bottom: parent.bottom
+        clip: true
+        state: advancedButton.expanded ? "VISIBLE" : "HIDDEN"
+
+        states: [
+            State {
+                name: "VISIBLE"
+
+                PropertyChanges {
+                    target: settingsArea
+                    height: settingsArea.implicitHeight
+                }
+            },
+            State {
+                name: "HIDDEN"
+
+                PropertyChanges {
+                    target: settingsArea
+                    height: 0
+                }
+            }
+        ]
+
+        transitions: Transition {
+            NumberAnimation {
+                properties: "height"
+                easing.type: Easing.InOutQuad
+            }
         }
 
         RowLayout {
-            visible: expand.expanded
+            width: parent.width
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -161,7 +209,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expand.expanded
+            width: parent.width
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -183,7 +231,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expand.expanded
+            width: parent.width
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -205,7 +253,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expand.expanded
+            width: parent.width
 
             Label {
                 Layout.preferredWidth: root.textWidth
@@ -223,7 +271,7 @@ Item {
             }
         }
         RowLayout {
-            visible: expand.expanded
+            width: parent.width
 
             Label {
                 Layout.preferredWidth: root.textWidth

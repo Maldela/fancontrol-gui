@@ -1,11 +1,12 @@
 set(LIBRARIES KF5::QuickAddons
+              KF5::CoreAddons
               KF5::I18n
               fancontrol_gui_lib)
-              
+
 find_package(KF5Declarative REQUIRED)
 
 add_library(kcm_fancontrol MODULE src/fancontrolkcm.cpp)
-                                  
+
 target_link_libraries(kcm_fancontrol ${LIBRARIES})
 
 install(TARGETS kcm_fancontrol DESTINATION "${LIB_INSTALL_DIR}/qt/plugins/kcms")
