@@ -227,7 +227,7 @@ bool Loader::load(const QUrl &url)
     QString fileName;
     if (url.isEmpty())
     {
-        qDebug() << "Given empty url. Fallback to " << m_configUrl;
+        qDebug() << "Given empty url. Fallback to" << m_configUrl;
         fileName = m_configUrl.toLocalFile();
     }
     else if (url.isValid())
@@ -272,7 +272,13 @@ bool Loader::load(const QUrl &url)
         KAuth::ExecuteJob *reply = action.execute();
         if (!reply->exec())
         {
-            qDebug() << reply->error();
+            if (reply->error() == 4)
+            {
+                qDebug() << "Aborted by user";
+                return false;
+            }
+            
+            qDebug() << "Error while loading:" << reply->error();
             setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
@@ -495,7 +501,13 @@ bool Loader::save(const QUrl &url)
 
         if (!reply->exec())
         {
-            qDebug() << reply->error();
+            if (reply->error() == 4)
+            {
+                qDebug() << "Aborted by user";
+                return false;
+            }
+            
+            qDebug() << "Error while saving:" << reply->error();
             setError(reply->errorString() + reply->errorText(), true);
             return false;
         }
@@ -678,7 +690,13 @@ void Loader::handleDetectSensorsResult(KJob *job)
 {
     if (job->error())
     {
-        qDebug() << job->error();
+        if (job->error() == 4)
+        {
+            qDebug() << "Aborted by user";
+            return;
+        }
+            
+        qDebug() << "Error while detecting sensors:" << job->error();
         setError(job->errorString() + job->errorText(), true);
     }
     else

@@ -16,6 +16,8 @@ set(STANDARD_CONFIG_FILE "/etc/fancontrol" CACHE STRING "The location of the sta
 add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
 add_definitions(-DSTANDARD_CONFIG_FILE="${STANDARD_CONFIG_FILE}")
 
+set(KDE_INSTALL_USE_QT_SYS_PATHS ON)
+
 
 #KCM can't be build without systemd support
 if(BUILD_KCM AND NO_SYSTEMD)
@@ -92,12 +94,12 @@ endif(BUILD_GUI)
 
 
 #Build the KCM
-if(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
+if(BUILD_KCM)
 
     message(STATUS "Build the KCM")
     add_subdirectory(kcm)
 
-endif(BUILD_KCM AND ${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
+endif(BUILD_KCM)
 
 
 #install the shared parts

@@ -25,7 +25,6 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QIcon>
 
-
 #include <KDeclarative/KDeclarative>
 #include <KI18n/KLocalizedString>
 #include <KPackage/PackageLoader>
@@ -83,10 +82,23 @@ int main(int argc, char *argv[])
 
     if (!package.isValid())
     {
-        package.setDefaultPackageRoot(QStringLiteral("/usr/local/share/kpackage/kcms"));
-        package.setPath(QStringLiteral("kcm_fancontrol"));
-        package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
-        package.setRequired("appqmlroot", true);
+        QStringList possiblePackageLocations = QStringList() << QStringLiteral("/usr/local/share/kpackage/kcms")
+                                                             << QStringLiteral("kpackage/kcms")
+                                                             << QStringLiteral("/opt/share/kpackage/kcms");
+
+        for (int i=0; i<possiblePackageLocations.size(); i++)
+        {
+            package.setDefaultPackageRoot(possiblePackageLocations.at(i));
+            package.setPath(QStringLiteral("kcm_fancontrol"));
+            package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
+            package.setRequired("appqmlroot", true);
+
+            if (package.isValid())
+            {
+                engine.load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
+                break;
+            }
+        }
     }
 
     if (package.isValid())
