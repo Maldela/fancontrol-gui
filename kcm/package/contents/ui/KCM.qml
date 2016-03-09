@@ -20,25 +20,55 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-import QtQuick.Layouts 1.1
+import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
 import org.kde.kcm 1.0
-import "../scripts/units.js" as Units
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
-    property QtObject base: kcm.base
-    property QtObject loader: !!base ? base.loader : null
-    property QtObject systemdCom: !!base ? base.systemdCom : null
-    property QtObject pwmFanModel: !!base ? base.pwmFanModel : null
-    property QtObject tempModel: !!base ? base.tempModel : null
+    property QtObject loader: Fancontrol.base.loader
+    property QtObject systemdCom: Fancontrol.base.systemdCom
+    property QtObject pwmFanModel: Fancontrol.base.pwmFanModel
+    property QtObject tempModel: Fancontrol.base.tempModel
     property var locale: Qt.locale()
     property real textWidth: 0
-    property var pwmFans: pwmFanModel ? pwmFanModel.fans : null
+    property var pwmFans: pwmFanModel ? pwmFanModel.fans : []
 
     id: root
     implicitWidth: 1024
     implicitHeight: 768
+    
+    Connections {
+        target: loader
+        onConfigFileChanged: kcm.needsSave = true
+    }
+    
+    Connections {
+        target: Fancontrol.base
+        onMinTempChanged: kcm.needsSave = true
+        onMaxTempChanged: kcm.needsSave = true
+        onServiceNameChanged: kcm.needsSave = true
+        onConfigUrlChanged: kcm.needsSave = true
+    }
+    
+    Connections {
+        target: kcm
+        onAboutToSave: {
+            base.save(true);
+            if (systemdCom.serviceActive && enabledBox.checked) {
+                systemdCom.restartService();
+            } else {
+                systemdCom.serviceActive = enabledBox.checked;
+            }
+            systemdCom.serviceEnabled = enabledBox.checked;
+        }
+        onAboutToLoad: {
+            Fancontrol.base.load();
+            enabledBox.checked = systemdCom.serviceEnabled && systemdCom.serviceActive;
+        }
+        onAboutToDefault: enabledBox.checked = false
+    }
 
     ColumnLayout {
         id: noFansInfo
@@ -46,7 +76,7 @@ Item {
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         spacing: 20
-        visible: pwmFanModel.count == 0
+        visible: pwmFans.length === 0
 
         Label {
             Layout.alignment: Qt.AlignCenter
@@ -67,15 +97,10 @@ Item {
         id: enabledBox
 
         anchors.top: parent.top
-        visible: pwmFanModel.count > 0
+        visible: pwmFans.length > 0
         text: i18n("Control fans manually")
-        checked: kcm.manualControl
-        onCheckedChanged: kcm.manualControl = checked
-
-        Connections {
-            target: kcm
-            onManualControlChanged: enabledBox.checked = kcm.manualControl
-        }
+        checked: systemdCom.serviceEnabled && systemdCom.serviceActive;
+        onCheckedChanged: if (checked !== systemdCom.serviceActive || checked !== systemdCom.serviceEnabled) kcm.needsSave = true
     }
 
     ColumnLayout {
@@ -114,13 +139,13 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             active: !!pwmFans[fanComboBox.currentIndex]
-            sourceComponent: PwmFan {
-                unit: base.unit
+            sourceComponent: Fancontrol.PwmFan {
+                unit: Fancontrol.base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
                 systemdCom: root.systemdCom
                 tempModel: root.tempModel
-                minTemp: base.minTemp
-                maxTemp: base.maxTemp
+                minTemp: Fancontrol.base.minTemp
+                maxTemp: Fancontrol.base.maxTemp
             }
         }
     }
@@ -133,6 +158,7 @@ Item {
         anchors.bottom: settingsArea.top
         width: parent.width
         height: advancedArrow.height
+        visible: enabledBox.checked
 
         Image {
             id: advancedArrow
@@ -157,7 +183,7 @@ Item {
     ColumnLayout {
         id: settingsArea
 
-        visible: enabledBox.checked && parent.height - enabledBox.height - bodyLayout.height > height
+        visible: enabledBox.checked && parent.height - enabledBox.height - bodyLayout.height - advancedButton.height > height
         width: parent.width
         anchors.bottom: parent.bottom
         clip: true
@@ -224,10 +250,10 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, base.unit)
-                value: Units.fromCelsius(base.minTemp, base.unit)
-                suffix: base.unit == 0 ? i18n("°C") : base.unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: base.minTemp = value
+                minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
+                value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
+                suffix: Fancontrol.base.unit == 0 ? i18n("°C") : Fancontrol.base.unit == 1 ? i18n("K") : i18n("°F")
+                onValueChanged: Fancontrol.base.minTemp = value
             }
         }
         RowLayout {
@@ -247,9 +273,9 @@ Item {
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
                 minimumValue: minTempBox.value
-                value: Units.fromCelsius(base.maxTemp, base.unit)
-                suffix: base.unit == 0 ? i18n("°C") : base.unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: base.maxTemp = value
+                value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
+                suffix: Fancontrol.base.unit == 0 ? i18n("°C") : Fancontrol.base.unit == 1 ? i18n("K") : i18n("°F")
+                onValueChanged: Fancontrol.base.maxTemp = value
             }
         }
         RowLayout {
@@ -262,12 +288,12 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
-            OptionInput {
+            Fancontrol.OptionInput {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 color: systemdCom.serviceExists ? "green" : "red"
-                value: base.serviceName
-                onTextChanged: base.serviceName = text
+                value: Fancontrol.base.serviceName
+                onTextChanged: Fancontrol.base.serviceName = text
             }
         }
         RowLayout {
@@ -280,12 +306,12 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
-            OptionInput {
+            Fancontrol.OptionInput {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                text: base.configUrl.toString().replace("file://", "")
-                color: base.configValid ? "green" : "red"
-                onTextChanged: base.configUrl = text
+                text: Fancontrol.base.configUrl.toString().replace("file://", "")
+                color: Fancontrol.base.configValid ? "green" : "red"
+                onTextChanged: Fancontrol.base.configUrl = text
             }
             Button {
                 action: loadAction
@@ -308,16 +334,12 @@ Item {
         selectExisting: true
         selectMultiple: false
 
-        onAccepted: base.configUrl = fileUrl;
+        onAccepted: Fancontrol.base.configUrl = fileUrl;
     }
 
-    ErrorDialog {
+    Fancontrol.ErrorDialog {
         id: errorDialog
         modality: Qt.ApplicationModal
-        text: loader.error
-    }
-    Connections {
-        target: loader
-        onCriticalError: errorDialog.open()
+        loader: root.loader
     }
 }

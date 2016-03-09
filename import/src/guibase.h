@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman maldela@halloarsch.de
  *
  * This program is free software; you can redistribute it and/or
@@ -39,15 +38,13 @@
 #define SYSTEMD_BOOL false
 #endif
 
-#include "fancontrol_gui_lib_export.h"
-
 
 namespace Fancontrol
 {
 
 class Config;
 
-class FANCONTROL_GUI_LIB_EXPORT GUIBase : public QObject
+class GUIBase : public QObject
 {
     Q_OBJECT
 

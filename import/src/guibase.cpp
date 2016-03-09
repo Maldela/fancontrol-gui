@@ -26,7 +26,6 @@
 #include "config.h"
 #include "hwmon.h"
 
-#include <QtQml/qqml.h>
 #include <QtCore/QLocale>
 
 
@@ -50,16 +49,6 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
     m_unit = (system != QLocale::ImperialUSSystem) ? 0 : 2;
-
-    qmlRegisterType<Loader>();
-    qmlRegisterType<Hwmon>();
-    qmlRegisterType<Fan>();
-    qmlRegisterType<PwmFan>();
-    qmlRegisterType<Temp>();
-
-#ifndef NO_SYSTEMD
-    qmlRegisterType<SystemdCommunicator>();
-#endif
 
     m_tempModel->setUnit(m_unit);
     foreach (Hwmon *hwmon, m_loader->hwmons())

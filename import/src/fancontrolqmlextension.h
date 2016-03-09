@@ -1,6 +1,5 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2016  Malte Veerman <maldela@halloarsch.de>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,35 +19,34 @@
  * 
  */
 
-#ifndef FANCONTROLKCM_H
-#define FANCONTROLKCM_H
-
-#include <KDeclarative/KQuickAddons/ConfigModule>
+#ifndef FANCONTROLQMLEXTENSION_H
+#define FANCONTROLQMLEXTENSION_H
 
 
-using namespace KQuickAddons;
+#include <QtQml/QQmlExtensionPlugin>
 
-class FancontrolKCM : public ConfigModule
+
+class QQmlEngine;
+class QJSEngine;
+
+namespace Fancontrol
+{
+
+class FancontrolQmlExtension : public QQmlExtensionPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Fancontrol.Qml")
     
 public:
     
-    explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
+    void registerTypes(const char *uri) Q_DECL_OVERRIDE;
     
     
-public slots:
+private:
     
-    void load() Q_DECL_OVERRIDE;
-    void save() Q_DECL_OVERRIDE;
-    void defaults() Q_DECL_OVERRIDE;
-    
-    
-signals:
-    
-    void aboutToSave();
-    void aboutToLoad();
-    void aboutToDefault();
+    static QObject * base(QQmlEngine *engine, QJSEngine *jsengine);
 };
 
-#endif // FANCONTROLKCM_H
+}
+
+#endif // FANCONTROLQMLEXTENSION_H

@@ -1,0 +1,9 @@
+module Fancontrol.Qml
+plugin fancontrol_qml_plugin
+internal StatusPoint StatusPoint.qml
+internal PwmPoint PwmPoint.qml
+PwmFan 1.0 PwmFan.qml
+ErrorDialog 1.0 ErrorDialog.qml
+OptionInput 1.0 OptionInput.qml
+Units 1.0 units.js
+

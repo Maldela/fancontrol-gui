@@ -23,8 +23,6 @@
 
 #include <QtCore/QObject>
 
-#include "fancontrol_gui_lib_export.h"
-
 
 class QDBusInterface;
 class KJob;
@@ -32,7 +30,7 @@ class KJob;
 namespace Fancontrol
 {
 
-class FANCONTROL_GUI_LIB_EXPORT SystemdCommunicator : public QObject
+class SystemdCommunicator : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)

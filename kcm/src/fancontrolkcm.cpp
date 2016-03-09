@@ -22,8 +22,6 @@
 
 #include "fancontrolkcm.h"
 
-#include <QtQml/qqml.h>
-
 #include <KCoreAddons/KAboutData>
 #include <KCoreAddons/KPluginFactory>
 #include <KI18n/KLocalizedString>
@@ -33,16 +31,11 @@ K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", register
 
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
-    : ConfigModule(parent, args),
-    m_base(new GUIBase(this)),
-    m_manualControl(false)
+    : ConfigModule(parent, args)
 {
-    if (!m_base->hasSystemdCommunicator())
-        qFatal("Fancontrol-gui-lib was compiled without systemd support!");
-
     KAboutData *about = new KAboutData(QStringLiteral("kcm_fancontrol"),
                                        i18n("Fancontrol-KCM"),
-                                       QStringLiteral("0.1"),
+                                       QStringLiteral("0.3"),
                                        i18n("KDE Fancontrol Module"),
                                        KAboutLicense::KAboutLicense::GPL_V2,
                                        QStringLiteral("Copyright (C) 2015 Malte Veerman"),
@@ -54,49 +47,27 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 
     setButtons(Apply | Default);
     setAuthActionName(QStringLiteral("fancontrol.gui.helper.action"));
-
-    connect(m_base->loader(), &Loader::configFileChanged, [this] () { setNeedsSave(true); });
-    connect(m_base, &GUIBase::minTempChanged, [this] () { setNeedsSave(true); });
-    connect(m_base, &GUIBase::maxTempChanged, [this] () { setNeedsSave(true); });
-    connect(m_base, &GUIBase::serviceNameChanged, [this] () { setNeedsSave(true); });
-
-    qmlRegisterType<GUIBase>();
 }
 
 void FancontrolKCM::save()
 {
-    m_base->save(true);
-
-    if (m_base->systemdCommunicator()->serviceActive() && m_manualControl)
-        m_base->systemdCommunicator()->restartService();
-    else
-        m_base->systemdCommunicator()->setServiceActive(m_manualControl);
-
-    m_base->systemdCommunicator()->setServiceEnabled(m_manualControl);
+    emit aboutToSave();
+    
     setNeedsSave(false);
 }
 
 void FancontrolKCM::load()
 {
-    m_base->load();
-    setManualControl(m_base->systemdCommunicator()->serviceEnabled() || m_base->systemdCommunicator()->serviceActive());
+    emit aboutToLoad();
+    
     setNeedsSave(false);
 }
 
 void FancontrolKCM::defaults()
 {
-    setManualControl(false);
+    emit aboutToDefault();
+    
     setNeedsSave(true);
-}
-
-void FancontrolKCM::setManualControl(bool manualControl)
-{
-    if (m_manualControl != manualControl)
-    {
-        m_manualControl = manualControl;
-        emit manualControlChanged();
-        setNeedsSave(true);
-    }
 }
 
 

@@ -24,7 +24,10 @@ import QtQuick.Controls 1.2
 
 
 Dialog {
+    id: dialog
+
     property alias text: text.text
+    property QtObject loader
 
     title: i18n("Error")
     width: text.implicitWidth + 20
@@ -34,5 +37,11 @@ Dialog {
     Label {
         id: text
         anchors.centerIn: parent
+        text: !!loader ? loader.error : ""
+    }
+    
+    Connections {
+        target: loader
+        onCriticalError: dialog.open()
     }
 }

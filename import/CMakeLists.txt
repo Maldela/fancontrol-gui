@@ -7,7 +7,18 @@ set(LIB_SRCS src/hwmon.cpp
              src/guibase.cpp
              src/config.cpp
              src/pwmfanmodel.cpp
-             src/tempmodel.cpp)
+             src/tempmodel.cpp
+             src/fancontrolqmlextension.cpp)
+             
+set(QML_FILES qml/qmldir
+              qml/ErrorDialog.qml
+              qml/OptionInput.qml
+              qml/PwmFan.qml
+              qml/PwmPoint.qml
+              qml/StatusPoint.qml
+              qml/colors.js
+              qml/math.js
+              qml/units.js)
 
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
                           KF5::Auth
@@ -31,15 +42,8 @@ find_package(KF5 COMPONENTS Auth Config REQUIRED)
 
 include_directories(${Qt5Qml_INCLUDE_DIRS})
 
-add_library(fancontrol_gui_lib SHARED ${LIB_SRCS})
-target_link_libraries(fancontrol_gui_lib PRIVATE ${LIB_PRIVATE_LIBRARIES} PUBLIC ${LIB_PUBLIC_LIBRARIES})
+add_library(fancontrol_qml_plugin SHARED ${LIB_SRCS})
+target_link_libraries(fancontrol_qml_plugin PRIVATE ${LIB_PRIVATE_LIBRARIES} PUBLIC ${LIB_PUBLIC_LIBRARIES})
 
-target_compile_features(fancontrol_gui_lib PRIVATE cxx_lambdas)
-
-generate_export_header(fancontrol_gui_lib)
-
-if(INSTALL_SHARED)
-
-    install(TARGETS fancontrol_gui_lib ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-
-endif(INSTALL_SHARED)
+install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
+install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")

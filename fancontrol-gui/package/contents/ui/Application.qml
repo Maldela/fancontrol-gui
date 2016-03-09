@@ -22,6 +22,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 ApplicationWindow {
@@ -32,11 +33,14 @@ ApplicationWindow {
     visible: true
 
     onClosing: {
-        base.save();
+        Fancontrol.base.save();
         windowConfig.save(window);
     }
     
-    Component.onCompleted: windowConfig.restore(window)
+    Component.onCompleted: {
+        Fancontrol.base.load();
+        windowConfig.restore(window);
+    }
 
     menuBar: MenuBar {
         Menu {
@@ -63,22 +67,22 @@ ApplicationWindow {
             ToolButton { action: loadAction }
             ToolButton { action: saveAction }
             Loader {
-                active: base.hasSystemdCommunicator()
+                active: Fancontrol.base.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
-                    iconName: base.systemdCom.serviceActive ? "system-reboot" : "system-run"
+                    iconName: Fancontrol.base.systemdCom.serviceActive ? "system-reboot" : "system-run"
                     onClicked: {
-                        base.loader.abortTestingFans();
-                        base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
+                        Fancontrol.base.loader.abortTestingFans();
+                        Fancontrol.base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
                     }
-                    tooltip: base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
+                    tooltip: Fancontrol.base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
             }
             Loader {
-                active: base.hasSystemdCommunicator()
+                active: Fancontrol.base.hasSystemdCommunicator()
                 sourceComponent: ToolButton {
                     iconName: "system-shutdown"
-                    enabled: base.systemdCom.serviceActive
-                    onClicked: base.systemdCom.serviceActive = false;
+                    enabled: Fancontrol.base.systemdCom.serviceActive
+                    onClicked: Fancontrol.base.systemdCom.serviceActive = false;
                     tooltip: i18n("Stop fancontrol")
                 }
             }
@@ -97,36 +101,35 @@ ApplicationWindow {
         Tab {
             title: i18n("Sensors")
             SensorsTab {
-                loader: base.loader
+                loader: Fancontrol.base.loader
             }
         }
         Tab {
             title: i18n("PwmFans")
             PwmFansTab {
-                baseObject: base
+                baseObject: Fancontrol.base
             }
         }
         Tab {
             title: i18n("Configfile")
             ConfigfileTab {
-                loader: base.loader
+                loader: Fancontrol.base.loader
             }
         }
         Tab {
             id: settingsTab
             title: i18n("Settings")
             SettingsTab {
-                gui: base
+                gui: Fancontrol.base
             }
         }
     }
 
-    ErrorDialog {
+    Fancontrol.ErrorDialog {
         id: errorDialog
-        visible: !!base.loader.error
+        visible: false
         modality: Qt.ApplicationModal
-        text: base.loader.error
-        onTextChanged: show()
+        loader: Fancontrol.base.loader
     }
 
     Action {
@@ -142,7 +145,7 @@ ApplicationWindow {
         text: i18n("Save configuration file")
         onTriggered: base.save(true)
         iconName: "document-save"
-        tooltip: i18n("Save configuration file") + " (" + base.loader.configUrl.toString() + ")"
+        tooltip: i18n("Save configuration file") + " (" + Fancontrol.base.loader.configUrl.toString() + ")"
         shortcut: StandardKey.Save
     }
 
@@ -154,7 +157,7 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
 
-        onAccepted: base.configUrl = fileUrl;
+        onAccepted: Fancontrol.base.configUrl = fileUrl;
     }
     FileDialog {
         id: saveFileDialog
@@ -164,6 +167,6 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
 
-        onAccepted: base.save(true, fileUrl);
+        onAccepted: Fancontrol.base.save(true, fileUrl);
     }
 }

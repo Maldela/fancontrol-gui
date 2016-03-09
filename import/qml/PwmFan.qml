@@ -21,9 +21,9 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
-import "../scripts/math.js" as MoreMath
-import "../scripts/units.js" as Units
-import "../scripts/colors.js" as Colors
+import "math.js" as MoreMath
+import "units.js" as Units
+import "colors.js" as Colors
 
 
 Rectangle {

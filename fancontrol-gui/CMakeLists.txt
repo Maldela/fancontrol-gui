@@ -1,8 +1,7 @@
 set(Fancontrol_GUI_SRCS src/main.cpp
                         src/windowconfig.cpp)
 
-set(LIBRARIES fancontrol_gui_lib
-              Qt5::Widgets
+set(LIBRARIES Qt5::Widgets
               KF5::Declarative
               KF5::I18n
               KF5::ConfigGui
@@ -18,4 +17,6 @@ add_executable(fancontrol_gui ${Fancontrol_GUI_SRCS})
 target_link_libraries(fancontrol_gui ${LIBRARIES})
 
 install(TARGETS fancontrol_gui ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES metadata.desktop RENAME "fancontrol_gui.desktop" DESTINATION ${XDG_APPS_INSTALL_DIR})
+install(FILES metadata.desktop RENAME "fancontrol_gui.desktop" DESTINATION ${KDE_INSTALL_APPDIR})
+
+kpackage_install_package(package fancontrol-gui genericqml)

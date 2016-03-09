@@ -27,8 +27,6 @@
 #include <QtCore/QString>
 #include <QtCore/QPair>
 
-#include "fancontrol_gui_lib_export.h"
-
 
 class QTimer;
 class KJob;
@@ -40,7 +38,7 @@ class Hwmon;
 class PwmFan;
 class Temp;
 
-class FANCONTROL_GUI_LIB_EXPORT Loader : public QObject
+class Loader : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)

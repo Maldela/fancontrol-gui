@@ -47,7 +47,6 @@ find_package(KF5 COMPONENTS I18n Package REQUIRED)
 
 
 #includes
-include(GenerateExportHeader)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
@@ -70,10 +69,6 @@ else(NOT NO_SYSTEMD)
     add_definitions(-DNO_SYSTEMD)
 
 endif(NOT NO_SYSTEMD)
-
-
-#Shared library
-add_subdirectory(lib)
 
 
 #KHelper for actions that require superuser rights
@@ -105,12 +100,12 @@ endif(BUILD_KCM)
 #install the shared parts
 if(INSTALL_SHARED)
 
-    #KPackage containing the QML and javascript files
-    kpackage_install_package(package kcm_fancontrol kcms)
+    #qml plugin
+    add_subdirectory(import)
 
 
     #icon
-    install(FILES icon.svg RENAME "fancontrol_gui.svg" DESTINATION "${ICON_INSTALL_DIR}/hicolor/scalable/apps")
+    install(FILES icon.svg RENAME "fancontrol_gui.svg" DESTINATION "${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps")
 
 
     #translations

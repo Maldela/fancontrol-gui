@@ -21,7 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
-import "../scripts/units.js" as Units
+import Fancontrol.Qml 1.0
 
 
 Item {
