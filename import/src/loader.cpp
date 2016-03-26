@@ -267,33 +267,39 @@ bool Loader::load(const QUrl &url)
     else if (file.exists())
     {
         KAuth::Action action = newFancontrolAction();
-        QVariantMap map;
-        map[QStringLiteral("action")] = QVariant("read");
-        map[QStringLiteral("filename")] = fileName;
-        action.setArguments(map);
-        KAuth::ExecuteJob *reply = action.execute();
-        if (!reply->exec())
+        
+        if (action.isValid())
         {
-            if (reply->error() == 4)
+            QVariantMap map;
+            map[QStringLiteral("action")] = QVariant("read");
+            map[QStringLiteral("filename")] = fileName;
+            action.setArguments(map);
+            KAuth::ExecuteJob *reply = action.execute();
+            if (!reply->exec())
             {
-                qDebug() << "Aborted by user";
+                if (reply->error() == 4)
+                {
+                    qDebug() << "Aborted by user";
+                    return false;
+                }
+                
+                qDebug() << "Error while loading:" << reply->error();
+                setError(reply->errorString() + reply->errorText(), true);
                 return false;
             }
-            
-            qDebug() << "Error while loading:" << reply->error();
-            setError(reply->errorString() + reply->errorText(), true);
-            return false;
+            else
+            {
+                if (!url.isEmpty())
+                {
+                    m_configUrl = url;
+                    emit configUrlChanged();
+                }
+
+                fileContent = reply->data().value(QStringLiteral("content")).toString();
+            }
         }
         else
-        {
-            if (!url.isEmpty())
-            {
-                m_configUrl = url;
-                emit configUrlChanged();
-            }
-
-            fileContent = reply->data().value(QStringLiteral("content")).toString();
-        }
+            setError(i18n("Action not supported! Try running the application as root."), true);
     }
     else
     {
@@ -493,26 +499,32 @@ bool Loader::save(const QUrl &url)
     else
     {
         KAuth::Action action = newFancontrolAction();
-        QVariantMap map;
-        map[QStringLiteral("action")] = QVariant("write");
-        map[QStringLiteral("filename")] = fileName;
-        map[QStringLiteral("content")] = m_configFile;
-
-        action.setArguments(map);
-        KAuth::ExecuteJob *reply = action.execute();
-
-        if (!reply->exec())
+        
+        if (action.isValid())
         {
-            if (reply->error() == 4)
+            QVariantMap map;
+            map[QStringLiteral("action")] = QVariant("write");
+            map[QStringLiteral("filename")] = fileName;
+            map[QStringLiteral("content")] = m_configFile;
+
+            action.setArguments(map);
+            KAuth::ExecuteJob *reply = action.execute();
+
+            if (!reply->exec())
             {
-                qDebug() << "Aborted by user";
+                if (reply->error() == 4)
+                {
+                    qDebug() << "Aborted by user";
+                    return false;
+                }
+                
+                qDebug() << "Error while saving:" << reply->error();
+                setError(reply->errorString() + reply->errorText(), true);
                 return false;
             }
-            
-            qDebug() << "Error while saving:" << reply->error();
-            setError(reply->errorString() + reply->errorText(), true);
-            return false;
         }
+        else
+            setError(i18n("Action not supported! Try running the application as root."), true);
     }
 
     return true;
@@ -697,14 +709,20 @@ void Loader::handleDetectSensorsResult(int exitCode)
             setError(process->readAllStandardOutput());
         
         KAuth::Action action = newFancontrolAction();
-        QVariantMap map;
-        map[QStringLiteral("action")] = QVariant("detectSensors");
         
-        action.setArguments(map);
-        KAuth::ExecuteJob *job = action.execute();
-        
-        connect(job, &KAuth::ExecuteJob::result, this, static_cast<void(Loader::*)(KJob *)>(&Loader::handleDetectSensorsResult));
-        job->start();
+        if (action.isValid())
+        {
+            QVariantMap map;
+            map[QStringLiteral("action")] = QVariant("detectSensors");
+            
+            action.setArguments(map);
+            KAuth::ExecuteJob *job = action.execute();
+            
+            connect(job, &KAuth::ExecuteJob::result, this, static_cast<void(Loader::*)(KJob *)>(&Loader::handleDetectSensorsResult));
+            job->start();
+        }
+        else
+            setError(i18n("Action not supported! Try running the application as root."), true);
     }
     else
     {

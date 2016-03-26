@@ -177,25 +177,31 @@ bool PwmFan::setPwm(int pwm, bool write)
             else
             {
                 KAuth::Action action = newFancontrolAction();
-                QVariantMap map;
-                map[QStringLiteral("action")] = "write";
-                map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
-                map[QStringLiteral("content")] = QString::number(pwm);
-                action.setArguments(map);
                 
-                KAuth::ExecuteJob *job = action.execute();
-                if (!job->exec())
+                if (action.isValid())
                 {
-                    if (job->error() == KAuth::ActionReply::HelperBusyError)
-                    {
-                        qDebug() << "Helper busy...";
-                        
-                        QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
-                    }
+                    QVariantMap map;
+                    map[QStringLiteral("action")] = "write";
+                    map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
+                    map[QStringLiteral("content")] = QString::number(pwm);
+                    action.setArguments(map);
                     
-                    emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
+                    KAuth::ExecuteJob *job = action.execute();
+                    if (!job->exec())
+                    {
+                        if (job->error() == KAuth::ActionReply::HelperBusyError)
+                        {
+                            qDebug() << "Helper busy...";
+                            
+                            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                        }
+                        
+                        emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
+                    }
+                    update();
                 }
-                update();
+                else
+                    emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
             }
         }
     }
@@ -218,25 +224,30 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
             {
                 KAuth::Action action = newFancontrolAction();
                 
-                QVariantMap map;
-                map[QStringLiteral("action")] = QVariant("write");
-                map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
-                map[QStringLiteral("content")] = QString::number(pwmMode);
-                action.setArguments(map);
-
-                KAuth::ExecuteJob *job = action.execute();
-                if (!job->exec())
+                if (action.isValid())
                 {
-                    if (job->error() == KAuth::ActionReply::HelperBusyError)
+                    QVariantMap map;
+                    map[QStringLiteral("action")] = QVariant("write");
+                    map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
+                    map[QStringLiteral("content")] = QString::number(pwmMode);
+                    action.setArguments(map);
+
+                    KAuth::ExecuteJob *job = action.execute();
+                    if (!job->exec())
                     {
-                        qDebug() << "Helper busy...";
+                        if (job->error() == KAuth::ActionReply::HelperBusyError)
+                        {
+                            qDebug() << "Helper busy...";
+                            
+                            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                        }
                         
-                        QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                        emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
                     }
-                    
-                    emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
+                    update();
                 }
-                update();
+                else
+                    emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
             }
         }
     }
@@ -248,21 +259,30 @@ void PwmFan::test()
     if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
         KAuth::Action action = newFancontrolAction();
-        KAuth::ExecuteJob *job = action.execute();
-
-        if (!job->exec())
+        
+        if (action.isValid())
         {
-            if (job->error() == KAuth::ActionReply::HelperBusyError)
+            KAuth::ExecuteJob *job = action.execute();
+
+            if (!job->exec())
             {
-                qDebug() << "Helper busy...";
+                if (job->error() == KAuth::ActionReply::HelperBusyError)
+                {
+                    qDebug() << "Helper busy...";
+                    
+                    QTimer::singleShot(100, this, &PwmFan::test);
+                    return;
+                }
                 
-                QTimer::singleShot(100, this, &PwmFan::test);
+                emit errorChanged(i18n("Authorization error: ") + job->errorText());
+                m_testStatus = Error;
+                emit testStatusChanged();
                 return;
             }
-            
-            emit errorChanged(i18n("Authorization error: ") + job->errorText());
-            m_testStatus = Error;
-            emit testStatusChanged();
+        }
+        else
+        {
+            emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
             return;
         }
     }

@@ -7,8 +7,8 @@ project(fancontroller)
 option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality significantly!" OFF)
 option(BUILD_GUI "Build the standalone application" ON)
 option(BUILD_KCM "Build the KCM" OFF)
+option(BUILD_HELPER "Build the KHelper" ON)
 option(INSTALL_SHARED "Install the shared parts" ON)
-option(INSTALL_HELPER "Install the KHelper" ON)
 
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
@@ -70,11 +70,11 @@ endif(NOT NO_SYSTEMD)
 
 
 #KHelper for actions that require superuser rights
-if(INSTALL_HELPER)
+if(BUILD_HELPER)
 
     add_subdirectory(helper)
 
-endif(INSTALL_HELPER)
+endif(BUILD_HELPER)
 
 
 #Build the standalone application
@@ -95,7 +95,7 @@ if(BUILD_KCM)
 endif(BUILD_KCM)
 
 
-#install the shared parts
+#build and install the shared parts
 if(INSTALL_SHARED)
 
     #qml plugin
