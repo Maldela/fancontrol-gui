@@ -34,6 +34,9 @@ if(NOT NO_SYSTEMD)
 
     set(LIB_PRIVATE_LIBRARIES ${LIB_PRIVATE_LIBRARIES}
                               Qt5::DBus)
+                              
+    find_package(Qt5DBus REQUIRED)
+    include_directories(${Qt5DBus_INCLUDE_DIRS})
 
 endif(NOT NO_SYSTEMD)
 

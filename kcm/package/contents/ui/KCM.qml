@@ -87,7 +87,7 @@ Item {
 
         Button {
             Layout.alignment: Qt.AlignCenter
-            text: i18n("Detect fans")
+            text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
             iconName: kcm.needsAuthorization ? "dialog-password" : ""
             onClicked: loader.detectSensors()
         }

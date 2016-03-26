@@ -268,11 +268,12 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
             action.setArguments(map);
 
             KAuth::ExecuteJob *job = action.execute();
-            connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
+            connect(job, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
             job->start();
 
             return true;
         }
+        
         setError(dbusreply.errorMessage());
         return false;
     }
@@ -292,9 +293,9 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
             if (executeJob)
             {
                 KAuth::ExecuteJob *newJob = executeJob->action().execute();
-                connect(newJob, SIGNAL(result(KJob*)), this, SLOT(handleDbusActionResult(KJob*)));
-
-                QTimer::singleShot(50, this, [newJob] (){ newJob->start(); });
+                connect(newJob, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
+                
+                QTimer::singleShot(50, newJob, &KAuth::ExecuteJob::start);
                 return;
             }
         }

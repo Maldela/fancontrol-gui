@@ -20,6 +20,8 @@
 
 #include "hwmon.h"
 
+#include "loader.h"
+
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 
@@ -27,7 +29,7 @@
 namespace Fancontrol
 {
 
-Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
+Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
     m_path(path),
     m_valid(true)
 {
@@ -52,10 +54,10 @@ Hwmon::Hwmon(const QString &path, QObject *parent) : QObject(parent),
     else
         m_name = path.split('/').last();
 
-    connect(this, SIGNAL(configUpdateNeeded()), parent, SLOT(createConfigFile()));
-    connect(this, SIGNAL(pwmFansChanged()), parent, SLOT(emitAllPwmFansChanged()));
-    connect(this, SIGNAL(tempsChanged()), parent, SLOT(emitAllTempsChanged()));
-    connect(this, SIGNAL(errorChanged(QString)), parent, SLOT(setError(QString)));
+    connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::createConfigFile);
+    connect(this, &Hwmon::pwmFansChanged, parent, &Loader::emitAllPwmFansChanged);
+    connect(this, &Hwmon::tempsChanged, parent, &Loader::emitAllTempsChanged);
+    connect(this, &Hwmon::errorChanged, parent, &Loader::setError);
 
     if (m_valid)
         initialize();
@@ -87,7 +89,7 @@ void Hwmon::initialize()
                 if (!newPwmFan)
                 {
                     newPwmFan = new PwmFan(this, index);
-                    connect(this, SIGNAL(sensorsUpdateNeeded()), newPwmFan, SLOT(update()));
+                    connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
                     m_pwmFans << newPwmFan;
                     emit pwmFansChanged();
                 }
@@ -116,7 +118,7 @@ void Hwmon::initialize()
                 if (!newFan)
                 {
                     newFan = new Fan(this, index);
-                    connect(this, SIGNAL(sensorsUpdateNeeded()), newFan, SLOT(update()));
+                    connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
                     m_fans << newFan;
                     emit fansChanged();
                 }
@@ -140,7 +142,7 @@ void Hwmon::initialize()
             if (!newTemp)
             {
                 newTemp = new Temp(this, index);
-                connect(this, SIGNAL(sensorsUpdateNeeded()), newTemp, SLOT(update()));
+                connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
                 m_temps << newTemp;
                 emit tempsChanged();
             }

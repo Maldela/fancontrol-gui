@@ -62,8 +62,10 @@ QString Fan::name() const
     KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
     QString name = localNames.readEntry("fan" + QString::number(m_index), QString());
+    
     if (name.isEmpty())
         return "fan" + QString::number(m_index);
+    
     return name;
 }
 
@@ -71,6 +73,7 @@ void Fan::setName(const QString &name)
 {
     KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
+    
     if (name != localNames.readEntry("fan" + QString::number(m_index), QString())
         && !name.isEmpty())
     {
@@ -104,6 +107,7 @@ void Fan::update()
     m_rpmStream->seek(0);
     int rpm;
     *m_rpmStream >> rpm;
+    
     if (rpm != m_rpm)
     {
         m_rpm = rpm;

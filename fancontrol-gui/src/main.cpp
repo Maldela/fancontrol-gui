@@ -25,7 +25,6 @@
 
 #include <KDeclarative/QmlObject>
 #include <KI18n/KLocalizedString>
-#include <KPackage/PackageLoader>
 #include <KCoreAddons/KAboutData>
 
 #include "windowconfig.h"
@@ -58,8 +57,7 @@ int main(int argc, char *argv[])
     about.processCommandLine(&parser);
 
     KDeclarative::QmlObject qmlObject;
-    WindowConfig *windowConfig = WindowConfig::instance();
-    qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
+    qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());
 
     qmlObject.loadPackage("fancontrol-gui");
     

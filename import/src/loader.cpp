@@ -27,6 +27,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
+#include <QtCore/QProcess>
 #include <QtCore/QDebug>
 
 #include <KAuth/KAuthExecuteJob>
@@ -46,14 +47,15 @@ namespace Fancontrol
 Loader::Loader(QObject *parent) : QObject(parent),
     m_interval(10),
     m_configUrl(QUrl::fromLocalFile(QStringLiteral(STANDARD_CONFIG_FILE))),
-    m_timer(new QTimer(this))
+    m_timer(new QTimer(this)),
+    m_sensorsDetected(false)
 {
     parseHwmons();
 
     m_timer->setSingleShot(false);
     m_timer->start(1);
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateSensors()));
+    connect(m_timer, &QTimer::timeout, this, &Loader::updateSensors);
 }
 
 void Loader::parseHwmons()
@@ -108,7 +110,7 @@ void Loader::parseHwmons()
             Hwmon *newHwmon = new Hwmon(hwmonPath, this);
             if (newHwmon->isValid())
             {
-                connect(this, SIGNAL(sensorsUpdateNeeded()), newHwmon, SLOT(updateSensors()));
+                connect(this, &Loader::sensorsUpdateNeeded, newHwmon, &Hwmon::updateSensors);
                 m_hwmons << newHwmon;
                 emit hwmonsChanged();
             }
@@ -308,7 +310,7 @@ bool Loader::load(const QUrl &url)
     //They get reconnected later
     foreach (Hwmon *hwmon, m_hwmons)
     {
-        disconnect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
+        disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
         foreach (QObject *pwmFan, hwmon->pwmFans())
         {
             qobject_cast<PwmFan *>(pwmFan)->reset();
@@ -345,8 +347,8 @@ bool Loader::load(const QUrl &url)
             {
                 //Connect hwmons again
                 foreach (Hwmon *hwmon, m_hwmons)
-                    connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-
+                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                
                 setError(i18n("Unable to parse interval line: \n %1", line), true);
                 return false;
             }
@@ -393,8 +395,8 @@ bool Loader::load(const QUrl &url)
                     {
                         //Connect hwmons again
                         foreach (Hwmon *hwmon, m_hwmons)
-                            connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                        
                         setError(i18n("Can not parse %1", devname), true);
                         return false;
                     }
@@ -403,8 +405,8 @@ bool Loader::load(const QUrl &url)
                     {
                         //Connect hwmons again
                         foreach (Hwmon *hwmon, m_hwmons)
-                            connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                        
                         setError(i18n("Invalid config file!"), true);
                         return false;
                     }
@@ -446,8 +448,8 @@ bool Loader::load(const QUrl &url)
         {
             //Connect hwmons again
             foreach (Hwmon *hwmon, m_hwmons)
-                connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-
+                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+            
             setError(i18n("Unrecognized line in config:\n%1", line), true);
             return false;
         }
@@ -457,8 +459,8 @@ bool Loader::load(const QUrl &url)
 
     //Connect hwmons again
     foreach (Hwmon *hwmon, m_hwmons)
-        connect(hwmon, SIGNAL(configUpdateNeeded()), this, SLOT(createConfigFile()));
-
+        connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+    
     emit configUrlChanged();
 
     return true;
@@ -675,15 +677,48 @@ void Loader::abortTestingFans()
 
 void Loader::detectSensors()
 {
-    KAuth::Action action = newFancontrolAction();
-    QVariantMap map;
-    map[QStringLiteral("action")] = QVariant("detectSensors");
+    QString program = QStringLiteral("sensors-detect");
+    QStringList arguments = QStringList() << QStringLiteral("--auto");
+    
+    QProcess *process = new QProcess(this);
+    process->start(program, arguments);
+    
+    connect(process, static_cast<void(QProcess::*)(int)>(&QProcess::finished),
+            this, static_cast<void(Loader::*)(int)>(&Loader::handleDetectSensorsResult));
+}
 
-    action.setArguments(map);
-    KAuth::ExecuteJob *job = action.execute();
-
-    connect(job, SIGNAL(result(KJob*)), this, SLOT(handleDetectSensorsResult(KJob*)));
-    job->start();
+void Loader::handleDetectSensorsResult(int exitCode)
+{
+    QProcess *process = qobject_cast<QProcess *>(sender());
+    
+    if (exitCode)
+    {
+        if (process)
+            setError(process->readAllStandardOutput());
+        
+        KAuth::Action action = newFancontrolAction();
+        QVariantMap map;
+        map[QStringLiteral("action")] = QVariant("detectSensors");
+        
+        action.setArguments(map);
+        KAuth::ExecuteJob *job = action.execute();
+        
+        connect(job, &KAuth::ExecuteJob::result, this, static_cast<void(Loader::*)(KJob *)>(&Loader::handleDetectSensorsResult));
+        job->start();
+    }
+    else
+    {
+        if (!m_sensorsDetected)
+        {
+            m_sensorsDetected = true;
+            emit sensorsDetectedChanged();
+        }
+        
+        parseHwmons();
+    }
+    
+    if (process)
+        process->deleteLater();
 }
 
 void Loader::handleDetectSensorsResult(KJob *job)
@@ -700,7 +735,15 @@ void Loader::handleDetectSensorsResult(KJob *job)
         setError(job->errorString() + job->errorText(), true);
     }
     else
+    {
+        if (!m_sensorsDetected)
+        {
+            m_sensorsDetected = true;
+            emit sensorsDetectedChanged();
+        }
+        
         parseHwmons();
+    }
 }
 
 QList<QObject *> Loader::hwmonsAsObjects() const

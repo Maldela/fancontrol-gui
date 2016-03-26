@@ -70,10 +70,12 @@ QString Temp::name() const
     KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
     KConfigGroup localNames = names.group(m_parent->name());
     QString name = localNames.readEntry("temp" + QString::number(m_index), QString());
+    
     if (name.isEmpty())
     {
         if (m_label.isEmpty())
             return "temp" + QString::number(m_index);
+        
         return m_label;
     }
     return name;
@@ -118,6 +120,7 @@ void Temp::update()
     int value;
     *m_valueStream >> value;
     value /= 1000;
+    
     if (value != m_value)
     {
         m_value = value;

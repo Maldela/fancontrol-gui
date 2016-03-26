@@ -32,6 +32,8 @@
 
 namespace Fancontrol
 {
+    
+class Loader;
 
 class Hwmon : public QObject
 {
@@ -46,7 +48,7 @@ class Hwmon : public QObject
 
 public:
 
-    explicit Hwmon(const QString &path, QObject *parent = Q_NULLPTR);
+    explicit Hwmon(const QString &path, Loader *parent = Q_NULLPTR);
 
     void initialize();
     QString name() const { return m_name; }
@@ -70,10 +72,6 @@ public slots:
 
     void updateConfig() { emit configUpdateNeeded(); }
     void updateSensors() { emit sensorsUpdateNeeded(); }
-
-
-protected slots:
-
     void setError(const QString &error);
 
 
@@ -84,7 +82,7 @@ signals:
     void tempsChanged();
     void configUpdateNeeded();
     void sensorsUpdateNeeded();
-    void errorChanged(QString);
+    void errorChanged(QString, bool = false);
 
 
 private:

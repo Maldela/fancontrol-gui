@@ -1,10 +1,14 @@
-set(LIBRARIES KF5::Auth
+set(LIBRARIES Qt5::Core
+              KF5::Auth
               KF5::I18n)
 
 if(NOT NO_SYSTEMD)
 
     set(LIBRARIES ${LIBRARIES}
                   Qt5::DBus)
+                  
+    find_package(Qt5DBus REQUIRED)
+    include_directories(${Qt5DBus_INCLUDE_DIRS})
 
 endif(NOT NO_SYSTEMD)
 

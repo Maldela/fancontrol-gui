@@ -94,7 +94,7 @@ ColumnLayout {
 
     Action {
         id: detectFansAction
-        text: i18n("Detect fans")
+        text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
         iconName: "dialog-password"
         onTriggered: loader.detectSensors()
     }

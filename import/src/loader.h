@@ -30,6 +30,7 @@
 
 class QTimer;
 class KJob;
+class QProcess;
 
 namespace Fancontrol
 {
@@ -47,6 +48,7 @@ class Loader : public QObject
     Q_PROPERTY(QList<QObject *> allTemps READ allTemps NOTIFY allTempsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
+    Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
 
 
 public:
@@ -62,6 +64,7 @@ public:
     QUrl configUrl() const { return m_configUrl; }
     QString configFile() const { return m_configFile; }
     QList<Hwmon *> hwmons() const { return m_hwmons; }
+    bool sensorsDetected() const { return m_sensorsDetected; }
     QList<QObject *> hwmonsAsObjects() const;
     QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
@@ -74,16 +77,13 @@ public:
 public slots:
 
     void updateSensors() { emit sensorsUpdateNeeded(); }
-
-
-protected slots:
-
     void createConfigFile();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
     void setError(const QString &error, bool critical = false);
     void handleDetectSensorsResult(KJob *job);
-
+    void handleDetectSensorsResult(int exitCode);
+    
 
 protected:
 
@@ -101,6 +101,7 @@ private:
     QString m_configFile;
     QString m_error;
     QTimer *m_timer;
+    bool m_sensorsDetected;
 
 
 signals:
@@ -115,6 +116,7 @@ signals:
     void allTempsChanged();
     void invalidConfigUrl();
     void criticalError();
+    void sensorsDetectedChanged();
 };
 
 }

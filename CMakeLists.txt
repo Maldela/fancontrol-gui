@@ -43,7 +43,7 @@ find_package(Qt5Core REQUIRED)
 
 
 #Find KF5
-find_package(KF5 COMPONENTS I18n Package REQUIRED)
+find_package(KF5 COMPONENTS I18n REQUIRED)
 
 
 #includes
@@ -59,8 +59,6 @@ include_directories (${CMAKE_SOURCE_DIR})
 if(NOT NO_SYSTEMD)
 
     message(STATUS "Compiling for Systemd")
-    find_package(Qt5DBus REQUIRED)
-    include_directories(${Qt5DBus_INCLUDE_DIRS})
 
 else(NOT NO_SYSTEMD)
 

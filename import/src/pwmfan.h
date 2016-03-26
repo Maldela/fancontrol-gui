@@ -48,10 +48,23 @@ class PwmFan : public Fan
     Q_PROPERTY(int minStart READ minStart WRITE setMinStart NOTIFY minStartChanged)
     Q_PROPERTY(int minStop READ minStop WRITE setMinStop NOTIFY minStopChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
-    Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
+    Q_PROPERTY(bool testing READ testing NOTIFY testStatusChanged)
+    Q_PROPERTY(TestStatus testStatus READ testStatus NOTIFY testStatusChanged)
     Q_PROPERTY(int pwmMode READ pwmMode WRITE setPwmMode NOTIFY pwmModeChanged)
+    Q_ENUMS(TestStatus)
 
 public:
+    
+    enum TestStatus
+    {
+        NotStarted,
+        FindingStop1,
+        FindingStop2,
+        FindingStart,
+        Finished,
+        Cancelled,
+        Error
+    };
 
     explicit PwmFan(Hwmon *parent, uint index);
     virtual ~PwmFan();
@@ -66,6 +79,7 @@ public:
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
     int pwmMode() const { return m_pwmMode; }
+    TestStatus testStatus() const { return m_testStatus; }
     bool active() const;
     bool testing() const;
     bool setPwm(int pwm, bool write = true) Q_DECL_OVERRIDE;
@@ -96,17 +110,14 @@ signals:
     void minStartChanged();
     void minStopChanged();
     void activeChanged();
-    void testingChanged();
+    void testStatusChanged();
     void pwmModeChanged();
 
 
-protected slots:
+public slots:
 
     void update() Q_DECL_OVERRIDE;
     void continueTest();
-    void handleSetPwmResult(KJob *job);
-    void handleSetPwmModeResult(KJob *job);
-    void handleTestAuthReply(KJob *job);
 
 
 private:
@@ -124,17 +135,7 @@ private:
     int m_minStop;
     int m_pwmMode;
     int m_zeroRpm;
-
-    enum
-    {
-        NotStarted,
-        FindingStop1,
-        FindingStop2,
-        FindingStart,
-        Finished,
-        Cancelled,
-        Error
-    } m_testStatus;
+    TestStatus m_testStatus;
 };
 
 }

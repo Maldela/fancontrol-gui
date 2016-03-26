@@ -1,8 +1,9 @@
-set(LIBRARIES KF5::QuickAddons
+set(LIBRARIES Qt5::Core
+              KF5::QuickAddons
               KF5::CoreAddons
               KF5::I18n)
 
-find_package(KF5Declarative REQUIRED)
+find_package(KF5 COMPONENTS CoreAddons Package Declarative REQUIRED)
 
 add_library(kcm_fancontrol MODULE src/fancontrolkcm.cpp)
 

@@ -58,15 +58,15 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
     m_zeroRpm(0),
     m_testStatus(NotStarted)
 {
-    connect(this, SIGNAL(tempChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(hasTempChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(minTempChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(maxTempChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(minPwmChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(maxPwmChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(minStartChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(minStopChanged()), parent, SLOT(updateConfig()));
-    connect(this, SIGNAL(testingChanged()), parent, SLOT(updateConfig()));
+    connect(this, &PwmFan::tempChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::hasTempChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::minTempChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::maxTempChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::minPwmChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::maxPwmChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::minStartChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::minStopChanged, parent, &Hwmon::updateConfig);
+    connect(this, &PwmFan::testStatusChanged, parent, &Hwmon::updateConfig);
 
     if (QDir(parent->path()).isReadable())
     {
@@ -182,31 +182,24 @@ bool PwmFan::setPwm(int pwm, bool write)
                 map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
                 map[QStringLiteral("content")] = QString::number(pwm);
                 action.setArguments(map);
+                
                 KAuth::ExecuteJob *job = action.execute();
-                connect(job, SIGNAL(result(KJob*)), this, SLOT(handleSetPwmResult(KJob*)));
-                job->start();
+                if (!job->exec())
+                {
+                    if (job->error() == KAuth::ActionReply::HelperBusyError)
+                    {
+                        qDebug() << "Helper busy...";
+                        
+                        QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                    }
+                    
+                    emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
+                }
+                update();
             }
         }
     }
     return true;
-}
-
-void PwmFan::handleSetPwmResult(KJob *job)
-{
-    if (job->error())
-    {
-        if (job->error() == KAuth::ActionReply::HelperBusyError)
-        {
-            qDebug() << "Helper busy...";
-            
-            QTimer::singleShot(50, this, [this] (){ setPwm(m_pwm); });
-            return;
-        }
-        
-        emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
-        return;
-    }
-    update();
 }
 
 bool PwmFan::setPwmMode(int pwmMode, bool write)
@@ -230,65 +223,56 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                 map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
                 map[QStringLiteral("content")] = QString::number(pwmMode);
                 action.setArguments(map);
+
                 KAuth::ExecuteJob *job = action.execute();
-                connect(job, SIGNAL(result(KJob*)), this, SLOT(handleSetPwmModeResult(KJob*)));
-                job->start();
+                if (!job->exec())
+                {
+                    if (job->error() == KAuth::ActionReply::HelperBusyError)
+                    {
+                        qDebug() << "Helper busy...";
+                        
+                        QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                    }
+                    
+                    emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
+                }
+                update();
             }
         }
     }
     return true;
 }
 
-void PwmFan::handleSetPwmModeResult(KJob *job)
-{
-    if (job->error())
-    {
-        if (job->error() == KAuth::ActionReply::HelperBusyError)
-        {
-            qDebug() << "Helper busy...";
-            
-            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
-            return;
-        }
-        
-        emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
-        return;
-    }
-    update();
-}
-
 void PwmFan::test()
 {
-    KAuth::Action action = newFancontrolAction();
-    KAuth::ExecuteJob *job = action.execute();
-    connect(job, SIGNAL(result(KJob*)), this, SLOT(handleTestAuthReply(KJob*)));
-    job->start();
-}
-
-void PwmFan::handleTestAuthReply(KJob *job)
-{  
-    if (job->error())
+    if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
-        if (job->error() == KAuth::ActionReply::HelperBusyError)
+        KAuth::Action action = newFancontrolAction();
+        KAuth::ExecuteJob *job = action.execute();
+
+        if (!job->exec())
         {
-            qDebug() << "Helper busy...";
+            if (job->error() == KAuth::ActionReply::HelperBusyError)
+            {
+                qDebug() << "Helper busy...";
+                
+                QTimer::singleShot(100, this, &PwmFan::test);
+                return;
+            }
             
-            QTimer::singleShot(100, this, &PwmFan::test);
+            emit errorChanged(i18n("Authorization error: ") + job->errorText());
+            m_testStatus = Error;
+            emit testStatusChanged();
             return;
         }
-        
-        emit errorChanged(i18n("Authorization error: ") + job->errorText());
-        m_testStatus = Error;
-        emit testingChanged();
-        return;
     }
     
     setPwm(255);
     
     m_testStatus = FindingStop1;
-    emit testingChanged();
+    emit testStatusChanged();
     
-    QTimer::singleShot(500, this, SLOT(continueTest()));
+    QTimer::singleShot(500, this, &PwmFan::continueTest);
     qDebug() << "Start testing...";
 }
 
@@ -298,10 +282,8 @@ void PwmFan::abortTest()
     {
         qDebug() << "Abort testing";
         
-        disconnect(this, 0, this, SLOT(continueTest()));
-
         m_testStatus = Cancelled;
-        emit testingChanged();
+        emit testStatusChanged();
 
         setPwm(255);
     }
@@ -309,16 +291,20 @@ void PwmFan::abortTest()
 
 void PwmFan::continueTest()
 {
-    KAuth::Action action = newFancontrolAction();
-    
-    if (action.status() != KAuth::Action::AuthorizedStatus)
+    if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
-        m_testStatus = Error;
-        emit testingChanged();
-        return;
+        KAuth::Action action = newFancontrolAction();
+        
+        if (action.status() != KAuth::Action::AuthorizedStatus)
+        {
+            m_testStatus = Error;
+            emit testStatusChanged();
+            return;
+        }
     }
     
     update();
+    
     switch (m_testStatus)
     {
     case FindingStop1:
@@ -340,7 +326,7 @@ void PwmFan::continueTest()
                 qDebug() << "Start finding start value...";
             }
         }
-        QTimer::singleShot(500, this, SLOT(continueTest()));
+        QTimer::singleShot(500, this, &PwmFan::continueTest);
         break;
 
     case FindingStart:
@@ -352,7 +338,7 @@ void PwmFan::continueTest()
             setMinStart(m_pwm);
             qDebug() << "Start finding stop value...";
         }
-        QTimer::singleShot(1000, this, SLOT(continueTest()));
+        QTimer::singleShot(1000, this, &PwmFan::continueTest);
         break;
 
     case FindingStop2:
@@ -360,19 +346,19 @@ void PwmFan::continueTest()
         {
             setPwm(m_pwm - 1);
             m_zeroRpm = 0;
-            QTimer::singleShot(1000, this, SLOT(continueTest()));
+            QTimer::singleShot(1000, this, &PwmFan::continueTest);
         }
         else
         {
             if (m_zeroRpm < MAX_ERRORS_FOR_RPM_ZERO)
             {
                 m_zeroRpm++;
-                QTimer::singleShot(500, this, SLOT(continueTest()));
+                QTimer::singleShot(500, this, &PwmFan::continueTest);
             }
             else
             {
                 m_testStatus = Finished;
-                emit testingChanged();
+                emit testStatusChanged();
                 m_zeroRpm = 0;
                 setMinStop(m_pwm + 5);
                 qDebug() << "Finished testing!";

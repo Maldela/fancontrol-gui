@@ -58,7 +58,7 @@ public slots:
 signals:
 
     void nameChanged();
-    void errorChanged(QString);
+    void errorChanged(QString, bool = false);
 
 
 protected:
