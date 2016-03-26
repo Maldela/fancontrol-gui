@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
+import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
 import "units.js" as Units
 import "colors.js" as Colors
@@ -449,9 +450,10 @@ Rectangle {
                 Layout.fillWidth: true
             }
             Button {
+                id: testButton
+
                 property bool reactivateAfterTesting
 
-                id: testButton
                 text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
                 iconName: "dialog-password"
                 anchors.right: parent.right
@@ -465,6 +467,10 @@ Rectangle {
                         minStartInput.value = Qt.binding(function() { return Math.round(fan.minStart / 2.55) });
                         fan.test();
                     }
+                }
+                Connections {
+                    target: fan
+                    onTestStatusChanged: if (fan.testStatus === Fancontrol.PwmFan.Finished && testButton.reactivateAfterTesting) systemdCom.serviceActive = true
                 }
             }
         }

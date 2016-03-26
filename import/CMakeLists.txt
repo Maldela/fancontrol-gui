@@ -9,11 +9,11 @@ set(LIB_SRCS src/hwmon.cpp
              src/pwmfanmodel.cpp
              src/tempmodel.cpp
              src/fancontrolqmlextension.cpp)
-             
+
 set(QML_FILES qml/qmldir
               qml/ErrorDialog.qml
               qml/OptionInput.qml
-              qml/PwmFan.qml
+              qml/FanItem.qml
               qml/PwmPoint.qml
               qml/StatusPoint.qml
               qml/colors.js
@@ -34,7 +34,7 @@ if(NOT NO_SYSTEMD)
 
     set(LIB_PRIVATE_LIBRARIES ${LIB_PRIVATE_LIBRARIES}
                               Qt5::DBus)
-                              
+
     find_package(Qt5DBus REQUIRED)
     include_directories(${Qt5DBus_INCLUDE_DIRS})
 

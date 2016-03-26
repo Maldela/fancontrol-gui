@@ -38,12 +38,12 @@ Item {
     id: root
     implicitWidth: 1024
     implicitHeight: 768
-    
+
     Connections {
         target: loader
         onConfigFileChanged: kcm.needsSave = true
     }
-    
+
     Connections {
         target: Fancontrol.base
         onMinTempChanged: kcm.needsSave = true
@@ -51,11 +51,11 @@ Item {
         onServiceNameChanged: kcm.needsSave = true
         onConfigUrlChanged: kcm.needsSave = true
     }
-    
+
     Connections {
         target: kcm
         onAboutToSave: {
-            base.save(true);
+            Fancontrol.base.save(true);
             if (systemdCom.serviceActive && enabledBox.checked) {
                 systemdCom.restartService();
             } else {
@@ -113,7 +113,7 @@ Item {
         visible: enabledBox.checked
 
         RowLayout {
-            visible: enabledBox.checked && pwmFanModel.count > 0
+            visible: enabledBox.checked && pwmFans.length > 0
 
             Label {
                 text: i18n("Fan:")
@@ -139,7 +139,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             active: !!pwmFans[fanComboBox.currentIndex]
-            sourceComponent: Fancontrol.PwmFan {
+            sourceComponent: Fancontrol.FanItem {
                 unit: Fancontrol.base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
                 systemdCom: root.systemdCom

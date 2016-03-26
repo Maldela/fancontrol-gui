@@ -63,7 +63,7 @@ ColumnLayout {
         Layout.fillWidth: true
         active: !!tempModel && !!systemdCom && pwmFans.length > fanComboBox.currentIndex
 
-        sourceComponent: PwmFan {
+        sourceComponent: FanItem {
             unit: !!baseObject ? baseObject.unit : 0
             fan: pwmFans[fanComboBox.currentIndex]
             tempModel: root.tempModel
