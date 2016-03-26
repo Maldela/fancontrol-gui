@@ -49,6 +49,7 @@ class Loader : public QObject
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
+    Q_PROPERTY(bool restartServiceAfterTesting READ restartServiceAfterTesting WRITE setRestartServiceAfterTesting NOTIFY restartServiceAfterTestingChanged)
 
 
 public:
@@ -65,6 +66,8 @@ public:
     QString configFile() const { return m_configFile; }
     QList<Hwmon *> hwmons() const { return m_hwmons; }
     bool sensorsDetected() const { return m_sensorsDetected; }
+    bool restartServiceAfterTesting() const { return m_reactivateAfterTesting; }
+    void setRestartServiceAfterTesting(bool restart);
     QList<QObject *> hwmonsAsObjects() const;
     QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
@@ -83,7 +86,8 @@ public slots:
     void setError(const QString &error, bool critical = false);
     void handleDetectSensorsResult(KJob *job);
     void handleDetectSensorsResult(int exitCode);
-    
+    void handleTestStatusChanged();
+
 
 protected:
 
@@ -95,6 +99,7 @@ private:
     PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
     Temp *getTemp(const QPair<int, int> &indexPair) const;
 
+    bool m_reactivateAfterTesting;
     int m_interval;
     QList<Hwmon *> m_hwmons;
     QUrl m_configUrl;
@@ -117,6 +122,8 @@ signals:
     void invalidConfigUrl();
     void criticalError();
     void sensorsDetectedChanged();
+    void restartServiceAfterTestingChanged();
+    void requestSetServiceActive(bool);
 };
 
 }

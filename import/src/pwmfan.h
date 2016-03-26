@@ -54,7 +54,7 @@ class PwmFan : public Fan
     Q_ENUMS(TestStatus)
 
 public:
-    
+
     enum TestStatus
     {
         NotStarted,
@@ -110,7 +110,7 @@ signals:
     void minStartChanged();
     void minStopChanged();
     void activeChanged();
-    void testStatusChanged();
+    void testStatusChanged(bool = false);
     void pwmModeChanged();
 
 

@@ -46,6 +46,10 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 {
     connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
 
+#ifndef NO_SYSTEMD
+    connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
+#endif
+
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
     m_unit = (system != QLocale::ImperialUSSystem) ? 0 : 2;

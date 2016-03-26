@@ -30,6 +30,7 @@ namespace Fancontrol
 {
 
 Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
+    m_parent(parent),
     m_path(path),
     m_valid(true)
 {
@@ -90,6 +91,7 @@ void Hwmon::initialize()
                 {
                     newPwmFan = new PwmFan(this, index);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
+                    connect(newPwmFan, &PwmFan::testStatusChanged, m_parent, &Loader::handleTestStatusChanged);
                     m_pwmFans << newPwmFan;
                     emit pwmFansChanged();
                 }
@@ -214,6 +216,22 @@ Temp* Hwmon::temp(int i) const
 void Hwmon::setError(const QString &error)
 {
     emit errorChanged(error);
+}
+
+bool Hwmon::testing() const
+{
+    bool testing = false;
+
+    foreach(const PwmFan *fan, m_pwmFans)
+    {
+        if (fan->testing())
+        {
+            testing = true;
+            break;
+        }
+    }
+
+    return testing;
 }
 
 }

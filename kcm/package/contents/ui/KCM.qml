@@ -100,7 +100,10 @@ Item {
         visible: pwmFans.length > 0
         text: i18n("Control fans manually")
         checked: systemdCom.serviceEnabled && systemdCom.serviceActive;
-        onCheckedChanged: if (checked !== systemdCom.serviceActive || checked !== systemdCom.serviceEnabled) kcm.needsSave = true
+        onCheckedChanged: if (checked !== systemdCom.serviceActive || checked !== systemdCom.serviceEnabled) {
+            kcm.needsSave = true;
+            loader.restartServiceAfterTesting = checked;
+        }
     }
 
     ColumnLayout {

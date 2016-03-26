@@ -32,7 +32,7 @@
 
 namespace Fancontrol
 {
-    
+
 class Loader;
 
 class Hwmon : public QObject
@@ -66,6 +66,7 @@ public:
     PwmFan * pwmFan(int i) const;
     Temp * temp(int i) const;
     bool isValid() const { return m_valid; }
+    bool testing() const;
 
 
 public slots:
@@ -87,6 +88,7 @@ signals:
 
 private:
 
+    Loader *m_parent;
     QString m_name;
     const QString m_path;
     bool m_valid;

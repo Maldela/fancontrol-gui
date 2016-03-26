@@ -452,25 +452,16 @@ Rectangle {
             Button {
                 id: testButton
 
-                property bool reactivateAfterTesting
-
                 text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
                 iconName: "dialog-password"
                 anchors.right: parent.right
                 onClicked: {
                     if (fan.testing) {
-                        systemdCom.serviceActive = reactivateAfterTesting;
                         fan.abortTest();
                     } else {
-                        reactivateAfterTesting = systemdCom.serviceActive;
-                        systemdCom.serviceActive = false;
                         minStartInput.value = Qt.binding(function() { return Math.round(fan.minStart / 2.55) });
                         fan.test();
                     }
-                }
-                Connections {
-                    target: fan
-                    onTestStatusChanged: if (fan.testStatus === Fancontrol.PwmFan.Finished && testButton.reactivateAfterTesting) systemdCom.serviceActive = true
                 }
             }
         }

@@ -45,6 +45,7 @@ namespace Fancontrol
 {
 
 Loader::Loader(QObject *parent) : QObject(parent),
+    m_reactivateAfterTesting(true),
     m_interval(10),
     m_configUrl(QUrl::fromLocalFile(QStringLiteral(STANDARD_CONFIG_FILE))),
     m_timer(new QTimer(this)),
@@ -267,7 +268,7 @@ bool Loader::load(const QUrl &url)
     else if (file.exists())
     {
         KAuth::Action action = newFancontrolAction();
-        
+
         if (action.isValid())
         {
             QVariantMap map;
@@ -282,7 +283,7 @@ bool Loader::load(const QUrl &url)
                     qDebug() << "Aborted by user";
                     return false;
                 }
-                
+
                 qDebug() << "Error while loading:" << reply->error();
                 setError(reply->errorString() + reply->errorText(), true);
                 return false;
@@ -354,7 +355,7 @@ bool Loader::load(const QUrl &url)
                 //Connect hwmons again
                 foreach (Hwmon *hwmon, m_hwmons)
                     connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
-                
+
                 setError(i18n("Unable to parse interval line: \n %1", line), true);
                 return false;
             }
@@ -402,7 +403,7 @@ bool Loader::load(const QUrl &url)
                         //Connect hwmons again
                         foreach (Hwmon *hwmon, m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
-                        
+
                         setError(i18n("Can not parse %1", devname), true);
                         return false;
                     }
@@ -412,7 +413,7 @@ bool Loader::load(const QUrl &url)
                         //Connect hwmons again
                         foreach (Hwmon *hwmon, m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
-                        
+
                         setError(i18n("Invalid config file!"), true);
                         return false;
                     }
@@ -455,7 +456,7 @@ bool Loader::load(const QUrl &url)
             //Connect hwmons again
             foreach (Hwmon *hwmon, m_hwmons)
                 connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
-            
+
             setError(i18n("Unrecognized line in config:\n%1", line), true);
             return false;
         }
@@ -466,7 +467,7 @@ bool Loader::load(const QUrl &url)
     //Connect hwmons again
     foreach (Hwmon *hwmon, m_hwmons)
         connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
-    
+
     emit configUrlChanged();
 
     return true;
@@ -499,7 +500,7 @@ bool Loader::save(const QUrl &url)
     else
     {
         KAuth::Action action = newFancontrolAction();
-        
+
         if (action.isValid())
         {
             QVariantMap map;
@@ -517,7 +518,7 @@ bool Loader::save(const QUrl &url)
                     qDebug() << "Aborted by user";
                     return false;
                 }
-                
+
                 qDebug() << "Error while saving:" << reply->error();
                 setError(reply->errorString() + reply->errorText(), true);
                 return false;
@@ -566,14 +567,14 @@ void Loader::createConfigFile()
             configFile += QStringLiteral("hwmon") + QString::number(hwmon->index()) + "=" + sanitizedPath + QChar(QChar::Space);
         }
         configFile += QChar(QChar::LineFeed);
-        
+
         configFile += QStringLiteral("DEVNAME=");
         foreach (Hwmon *hwmon, usedHwmons)
         {
             configFile += QStringLiteral("hwmon") + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + QChar(QChar::Space);
         }
         configFile += QChar(QChar::LineFeed);
-        
+
         if (!usedFans.isEmpty())
         {
             configFile += QStringLiteral("FCTEMPS=");
@@ -585,7 +586,7 @@ void Loader::createConfigFile()
                 configFile += QStringLiteral("temp") + QString::number(pwmFan->temp()->index()) + QStringLiteral("_input ");
             }
             configFile += QChar(QChar::LineFeed);
-            
+
             configFile += QStringLiteral("FCFANS=");
             foreach (PwmFan *pwmFan, usedFans)
             {
@@ -595,7 +596,7 @@ void Loader::createConfigFile()
                 configFile += QStringLiteral("fan") + QString::number(pwmFan->index()) + QStringLiteral("_input ");
             }
             configFile += QChar(QChar::LineFeed);
-            
+
             configFile += QStringLiteral("MINTEMP=");
             foreach (PwmFan *pwmFan, usedFans)
             {
@@ -604,7 +605,7 @@ void Loader::createConfigFile()
                 configFile += QString::number(pwmFan->minTemp()) + QChar(QChar::Space);
             }
             configFile += QChar(QChar::LineFeed);
-            
+
             configFile += QStringLiteral("MAXTEMP=");
             foreach (PwmFan *pwmFan, usedFans)
             {
@@ -613,7 +614,7 @@ void Loader::createConfigFile()
                 configFile += QString::number(pwmFan->maxTemp()) + QChar(QChar::Space);
             }
             configFile += QChar(QChar::LineFeed);
-            
+
             configFile += QStringLiteral("MINSTART=");
             foreach (PwmFan *pwmFan, usedFans)
             {
@@ -622,7 +623,7 @@ void Loader::createConfigFile()
                 configFile += QString::number(pwmFan->minStart()) + QChar(QChar::Space);
             }
             configFile += QChar(QChar::LineFeed);
-            
+
             configFile += QStringLiteral("MINSTOP=");
             foreach (PwmFan *pwmFan, usedFans)
             {
@@ -691,10 +692,10 @@ void Loader::detectSensors()
 {
     QString program = QStringLiteral("sensors-detect");
     QStringList arguments = QStringList() << QStringLiteral("--auto");
-    
+
     QProcess *process = new QProcess(this);
     process->start(program, arguments);
-    
+
     connect(process, static_cast<void(QProcess::*)(int)>(&QProcess::finished),
             this, static_cast<void(Loader::*)(int)>(&Loader::handleDetectSensorsResult));
 }
@@ -702,22 +703,22 @@ void Loader::detectSensors()
 void Loader::handleDetectSensorsResult(int exitCode)
 {
     QProcess *process = qobject_cast<QProcess *>(sender());
-    
+
     if (exitCode)
     {
         if (process)
             setError(process->readAllStandardOutput());
-        
+
         KAuth::Action action = newFancontrolAction();
-        
+
         if (action.isValid())
         {
             QVariantMap map;
             map[QStringLiteral("action")] = QVariant("detectSensors");
-            
+
             action.setArguments(map);
             KAuth::ExecuteJob *job = action.execute();
-            
+
             connect(job, &KAuth::ExecuteJob::result, this, static_cast<void(Loader::*)(KJob *)>(&Loader::handleDetectSensorsResult));
             job->start();
         }
@@ -731,10 +732,10 @@ void Loader::handleDetectSensorsResult(int exitCode)
             m_sensorsDetected = true;
             emit sensorsDetectedChanged();
         }
-        
+
         parseHwmons();
     }
-    
+
     if (process)
         process->deleteLater();
 }
@@ -748,7 +749,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
             qDebug() << "Aborted by user";
             return;
         }
-            
+
         qDebug() << "Error while detecting sensors:" << job->error();
         setError(job->errorString() + job->errorText(), true);
     }
@@ -759,7 +760,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
             m_sensorsDetected = true;
             emit sensorsDetectedChanged();
         }
-        
+
         parseHwmons();
     }
 }
@@ -796,6 +797,34 @@ void Loader::setError (const QString &error, bool critical)
     }
     else
         qWarning() << error;
+}
+
+void Loader::handleTestStatusChanged()
+{
+    bool testing = false;
+
+    foreach (const Hwmon *hwmon, m_hwmons)
+    {
+        if (hwmon->testing() == true)
+        {
+            testing = true;
+            break;
+        }
+    }
+
+    if (!testing && !m_reactivateAfterTesting)
+        return;
+
+    emit requestSetServiceActive(!testing);
+}
+
+void Loader::setRestartServiceAfterTesting(bool restart)
+{
+    if (m_reactivateAfterTesting == restart)
+        return;
+
+    m_reactivateAfterTesting = restart;
+    emit restartServiceAfterTestingChanged();
 }
 
 }

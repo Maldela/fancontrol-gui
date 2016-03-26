@@ -120,18 +120,18 @@ void PwmFan::update()
 void PwmFan::reset()
 {
     Fan::reset();
-    
+
     setHasTemp(false);
     setTemp(Q_NULLPTR);
-    
+
     QIODevice *oldFile = m_pwmStream->device();
     delete m_pwmStream;
     delete oldFile;
-    
+
     oldFile = m_modeStream->device();
     delete m_modeStream;
     delete oldFile;
-    
+
     QFile *pwmFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index), this);
         if (pwmFile->open(QFile::ReadWrite))
         {
@@ -171,13 +171,13 @@ bool PwmFan::setPwm(int pwm, bool write)
         if (write)
         {
             setPwmMode(1);
-            
+
             if (m_pwmStream->device()->isWritable())
                 *m_pwmStream << pwm;
             else
             {
                 KAuth::Action action = newFancontrolAction();
-                
+
                 if (action.isValid())
                 {
                     QVariantMap map;
@@ -185,17 +185,17 @@ bool PwmFan::setPwm(int pwm, bool write)
                     map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_pwmStream->device())->fileName();
                     map[QStringLiteral("content")] = QString::number(pwm);
                     action.setArguments(map);
-                    
+
                     KAuth::ExecuteJob *job = action.execute();
                     if (!job->exec())
                     {
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
                         {
                             qDebug() << "Helper busy...";
-                            
+
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
-                        
+
                         emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
                     }
                     update();
@@ -223,7 +223,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
             else
             {
                 KAuth::Action action = newFancontrolAction();
-                
+
                 if (action.isValid())
                 {
                     QVariantMap map;
@@ -238,10 +238,10 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
                         {
                             qDebug() << "Helper busy...";
-                            
+
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
-                        
+
                         emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
                     }
                     update();
@@ -259,21 +259,13 @@ void PwmFan::test()
     if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
         KAuth::Action action = newFancontrolAction();
-        
+
         if (action.isValid())
         {
-            KAuth::ExecuteJob *job = action.execute();
+            KAuth::ExecuteJob *job = action.execute(KAuth::Action::AuthorizeOnlyMode);
 
             if (!job->exec())
             {
-                if (job->error() == KAuth::ActionReply::HelperBusyError)
-                {
-                    qDebug() << "Helper busy...";
-                    
-                    QTimer::singleShot(100, this, &PwmFan::test);
-                    return;
-                }
-                
                 emit errorChanged(i18n("Authorization error: ") + job->errorText());
                 m_testStatus = Error;
                 emit testStatusChanged();
@@ -286,12 +278,12 @@ void PwmFan::test()
             return;
         }
     }
-    
+
     setPwm(255);
-    
+
     m_testStatus = FindingStop1;
     emit testStatusChanged();
-    
+
     QTimer::singleShot(500, this, &PwmFan::continueTest);
     qDebug() << "Start testing...";
 }
@@ -301,7 +293,7 @@ void PwmFan::abortTest()
     if (m_testStatus >= FindingStop1 && m_testStatus <= FindingStart)
     {
         qDebug() << "Abort testing";
-        
+
         m_testStatus = Cancelled;
         emit testStatusChanged();
 
@@ -314,7 +306,7 @@ void PwmFan::continueTest()
     if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
         KAuth::Action action = newFancontrolAction();
-        
+
         if (action.status() != KAuth::Action::AuthorizedStatus)
         {
             m_testStatus = Error;
@@ -322,9 +314,9 @@ void PwmFan::continueTest()
             return;
         }
     }
-    
+
     update();
-    
+
     switch (m_testStatus)
     {
     case FindingStop1:
@@ -381,7 +373,8 @@ void PwmFan::continueTest()
                 emit testStatusChanged();
                 m_zeroRpm = 0;
                 setMinStop(m_pwm + 5);
-                qDebug() << "Finished testing!";
+                setPwm(255);
+                qDebug() << "Finished testing PwmFan" << m_index;
             }
         }
         break;
