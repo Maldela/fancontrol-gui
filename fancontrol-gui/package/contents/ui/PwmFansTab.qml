@@ -34,7 +34,7 @@ ColumnLayout {
 
     id: root
     anchors.fill: parent
-    anchors.topMargin: 5
+    anchors.margins: 10
 
     RowLayout {
         width: parent.width
@@ -61,7 +61,7 @@ ColumnLayout {
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        active: !!tempModel && !!systemdCom && pwmFans.length < fanComboBox.currentIndex
+        active: !!tempModel && !!systemdCom && pwmFans.length > fanComboBox.currentIndex
 
         sourceComponent: PwmFan {
             unit: !!baseObject ? baseObject.unit : 0

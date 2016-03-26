@@ -28,7 +28,7 @@ ColumnLayout {
     property QtObject loader
 
     anchors.fill: parent
-    anchors.topMargin: 5
+    anchors.margins: 10
 
     Label {
         anchors.top: parent.top

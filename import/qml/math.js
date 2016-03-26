@@ -35,3 +35,11 @@ function intervals(lower, upper, delta) {
     array.push(upper);
     return array;
 }
+
+function maxWidth(items) {
+    var maxWidth = 0;
+    for (var i=0; i<items.length; i++) {
+        maxWidth = Math.max(items[i].width, maxWidth);
+    }
+    return maxWidth;
+}

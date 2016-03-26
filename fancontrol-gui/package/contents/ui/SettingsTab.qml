@@ -35,7 +35,7 @@ Item {
 
     id: root
     anchors.fill: parent
-    anchors.topMargin: 5
+    anchors.margins: 10
 
     Column {
         id: column

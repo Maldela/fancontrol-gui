@@ -29,8 +29,7 @@ RowLayout {
 
     id: root
     anchors.fill: parent
-    anchors.margins: 2
-    anchors.topMargin: 10
+    anchors.margins: 10
 
     Repeater {
         model: !!loader ? loader.hwmons.length : 0

@@ -114,15 +114,16 @@ Rectangle {
                 bottom: background.bottom
                 left: parent.left
             }
-            width: graph.fontSize * 3
+            width: MoreMath.maxWidth(children) + graph.fontSize
 
             Repeater {
+                id: verticalRepeater
+
                 model: graph.verticalScalaCount
 
                 Label {
-                    x: 0
-                    width: verticalScala.width - graph.fontSize / 3
-                    y: background.scaleY(255 / (graph.verticalScalaCount - 1) * index) - graph.fontSize / 2
+                    x: verticalScala.width - implicitWidth - graph.fontSize / 3
+                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize / 2
                     horizontalAlignment: Text.AlignRight
                     color: graph.pal.text
                     text: index * (100 / (graph.verticalScalaCount - 1)) + "%"
@@ -144,8 +145,8 @@ Rectangle {
                 model: graph.horIntervals.length;
 
                 Label {
-                    x: Math.min(horizontalScala.width, background.scaleX(Units.toCelsius(graph.horIntervals[index]), root.unit)) - width / 2
-                    y: graph.fontSize / 2
+                    x: Math.min(horizontalScala.width, background.width / (graph.horIntervals.length - 1) * index) - width / 2
+                    y: horizontalScala.height / 2 - implicitHeight / 2
                     color: graph.pal.text
                     text: graph.horIntervals[index] + graph.suffix
                     font.pixelSize: graph.fontSize
