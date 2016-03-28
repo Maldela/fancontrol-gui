@@ -24,7 +24,7 @@ import QtQuick.Layouts 1.2
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
-ColumnLayout {
+Item {
     property QtObject loader: Fancontrol.base.loader
     property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
     property QtObject pwmFanModel: Fancontrol.base.pwmFanModel
@@ -36,7 +36,11 @@ ColumnLayout {
     anchors.margins: 10
 
     RowLayout {
+        id: fanRow
+
+        anchors.top: parent.top
         width: parent.width
+        height: childrenRect.height
         visible: pwmFans.length > 0
 
         Label {
@@ -58,8 +62,10 @@ ColumnLayout {
     }
 
     Loader {
-        Layout.fillHeight: true
-        Layout.fillWidth: true
+        width: parent.width
+        anchors.top: fanRow.bottom
+        anchors.bottom: parent.bottom
+        anchors.topMargin: parent.anchors.margins
         active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
 
         sourceComponent: Fancontrol.FanItem {

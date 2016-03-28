@@ -25,12 +25,12 @@ import Fancontrol.Qml 1.0 as Fancontrol
 
 
 RowLayout {
-    property QtObject loader: Fancontrol.base.loader 
+    property QtObject loader: Fancontrol.base.loader
 
     id: root
     anchors.fill: parent
     anchors.margins: 10
-    
+
     Repeater {
         model: loader.hwmons.length
 
@@ -68,13 +68,13 @@ RowLayout {
                             anchors.leftMargin: padding
                             Layout.maximumWidth: parent.width - rpmValue.width - padding*2
                             clip: true
-                            text: "Fan " + (index+1) + " RPM : "
+                            text: "Fan " + (index+1) + ":"
                         }
                         Label {
                             id: rpmValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding
-                            text: hwmon.fans[index].rpm
+                            text: hwmon.fans[index].rpm + " " + i18n("rpm")
                         }
                     }
                 }
@@ -95,7 +95,7 @@ RowLayout {
                             id: tempValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding
-                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + Fancontrol.base.unit
+                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + i18n(Fancontrol.base.unit)
                         }
                     }
                 }

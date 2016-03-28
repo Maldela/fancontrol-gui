@@ -80,13 +80,13 @@ Rectangle {
             Label {
                 id: temp
                 font.pixelSize: root.height * 1.5
-                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + unit
+                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + i18n(unit)
 
             }
             Label {
                 id: pwm
                 font.pixelSize: root.height * 1.5
-                text: Number(Math.round(unscaledPwm / 2.55)).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(unscaledPwm / 2.55)).toLocaleString(locale, 'f', 1) + i18n('%')
             }
             Label {
                 id: rpm

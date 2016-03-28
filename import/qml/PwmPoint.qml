@@ -76,12 +76,12 @@ Rectangle {
             Label {
                 id: pwm
                 font.pixelSize: root.size * 1.5
-                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
+                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + i18n('%')
             }
             Label {
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + unit
+                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + i18n(unit)
             }
         }
     }

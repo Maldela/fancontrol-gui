@@ -60,7 +60,7 @@ Rectangle {
 
     TextEdit {
         id: nameField
-        
+
         anchors {
             left: parent.left
             leftMargin: margin
@@ -83,12 +83,12 @@ Rectangle {
                 fan.name = text;
             }
         }
-        
+
         Connections {
             target: fan
             onNameChanged: if (fan.name != text) text = fan.name
         }
-            
+
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.IBeamCursor
@@ -132,7 +132,7 @@ Rectangle {
                     y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize / 2
                     horizontalAlignment: Text.AlignRight
                     color: graph.pal.text
-                    text: index * (100 / (graph.verticalScalaCount - 1)) + "%"
+                    text: i18n("%1\%", index * (100 / (graph.verticalScalaCount - 1)))
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -154,7 +154,7 @@ Rectangle {
                     x: Math.min(horizontalScala.width, background.width / (graph.horIntervals.length - 1) * index) - width / 2
                     y: horizontalScala.height / 2 - implicitHeight / 2
                     color: graph.pal.text
-                    text: graph.horIntervals[index] + unit
+                    text: i18n("%1" + unit, graph.horIntervals[index])
                     font.pixelSize: graph.fontSize
                 }
             }
