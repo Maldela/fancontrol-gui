@@ -21,18 +21,18 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
-import Fancontrol.Qml 1.0
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 RowLayout {
-    property QtObject loader
+    property QtObject loader: Fancontrol.base.loader 
 
     id: root
     anchors.fill: parent
     anchors.margins: 10
 
     Repeater {
-        model: !!loader ? loader.hwmons.length : 0
+        model: loader.hwmons.length
 
         Rectangle {
             property QtObject hwmon: loader.hwmons[index]
@@ -95,7 +95,7 @@ RowLayout {
                             id: tempValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding
-                            text: hwmon.temps[index].value
+                            text: hwmon.temps[index].value + " " + Fancontrol.base.unit
                         }
                     }
                 }

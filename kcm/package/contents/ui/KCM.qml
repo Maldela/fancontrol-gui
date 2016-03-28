@@ -33,7 +33,7 @@ Item {
     property QtObject tempModel: Fancontrol.base.tempModel
     property var locale: Qt.locale()
     property real textWidth: 0
-    property var pwmFans: pwmFanModel ? pwmFanModel.fans : []
+    property var pwmFans: pwmFanModel.fans
 
     id: root
     implicitWidth: 1024
@@ -141,7 +141,7 @@ Item {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            active: !!pwmFans[fanComboBox.currentIndex]
+            active: pwmFans.length > fanComboBox.currentIndex
             sourceComponent: Fancontrol.FanItem {
                 unit: Fancontrol.base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
@@ -231,7 +231,7 @@ Item {
             SpinBox {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                value: !!loader ? loader.interval : 1
+                value: loader.interval
                 suffix: " " + i18np("second", "seconds", loader.interval)
                 minimumValue: 1.0
                 onValueChanged: loader.interval = value
@@ -255,7 +255,7 @@ Item {
                 maximumValue: maxTempBox.value
                 minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
                 value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit == 0 ? i18n("°C") : Fancontrol.base.unit == 1 ? i18n("K") : i18n("°F")
+                suffix: Fancontrol.base.unit
                 onValueChanged: Fancontrol.base.minTemp = value
             }
         }
@@ -277,7 +277,7 @@ Item {
                 maximumValue: Number.POSITIVE_INFINITY
                 minimumValue: minTempBox.value
                 value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit == 0 ? i18n("°C") : Fancontrol.base.unit == 1 ? i18n("K") : i18n("°F")
+                suffix: Fancontrol.base.unit
                 onValueChanged: Fancontrol.base.maxTemp = value
             }
         }

@@ -32,7 +32,7 @@ Rectangle {
     readonly property point center: Qt.point(centerX, centerY)
     property alias drag: pwmMouse.drag
     property int size: 10
-    property int unit: 0
+    property string unit: "°C"
     property var locale: Qt.locale()
 
     signal positionChanged()
@@ -79,11 +79,9 @@ Rectangle {
                 text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + '%'
             }
             Label {
-                property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
-
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + suffix
+                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + unit
             }
         }
     }

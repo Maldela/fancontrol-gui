@@ -24,15 +24,15 @@ function round(number, dec) {
 
 function toCelsius(degrees, currentUnit) {
     var float = parseFloat(degrees);
-    if (currentUnit == 1) { return float - 273.15; }
-    if (currentUnit == 2) { return (float - 32) * 5 / 9; }
+    if (currentUnit == "K") { return float - 273.15; }
+    if (currentUnit == "°F") { return (float - 32) * 5 / 9; }
     return float;
 }
 
 function fromCelsius(degrees, newUnit) {
     var float = parseFloat(degrees);
-    if (newUnit == 1) { return float + 273.15; }
-    if (newUnit == 2) { return float * 9 / 5 + 32; }
+    if (newUnit == "K") { return float + 273.15; }
+    if (newUnit == "°F") { return float * 9 / 5 + 32; }
     return float;
 }
 
@@ -41,4 +41,4 @@ function fromKelvin(degrees, newUnit) {
     if (newUnit == 0) { return float - 273.15; }
     if (newUnit == 2) { return float * 9 / 5 - 459.67; }
     return float;
-}
+}    

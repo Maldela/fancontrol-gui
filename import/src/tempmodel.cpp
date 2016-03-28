@@ -31,15 +31,13 @@ namespace Fancontrol
 {
 
 TempModel::TempModel(QObject *parent) : QStringListModel(parent),
-m_unit(0)
+m_unit(QStringLiteral("°C"))
 {
 }
 
 QString TempModel::composeText(Temp *temp)
 {
-    QString suffix = m_unit == 0 ? QStringLiteral("°C") : m_unit == 2 ? QStringLiteral("°F") : QStringLiteral("K");
-
-    return temp->name() + ": " + QString::number(temp->value()) + suffix + "   (" + temp->path() + ")";
+    return temp->name() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->path() + ")";
 }
 
 

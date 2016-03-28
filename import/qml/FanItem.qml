@@ -34,7 +34,7 @@ Rectangle {
     property real minTemp: 40.0
     property real maxTemp: 90.0
     property int margin: 5
-    property int unit: 0
+    property string unit: "°C"
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
@@ -60,6 +60,7 @@ Rectangle {
 
     TextEdit {
         id: nameField
+        
         anchors {
             left: parent.left
             leftMargin: margin
@@ -82,7 +83,12 @@ Rectangle {
                 fan.name = text;
             }
         }
-
+        
+        Connections {
+            target: fan
+            onNameChanged: if (fan.name != text) text = fan.name
+        }
+            
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.IBeamCursor
@@ -95,7 +101,6 @@ Rectangle {
 
         property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
         property QtObject pal: !!fan ? fan.hasTemp ? palette : disabledPalette : disabledPalette
-        property string suffix: (root.unit == 0) ? "°C" : (root.unit == 1) ? "K" : "°F"
         property int verticalScalaCount: 6
         property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
 
@@ -149,7 +154,7 @@ Rectangle {
                     x: Math.min(horizontalScala.width, background.width / (graph.horIntervals.length - 1) * index) - width / 2
                     y: horizontalScala.height / 2 - implicitHeight / 2
                     color: graph.pal.text
-                    text: graph.horIntervals[index] + graph.suffix
+                    text: graph.horIntervals[index] + unit
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -444,7 +449,7 @@ Rectangle {
         }
 
         RowLayout {
-            visible: systemdCom
+            visible: !!systemdCom
 
             Item {
                 Layout.fillWidth: true

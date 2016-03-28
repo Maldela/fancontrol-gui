@@ -56,7 +56,7 @@ class GUIBase : public QObject
 
     Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
-    Q_PROPERTY(int unit READ unit WRITE setUnit NOTIFY unitChanged)
+    Q_PROPERTY(QString unit READ unit WRITE setUnit NOTIFY unitChanged)
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
@@ -78,12 +78,12 @@ public:
     QString serviceName() const;
     QUrl configUrl() const;
     bool configValid() const { return m_configValid; }
-    int unit() const { return m_unit; }
+    QString unit() const { return m_unit; }
     void setMinTemp(qreal minTemp);
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
-    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); m_tempModel->setUnit(unit); } }
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); m_tempModel->setUnit(unit); } }
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
     TempModel *tempModel() const { return m_tempModel; };
     
@@ -119,7 +119,7 @@ private:
 #endif
 
     Loader *const m_loader;
-    int m_unit;
+    QString m_unit;
     bool m_configValid;
     PwmFanModel *m_pwmFanModel;
     TempModel *m_tempModel;

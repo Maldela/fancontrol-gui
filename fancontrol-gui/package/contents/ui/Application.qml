@@ -100,28 +100,20 @@ ApplicationWindow {
 
         Tab {
             title: i18n("Sensors")
-            SensorsTab {
-                loader: Fancontrol.base.loader
-            }
+            SensorsTab {}
         }
         Tab {
             title: i18n("PwmFans")
-            PwmFansTab {
-                baseObject: Fancontrol.base
-            }
+            PwmFansTab {}
         }
         Tab {
             title: i18n("Configfile")
-            ConfigfileTab {
-                loader: Fancontrol.base.loader
-            }
+            ConfigfileTab {}
         }
         Tab {
             id: settingsTab
             title: i18n("Settings")
-            SettingsTab {
-                gui: Fancontrol.base
-            }
+            SettingsTab {}
         }
     }
 

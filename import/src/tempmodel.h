@@ -45,7 +45,7 @@ public:
     void setTemps(const QList<Temp *> &temps);
     void addTemps(const QList<Temp *> &temps);
     QList<QObject *> temps() const;
-    void setUnit(int unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
 
 
 protected:
@@ -76,7 +76,7 @@ signals:
 private:
 
     QList<Temp *> m_temps;
-    int m_unit;
+    QString m_unit;
 };
 
 }

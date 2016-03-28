@@ -52,7 +52,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
-    m_unit = (system != QLocale::ImperialUSSystem) ? 0 : 2;
+    m_unit = (system == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
 
     m_tempModel->setUnit(m_unit);
     foreach (Hwmon *hwmon, m_loader->hwmons())

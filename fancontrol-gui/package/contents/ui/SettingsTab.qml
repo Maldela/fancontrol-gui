@@ -21,15 +21,13 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
-import Fancontrol.Qml 1.0
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
-    property QtObject gui
-    property QtObject systemdCom: !!gui && gui.hasSystemdCommunicator() ? gui.systemdCom : null
-    property QtObject loader : !!gui ? gui.loader : null
+    property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
+    property QtObject loader : Fancontrol.base.loader
     property int padding: 10
-    property int unit: !!gui ? gui.unit : 0
     property real textWidth: 0
     property var locale: Qt.locale()
 
@@ -56,14 +54,10 @@ Item {
             SpinBox {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                value: !!loader ? loader.interval : 1
-                suffix: !!loader ? " " + i18np("second", "seconds", loader.interval): ""
+                value: loader.interval
+                suffix: " " + i18np("second", "seconds", loader.interval)
                 minimumValue: 1.0
-                onValueChanged: {
-                    if (!!loader) {
-                        loader.interval = value;
-                    }
-                }
+                onValueChanged: loader.interval = value
             }
         }
         RowLayout {
@@ -82,14 +76,10 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, unit)
-                value: !!gui ? Units.fromCelsius(gui.minTemp, unit) : 0
-                suffix: unit == 0 ? i18n("°C") : unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: {
-                    if (!!gui) {
-                        gui.minTemp = value;
-                    }
-                }
+                minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
+                value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
+                suffix: Fancontrol.base.unit
+                onValueChanged: Fancontrol.base.minTemp = value
             }
         }
         RowLayout {
@@ -109,13 +99,9 @@ Item {
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
                 minimumValue: minTempBox.value
-                value: !!gui ? Units.fromCelsius(gui.maxTemp, unit) : 0
-                suffix: unit == 0 ? i18n("°C") : unit == 1 ? i18n("K") : i18n("°F")
-                onValueChanged: {
-                    if (!!gui) {
-                        gui.maxTemp = value;
-                    }
-                }
+                value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
+                suffix: Fancontrol.base.unit
+                onValueChanged:Fancontrol.base.maxTemp = value
             }
         }
         Loader {
@@ -130,16 +116,12 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
-                OptionInput {
+                Fancontrol.OptionInput {
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: !!systemdCom && systemdCom.serviceExists ? "green" : "red"
-                    value: !!gui ? gui.serviceName : ""
-                    onTextChanged: {
-                        if (!!gui) {
-                            gui.serviceName = text;
-                        }
-                    }
+                    value: Fancontrol.base.serviceName
+                    onTextChanged: Fancontrol.base.serviceName = text
                 }
             }
         }

@@ -36,7 +36,7 @@ Rectangle {
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
-    property int unit: 0
+    property string unit: "°C"
 
     width: size
     height: size
@@ -78,11 +78,9 @@ Rectangle {
 
         Column {
             Label {
-                property string suffix: (unit == 0) ? "°C" : (unit == 1) ? "K" : "°F"
-
                 id: temp
                 font.pixelSize: root.height * 1.5
-                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + suffix
+                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + unit
 
             }
             Label {

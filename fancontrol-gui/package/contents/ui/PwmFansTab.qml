@@ -21,16 +21,15 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
-import Fancontrol.Qml 1.0
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 ColumnLayout {
-    property QtObject baseObject
-    property QtObject loader: baseObject ? baseObject.loader : null
-    property QtObject systemdCom: baseObject && baseObject.hasSystemdCommunicator() ? baseObject.systemdCom : null
-    property QtObject pwmFanModel: baseObject ? baseObject.pwmFanModel : null
-    property QtObject tempModel: baseObject ? baseObject.tempModel : null
-    property var pwmFans: pwmFanModel ? pwmFanModel.fans : []
+    property QtObject loader: Fancontrol.base.loader
+    property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
+    property QtObject pwmFanModel: Fancontrol.base.pwmFanModel
+    property QtObject tempModel: Fancontrol.base.tempModel
+    property var pwmFans: pwmFanModel.fans
 
     id: root
     anchors.fill: parent
@@ -38,7 +37,7 @@ ColumnLayout {
 
     RowLayout {
         width: parent.width
-        visible: !!pwmFanModel && pwmFans.length > 0
+        visible: pwmFans.length > 0
 
         Label {
             text: i18n("Fan:")
@@ -61,15 +60,15 @@ ColumnLayout {
     Loader {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        active: !!tempModel && !!systemdCom && pwmFans.length > fanComboBox.currentIndex
+        active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
 
-        sourceComponent: FanItem {
-            unit: !!baseObject ? baseObject.unit : 0
+        sourceComponent: Fancontrol.FanItem {
+            unit: Fancontrol.base.unit
             fan: pwmFans[fanComboBox.currentIndex]
             tempModel: root.tempModel
             systemdCom: root.systemdCom
-            minTemp: !!baseObject ? baseObject.minTemp : 30
-            maxTemp: !!baseObject ? baseObject.maxTemp : 100
+            minTemp: Fancontrol.base.minTemp
+            maxTemp: Fancontrol.base.maxTemp
         }
     }
 
