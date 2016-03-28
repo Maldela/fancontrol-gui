@@ -45,7 +45,6 @@ public:
     void setTemps(const QList<Temp *> &temps);
     void addTemps(const QList<Temp *> &temps);
     QList<QObject *> temps() const;
-    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
 
 
 protected:
@@ -56,7 +55,8 @@ protected:
 public slots:
 
     void updateTemp(Temp *temp);
-
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
+    
 
 protected slots:
 

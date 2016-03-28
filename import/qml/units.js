@@ -38,7 +38,7 @@ function fromCelsius(degrees, newUnit) {
 
 function fromKelvin(degrees, newUnit) {
     var float = parseFloat(degrees);
-    if (newUnit == 0) { return float - 273.15; }
-    if (newUnit == 2) { return float * 9 / 5 - 459.67; }
+    if (newUnit == "°C") { return float - 273.15; }
+    if (newUnit == "°F") { return float * 9 / 5 - 459.67; }
     return float;
 }    

@@ -100,4 +100,5 @@ private:
 
 }
 
+
 #endif // HWMON_H

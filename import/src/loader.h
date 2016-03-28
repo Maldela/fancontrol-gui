@@ -45,7 +45,6 @@ class Loader : public QObject
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmonsAsObjects NOTIFY hwmonsChanged)
-    Q_PROPERTY(QList<QObject *> allTemps READ allTemps NOTIFY allTempsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
@@ -69,7 +68,6 @@ public:
     bool restartServiceAfterTesting() const { return m_reactivateAfterTesting; }
     void setRestartServiceAfterTesting(bool restart);
     QList<QObject *> hwmonsAsObjects() const;
-    QList<QObject *> allTemps() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }

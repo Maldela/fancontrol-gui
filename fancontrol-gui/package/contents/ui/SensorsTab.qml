@@ -30,7 +30,7 @@ RowLayout {
     id: root
     anchors.fill: parent
     anchors.margins: 10
-
+    
     Repeater {
         model: loader.hwmons.length
 
@@ -95,7 +95,7 @@ RowLayout {
                             id: tempValue
                             anchors.right: parent.right
                             anchors.rightMargin: padding
-                            text: hwmon.temps[index].value + " " + Fancontrol.base.unit
+                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + Fancontrol.base.unit
                         }
                     }
                 }

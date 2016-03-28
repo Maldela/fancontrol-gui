@@ -45,6 +45,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_tempModel(new TempModel(this))
 {
     connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
+    connect(this, &GUIBase::unitChanged, m_tempModel, &TempModel::setUnit);
 
 #ifndef NO_SYSTEMD
     connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
@@ -53,8 +54,8 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     QLocale locale = QLocale::system();
     QLocale::MeasurementSystem system = locale.measurementSystem();
     m_unit = (system == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
+    emit unitChanged(m_unit);
 
-    m_tempModel->setUnit(m_unit);
     foreach (Hwmon *hwmon, m_loader->hwmons())
     {
         m_pwmFanModel->addPwmFans(hwmon->pwmFans());
@@ -151,5 +152,15 @@ void GUIBase::emitConfigChanged()
     emit maxTempChanged();
     emit configUrlChanged();
 }
+
+bool GUIBase::hasSystemdCommunicator() const
+{
+#ifndef NO_SYSTEMD
+    return true;
+#else
+    return false;
+#endif
+}
+
 
 }

@@ -24,7 +24,7 @@
 #define GUIBASE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QStringListModel>
+#include <QtCore/QUrl>
 
 #include "loader.h"
 #include "pwmfanmodel.h"
@@ -32,10 +32,6 @@
 
 #ifndef NO_SYSTEMD
 #include "systemdcommunicator.h"
-
-#define SYSTEMD_BOOL true
-#else
-#define SYSTEMD_BOOL false
 #endif
 
 
@@ -48,20 +44,19 @@ class GUIBase : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(Loader* loader READ loader CONSTANT)
-
 #ifndef NO_SYSTEMD
     Q_PROPERTY(SystemdCommunicator* systemdCom READ systemdCommunicator CONSTANT)
 #endif
 
+    Q_PROPERTY(PwmFanModel *pwmFanModel READ pwmFanModel CONSTANT)
+    Q_PROPERTY(TempModel *tempModel READ tempModel CONSTANT)
+    Q_PROPERTY(Loader* loader READ loader CONSTANT)
     Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
     Q_PROPERTY(QString unit READ unit WRITE setUnit NOTIFY unitChanged)
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
-    Q_PROPERTY(PwmFanModel *pwmFanModel READ pwmFanModel CONSTANT)
-    Q_PROPERTY(TempModel *tempModel READ tempModel CONSTANT)
 
 public:
 
@@ -83,11 +78,11 @@ public:
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
-    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(); m_tempModel->setUnit(unit); } }
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(m_unit); } }
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
     TempModel *tempModel() const { return m_tempModel; };
     
-    Q_INVOKABLE bool hasSystemdCommunicator() const { return SYSTEMD_BOOL; }
+    Q_INVOKABLE bool hasSystemdCommunicator() const;
 
 
 public slots:
@@ -102,7 +97,7 @@ signals:
     void maxTempChanged();
     void serviceNameChanged();
     void configUrlChanged();
-    void unitChanged();
+    void unitChanged(QString);
 
 
 protected:
@@ -112,7 +107,7 @@ protected:
 
 private:
 
-    Config *m_config;
+    Config *const m_config;
 
 #ifndef NO_SYSTEMD
     SystemdCommunicator *const m_com;

@@ -21,12 +21,12 @@
 
 #include "fancontrolqmlextension.h"
 
-#include "guibase.h"
-#include "loader.h"
-#include "hwmon.h"
 #include "fan.h"
 #include "pwmfan.h"
 #include "temp.h"
+#include "hwmon.h"
+#include "loader.h"
+#include "guibase.h"
 
 #ifndef NO_SYSTEMD
 #include "systemdcommunicator.h"
@@ -42,16 +42,17 @@ void FancontrolQmlExtension::registerTypes(const char* uri)
 {
     Q_ASSERT(uri == QLatin1String("Fancontrol.Qml"));
 
-    qmlRegisterType<Loader>();
-    qmlRegisterType<Hwmon>();
     qmlRegisterType<Fan>();
     qmlRegisterUncreatableType<PwmFan>(uri, 1, 0, "PwmFan", QStringLiteral("PwmFan is not instantiable from QML!"));
     qmlRegisterType<Temp>();
-    qmlRegisterSingletonType<GUIBase>(uri, 1, 0, "base", base);
+    qmlRegisterType<Hwmon>();
+    qmlRegisterType<Loader>();
 
 #ifndef NO_SYSTEMD
     qmlRegisterType<SystemdCommunicator>();
 #endif
+
+    qmlRegisterSingletonType<GUIBase>(uri, 1, 0, "base", base);
 }
 
 QObject * FancontrolQmlExtension::base(QQmlEngine *engine, QJSEngine *jsengine)

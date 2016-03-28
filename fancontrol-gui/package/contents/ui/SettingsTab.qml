@@ -75,11 +75,14 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 decimals: 2
-                maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
-                value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
+                maximumValue: Number.POSITIVE_INFINITY
+                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.base.unit)
+                value: Fancontrol.Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
-                onValueChanged: Fancontrol.base.minTemp = value
+                onValueChanged: {
+                    Fancontrol.base.minTemp = value;
+                    if (value > maxTempBox.value) maxTempBox.value = value;
+                }
             }
         }
         RowLayout {
@@ -98,10 +101,13 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: minTempBox.value
-                value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
+                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.base.unit)
+                value: Fancontrol.Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
-                onValueChanged:Fancontrol.base.maxTemp = value
+                onValueChanged: {
+                    Fancontrol.base.maxTemp = value;
+                    if (value < minTempBox.value) minTempBox.value = value;
+                }
             }
         }
         Loader {

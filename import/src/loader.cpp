@@ -775,16 +775,6 @@ QList<QObject *> Loader::hwmonsAsObjects() const
     return list;
 }
 
-QList<QObject *> Loader::allTemps() const
-{
-    QList<QObject *> list;
-    foreach (const Hwmon *hwmon, m_hwmons)
-    {
-        list += hwmon->tempsAsObjects();
-    }
-    return list;
-}
-
 void Loader::setError (const QString &error, bool critical)
 {
     m_error = error;

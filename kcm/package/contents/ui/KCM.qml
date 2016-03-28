@@ -141,7 +141,7 @@ Item {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            active: pwmFans.length > fanComboBox.currentIndex
+            active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
             sourceComponent: Fancontrol.FanItem {
                 unit: Fancontrol.base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
