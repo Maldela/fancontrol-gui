@@ -18,19 +18,15 @@
  */
 
 #include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QLoggingCategory>
-#include <QtCore/QFileInfo>
 #include <QtGui/QIcon>
 
-#include <KDeclarative/KDeclarative>
+#include <KDeclarative/QmlObject>
 #include <KI18n/KLocalizedString>
-#include <KPackage/PackageLoader>
 #include <KCoreAddons/KAboutData>
 
-#include "lib/src/guibase.h"
 #include "windowconfig.h"
 
 
@@ -46,7 +42,7 @@ int main(int argc, char *argv[])
 
     KAboutData about(QStringLiteral("fancontrol_gui"),
                      i18n("Fancontrol-GUI"),
-                     QStringLiteral("0.3"),
+                     QStringLiteral("0.4"),
                      i18n("Graphical user interface for fancontrol"),
                      KAboutLicense::KAboutLicense::GPL_V2,
                      QStringLiteral("Copyright (C) 2015 Malte Veerman"),
@@ -60,40 +56,10 @@ int main(int argc, char *argv[])
     parser.process(app);
     about.processCommandLine(&parser);
 
-    QQmlApplicationEngine engine;
-    QQmlContext *context = engine.rootContext();
+    KDeclarative::QmlObject qmlObject;
+    qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());
 
-    KDeclarative::KDeclarative decl;
-    decl.setDeclarativeEngine(&engine);
-    decl.setupBindings();
-
-    Fancontrol::GUIBase base;
-    base.load();
-    context->setContextProperty(QStringLiteral("base"), &base);
-
-    WindowConfig *windowConfig = WindowConfig::instance();
-    context->setContextProperty(QStringLiteral("windowConfig"), windowConfig);
-
-    KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("KPackage/GenericQML"));
-
-    QStringList possiblePackageLocations = QStringList() << QStringLiteral("/usr/share/kpackage/kcms")
-                                                         << QStringLiteral("/usr/local/share/kpackage/kcms")
-                                                         << QStringLiteral("kpackage/kcms")
-                                                         << QStringLiteral("/opt/share/kpackage/kcms");
-
-    foreach (const QString location, possiblePackageLocations)
-    {
-        package.setDefaultPackageRoot(location);
-        package.setPath(QStringLiteral("kcm_fancontrol"));
-        package.addFileDefinition("appqmlroot", QStringLiteral("ui/Application.qml"), i18n("The Application's root QML file"));
-        package.setRequired("appqmlroot", true);
-
-        if (package.isValid())
-        {
-            engine.load(QUrl::fromLocalFile(package.filePath("appqmlroot")));
-            return app.exec();
-        }
-    }   
+    qmlObject.loadPackage("fancontrol-gui");
     
-    return 1;
+    return app.exec();
 }

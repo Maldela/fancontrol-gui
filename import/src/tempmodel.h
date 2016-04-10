@@ -1,7 +1,7 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman maldela@halloarsch.de
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of
@@ -9,46 +9,77 @@
  * accepted by the membership of KDE e.V. (or its successor approved
  * by the membership of KDE e.V.), which shall act as a proxy
  * defined in Section 14 of version 3 of the license.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
-#ifndef FANCONTROLKCM_H
-#define FANCONTROLKCM_H
 
-#include <KDeclarative/KQuickAddons/ConfigModule>
+#ifndef TEMPMODEL_H
+#define TEMPMODEL_H
 
 
-using namespace KQuickAddons;
+#include <QtCore/QStringListModel>
 
-class FancontrolKCM : public ConfigModule
+
+
+namespace Fancontrol {
+
+
+class Temp;
+
+class TempModel : public QStringListModel
 {
     Q_OBJECT
-    
+    Q_PROPERTY(QList<QObject *> temps READ temps NOTIFY tempsChanged)
+
 public:
-    
-    explicit FancontrolKCM(QObject *parent, const QVariantList &args = QVariantList());
-    
-    
+
+    TempModel(QObject *parent = Q_NULLPTR);
+    void setTemps(const QList<Temp *> &temps);
+    void addTemps(const QList<Temp *> &temps);
+    QList<QObject *> temps() const;
+
+
+protected:
+
+    QString composeText(Temp *temp);
+
+
 public slots:
+
+    void updateTemp(Temp *temp);
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
     
-    void load() Q_DECL_OVERRIDE;
-    void save() Q_DECL_OVERRIDE;
-    void defaults() Q_DECL_OVERRIDE;
-    
-    
+
+protected slots:
+
+    void updateAll();
+
+
+private slots:
+
+    void updateTemp();
+
+
 signals:
-    
-    void aboutToSave();
-    void aboutToLoad();
-    void aboutToDefault();
+
+    void tempsChanged();
+
+
+private:
+
+    QList<Temp *> m_temps;
+    QString m_unit;
 };
 
-#endif // FANCONTROLKCM_H
+}
+
+
+#endif //TEMPMODEL_H

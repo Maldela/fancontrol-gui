@@ -7,8 +7,8 @@ project(fancontroller)
 option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality significantly!" OFF)
 option(BUILD_GUI "Build the standalone application" ON)
 option(BUILD_KCM "Build the KCM" OFF)
+option(BUILD_HELPER "Build the KHelper" ON)
 option(INSTALL_SHARED "Install the shared parts" ON)
-option(INSTALL_HELPER "Install the KHelper" ON)
 
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
@@ -43,11 +43,10 @@ find_package(Qt5Core REQUIRED)
 
 
 #Find KF5
-find_package(KF5 COMPONENTS I18n Package REQUIRED)
+find_package(KF5 COMPONENTS I18n REQUIRED)
 
 
 #includes
-include(GenerateExportHeader)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
@@ -60,8 +59,6 @@ include_directories (${CMAKE_SOURCE_DIR})
 if(NOT NO_SYSTEMD)
 
     message(STATUS "Compiling for Systemd")
-    find_package(Qt5DBus REQUIRED)
-    include_directories(${Qt5DBus_INCLUDE_DIRS})
 
 else(NOT NO_SYSTEMD)
 
@@ -72,16 +69,12 @@ else(NOT NO_SYSTEMD)
 endif(NOT NO_SYSTEMD)
 
 
-#Shared library
-add_subdirectory(lib)
-
-
 #KHelper for actions that require superuser rights
-if(INSTALL_HELPER)
+if(BUILD_HELPER)
 
     add_subdirectory(helper)
 
-endif(INSTALL_HELPER)
+endif(BUILD_HELPER)
 
 
 #Build the standalone application
@@ -102,15 +95,15 @@ if(BUILD_KCM)
 endif(BUILD_KCM)
 
 
-#install the shared parts
+#build and install the shared parts
 if(INSTALL_SHARED)
 
-    #KPackage containing the QML and javascript files
-    kpackage_install_package(package kcm_fancontrol kcms)
+    #qml plugin
+    add_subdirectory(import)
 
 
     #icon
-    install(FILES icon.svg RENAME "fancontrol_gui.svg" DESTINATION "${ICON_INSTALL_DIR}/hicolor/scalable/apps")
+    install(FILES icon.svg RENAME "fancontrol_gui.svg" DESTINATION "${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps")
 
 
     #translations
