@@ -12,8 +12,9 @@ To compile the additional KCM set the cmake option -DBUILD_KCM=on.
 The KCM is only build, if the -DNO_SYSTEMD option is unset or set to false.
 
 
-Example:
+## Example:
 
+```
 git clone https://github.com/Maldela/fancontrol-gui.git
 cd fancontrol-gui
 mkdir build
@@ -21,3 +22,4 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_KCM=on
 make -j2
 sudo make install
+```
