@@ -43,8 +43,8 @@ Temp::Temp(Hwmon *parent, uint index) :
 {
     if (QDir(parent->path()).isReadable())
     {
-        QFile *valueFile = new QFile(parent->path() + "/temp" + QString::number(index) + "_input", this);
-        QFile labelFile(parent->path() + "/temp" + QString::number(index) + "_label");
+        const auto valueFile = new QFile(parent->path() + "/temp" + QString::number(index) + "_input", this);
+        const auto labelFile = new QFile(parent->path() + "/temp" + QString::number(index) + "_label");
 
         if (valueFile->open(QFile::ReadOnly))
         {
@@ -53,23 +53,36 @@ Temp::Temp(Hwmon *parent, uint index) :
             m_value /= 1000;
         }
         else
+        {
+            delete valueFile;
             qCritical() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
+        }
 
-        if (labelFile.open(QFile::ReadOnly))
-            m_label = QTextStream(&labelFile).readLine();
+        if (labelFile->exists())
+        {
+            if (labelFile->open(QFile::ReadOnly))
+                m_label = QTextStream(labelFile).readLine();
+            else
+                qWarning() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
+        }
+        else
+            qWarning() << parent->path() + "/temp" + QString::number(index) << "has no label.";
+
+        delete labelFile;
     }
 }
 
 Temp::~Temp()
 {
+    delete m_valueStream->device();
     delete m_valueStream;
 }
 
 QString Temp::name() const
 {
-    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    KConfigGroup localNames = names.group(m_parent->name());
-    QString name = localNames.readEntry("temp" + QString::number(m_index), QString());
+    const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
+    const auto localNames = names.group(m_parent->name());
+    const auto name = localNames.readEntry("temp" + QString::number(m_index), QString());
     
     if (name.isEmpty())
     {
@@ -83,8 +96,9 @@ QString Temp::name() const
 
 void Temp::setName(const QString &name)
 {
-    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    KConfigGroup localNames = names.group(m_parent->name());
+    const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
+    auto localNames = names.group(m_parent->name());
+
     if (name != localNames.readEntry("temp" + QString::number(m_index), QString())
         && !name.isEmpty())
     {
@@ -95,13 +109,12 @@ void Temp::setName(const QString &name)
 
 void Temp::reset()
 {
-    QIODevice *oldFile = m_valueStream->device();
+    delete m_valueStream->device();
     delete m_valueStream;
-    delete oldFile;
 
     if (QDir(m_parent->path()).isReadable())
     {
-        QFile *valueFile = new QFile(m_parent->path() + "/temp" + QString::number(m_index) + "_input", this);
+        const auto valueFile = new QFile(m_parent->path() + "/temp" + QString::number(m_index) + "_input", this);
 
         if (valueFile->open(QFile::ReadOnly))
         {
@@ -116,10 +129,13 @@ void Temp::reset()
 
 void Temp::update()
 {
+    auto success = false;
+
     m_valueStream->seek(0);
-    int value;
-    *m_valueStream >> value;
-    value /= 1000;
+    const auto value = m_valueStream->readAll().toInt(&success) / 1000;
+
+    if (!success)
+        qCritical() << "Can't update value of temp:" << m_parent->path() + "/temp" + QString::number(m_index);
     
     if (value != m_value)
     {

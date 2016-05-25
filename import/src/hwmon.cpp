@@ -24,6 +24,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
+#include <QtCore/QDebug>
 
 
 namespace Fancontrol
@@ -41,19 +42,23 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
         m_valid = false;
     }
 
-    bool success;
+    auto success = false;
     m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toInt(&success);
+
     if (!success)
     {
         emit errorChanged(path + "is invalid!");
         m_valid = false;
     }
 
-    QFile nameFile(path + "/name");
-    if (nameFile.open(QFile::ReadOnly))
-        m_name = QTextStream(&nameFile).readLine();
+    const auto nameFile = new QFile(path + "/name");
+
+    if (nameFile->open(QFile::ReadOnly))
+        m_name = QTextStream(nameFile).readLine();
     else
         m_name = path.split('/').last();
+
+    delete nameFile;
 
     connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::createConfigFile);
     connect(this, &Hwmon::pwmFansChanged, parent, &Loader::emitAllPwmFansChanged);
@@ -67,18 +72,29 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
 void Hwmon::initialize()
 {
     QDir dir(m_path);
-    QStringList entrys = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach (const QString &entry, entrys)
+    const auto entries = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    foreach (auto entry, entries)
     {
-        QString str = entry;
-        uint index = str.remove(QRegExp("\\D+")).toUInt();
-        if (entry.contains(QStringLiteral("fan")) && entry.contains(QStringLiteral("input")))
+        if (!entry.contains(QStringLiteral("input")))
+            continue;
+
+        auto str = entry;
+        auto success = false;
+        const auto index = str.remove(QRegExp("\\D+")).toUInt(&success);
+
+        if (!success)
+        {
+            qWarning() << "Not a valid Sensor:" << entry;
+            continue;
+        }
+
+        if (entry.contains(QStringLiteral("fan")))
         {
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
                 PwmFan *newPwmFan = Q_NULLPTR;
 
-                foreach (PwmFan *pwmFan, m_pwmFans)
+                foreach (const auto &pwmFan, m_pwmFans)
                 {
                     if (pwmFan->index() == index)
                     {
@@ -96,7 +112,7 @@ void Hwmon::initialize()
                     emit pwmFansChanged();
                 }
 
-                Fan *newFan = qobject_cast<Fan *>(newPwmFan);
+                const auto newFan = qobject_cast<Fan *>(newPwmFan);
                 if (!m_fans.contains(newFan))
                 {
                     m_fans << newFan;
@@ -107,7 +123,7 @@ void Hwmon::initialize()
             {
                 Fan *newFan = Q_NULLPTR;
 
-                foreach (Fan *fan, m_fans)
+                foreach (const auto &fan, m_fans)
                 {
                     if (fan->index() == index)
                     {
@@ -127,11 +143,11 @@ void Hwmon::initialize()
             }
         }
 
-        if (entry.contains(QStringLiteral("temp")) && entry.contains(QStringLiteral("input")))
+        if (entry.contains(QStringLiteral("temp")))
         {
             Temp *newTemp = Q_NULLPTR;
 
-            foreach (Temp *temp, m_temps)
+            foreach (const auto &temp, m_temps)
             {
                 if (temp->index() == index)
                 {
@@ -155,7 +171,7 @@ void Hwmon::initialize()
 QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
-    foreach (Fan *fan, m_fans)
+    foreach (const auto &fan, m_fans)
     {
         list << qobject_cast<QObject *>(fan);
     }
@@ -165,7 +181,7 @@ QList<QObject *> Hwmon::fansAsObjects() const
 QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
-    foreach (PwmFan *pwmFan, m_pwmFans)
+    foreach (const auto &pwmFan, m_pwmFans)
     {
         list << qobject_cast<QObject *>(pwmFan);
     }
@@ -175,7 +191,7 @@ QList<QObject *> Hwmon::pwmFansAsObjects() const
 QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
-    foreach (Temp *temp, m_temps)
+    foreach (const auto &temp, m_temps)
     {
         list << qobject_cast<QObject *>(temp);
     }
@@ -184,7 +200,7 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 
 void Hwmon::testFans()
 {
-    foreach (PwmFan *const fan, m_pwmFans)
+    foreach (const auto &fan, m_pwmFans)
     {
         fan->test();
     }
@@ -192,7 +208,7 @@ void Hwmon::testFans()
 
 void Hwmon::abortTestingFans()
 {
-    foreach (PwmFan *const fan, m_pwmFans)
+    foreach (const auto &fan, m_pwmFans)
     {
         fan->abortTest();
     }
@@ -220,9 +236,9 @@ void Hwmon::setError(const QString &error)
 
 bool Hwmon::testing() const
 {
-    bool testing = false;
+    auto testing = false;
 
-    foreach(const PwmFan *fan, m_pwmFans)
+    foreach(const auto &fan, m_pwmFans)
     {
         if (fan->testing())
         {

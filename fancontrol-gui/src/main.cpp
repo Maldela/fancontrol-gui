@@ -40,26 +40,27 @@ int main(int argc, char *argv[])
 
     KLocalizedString::setApplicationDomain("kcm_fancontrol");
 
-    KAboutData about(QStringLiteral("fancontrol_gui"),
-                     i18n("Fancontrol-GUI"),
-                     QStringLiteral("0.4"),
-                     i18n("Graphical user interface for fancontrol"),
-                     KAboutLicense::KAboutLicense::GPL_V2,
-                     QStringLiteral("Copyright (C) 2015 Malte Veerman"),
-                     QString(),
-                     QStringLiteral("http://github.com/maldela/fancontrol-gui"),
-                     QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
+    auto about = KAboutData(QStringLiteral("fancontrol_gui"),
+                            i18n("Fancontrol-GUI"),
+                            QStringLiteral("0.4"),
+                            i18n("Graphical user interface for fancontrol"),
+                            KAboutLicense::KAboutLicense::GPL_V2,
+                            QStringLiteral("Copyright (C) 2015 Malte Veerman"),
+                            QString(),
+                            QStringLiteral("http://github.com/maldela/fancontrol-gui"),
+                            QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
     about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
     KAboutData::setApplicationData(about);
-    QCommandLineParser parser;
-    about.setupCommandLine(&parser);
-    parser.process(app);
-    about.processCommandLine(&parser);
+
+    const auto parser = new QCommandLineParser;
+    about.setupCommandLine(parser);
+    parser->process(app);
+    about.processCommandLine(parser);
+    delete parser;
 
     KDeclarative::QmlObject qmlObject;
     qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());
-
     qmlObject.loadPackage("fancontrol-gui");
-    
+
     return app.exec();
 }

@@ -70,7 +70,8 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
 
     if (QDir(parent->path()).isReadable())
     {
-        QFile *pwmFile = new QFile(parent->path() + "/pwm" + QString::number(index), this);
+        const auto pwmFile = new QFile(parent->path() + "/pwm" + QString::number(index), this);
+
         if (pwmFile->open(QFile::ReadWrite))
         {
             m_pwmStream->setDevice(pwmFile);
@@ -82,9 +83,13 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
             *m_pwmStream >> m_pwm;
         }
         else
+        {
+            delete pwmFile;
             qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+        }
 
-        QFile *pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
+        const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
+
         if (pwmModeFile->open(QFile::ReadWrite))
         {
             m_modeStream->setDevice(pwmModeFile);
@@ -96,7 +101,10 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
             *m_modeStream >> m_pwmMode;
         }
         else
+        {
+            delete pwmModeFile;
             qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+        }
     }
 }
 
@@ -124,41 +132,47 @@ void PwmFan::reset()
     setHasTemp(false);
     setTemp(Q_NULLPTR);
 
-    QIODevice *oldFile = m_pwmStream->device();
+    delete m_pwmStream->device();
     delete m_pwmStream;
-    delete oldFile;
 
-    oldFile = m_modeStream->device();
+    delete m_modeStream->device();
     delete m_modeStream;
-    delete oldFile;
 
-    QFile *pwmFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index), this);
-        if (pwmFile->open(QFile::ReadWrite))
-        {
-            m_pwmStream = new QTextStream(pwmFile);
-            *m_pwmStream >> m_pwm;
-        }
-        else if (pwmFile->open(QFile::ReadOnly))
-        {
-            m_pwmStream = new QTextStream(pwmFile);
-            *m_pwmStream >> m_pwm;
-        }
-        else
-            qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+    const auto pwmFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index), this);
 
-        QFile *pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
-        if (pwmModeFile->open(QFile::ReadWrite))
-        {
-            m_modeStream = new QTextStream(pwmModeFile);
-            *m_modeStream >> m_pwmMode;
-        }
-        else if (pwmModeFile->open(QFile::ReadOnly))
-        {
-            m_modeStream = new QTextStream(pwmModeFile);
-            *m_modeStream >> m_pwmMode;
-        }
-        else
-            qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+    if (pwmFile->open(QFile::ReadWrite))
+    {
+        m_pwmStream = new QTextStream(pwmFile);
+        *m_pwmStream >> m_pwm;
+    }
+    else if (pwmFile->open(QFile::ReadOnly))
+    {
+        m_pwmStream = new QTextStream(pwmFile);
+        *m_pwmStream >> m_pwm;
+    }
+    else
+    {
+        delete pwmFile;
+        qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+    }
+
+    const auto pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
+
+    if (pwmModeFile->open(QFile::ReadWrite))
+    {
+        m_modeStream = new QTextStream(pwmModeFile);
+        *m_modeStream >> m_pwmMode;
+    }
+    else if (pwmModeFile->open(QFile::ReadOnly))
+    {
+        m_modeStream = new QTextStream(pwmModeFile);
+        *m_modeStream >> m_pwmMode;
+    }
+    else
+    {
+        delete pwmModeFile;
+        qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+    }
 }
 
 bool PwmFan::setPwm(int pwm, bool write)
@@ -176,7 +190,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                 *m_pwmStream << pwm;
             else
             {
-                KAuth::Action action = newFancontrolAction();
+                auto action = newFancontrolAction();
 
                 if (action.isValid())
                 {
@@ -186,7 +200,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                     map[QStringLiteral("content")] = QString::number(pwm);
                     action.setArguments(map);
 
-                    KAuth::ExecuteJob *job = action.execute();
+                    const auto job = action.execute();
                     if (!job->exec())
                     {
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
@@ -222,7 +236,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
 
             else
             {
-                KAuth::Action action = newFancontrolAction();
+                auto action = newFancontrolAction();
 
                 if (action.isValid())
                 {
@@ -232,7 +246,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                     map[QStringLiteral("content")] = QString::number(pwmMode);
                     action.setArguments(map);
 
-                    KAuth::ExecuteJob *job = action.execute();
+                    const auto job = action.execute();
                     if (!job->exec())
                     {
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
@@ -258,11 +272,11 @@ void PwmFan::test()
 {
     if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
-        KAuth::Action action = newFancontrolAction();
+        auto action = newFancontrolAction();
 
         if (action.isValid())
         {
-            KAuth::ExecuteJob *job = action.execute(KAuth::Action::AuthorizeOnlyMode);
+            const auto job = action.execute(KAuth::Action::AuthorizeOnlyMode);
 
             if (!job->exec())
             {
@@ -305,7 +319,7 @@ void PwmFan::continueTest()
 {
     if (!m_modeStream->device()->isWritable() || !m_pwmStream->device()->isWritable())
     {
-        KAuth::Action action = newFancontrolAction();
+        auto action = newFancontrolAction();
 
         if (action.status() != KAuth::Action::AuthorizedStatus)
         {
@@ -391,15 +405,15 @@ bool PwmFan::testing() const
 
 bool PwmFan::active() const
 {
-    KConfigGroup active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
-    KConfigGroup localActive = active.group(m_parent->name());
+    const auto active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
+    const auto localActive = active.group(m_parent->name());
     return localActive.readEntry("pwmfan" + QString::number(m_index), true);
 }
 
 void PwmFan::setActive(bool a)
 {
-    KConfigGroup active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
-    KConfigGroup localActive = active.group(m_parent->name());
+    const auto active = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("active");
+    auto localActive = active.group(m_parent->name());
     if (a != localActive.readEntry("pwmfan" + QString::number(m_index), true))
     {
         localActive.writeEntry("pwmfan" + QString::number(m_index), a);

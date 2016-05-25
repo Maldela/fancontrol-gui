@@ -46,12 +46,12 @@ void TempModel::setTemps(const QList<Temp *> &temps)
     m_temps = temps;
     emit tempsChanged();
 
-    QStringList list;
+    auto list = QStringList();
 
-    foreach (Temp *const temp, temps)
+    foreach (const auto &temp, temps)
     {
-        connect(temp, SIGNAL(nameChanged()), this, SLOT(updateTemp()));
-        connect(temp, SIGNAL(valueChanged()), this, SLOT(updateTemp()));
+        connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
+        connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
         list << composeText(temp);
     }
 
@@ -65,14 +65,14 @@ void TempModel::addTemps(const QList<Temp *> &temps)
         m_temps += temps;
         emit tempsChanged();
 
-        int oldSize = rowCount();
+        const auto oldSize = rowCount();
 
         insertRows(oldSize, temps.size());
 
-        foreach (Temp *const temp, temps)
+        foreach (const auto &temp, temps)
         {
-            connect(temp, SIGNAL(nameChanged()), this, SLOT(updateTemp()));
-            connect(temp, SIGNAL(valueChanged()), this, SLOT(updateTemp()));
+            connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
+            connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
             updateTemp(temp);
         }
     }
@@ -83,7 +83,7 @@ void TempModel::updateTemp(Temp *temp)
     if (!temp)
         return;
 
-    int i = m_temps.indexOf(temp);
+    const auto i = m_temps.indexOf(temp);
     if (i == -1)
         return;
 
@@ -93,7 +93,7 @@ void TempModel::updateTemp(Temp *temp)
 
 void TempModel::updateTemp()
 {
-    Temp *temp = qobject_cast<Temp *>(sender());
+    const auto temp = qobject_cast<Temp *>(sender());
 
     updateTemp(temp);
 }
@@ -101,18 +101,18 @@ void TempModel::updateTemp()
 void TempModel::updateAll()
 {
     for (int i=0; i<m_temps.size(); i++)
-    {
-        Temp *temp = m_temps.at(i);
-        setData(index(i, 0), composeText(temp));
-    }
+        setData(index(i, 0), composeText(m_temps.at(i)));
+
     emit dataChanged(index(0, 0), index(m_temps.size(), 0));
 }
 
 QList<QObject *> TempModel::temps() const
 {
     QList<QObject *> list;
-    foreach(Temp *const temp, m_temps)
+
+    foreach(const auto &temp, m_temps)
         list << qobject_cast<QObject *>(temp);
+
     return list;
 }
 

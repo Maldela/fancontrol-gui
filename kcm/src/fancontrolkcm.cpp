@@ -33,15 +33,15 @@ K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", register
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args)
 {
-    KAboutData *about = new KAboutData(QStringLiteral("kcm_fancontrol"),
-                                       i18n("Fancontrol-KCM"),
-                                       QStringLiteral("0.3"),
-                                       i18n("KDE Fancontrol Module"),
-                                       KAboutLicense::KAboutLicense::GPL_V2,
-                                       QStringLiteral("Copyright (C) 2015 Malte Veerman"),
-                                       QString(),
-                                       QStringLiteral("http://github.com/maldela/fancontrol-gui"),
-                                       QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
+    auto about = new KAboutData(QStringLiteral("kcm_fancontrol"),
+                                i18n("Fancontrol-KCM"),
+                                QStringLiteral("0.3"),
+                                i18n("KDE Fancontrol Module"),
+                                KAboutLicense::KAboutLicense::GPL_V2,
+                                QStringLiteral("Copyright (C) 2015 Malte Veerman"),
+                                QString(),
+                                QStringLiteral("http://github.com/maldela/fancontrol-gui"),
+                                QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
     about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
     setAboutData(about);
 

@@ -40,7 +40,7 @@ Fan::Fan(Hwmon *parent, uint index) :
 {
     if (QDir(parent->path()).isReadable())
     {
-        QFile *rpmFile = new QFile(parent->path() + "/fan" + QString::number(index) + "_input", this);
+        const auto rpmFile = new QFile(parent->path() + "/fan" + QString::number(index) + "_input", this);
 
         if (rpmFile->open(QFile::ReadOnly))
         {
@@ -48,20 +48,24 @@ Fan::Fan(Hwmon *parent, uint index) :
             *m_rpmStream >> m_rpm;
         }
         else
+        {
+            delete rpmFile;
             qWarning() << "Can't open rpmFile " << parent->path() + "/fan" + QString::number(index) + "_input";
+        }
     }
 }
 
 Fan::~Fan()
 {
+    delete m_rpmStream->device();
     delete m_rpmStream;
 }
 
 QString Fan::name() const
 {
-    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    KConfigGroup localNames = names.group(m_parent->name());
-    QString name = localNames.readEntry("fan" + QString::number(m_index), QString());
+    const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
+    const auto localNames = names.group(m_parent->name());
+    const auto name = localNames.readEntry("fan" + QString::number(m_index), QString());
     
     if (name.isEmpty())
         return "fan" + QString::number(m_index);
@@ -71,8 +75,8 @@ QString Fan::name() const
 
 void Fan::setName(const QString &name)
 {
-    KConfigGroup names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    KConfigGroup localNames = names.group(m_parent->name());
+    const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
+    auto localNames = names.group(m_parent->name());
     
     if (name != localNames.readEntry("fan" + QString::number(m_index), QString())
         && !name.isEmpty())
@@ -84,13 +88,12 @@ void Fan::setName(const QString &name)
 
 void Fan::reset()
 {
-    QIODevice *oldFile = m_rpmStream->device();
+    delete m_rpmStream->device();
     delete m_rpmStream;
-    delete oldFile;
 
     if (QDir(m_parent->path()).isReadable())
     {
-        QFile *rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
+        const auto rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
 
         if (rpmFile->open(QFile::ReadOnly))
         {
@@ -98,7 +101,10 @@ void Fan::reset()
             *m_rpmStream >> m_rpm;
         }
         else
+        {
+            delete rpmFile;
             qWarning() << "Can't open rpmFile " << m_parent->path() + "/fan" + QString::number(m_index) + "_input";
+        }
     }
 }
 

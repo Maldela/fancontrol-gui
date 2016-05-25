@@ -107,7 +107,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
         {
             QVariantList arguments;
             arguments << QVariant(m_serviceName + ".service");
-            QDBusMessage dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, QStringLiteral("LoadUnit"), arguments);
+            const auto dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, QStringLiteral("LoadUnit"), arguments);
             if (dbusreply.type() == QDBusMessage::ErrorMessage)
             {
                 m_error = dbusreply.errorMessage();
@@ -158,7 +158,7 @@ bool SystemdCommunicator::serviceExists()
     }
     SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
 
-    foreach (const SystemdUnitFile &unitFile, list)
+    foreach (const auto &unitFile, list)
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
             return true;
@@ -195,9 +195,9 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
     {
         if (enabled != serviceEnabled())
         {
-            QString action = enabled ? QStringLiteral("EnableUnitFiles") : QStringLiteral("DisableUnitFiles");
-            QStringList files = QStringList() << m_serviceName + ".service";
-            QVariantList arguments = QVariantList() << files << false;
+            const auto action = enabled ? QStringLiteral("EnableUnitFiles") : QStringLiteral("DisableUnitFiles");
+            const auto files = QStringList() << m_serviceName + ".service";
+            auto arguments = QVariantList() << files << false;
             if (enabled)
                 arguments << true;
 
@@ -224,8 +224,8 @@ bool SystemdCommunicator::setServiceActive(bool active)
     {
         if (active != serviceActive())
         {
-            QVariantList args = QVariantList() << m_serviceName + ".service" << "replace";
-            QString action = active ? QStringLiteral("ReloadOrRestartUnit") : QStringLiteral("StopUnit");
+            auto args = QVariantList() << m_serviceName + ".service" << "replace";
+            const auto action = active ? QStringLiteral("ReloadOrRestartUnit") : QStringLiteral("StopUnit");
 
             if (dbusAction(action, args))
             {
@@ -241,44 +241,37 @@ bool SystemdCommunicator::setServiceActive(bool active)
 
 bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &arguments)
 {
-    QDBusMessage dbusreply;
-
-    if (m_managerInterface->isValid())
-    {
-        if (arguments.isEmpty())
-            dbusreply = m_managerInterface->call(QDBus::AutoDetect, method);
-        else
-            dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
-    }
-    else
+    if (!m_managerInterface->isValid())
     {
         qDebug() << "Invalid manager interface!";
         return false;
+
     }
 
-    if (dbusreply.type() == QDBusMessage::ErrorMessage)
+    const auto dbusreply = arguments.isEmpty() ? m_managerInterface->call(QDBus::AutoDetect, method) : m_managerInterface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
+
+    if (dbusreply.type() != QDBusMessage::ErrorMessage)
+        return true;
+
+    if (dbusreply.errorMessage() == QStringLiteral("Interactive authentication required."))
     {
-        if (dbusreply.errorMessage() == QStringLiteral("Interactive authentication required."))
-        {
-            KAuth::Action action = newFancontrolAction();
-            QVariantMap map;
-            map[QStringLiteral("action")] = "dbusaction";
-            map[QStringLiteral("method")] = method;
-            map[QStringLiteral("arguments")] = arguments;
-            action.setArguments(map);
+        auto action = newFancontrolAction();
+        QVariantMap map;
+        map[QStringLiteral("action")] = "dbusaction";
+        map[QStringLiteral("method")] = method;
+        map[QStringLiteral("arguments")] = arguments;
+        action.setArguments(map);
 
-            KAuth::ExecuteJob *job = action.execute();
-            connect(job, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
-            job->start();
+        const auto job = action.execute();
+        connect(job, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
+        job->start();
 
-            return true;
-        }
-        
-        setError(dbusreply.errorMessage());
-        return false;
+        return true;
     }
 
-    return true;
+    setError(dbusreply.errorMessage());
+    return false;
+
 }
 
 void SystemdCommunicator::handleDbusActionResult(KJob *job)
@@ -289,10 +282,10 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
         {
             qDebug() << "Helper busy...";
 
-            KAuth::ExecuteJob *executeJob = static_cast<KAuth::ExecuteJob *>(job);
+            const auto executeJob = static_cast<KAuth::ExecuteJob *>(job);
             if (executeJob)
             {
-                KAuth::ExecuteJob *newJob = executeJob->action().execute();
+                const auto newJob = executeJob->action().execute();
                 connect(newJob, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
                 
                 QTimer::singleShot(50, newJob, &KAuth::ExecuteJob::start);
@@ -310,6 +303,7 @@ bool SystemdCommunicator::restartService()
     {
         QVariantList args;
         args << m_serviceName + ".service" << "replace";
+
         return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 

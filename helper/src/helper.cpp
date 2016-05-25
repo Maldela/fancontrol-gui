@@ -38,16 +38,16 @@ ActionReply Helper::action(const QVariantMap &arguments)
 #ifndef NO_SYSTEMD
     if (arguments[QStringLiteral("action")] == "dbusaction")
     {
-        QString method = arguments[QStringLiteral("method")].toString();
-        QVariantList argsForCall = arguments[QStringLiteral("arguments")].toList();
+        const auto method = arguments[QStringLiteral("method")].toString();
+        const auto argsForCall = arguments[QStringLiteral("arguments")].toList();
 
-        QDBusConnection systembus = QDBusConnection::systemBus();
+        const auto systembus = QDBusConnection::systemBus();
 
-        QDBusInterface *iface = new QDBusInterface (QStringLiteral("org.freedesktop.systemd1"),
-                                                    QStringLiteral("/org/freedesktop/systemd1"),
-                                                    QStringLiteral("org.freedesktop.systemd1.Manager"),
-                                                    systembus,
-                                                    this);
+        const auto iface = new QDBusInterface (QStringLiteral("org.freedesktop.systemd1"),
+                                               QStringLiteral("/org/freedesktop/systemd1"),
+                                               QStringLiteral("org.freedesktop.systemd1.Manager"),
+                                               systembus,
+                                               this);
 
         QDBusMessage dbusreply;
 
@@ -68,7 +68,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
 #endif
         if (arguments[QStringLiteral("action")] == "read")
     {
-        QString filename = arguments[QStringLiteral("filename")].toString();
+        const auto filename = arguments[QStringLiteral("filename")].toString();
         QFile file(filename);
 
         if (!file.open(QIODevice::ReadOnly))
@@ -80,7 +80,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         }
 
         QTextStream stream(&file);
-        QString content = stream.readAll();
+        const auto content = stream.readAll();
 
         QVariantMap returnData;
         returnData[QStringLiteral("content")] = content;
@@ -90,7 +90,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
 
     else if (arguments[QStringLiteral("action")] == "write")
     {
-        QString filename = arguments[QStringLiteral("filename")].toString();
+        const auto filename = arguments[QStringLiteral("filename")].toString();
         QFile file(filename);
 
         if (!file.open(QIODevice::WriteOnly))
@@ -107,8 +107,8 @@ ActionReply Helper::action(const QVariantMap &arguments)
 
     else if (arguments[QStringLiteral("action")] == "detectSensors")
     {
-        QString program = QStringLiteral("sensors-detect");
-        QStringList arguments = QStringList() << QStringLiteral("--auto");
+        const auto program = QStringLiteral("sensors-detect");
+        const auto arguments = QStringList() << QStringLiteral("--auto");
 
         QProcess process;
         process.start(program, arguments);

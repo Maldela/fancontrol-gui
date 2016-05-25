@@ -30,6 +30,7 @@ ApplicationWindow {
     title: i18n("Fancontrol-GUI")
     width: 1024
     height: 768
+    color: palette.window
     visible: true
 
     onClosing: {
@@ -160,5 +161,9 @@ ApplicationWindow {
         modality: Qt.NonModal
 
         onAccepted: Fancontrol.base.save(true, fileUrl);
+    }
+
+    SystemPalette {
+        id: palette
     }
 }

@@ -34,14 +34,17 @@ PwmFanModel::PwmFanModel(QObject *parent) : QStringListModel(parent)
 
 void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
 {
+    if (m_fans == fans)
+        return;
+
     m_fans = fans;
     emit fansChanged();
 
     QStringList list;
 
-    foreach (PwmFan *const fan, fans)
+    foreach (const auto &fan, fans)
     {
-        connect(fan, SIGNAL(nameChanged()), this, SLOT(updateFan()));
+        connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
         list << fan->name() + "  (" + fan->path() + ")";
     }
 
@@ -55,13 +58,13 @@ void PwmFanModel::addPwmFans(const QList<PwmFan *> &fans)
         m_fans += fans;
         emit fansChanged();
 
-        int oldSize = rowCount();
+        const auto oldSize = rowCount();
 
         insertRows(oldSize, fans.size());
 
-        foreach (PwmFan *const fan, fans)
+        foreach (const auto &fan, fans)
         {
-            connect(fan, SIGNAL(nameChanged()), this, SLOT(updateFan()));
+            connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
             updateFan(fan);
         }
     }
@@ -72,35 +75,35 @@ void PwmFanModel::updateFan(PwmFan *fan)
     if (!fan)
         return;
 
-    int i = m_fans.indexOf(fan);
+    const auto i = m_fans.indexOf(fan);
     if (i == -1)
         return;
 
-    QString string = fan->name() + "  (" + fan->path() + ")";
+    const auto string = fan->name() + "  (" + fan->path() + ")";
     setData(index(i, 0), string);
     emit dataChanged(index(i, 0), index(i, 0));
 }
 
 void PwmFanModel::updateFan()
 {
-    PwmFan *fan = qobject_cast<PwmFan *>(sender());
+    const auto fan = qobject_cast<PwmFan *>(sender());
 
     if (!fan)
         return;
 
-    int i = m_fans.indexOf(fan);
+    const auto i = m_fans.indexOf(fan);
     if (i == -1)
         return;
 
-    QString string = fan->name() + "  (" + fan->path() + ")";
+    const auto string = fan->name() + "  (" + fan->path() + ")";
     setData(index(i, 0), string);
     emit dataChanged(index(i, 0), index(i, 0));
 }
 
 QList<QObject *> PwmFanModel::fans() const
 {
-    QList<QObject *> list;
-    foreach(PwmFan *const fan, m_fans)
+    auto list = QList<QObject *>();
+    foreach(const auto &fan, m_fans)
         list << qobject_cast<QObject *>(fan);
     return list;
 }

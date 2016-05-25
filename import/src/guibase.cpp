@@ -51,12 +51,12 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
 #endif
 
-    QLocale locale = QLocale::system();
-    QLocale::MeasurementSystem system = locale.measurementSystem();
+    const auto locale = QLocale::system();
+    const auto system = locale.measurementSystem();
     m_unit = (system == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
     emit unitChanged(m_unit);
 
-    foreach (Hwmon *hwmon, m_loader->hwmons())
+    foreach (const auto &hwmon, m_loader->hwmons())
     {
         m_pwmFanModel->addPwmFans(hwmon->pwmFans());
         m_tempModel->addTemps(hwmon->temps());
