@@ -43,7 +43,7 @@ public:
 
     TempModel(QObject *parent = Q_NULLPTR);
     void setTemps(const QList<Temp *> &temps);
-    void addTemps(const QList<Temp *> &temps);
+    void addTemps(QList<Temp *> newTemps);
     QList<QObject *> temps() const;
 
 

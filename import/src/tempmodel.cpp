@@ -46,7 +46,7 @@ void TempModel::setTemps(const QList<Temp *> &temps)
     m_temps = temps;
     emit tempsChanged();
 
-    auto list = QStringList();
+    QStringList list;
 
     foreach (const auto &temp, temps)
     {
@@ -58,18 +58,31 @@ void TempModel::setTemps(const QList<Temp *> &temps)
     setStringList(list);
 }
 
-void TempModel::addTemps(const QList<Temp *> &temps)
+void TempModel::addTemps(QList<Temp *> newTemps)
 {
-    if (!temps.isEmpty())
+
+    foreach (const auto &newTemp, newTemps)
     {
-        m_temps += temps;
+        foreach (const auto &temp, m_temps)
+        {
+            if (*temp == *newTemp)
+            {
+                newTemps.removeAll(newTemp);
+                break;
+            }
+        }
+    }
+
+    if (!newTemps.isEmpty())
+    {
+        m_temps += newTemps;
         emit tempsChanged();
 
         const auto oldSize = rowCount();
 
-        insertRows(oldSize, temps.size());
+        insertRows(oldSize, newTemps.size());
 
-        foreach (const auto &temp, temps)
+        foreach (const auto &temp, newTemps)
         {
             connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
             connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));

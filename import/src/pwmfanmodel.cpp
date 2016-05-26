@@ -51,18 +51,30 @@ void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
     setStringList(list);
 }
 
-void PwmFanModel::addPwmFans(const QList<PwmFan *> &fans)
+void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
 {
-    if (!fans.isEmpty())
+    foreach (const auto &newFan, newFans)
     {
-        m_fans += fans;
+        foreach (const auto &fan, m_fans)
+        {
+            if (*fan == *newFan)
+            {
+                newFans.removeAll(newFan);
+                break;
+            }
+        }
+    }
+
+    if (!newFans.isEmpty())
+    {
+        m_fans += newFans;
         emit fansChanged();
 
         const auto oldSize = rowCount();
 
-        insertRows(oldSize, fans.size());
+        insertRows(oldSize, newFans.size());
 
-        foreach (const auto &fan, fans)
+        foreach (const auto &fan, newFans)
         {
             connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
             updateFan(fan);

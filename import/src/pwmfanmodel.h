@@ -42,7 +42,7 @@ public:
 
     PwmFanModel(QObject *parent = Q_NULLPTR);
     void setPwmFans(const QList<PwmFan *> &fans);
-    void addPwmFans(const QList<PwmFan *> &fans);
+    void addPwmFans(QList<PwmFan *> newFans);
     QList<QObject *> fans() const;
 
 

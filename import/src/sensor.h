@@ -49,6 +49,9 @@ public:
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
 
+    bool operator==(const Sensor &other) { return m_path == other.path(); }
+    bool operator!=(const Sensor &other) { return m_path != other.path(); }
+
 
 public slots:
 
