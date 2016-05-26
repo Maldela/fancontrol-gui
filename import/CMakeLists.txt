@@ -48,6 +48,5 @@ include_directories(${Qt5Qml_INCLUDE_DIRS})
 add_library(fancontrol_qml_plugin SHARED ${LIB_SRCS})
 target_link_libraries(fancontrol_qml_plugin PRIVATE ${LIB_PRIVATE_LIBRARIES} PUBLIC ${LIB_PUBLIC_LIBRARIES})
 
-
-install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_LIBDIR}/qt/qml/Fancontrol/Qml/")
-install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_FULL_LIBDIR}/qt/qml/Fancontrol/Qml/")
+install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
+install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
