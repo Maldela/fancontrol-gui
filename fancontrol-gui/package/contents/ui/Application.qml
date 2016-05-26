@@ -46,6 +46,7 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: i18n("File")
+
             MenuItem { action: loadAction }
             MenuItem { action: saveAction }
             MenuItem {
@@ -136,7 +137,7 @@ ApplicationWindow {
     Action {
         id: saveAction
         text: i18n("Save configuration file")
-        onTriggered: base.save(true)
+        onTriggered: Fancontrol.base.save(true)
         iconName: "document-save"
         tooltip: i18n("Save configuration file") + " (" + Fancontrol.base.loader.configUrl.toString() + ")"
         shortcut: StandardKey.Save
