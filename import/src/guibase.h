@@ -57,6 +57,7 @@ class GUIBase : public QObject
     Q_PROPERTY(QString serviceName READ serviceName WRITE setServiceName NOTIFY serviceNameChanged)
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
+    Q_PROPERTY(QString error READ error NOTIFY errorChanged)
 
 public:
 
@@ -74,13 +75,14 @@ public:
     QUrl configUrl() const;
     bool configValid() const { return m_configValid; }
     QString unit() const { return m_unit; }
+    QString error() const { return m_error; }
     void setMinTemp(qreal minTemp);
     void setMaxTemp(qreal maxTemp);
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
     void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(m_unit); } }
-    PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
-    TempModel *tempModel() const { return m_tempModel; };
+    PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
+    TempModel *tempModel() const { return m_tempModel; }
     
     Q_INVOKABLE bool hasSystemdCommunicator() const;
 
@@ -89,6 +91,7 @@ public slots:
     
     void save(bool saveLoader = false, const QUrl &url = QUrl());
     void load();
+    void setError(const QString &error, bool critical = false);
     
     
 signals:
@@ -98,6 +101,8 @@ signals:
     void serviceNameChanged();
     void configUrlChanged();
     void unitChanged(QString);
+    void errorChanged();
+    void criticalError();
 
 
 protected:
@@ -107,6 +112,7 @@ protected:
 
 private:
 
+    QString m_error;
     Config *const m_config;
 
 #ifndef NO_SYSTEMD

@@ -123,7 +123,7 @@ ApplicationWindow {
         id: errorDialog
         visible: false
         modality: Qt.ApplicationModal
-        loader: Fancontrol.base.loader
+        base: Fancontrol.base
     }
 
     Action {

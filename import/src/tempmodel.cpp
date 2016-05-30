@@ -24,8 +24,6 @@
 #include "tempmodel.h"
 #include "temp.h"
 
-#include <QDebug>
-
 
 namespace Fancontrol
 {

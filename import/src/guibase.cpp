@@ -27,6 +27,7 @@
 #include "hwmon.h"
 
 #include <QtCore/QLocale>
+#include <QtCore/QDebug>
 
 
 namespace Fancontrol
@@ -139,9 +140,13 @@ void GUIBase::setConfigUrl(const QUrl &url)
 {
     if (url != configUrl())
     {
-        m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
         m_configValid = m_loader->load(url);
-        emit configUrlChanged();
+
+        if (m_configValid)
+        {
+            m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
+            emit configUrlChanged();
+        }
     }
 }
 
@@ -160,6 +165,23 @@ bool GUIBase::hasSystemdCommunicator() const
 #else
     return false;
 #endif
+}
+
+void GUIBase::setError(const QString &error, bool critical)
+{
+    if (error.isEmpty() || error == m_error)
+        return;
+
+    m_error = error;
+    emit errorChanged();
+
+    if (critical)
+    {
+        qCritical() << error;
+        emit criticalError();
+    }
+    else
+        qWarning() << error;
 }
 
 

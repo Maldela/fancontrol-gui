@@ -24,7 +24,6 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
-#include <QtCore/QDebug>
 
 
 namespace Fancontrol
@@ -84,7 +83,7 @@ void Hwmon::initialize()
 
         if (!success)
         {
-            qWarning() << "Not a valid Sensor:" << entry;
+            emit errorChanged("Not a valid Sensor:" + entry);
             continue;
         }
 
@@ -229,9 +228,9 @@ Temp* Hwmon::temp(int i) const
     return m_temps.value(i, Q_NULLPTR);
 }
 
-void Hwmon::setError(const QString &error)
+void Hwmon::setError(const QString &error, bool critical)
 {
-    emit errorChanged(error);
+    emit errorChanged(error, critical);
 }
 
 bool Hwmon::testing() const

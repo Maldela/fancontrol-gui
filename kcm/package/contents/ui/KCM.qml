@@ -343,6 +343,6 @@ Item {
     Fancontrol.ErrorDialog {
         id: errorDialog
         modality: Qt.ApplicationModal
-        loader: root.loader
+        base: base
     }
 }

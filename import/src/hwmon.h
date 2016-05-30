@@ -73,7 +73,7 @@ public slots:
 
     void updateConfig() { emit configUpdateNeeded(); }
     void updateSensors() { emit sensorsUpdateNeeded(); }
-    void setError(const QString &error);
+    void setError(const QString &error, bool critical = false);
 
 
 signals:

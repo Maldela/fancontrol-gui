@@ -27,7 +27,7 @@ Dialog {
     id: dialog
 
     property alias text: text.text
-    property QtObject loader
+    property QtObject base
 
     title: i18n("Error")
     width: text.implicitWidth + 20
@@ -37,11 +37,11 @@ Dialog {
     Label {
         id: text
         anchors.centerIn: parent
-        text: !!loader ? loader.error : ""
+        text: !!base ? base.error : ""
     }
     
     Connections {
-        target: loader
+        target: base
         onCriticalError: dialog.open()
     }
 }

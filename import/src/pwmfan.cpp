@@ -30,7 +30,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
-#include <QtCore/QDebug>
 
 #include <KConfigCore/KConfigGroup>
 #include <KConfigCore/KSharedConfig>
@@ -85,7 +84,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         else
         {
             delete pwmFile;
-            qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+            emit errorChanged("Can't open pwmFile: " + pwmFile->fileName());
         }
 
         const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
@@ -103,7 +102,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         else
         {
             delete pwmModeFile;
-            qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+            emit errorChanged("Can't open pwmModeFile: " + pwmModeFile->fileName());
         }
     }
 }
@@ -153,7 +152,7 @@ void PwmFan::reset()
     else
     {
         delete pwmFile;
-        qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+        emit errorChanged("Can't open pwmFile: " + pwmFile->fileName());
     }
 
     const auto pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
@@ -171,7 +170,7 @@ void PwmFan::reset()
     else
     {
         delete pwmModeFile;
-        qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+        emit errorChanged("Can't open pwmModeFile: " + pwmModeFile->fileName());
     }
 }
 
@@ -205,7 +204,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                     {
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
                         {
-                            qDebug() << "Helper busy...";
+//                            qDebug() << "Helper busy...";
 
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
@@ -251,7 +250,7 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                     {
                         if (job->error() == KAuth::ActionReply::HelperBusyError)
                         {
-                            qDebug() << "Helper busy...";
+//                            qDebug() << "Helper busy...";
 
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
@@ -299,14 +298,14 @@ void PwmFan::test()
     emit testStatusChanged();
 
     QTimer::singleShot(500, this, &PwmFan::continueTest);
-    qDebug() << "Start testing...";
+//    qDebug() << "Start testing...";
 }
 
 void PwmFan::abortTest()
 {
     if (m_testStatus >= FindingStop1 && m_testStatus <= FindingStart)
     {
-        qDebug() << "Abort testing";
+//        qDebug() << "Abort testing";
 
         m_testStatus = Cancelled;
         emit testStatusChanged();
@@ -349,7 +348,7 @@ void PwmFan::continueTest()
             {
                 m_testStatus = FindingStart;
                 m_zeroRpm = 0;
-                qDebug() << "Start finding start value...";
+//                qDebug() << "Start finding start value...";
             }
         }
         QTimer::singleShot(500, this, &PwmFan::continueTest);
@@ -362,7 +361,7 @@ void PwmFan::continueTest()
         {
             m_testStatus = FindingStop2;
             setMinStart(m_pwm);
-            qDebug() << "Start finding stop value...";
+//            qDebug() << "Start finding stop value...";
         }
         QTimer::singleShot(1000, this, &PwmFan::continueTest);
         break;
@@ -388,7 +387,7 @@ void PwmFan::continueTest()
                 m_zeroRpm = 0;
                 setMinStop(m_pwm + 5);
                 setPwm(255);
-                qDebug() << "Finished testing PwmFan" << m_index;
+//                qDebug() << "Finished testing PwmFan" << m_index;
             }
         }
         break;

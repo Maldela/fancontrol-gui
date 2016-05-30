@@ -38,6 +38,7 @@ namespace Fancontrol
 class Hwmon;
 class PwmFan;
 class Temp;
+class GUIBase;
 
 class Loader : public QObject
 {
@@ -53,7 +54,7 @@ class Loader : public QObject
 
 public:
 
-    explicit Loader(QObject *parent = Q_NULLPTR);
+    explicit Loader(GUIBase *parent = Q_NULLPTR);
 
     Q_INVOKABLE void parseHwmons();
     Q_INVOKABLE bool load(const QUrl & = QUrl());
@@ -72,8 +73,6 @@ public:
     void setInterval(int interval, bool writeNewConfig = true);
     QString error() const { return m_error; }
 
-    static QPair<int, int> getEntryNumbers(const QString &entry);
-
 
 public slots:
 
@@ -84,16 +83,13 @@ public slots:
     void setError(const QString &error, bool critical = false);
     void handleDetectSensorsResult(KJob *job);
     void handleDetectSensorsResult(int exitCode);
-    void handleTestStatusChanged();
-
-
-protected:
-
-    void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value)) const;
+    void handleTestStatusChanged();    
 
 
 private:
 
+    void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value));
+    QPair<int, int> getEntryNumbers(const QString &entry);
     PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
     Temp *getTemp(const QPair<int, int> &indexPair) const;
 
@@ -113,12 +109,11 @@ signals:
     void configFileChanged();
     void hwmonsChanged();
     void intervalChanged();
-    void errorChanged();
+    void errorChanged(QString, bool = false);
     void sensorsUpdateNeeded();
     void allPwmFansChanged();
     void allTempsChanged();
     void invalidConfigUrl();
-    void criticalError();
     void sensorsDetectedChanged();
     void restartServiceAfterTestingChanged();
     void requestSetServiceActive(bool);

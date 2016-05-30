@@ -25,7 +25,6 @@
 #define FANCONTROLACTION_H
 
 
-#include <QtCore/QDebug>
 #include <KAuth/KAuthAction>
 
 
@@ -36,9 +35,6 @@ inline KAuth::Action newFancontrolAction()
 {
     KAuth::Action action(QStringLiteral("fancontrol.gui.helper.action"));
     action.setHelperId(QStringLiteral("fancontrol.gui.helper"));
-    
-    if (!action.isValid())
-        qDebug() << "Action is invalid!";
     
     return action;
 }

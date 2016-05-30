@@ -30,17 +30,18 @@ class KJob;
 namespace Fancontrol
 {
 
+class GUIBase;
+
 class SystemdCommunicator : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool serviceExists READ serviceExists NOTIFY serviceNameChanged)
     Q_PROPERTY(bool serviceEnabled READ serviceEnabled WRITE setServiceEnabled NOTIFY serviceEnabledChanged)
     Q_PROPERTY(bool serviceActive READ serviceActive WRITE setServiceActive NOTIFY serviceActiveChanged)
 
 public:
 
-    explicit SystemdCommunicator(QObject *parent = Q_NULLPTR, const QString &serviceName = QString());
+    explicit SystemdCommunicator(GUIBase *parent = Q_NULLPTR, const QString &serviceName = QString());
 
     QString serviceName() const { return m_serviceName; }
     void setServiceName(const QString &name);
@@ -49,7 +50,6 @@ public:
     bool serviceActive();
     bool setServiceEnabled(bool enabled);
     bool setServiceActive(bool active);
-    QString error() const { return m_error; }
     Q_INVOKABLE bool restartService();
 
 
@@ -58,7 +58,7 @@ signals:
     void serviceNameChanged();
     void serviceEnabledChanged();
     void serviceActiveChanged();
-    void errorChanged();
+    void errorChanged(QString, bool = false);
 
 
 protected slots:
@@ -70,14 +70,12 @@ protected slots:
 protected:
     
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
-    void setError(const QString &error);
     
     
 private:
 
     QString m_serviceName;
     QString m_serviceObjectPath;
-    QString m_error;
     QDBusInterface * const m_managerInterface;
     QDBusInterface *m_serviceInterface;
 };

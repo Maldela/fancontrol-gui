@@ -21,8 +21,8 @@
 #include "systemdcommunicator.h"
 
 #include "fancontrolaction.h"
+#include "guibase.h"
 
-#include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QTimer>
 #include <QtDBus/QDBusArgument>
@@ -67,7 +67,7 @@ const QDBusArgument& operator >>(const QDBusArgument &argument, SystemdUnitFile 
 namespace Fancontrol
 {
 
-SystemdCommunicator::SystemdCommunicator(QObject *parent, const QString &serviceName) : QObject(parent),
+SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &serviceName) : QObject(parent),
     m_managerInterface(new QDBusInterface(QStringLiteral("org.freedesktop.systemd1"),
                                           QStringLiteral("/org/freedesktop/systemd1"),
                                           QStringLiteral("org.freedesktop.systemd1.Manager"),
@@ -75,6 +75,9 @@ SystemdCommunicator::SystemdCommunicator(QObject *parent, const QString &service
                                           this)),
     m_serviceInterface(Q_NULLPTR)
 {
+    if (parent)
+        connect(this, &SystemdCommunicator::errorChanged, parent, &GUIBase::setError);
+
     if (serviceName.isEmpty())
         setServiceName(QStringLiteral(STANDARD_SERVICE_NAME));
     else
@@ -110,8 +113,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
             const auto dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, QStringLiteral("LoadUnit"), arguments);
             if (dbusreply.type() == QDBusMessage::ErrorMessage)
             {
-                m_error = dbusreply.errorMessage();
-                emit errorChanged();
+                emit errorChanged(dbusreply.errorMessage());
                 m_serviceObjectPath.clear();
             }
             else
@@ -153,7 +155,7 @@ bool SystemdCommunicator::serviceExists()
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
-        setError(dbusreply.errorMessage());
+        emit errorChanged(dbusreply.errorMessage());
         return false;
     }
     SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
@@ -164,7 +166,7 @@ bool SystemdCommunicator::serviceExists()
             return true;
     }
 
-    setError(i18n("Service %1 doesn't exist", m_serviceName));
+    emit errorChanged(i18n("Service does not exist: %1", m_serviceName));
     return false;
 }
 
@@ -218,7 +220,7 @@ bool SystemdCommunicator::setServiceEnabled(bool enabled)
 
 bool SystemdCommunicator::setServiceActive(bool active)
 {
-    qDebug() << "Set service active:" << active;
+//    qDebug() << "Set service active:" << active;
 
     if (serviceExists())
     {
@@ -243,7 +245,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 {
     if (!m_managerInterface->isValid())
     {
-        qDebug() << "Invalid manager interface!";
+        emit errorChanged(i18n("Invalid manager interface!"), true);
         return false;
 
     }
@@ -269,7 +271,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         return true;
     }
 
-    setError(dbusreply.errorMessage());
+    emit errorChanged(dbusreply.errorMessage());
     return false;
 
 }
@@ -280,7 +282,7 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
     {
         if (job->error() == KAuth::ActionReply::HelperBusyError)
         {
-            qDebug() << "Helper busy...";
+//            qDebug() << "Helper busy...";
 
             const auto executeJob = static_cast<KAuth::ExecuteJob *>(job);
             if (executeJob)
@@ -293,7 +295,7 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
             }
         }
 
-        setError(job->errorText());
+        emit errorChanged(job->errorText());
     }
 }
 
@@ -307,7 +309,7 @@ bool SystemdCommunicator::restartService()
         return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 
-    setError(i18n("Service does not exist"));
+    emit errorChanged(i18n("Service does not exist: %1", m_serviceName));
     return false;
 }
 
@@ -318,14 +320,6 @@ void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchang
 
     if (propchanged.value(QStringLiteral("UnitFileState")).isValid())
         emit serviceEnabledChanged();
-}
-
-void SystemdCommunicator::setError(const QString &error)
-{
-    qCritical() << error;
-
-    m_error = error;
-    emit errorChanged();
 }
 
 }

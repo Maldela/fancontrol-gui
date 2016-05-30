@@ -26,7 +26,6 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QDebug>
 
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
@@ -55,7 +54,7 @@ Temp::Temp(Hwmon *parent, uint index) :
         else
         {
             delete valueFile;
-            qCritical() << "Can't open valueFile " << parent->path() + "/temp" + QString::number(index) + "_input";
+            emit errorChanged("Can't open valueFile " + parent->path() + "/temp" + QString::number(index) + "_input");
         }
 
         if (labelFile->exists())
@@ -63,10 +62,10 @@ Temp::Temp(Hwmon *parent, uint index) :
             if (labelFile->open(QFile::ReadOnly))
                 m_label = QTextStream(labelFile).readLine();
             else
-                qWarning() << "Can't open labelFile " << parent->path() + "/temp" + QString::number(index) + "_label";
+                emit errorChanged("Can't open labelFile: " + parent->path() + "/temp" + QString::number(index) + "_label");
         }
         else
-            qWarning() << parent->path() + "/temp" + QString::number(index) << "has no label.";
+            emit errorChanged(parent->path() + "/temp" + QString::number(index) + "has no label.");
 
         delete labelFile;
     }
@@ -123,7 +122,7 @@ void Temp::reset()
             m_value /= 1000;
         }
         else
-            qCritical() << "Can't open valueFile " << m_parent->path() + "/temp" + QString::number(m_index) + "_input";
+            emit errorChanged("Can't open valueFile " + m_parent->path() + "/temp" + QString::number(m_index) + "_input");
     }
 }
 
@@ -135,7 +134,7 @@ void Temp::update()
     const auto value = m_valueStream->readAll().toInt(&success) / 1000;
 
     if (!success)
-        qCritical() << "Can't update value of temp:" << m_parent->path() + "/temp" + QString::number(m_index);
+        emit errorChanged("Can't update value of temp:" + m_parent->path() + "/temp" + QString::number(m_index));
     
     if (value != m_value)
     {
