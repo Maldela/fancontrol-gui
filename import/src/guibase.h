@@ -79,8 +79,8 @@ public:
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
     void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(m_unit); } }
-    PwmFanModel *pwmFanModel() const { return m_pwmFanModel; };
-    TempModel *tempModel() const { return m_tempModel; };
+    PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
+    TempModel *tempModel() const { return m_tempModel; }
     
     Q_INVOKABLE bool hasSystemdCommunicator() const;
 
