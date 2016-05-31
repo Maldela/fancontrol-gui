@@ -84,8 +84,8 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         }
         else
         {
-            delete pwmFile;
             qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+            delete pwmFile;
         }
 
         const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
@@ -102,8 +102,8 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         }
         else
         {
-            delete pwmModeFile;
             qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+            delete pwmModeFile;
         }
     }
 }
@@ -152,8 +152,8 @@ void PwmFan::reset()
     }
     else
     {
-        delete pwmFile;
         qWarning() << "Can't open pwmFile " << pwmFile->fileName();
+        delete pwmFile;
     }
 
     const auto pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
@@ -170,8 +170,8 @@ void PwmFan::reset()
     }
     else
     {
-        delete pwmModeFile;
         qWarning() << "Can't open pwmModeFile " << pwmModeFile->fileName();
+        delete pwmModeFile;
     }
 }
 
