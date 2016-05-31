@@ -294,7 +294,7 @@ bool Loader::load(const QUrl &url)
     //They get reconnected later
     foreach (const auto &hwmon, m_hwmons)
     {
-        disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+        disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
         foreach (const auto &pwmFan, hwmon->pwmFans())
         {
             qobject_cast<PwmFan *>(pwmFan)->reset();
@@ -334,7 +334,7 @@ bool Loader::load(const QUrl &url)
             {
                 //Connect hwmons again
                 foreach (const auto &hwmon, m_hwmons)
-                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                 emit error(i18n("Unable to parse interval line: %1", line), true);
                 return false;
@@ -384,7 +384,7 @@ bool Loader::load(const QUrl &url)
                     {
                         //Connect hwmons again
                         foreach (const auto &hwmon, m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                         emit error(i18n("Can not parse %1", devname), true);
                         return false;
@@ -394,7 +394,7 @@ bool Loader::load(const QUrl &url)
                     {
                         //Connect hwmons again
                         foreach (const auto &hwmon, m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                         emit error(i18n("Invalid config file!"), true);
                         return false;
@@ -437,18 +437,18 @@ bool Loader::load(const QUrl &url)
         {
             //Connect hwmons again
             foreach (const auto &hwmon, m_hwmons)
-                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
             emit error(i18n("Unrecognized line in config: %1", line), true);
             return false;
         }
     }
 
-    createConfigFile();
+    updateConfig();
 
     //Connect hwmons again
     foreach (const auto &hwmon, m_hwmons)
-        connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
+        connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
     if (!url.isEmpty())
     {
@@ -516,7 +516,18 @@ bool Loader::save(const QUrl &url)
     return true;
 }
 
-void Loader::createConfigFile()
+void Loader::updateConfig()
+{
+    const auto configFile = createConfig();
+
+    if (configFile != m_configFile)
+    {
+        m_configFile = configFile;
+        emit configFileChanged();
+    }
+}
+
+QString Loader::createConfig() const
 {
     QList<Hwmon *> usedHwmons;
     QList<PwmFan *> usedFans;
@@ -649,11 +660,7 @@ void Loader::createConfigFile()
         }
     }
 
-    if (configFile != m_configFile)
-    {
-        m_configFile = configFile;
-        emit configFileChanged();
-    }
+    return configFile;
 }
 
 void Loader::setInterval(int interval, bool writeNewConfig)
@@ -664,7 +671,7 @@ void Loader::setInterval(int interval, bool writeNewConfig)
         emit intervalChanged();
 
         if (writeNewConfig)
-            createConfigFile();
+            updateConfig();
     }
 }
 

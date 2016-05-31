@@ -75,18 +75,19 @@ public:
 public slots:
 
     void updateSensors() { emit sensorsUpdateNeeded(); }
-    void createConfigFile();
+    void updateConfig();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
     void handleDetectSensorsResult(KJob *job);
     void handleDetectSensorsResult(int exitCode);
-    void handleTestStatusChanged();    
+    void handleTestStatusChanged();
 
 
 private:
 
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value));
     QPair<int, int> getEntryNumbers(const QString &entry);
+    QString createConfig() const;
     PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
     Temp *getTemp(const QPair<int, int> &indexPair) const;
 

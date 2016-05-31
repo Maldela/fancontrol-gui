@@ -59,7 +59,7 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
 
     delete nameFile;
 
-    connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::createConfigFile);
+    connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::updateConfig);
     connect(this, &Hwmon::pwmFansChanged, parent, &Loader::emitAllPwmFansChanged);
     connect(this, &Hwmon::tempsChanged, parent, &Loader::emitAllTempsChanged);
     connect(this, &Hwmon::error, parent, &Loader::error);
