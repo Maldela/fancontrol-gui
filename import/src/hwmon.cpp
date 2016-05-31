@@ -37,7 +37,7 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
     QDir dir(path);
     if (!dir.isReadable())
     {
-        emit errorChanged(path + " is not readable!");
+        emit error(path + " is not readable!");
         m_valid = false;
     }
 
@@ -46,7 +46,7 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
 
     if (!success)
     {
-        emit errorChanged(path + "is invalid!");
+        emit error(path + "is invalid!");
         m_valid = false;
     }
 
@@ -62,7 +62,7 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
     connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::createConfigFile);
     connect(this, &Hwmon::pwmFansChanged, parent, &Loader::emitAllPwmFansChanged);
     connect(this, &Hwmon::tempsChanged, parent, &Loader::emitAllTempsChanged);
-    connect(this, &Hwmon::errorChanged, parent, &Loader::setError);
+    connect(this, &Hwmon::error, parent, &Loader::error);
 
     if (m_valid)
         initialize();
@@ -83,7 +83,7 @@ void Hwmon::initialize()
 
         if (!success)
         {
-            emit errorChanged("Not a valid Sensor:" + entry);
+            emit error("Not a valid Sensor:" + entry);
             continue;
         }
 
@@ -226,11 +226,6 @@ PwmFan* Hwmon::pwmFan(int i) const
 Temp* Hwmon::temp(int i) const
 {
     return m_temps.value(i, Q_NULLPTR);
-}
-
-void Hwmon::setError(const QString &error, bool critical)
-{
-    emit errorChanged(error, critical);
 }
 
 bool Hwmon::testing() const

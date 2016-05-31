@@ -52,7 +52,7 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     m_sensorsDetected(false)
 {
     if (parent)
-        connect(this, &Loader::errorChanged, parent, &GUIBase::setError);
+        connect(this, &Loader::error, parent, &GUIBase::handleError);
 
     parseHwmons();
 
@@ -71,12 +71,12 @@ void Loader::parseHwmons()
 
     else if (hwmonDir.exists())
     {
-        emit errorChanged(i18n("%1 is not readable!", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("%1 is not readable!", QStringLiteral(HWMON_PATH)), true);
         return;
     }
     else
     {
-        emit errorChanged(i18n("%1 does not exist!", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("%1 does not exist!", QStringLiteral(HWMON_PATH)), true);
         return;
     }
 
@@ -152,7 +152,7 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
-        emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: %1", entry));
         return QPair<int, int>(-1, -1);
     }
     auto &hwmon = list[0];
@@ -160,12 +160,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
-        emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: %1", entry));
         return QPair<int, int>(-1, -1);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
-        emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: %1", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -178,13 +178,13 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     const auto hwmonResult = hwmon.toInt(&success);
     if (!success)
     {
-        emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: %1", entry));
         return QPair<int, int>(-1, -1);
     }
     const auto sensorResult = sensor.toInt(&success);
     if (!success)
     {
-        emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: %1", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -215,10 +215,10 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
                     (fan->*memberSetFunction)(value);
             }
             else
-                emit errorChanged(valueString + " is not an int");
+                emit error(valueString + " is not an int");
         }
         else
-            emit errorChanged(i18n("Invalid entry to parse: %1", entry));
+            emit error(i18n("Invalid entry to parse: %1", entry));
     }
 }
 
@@ -237,13 +237,13 @@ bool Loader::load(const QUrl &url)
 
         else
         {
-            emit errorChanged(i18n("%1 is not a local file!", url.toDisplayString()));
+            emit error(i18n("%1 is not a local file!", url.toDisplayString()));
             return false;
         }
     }
     else
     {
-        emit errorChanged(i18n("%1 is not a valid url!", url.toDisplayString()));
+        emit error(i18n("%1 is not a valid url!", url.toDisplayString()));
         return false;
     }
 
@@ -275,18 +275,18 @@ bool Loader::load(const QUrl &url)
                     return false;
                 }
 
-                emit errorChanged(reply->errorString() + reply->errorText(), true);
+                emit error(reply->errorString() + reply->errorText(), true);
                 return false;
             }
             else
                 fileContent = reply->data().value(QStringLiteral("content")).toString();
         }
         else
-            emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+            emit error(i18n("Action not supported! Try running the application as root."), true);
     }
     else
     {
-        emit errorChanged(i18n("File does not exist: %1" ,fileName));
+        emit error(i18n("File does not exist: %1" ,fileName));
         return false;
     }
 
@@ -336,7 +336,7 @@ bool Loader::load(const QUrl &url)
                 foreach (const auto &hwmon, m_hwmons)
                     connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
 
-                emit errorChanged(i18n("Unable to parse interval line: %1", line), true);
+                emit error(i18n("Unable to parse interval line: %1", line), true);
                 return false;
             }
         }
@@ -362,7 +362,7 @@ bool Loader::load(const QUrl &url)
                     }
                 }
                 else
-                    emit errorChanged(i18n("Invalid entry: %1", fctemp));
+                    emit error(i18n("Invalid entry: %1", fctemp));
             }
         }
         else if (line.startsWith(QStringLiteral("DEVNAME=")))
@@ -386,7 +386,7 @@ bool Loader::load(const QUrl &url)
                         foreach (const auto &hwmon, m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
 
-                        emit errorChanged(i18n("Can not parse %1", devname), true);
+                        emit error(i18n("Can not parse %1", devname), true);
                         return false;
                     }
 
@@ -396,7 +396,7 @@ bool Loader::load(const QUrl &url)
                         foreach (const auto &hwmon, m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
 
-                        emit errorChanged(i18n("Invalid config file!"), true);
+                        emit error(i18n("Invalid config file!"), true);
                         return false;
                     }
                 }
@@ -439,7 +439,7 @@ bool Loader::load(const QUrl &url)
             foreach (const auto &hwmon, m_hwmons)
                 connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::createConfigFile);
 
-            emit errorChanged(i18n("Unrecognized line in config: %1", line), true);
+            emit error(i18n("Unrecognized line in config: %1", line), true);
             return false;
         }
     }
@@ -472,7 +472,7 @@ bool Loader::save(const QUrl &url)
 
     else
     {
-        emit errorChanged(i18n("%1 is not a local file!", url.toDisplayString()), true);
+        emit error(i18n("%1 is not a local file!", url.toDisplayString()), true);
         return false;
     }
 
@@ -505,12 +505,12 @@ bool Loader::save(const QUrl &url)
                     return false;
                 }
 
-                emit errorChanged(reply->errorString() + reply->errorText(), true);
+                emit error(reply->errorString() + reply->errorText(), true);
                 return false;
             }
         }
         else
-            emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+            emit error(i18n("Action not supported! Try running the application as root."), true);
     }
 
     return true;
@@ -699,7 +699,7 @@ void Loader::handleDetectSensorsResult(int exitCode)
     if (exitCode)
     {
         if (process)
-            emit errorChanged(process->readAllStandardOutput());
+            emit error(process->readAllStandardOutput());
 
         auto action = newFancontrolAction();
 
@@ -715,7 +715,7 @@ void Loader::handleDetectSensorsResult(int exitCode)
             job->start();
         }
         else
-            emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+            emit error(i18n("Action not supported! Try running the application as root."), true);
     }
     else
     {
@@ -742,7 +742,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
             return;
         }
 
-        emit errorChanged(job->errorString() + job->errorText(), true);
+        emit error(job->errorString() + job->errorText(), true);
     }
     else
     {
@@ -763,11 +763,6 @@ QList<QObject *> Loader::hwmonsAsObjects() const
         list << qobject_cast<QObject *>(hwmon);
 
     return list;
-}
-
-void Loader::setError (const QString &error, bool critical)
-{
-    emit errorChanged(error, critical);
 }
 
 void Loader::handleTestStatusChanged()

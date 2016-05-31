@@ -167,7 +167,7 @@ bool GUIBase::hasSystemdCommunicator() const
 #endif
 }
 
-void GUIBase::setError(const QString &error, bool critical)
+void GUIBase::handleError(const QString &error, bool critical)
 {
     if (error.isEmpty() || error == m_error)
         return;

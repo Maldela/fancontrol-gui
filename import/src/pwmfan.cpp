@@ -84,7 +84,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         else
         {
             delete pwmFile;
-            emit errorChanged("Can't open pwmFile: " + pwmFile->fileName());
+            emit error("Can't open pwmFile: " + pwmFile->fileName());
         }
 
         const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
@@ -102,7 +102,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
         else
         {
             delete pwmModeFile;
-            emit errorChanged("Can't open pwmModeFile: " + pwmModeFile->fileName());
+            emit error("Can't open pwmModeFile: " + pwmModeFile->fileName());
         }
     }
 }
@@ -152,7 +152,7 @@ void PwmFan::reset()
     else
     {
         delete pwmFile;
-        emit errorChanged("Can't open pwmFile: " + pwmFile->fileName());
+        emit error("Can't open pwmFile: " + pwmFile->fileName());
     }
 
     const auto pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
@@ -170,7 +170,7 @@ void PwmFan::reset()
     else
     {
         delete pwmModeFile;
-        emit errorChanged("Can't open pwmModeFile: " + pwmModeFile->fileName());
+        emit error("Can't open pwmModeFile: " + pwmModeFile->fileName());
     }
 }
 
@@ -209,12 +209,12 @@ bool PwmFan::setPwm(int pwm, bool write)
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
 
-                        emit errorChanged(i18n("Could not set pwm: ") + job->errorText());
+                        emit error(i18n("Could not set pwm: ") + job->errorText());
                     }
                     update();
                 }
                 else
-                    emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+                    emit error(i18n("Action not supported! Try running the application as root."), true);
             }
         }
     }
@@ -255,12 +255,12 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                             QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
                         }
 
-                        emit errorChanged(i18n("Could not set pwm mode: ") + job->errorText());
+                        emit error(i18n("Could not set pwm mode: ") + job->errorText());
                     }
                     update();
                 }
                 else
-                    emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+                    emit error(i18n("Action not supported! Try running the application as root."), true);
             }
         }
     }
@@ -279,7 +279,7 @@ void PwmFan::test()
 
             if (!job->exec())
             {
-                emit errorChanged(i18n("Authorization error: ") + job->errorText());
+                emit error(i18n("Authorization error: ") + job->errorText());
                 m_testStatus = Error;
                 emit testStatusChanged();
                 return;
@@ -287,7 +287,7 @@ void PwmFan::test()
         }
         else
         {
-            emit errorChanged(i18n("Action not supported! Try running the application as root."), true);
+            emit error(i18n("Action not supported! Try running the application as root."), true);
             return;
         }
     }

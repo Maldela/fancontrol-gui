@@ -49,7 +49,7 @@ Fan::Fan(Hwmon *parent, uint index) :
         else
         {
             delete rpmFile;
-            emit errorChanged("Can't open rpmFile: " + parent->path() + "/fan" + QString::number(index) + "_input");
+            emit error("Can't open rpmFile: " + parent->path() + "/fan" + QString::number(index) + "_input");
         }
     }
 }
@@ -102,7 +102,7 @@ void Fan::reset()
         else
         {
             delete rpmFile;
-            emit errorChanged("Can't open rpmFile: " + m_parent->path() + "/fan" + QString::number(m_index) + "_input");
+            emit error("Can't open rpmFile: " + m_parent->path() + "/fan" + QString::number(m_index) + "_input");
         }
     }
 }

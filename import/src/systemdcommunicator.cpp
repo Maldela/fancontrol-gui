@@ -76,7 +76,7 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
     m_serviceInterface(Q_NULLPTR)
 {
     if (parent)
-        connect(this, &SystemdCommunicator::errorChanged, parent, &GUIBase::setError);
+        connect(this, &SystemdCommunicator::error, parent, &GUIBase::handleError);
 
     if (serviceName.isEmpty())
         setServiceName(QStringLiteral(STANDARD_SERVICE_NAME));
@@ -113,7 +113,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
             const auto dbusreply = m_managerInterface->callWithArgumentList(QDBus::AutoDetect, QStringLiteral("LoadUnit"), arguments);
             if (dbusreply.type() == QDBusMessage::ErrorMessage)
             {
-                emit errorChanged(dbusreply.errorMessage());
+                emit error(dbusreply.errorMessage());
                 m_serviceObjectPath.clear();
             }
             else
@@ -155,7 +155,7 @@ bool SystemdCommunicator::serviceExists()
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
-        emit errorChanged(dbusreply.errorMessage());
+        emit error(dbusreply.errorMessage());
         return false;
     }
     SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
@@ -166,7 +166,7 @@ bool SystemdCommunicator::serviceExists()
             return true;
     }
 
-    emit errorChanged(i18n("Service does not exist: %1", m_serviceName));
+    emit error(i18n("Service does not exist: %1", m_serviceName));
     return false;
 }
 
@@ -245,7 +245,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
 {
     if (!m_managerInterface->isValid())
     {
-        emit errorChanged(i18n("Invalid manager interface!"), true);
+        emit error(i18n("Invalid manager interface!"), true);
         return false;
 
     }
@@ -271,7 +271,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         return true;
     }
 
-    emit errorChanged(dbusreply.errorMessage());
+    emit error(dbusreply.errorMessage());
     return false;
 
 }
@@ -295,7 +295,7 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
             }
         }
 
-        emit errorChanged(job->errorText());
+        emit error(job->errorText());
     }
 }
 
@@ -309,7 +309,7 @@ bool SystemdCommunicator::restartService()
         return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 
-    emit errorChanged(i18n("Service does not exist: %1", m_serviceName));
+    emit error(i18n("Service does not exist: %1", m_serviceName));
     return false;
 }
 

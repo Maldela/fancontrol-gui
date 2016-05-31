@@ -91,7 +91,7 @@ public slots:
     
     void save(bool saveLoader = false, const QUrl &url = QUrl());
     void load();
-    void setError(const QString &error, bool critical = false);
+    void handleError(const QString &error, bool critical = false);
     
     
 signals:

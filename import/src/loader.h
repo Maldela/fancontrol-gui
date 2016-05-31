@@ -47,7 +47,6 @@ class Loader : public QObject
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmonsAsObjects NOTIFY hwmonsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
-    Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
     Q_PROPERTY(bool restartServiceAfterTesting READ restartServiceAfterTesting WRITE setRestartServiceAfterTesting NOTIFY restartServiceAfterTestingChanged)
 
@@ -71,7 +70,6 @@ public:
     QList<QObject *> hwmonsAsObjects() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
-    QString error() const { return m_error; }
 
 
 public slots:
@@ -80,7 +78,6 @@ public slots:
     void createConfigFile();
     void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
     void emitAllTempsChanged() { emit allTempsChanged(); }
-    void setError(const QString &error, bool critical = false);
     void handleDetectSensorsResult(KJob *job);
     void handleDetectSensorsResult(int exitCode);
     void handleTestStatusChanged();    
@@ -98,7 +95,6 @@ private:
     QList<Hwmon *> m_hwmons;
     QUrl m_configUrl;
     QString m_configFile;
-    QString m_error;
     QTimer *m_timer;
     bool m_sensorsDetected;
 
@@ -109,7 +105,7 @@ signals:
     void configFileChanged();
     void hwmonsChanged();
     void intervalChanged();
-    void errorChanged(QString, bool = false);
+    void error(QString, bool = false);
     void sensorsUpdateNeeded();
     void allPwmFansChanged();
     void allTempsChanged();

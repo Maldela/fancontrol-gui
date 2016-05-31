@@ -54,7 +54,7 @@ Temp::Temp(Hwmon *parent, uint index) :
         else
         {
             delete valueFile;
-            emit errorChanged("Can't open valueFile " + parent->path() + "/temp" + QString::number(index) + "_input");
+            emit error("Can't open valueFile " + parent->path() + "/temp" + QString::number(index) + "_input");
         }
 
         if (labelFile->exists())
@@ -62,10 +62,10 @@ Temp::Temp(Hwmon *parent, uint index) :
             if (labelFile->open(QFile::ReadOnly))
                 m_label = QTextStream(labelFile).readLine();
             else
-                emit errorChanged("Can't open labelFile: " + parent->path() + "/temp" + QString::number(index) + "_label");
+                emit error("Can't open labelFile: " + parent->path() + "/temp" + QString::number(index) + "_label");
         }
         else
-            emit errorChanged(parent->path() + "/temp" + QString::number(index) + "has no label.");
+            emit error(parent->path() + "/temp" + QString::number(index) + "has no label.");
 
         delete labelFile;
     }
@@ -122,7 +122,7 @@ void Temp::reset()
             m_value /= 1000;
         }
         else
-            emit errorChanged("Can't open valueFile " + m_parent->path() + "/temp" + QString::number(m_index) + "_input");
+            emit error("Can't open valueFile " + m_parent->path() + "/temp" + QString::number(m_index) + "_input");
     }
 }
 
@@ -134,7 +134,7 @@ void Temp::update()
     const auto value = m_valueStream->readAll().toInt(&success) / 1000;
 
     if (!success)
-        emit errorChanged("Can't update value of temp:" + m_parent->path() + "/temp" + QString::number(m_index));
+        emit error("Can't update value of temp:" + m_parent->path() + "/temp" + QString::number(m_index));
     
     if (value != m_value)
     {

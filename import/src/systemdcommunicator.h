@@ -58,7 +58,7 @@ signals:
     void serviceNameChanged();
     void serviceEnabledChanged();
     void serviceActiveChanged();
-    void errorChanged(QString, bool = false);
+    void error(QString, bool = false);
 
 
 protected slots:
