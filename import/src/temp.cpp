@@ -102,7 +102,7 @@ void Temp::setName(const QString &name)
     if (name != localNames.readEntry("temp" + QString::number(m_index), QString())
         && !name.isEmpty())
     {
-        localNames.writeEntry(m_parent->name() + "temp" + QString::number(m_index), name);
+        localNames.writeEntry("temp" + QString::number(m_index), name);
         emit nameChanged();
     }
 }
