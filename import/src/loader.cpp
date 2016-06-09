@@ -336,7 +336,7 @@ bool Loader::load(const QUrl &url)
         const auto offset = line.indexOf('#');
 
         if (offset != -1)
-            line.truncate(offset-1);
+            line.truncate(offset);
 
         line = line.simplified();
         lines << line;
