@@ -543,7 +543,7 @@ void Loader::createConfigFile()
 
     foreach (const auto &hwmon, m_hwmons)
     {
-        if (hwmon->pwmFans().size() > 0)
+        if (hwmon->pwmFans().size() > 0 && !usedHwmons.contains(hwmon))
             usedHwmons << hwmon;
 
         foreach (const auto &fan, hwmon->pwmFans())
