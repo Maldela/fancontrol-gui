@@ -28,16 +28,20 @@
 
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
+#include <KI18n/KLocalizedString>
+
+
+#define TEST_HWMON_NAME "test"
 
 
 namespace Fancontrol
 {
 
-Fan::Fan(Hwmon *parent, uint index) :
-    Sensor(parent, index, QString(parent->name() + QStringLiteral("/fan") + QString::number(index))),
-    m_rpmStream(new QTextStream)
+Fan::Fan(uint index, Hwmon *parent) : Sensor(parent, index, parent ? parent->name() + "/fan" + QString::number(index) : QString()),
+    m_rpmStream(new QTextStream),
+    m_rpm(0)
 {
-    if (QDir(parent->path()).isReadable())
+    if (m_parent && QDir(parent->path()).isReadable())
     {
         const auto rpmFile = new QFile(parent->path() + "/fan" + QString::number(index) + "_input", this);
 
@@ -48,35 +52,36 @@ Fan::Fan(Hwmon *parent, uint index) :
         }
         else
         {
+            emit error(i18n("Can't open rpmFile: %1", rpmFile->fileName()));
             delete rpmFile;
-            emit error("Can't open rpmFile: " + parent->path() + "/fan" + QString::number(index) + "_input");
         }
     }
 }
 
 Fan::~Fan()
 {
-    delete m_rpmStream->device();
+    auto device = m_rpmStream->device();
     delete m_rpmStream;
+    delete device;
 }
 
 QString Fan::name() const
 {
     const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    const auto localNames = names.group(m_parent->name());
+    const auto localNames = names.group(m_parent ? m_parent->name() : QStringLiteral(TEST_HWMON_NAME));
     const auto name = localNames.readEntry("fan" + QString::number(m_index), QString());
-    
+
     if (name.isEmpty())
         return "fan" + QString::number(m_index);
-    
+
     return name;
 }
 
 void Fan::setName(const QString &name)
 {
     const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    auto localNames = names.group(m_parent->name());
-    
+    auto localNames = names.group(m_parent ? m_parent->name() : QStringLiteral(TEST_HWMON_NAME));
+
     if (name != localNames.readEntry("fan" + QString::number(m_index), QString())
         && !name.isEmpty())
     {
@@ -87,22 +92,26 @@ void Fan::setName(const QString &name)
 
 void Fan::reset()
 {
-    delete m_rpmStream->device();
-    delete m_rpmStream;
-
-    if (QDir(m_parent->path()).isReadable())
+    if (m_rpmStream->device() && m_parent)
     {
-        const auto rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
+        auto device = m_rpmStream->device();
+        m_rpmStream->setDevice(Q_NULLPTR);
+        delete device;
 
-        if (rpmFile->open(QFile::ReadOnly))
+        if (QDir(m_parent->path()).isReadable())
         {
-            m_rpmStream = new QTextStream(rpmFile);
-            *m_rpmStream >> m_rpm;
-        }
-        else
-        {
-            delete rpmFile;
-            emit error("Can't open rpmFile: " + m_parent->path() + "/fan" + QString::number(m_index) + "_input");
+            const auto rpmFile = new QFile(m_parent->path() + "/fan" + QString::number(m_index) + "_input", this);
+
+            if (rpmFile->open(QFile::ReadOnly))
+            {
+                m_rpmStream->setDevice(rpmFile);
+                *m_rpmStream >> m_rpm;
+            }
+            else
+            {
+                emit error(i18n("Can't open rpmFile: %1", rpmFile->fileName()));
+                delete rpmFile;
+            }
         }
     }
 }
@@ -112,12 +121,17 @@ void Fan::update()
     m_rpmStream->seek(0);
     int rpm;
     *m_rpmStream >> rpm;
-    
+
     if (rpm != m_rpm)
     {
         m_rpm = rpm;
         emit rpmChanged();
     }
+}
+
+bool Fan::isValid() const
+{
+    return m_rpmStream->device() || m_rpmStream->string();
 }
 
 }

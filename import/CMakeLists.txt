@@ -50,3 +50,10 @@ target_link_libraries(fancontrol_qml_plugin PRIVATE ${LIB_PRIVATE_LIBRARIES} PUB
 
 install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
+
+
+#tests
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif(BUILD_TESTING)

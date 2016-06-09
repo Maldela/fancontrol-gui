@@ -23,7 +23,6 @@
 #include "fancontrolaction.h"
 #include "guibase.h"
 
-#include <QtCore/QVariant>
 #include <QtCore/QTimer>
 #include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusInterface>
@@ -289,7 +288,7 @@ void SystemdCommunicator::handleDbusActionResult(KJob *job)
             {
                 const auto newJob = executeJob->action().execute();
                 connect(newJob, &KAuth::ExecuteJob::result, this, &SystemdCommunicator::handleDbusActionResult);
-                
+
                 QTimer::singleShot(50, newJob, &KAuth::ExecuteJob::start);
                 return;
             }

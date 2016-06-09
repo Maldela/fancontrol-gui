@@ -2,13 +2,11 @@
 Exec=kcmshell5 kcm_fancontrol
 Icon=fancontrol_gui
 Type=Service
- 
+
 X-KDE-ServiceTypes=KCModule
 X-KDE-Library=kcm_fancontrol
-X-KDE-ParentApp=kcontrol
-X-KDE-Keywords=Fans,PWM,Temperature
+X-KDE-PluginKeyword=Fans
 X-KDE-System-Settings-Parent-Category=hardware
- 
+
 Name=Fancontrol
 Comment=Control PWM-fans
-Categories=Qt;KDE;X-KDE-settings-hardware;

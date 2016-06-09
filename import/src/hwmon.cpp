@@ -21,9 +21,13 @@
 #include "hwmon.h"
 
 #include "loader.h"
+#include "temp.h"
+#include "fan.h"
+#include "pwmfan.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
+#include <KI18n/KLocalizedString>
 
 
 namespace Fancontrol
@@ -31,40 +35,44 @@ namespace Fancontrol
 
 Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
     m_parent(parent),
-    m_path(path),
-    m_valid(true)
+    m_valid(true),
+    m_path(path)
 {
-    QDir dir(path);
-    if (!dir.isReadable())
+    if (!path.isEmpty())
     {
-        emit error(path + " is not readable!");
-        m_valid = false;
+        QDir dir(path);
+        if (!dir.isReadable())
+        {
+            emit error(i18n("%1 is not readable!", path));
+            m_valid = false;
+        }
+
+        auto success = false;
+        m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toInt(&success);
+
+        if (!success)
+        {
+            emit error(i18n("%1 is invalid!", path));
+            m_valid = false;
+        }
+
+        const auto nameFile = new QFile(path + "/name");
+
+        if (nameFile->open(QFile::ReadOnly))
+            m_name = QTextStream(nameFile).readLine();
+        else
+            m_name = path.split('/').last();
+
+        delete nameFile;
     }
 
-    auto success = false;
-    m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toInt(&success);
-
-    if (!success)
+    if (parent)
     {
-        emit error(path + "is invalid!");
-        m_valid = false;
+        connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::updateConfig);
+        connect(this, &Hwmon::error, parent, &Loader::error);
     }
 
-    const auto nameFile = new QFile(path + "/name");
-
-    if (nameFile->open(QFile::ReadOnly))
-        m_name = QTextStream(nameFile).readLine();
-    else
-        m_name = path.split('/').last();
-
-    delete nameFile;
-
-    connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::updateConfig);
-    connect(this, &Hwmon::pwmFansChanged, parent, &Loader::emitAllPwmFansChanged);
-    connect(this, &Hwmon::tempsChanged, parent, &Loader::emitAllTempsChanged);
-    connect(this, &Hwmon::error, parent, &Loader::error);
-
-    if (m_valid)
+    if (m_valid && !m_path.isEmpty())
         initialize();
 }
 
@@ -83,7 +91,7 @@ void Hwmon::initialize()
 
         if (!success)
         {
-            emit error("Not a valid Sensor:" + entry);
+            emit error(i18n("Not a valid Sensor: %1", entry));
             continue;
         }
 
@@ -104,9 +112,12 @@ void Hwmon::initialize()
 
                 if (!newPwmFan)
                 {
-                    newPwmFan = new PwmFan(this, index);
+                    newPwmFan = new PwmFan(index, this);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
-                    connect(newPwmFan, &PwmFan::testStatusChanged, m_parent, &Loader::handleTestStatusChanged);
+
+                    if (m_parent)
+                        connect(newPwmFan, &PwmFan::testStatusChanged, m_parent, &Loader::handleTestStatusChanged);
+
                     m_pwmFans << newPwmFan;
                     emit pwmFansChanged();
                 }
@@ -134,7 +145,7 @@ void Hwmon::initialize()
 
                 if (!newFan)
                 {
-                    newFan = new Fan(this, index);
+                    newFan = new Fan(index, this);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
                     m_fans << newFan;
                     emit fansChanged();
@@ -158,7 +169,7 @@ void Hwmon::initialize()
 
             if (!newTemp)
             {
-                newTemp = new Temp(this, index);
+                newTemp = new Temp(index, this);
                 connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
                 m_temps << newTemp;
                 emit tempsChanged();
@@ -170,47 +181,43 @@ void Hwmon::initialize()
 QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
+
     foreach (const auto &fan, m_fans)
-    {
         list << qobject_cast<QObject *>(fan);
-    }
+
     return list;
 }
 
 QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
+
     foreach (const auto &pwmFan, m_pwmFans)
-    {
         list << qobject_cast<QObject *>(pwmFan);
-    }
+
     return list;
 }
 
 QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
+
     foreach (const auto &temp, m_temps)
-    {
         list << qobject_cast<QObject *>(temp);
-    }
+
     return list;
 }
 
 void Hwmon::testFans()
 {
-    foreach (const auto &fan, m_pwmFans)
-    {
-        fan->test();
-    }
+    foreach (const auto &pwmFan, m_pwmFans)
+        pwmFan->test();
 }
 
 void Hwmon::abortTestingFans()
 {
-    foreach (const auto &fan, m_pwmFans)
-    {
-        fan->abortTest();
-    }
+    foreach (const auto &pwmFan, m_pwmFans)
+        pwmFan->abortTest();
 }
 
 Fan* Hwmon::fan(int i) const
@@ -232,7 +239,7 @@ bool Hwmon::testing() const
 {
     auto testing = false;
 
-    foreach(const auto &fan, m_pwmFans)
+    foreach (const auto &fan, m_pwmFans)
     {
         if (fan->testing())
         {
@@ -242,6 +249,12 @@ bool Hwmon::testing() const
     }
 
     return testing;
+}
+
+void Hwmon::reset() const
+{
+    foreach (const auto &pwmFan, m_pwmFans)
+        pwmFan->reset();
 }
 
 }

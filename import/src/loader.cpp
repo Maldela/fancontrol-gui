@@ -22,6 +22,8 @@
 
 #include "guibase.h"
 #include "hwmon.h"
+#include "pwmfan.h"
+#include "fan.h"
 #include "fancontrolaction.h"
 
 #include <QtCore/QFile>
@@ -54,12 +56,10 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     if (parent)
         connect(this, &Loader::error, parent, &GUIBase::handleError);
 
-    parseHwmons();
-
     m_timer->setSingleShot(false);
     m_timer->start(1);
 
-    connect(m_timer, &QTimer::timeout, this, &Loader::updateSensors);
+    connect(m_timer, &QTimer::timeout, this, &Loader::sensorsUpdateNeeded);
 }
 
 void Loader::parseHwmons()
@@ -71,12 +71,12 @@ void Loader::parseHwmons()
 
     else if (hwmonDir.exists())
     {
-        emit error(i18n("%1 is not readable!", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("File is not readable: \"%1\"", QStringLiteral(HWMON_PATH)), true);
         return;
     }
     else
     {
-        emit error(i18n("%1 does not exist!", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("File does not exist: \"%1\"", QStringLiteral(HWMON_PATH)), true);
         return;
     }
 
@@ -114,7 +114,7 @@ void Loader::parseHwmons()
             auto newHwmon = new Hwmon(hwmonPath, this);
             if (newHwmon->isValid())
             {
-                connect(this, &Loader::sensorsUpdateNeeded, newHwmon, &Hwmon::updateSensors);
+                connect(this, &Loader::sensorsUpdateNeeded, newHwmon, &Hwmon::sensorsUpdateNeeded);
                 m_hwmons << newHwmon;
                 emit hwmonsChanged();
             }
@@ -124,24 +124,34 @@ void Loader::parseHwmons()
     }
 }
 
-PwmFan * Loader::getPwmFan(const QPair<int, int> &indexPair) const
+PwmFan * Loader::pwmFan(int hwmonIndex, int pwmFanIndex) const
 {
-    const auto hwmon = m_hwmons.value(indexPair.first, Q_NULLPTR);
+    const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
 
     if (!hwmon)
         return Q_NULLPTR;
 
-    return hwmon->pwmFan(indexPair.second);
+    return hwmon->pwmFan(pwmFanIndex);
 }
 
-Temp * Loader::getTemp(const QPair<int, int> &indexPair) const
+Temp * Loader::temp(int hwmonIndex, int tempIndex) const
 {
-    const auto hwmon = m_hwmons.value(indexPair.first, Q_NULLPTR);
+    const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
 
     if (!hwmon)
         return Q_NULLPTR;
 
-    return hwmon->temp(indexPair.second);
+    return hwmon->temp(tempIndex);
+}
+
+Fan * Loader::fan(int hwmonIndex, int fanIndex) const
+{
+    const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
+
+    if (!hwmon)
+        return Q_NULLPTR;
+
+    return hwmon->fan(fanIndex);
 }
 
 QPair<int, int> Loader::getEntryNumbers(const QString &entry)
@@ -152,7 +162,7 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
-        emit error(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     auto &hwmon = list[0];
@@ -160,12 +170,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
-        emit error(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
-        emit error(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -178,17 +188,209 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     const auto hwmonResult = hwmon.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     const auto sensorResult = sensor.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry to parse: %1", entry));
+        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
 
     return QPair<int, int>(hwmonResult, sensorResult - 1);
+}
+
+bool Loader::parseConfig(QString config)
+{
+    //Disconnect hwmons for performance reasons
+    //They get reconnected later
+    foreach (const auto &hwmon, m_hwmons)
+    {
+        disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+        foreach (const auto &pwmFan, hwmon->pwmFans())
+        {
+            qobject_cast<PwmFan *>(pwmFan)->reset();
+        }
+    }
+
+    reset();
+
+    QTextStream stream;
+    stream.setString(&config, QIODevice::ReadOnly);
+    QStringList lines;
+    do
+    {
+        auto line(stream.readLine());
+
+        if (line.startsWith('#') || line.trimmed().isEmpty())
+            continue;
+
+        const auto offset = line.indexOf('#');
+
+        if (offset != -1)
+            line.truncate(offset);
+
+        line = line.simplified();
+        lines << line;
+    }
+    while(!stream.atEnd());
+
+    foreach (auto line, lines)
+    {
+        if (line.startsWith(QStringLiteral("INTERVAL=")))
+        {
+            line.remove(QStringLiteral("INTERVAL="));
+            line = line.simplified();
+            auto success = false;
+            const auto interval = line.toInt(&success);
+
+            if (success)
+                setInterval(interval, false);
+            else
+            {
+                //Connect hwmons again
+                foreach (const auto &hwmon, m_hwmons)
+                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+                emit error(i18n("Unable to parse interval line: \"%1\"", line), true);
+                return false;
+            }
+        }
+        else if (line.startsWith(QStringLiteral("FCTEMPS=")))
+        {
+            line.remove(QStringLiteral("FCTEMPS="));
+            line = line.simplified();
+            const auto fctemps = line.split(' ');
+            foreach (const auto &fctemp, fctemps)
+            {
+                const auto nameValuePair = fctemp.split('=');
+                if (nameValuePair.size() == 2)
+                {
+                    const auto pwmFanString = nameValuePair.at(0);
+                    const auto tempString = nameValuePair.at(1);
+                    const auto pwmPointer = pwmFan(getEntryNumbers(pwmFanString));
+                    const auto tempPointer = temp(getEntryNumbers(tempString));
+
+                    if (pwmPointer && tempPointer)
+                    {
+                        pwmPointer->setTemp(tempPointer);
+                        pwmPointer->setHasTemp(true);
+                        pwmPointer->setMinPwm(0);
+                    }
+                    else
+                    {
+                        if (!pwmPointer)
+                            emit error(i18n("Invalid fan entry: \"%1\"", pwmFanString), true);
+
+                        if (!tempPointer)
+                            emit error(i18n("Invalid temp entry: \"%1\"", tempString), true);
+                    }
+                }
+                else
+                    emit error(i18n("Invalid entry: \"%1\"", fctemp), true);
+            }
+        }
+        else if (line.startsWith(QStringLiteral("DEVNAME=")))
+        {
+            line.remove(QStringLiteral("DEVNAME="));
+            line = line.simplified();
+            const auto devnames = line.split(' ');
+            foreach (const auto &devname, devnames)
+            {
+                const auto indexNamePair = devname.split('=');
+
+                if (indexNamePair.size() == 2)
+                {
+                    auto index = indexNamePair.at(0);
+                    const auto &name = indexNamePair[1];
+                    auto success = false;
+                    index.remove(QStringLiteral("hwmon"));
+                    const auto hwmonPointer = m_hwmons.value(index.toInt(&success), Q_NULLPTR);
+
+                    if (!success)
+                    {
+                        //Connect hwmons again
+                        foreach (const auto &hwmon, m_hwmons)
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+                        emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
+                        return false;
+                    }
+
+                    if (!hwmonPointer)
+                    {
+                        //Connect hwmons again
+                        foreach (const auto &hwmon, m_hwmons)
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+                        emit error(i18n("Invalid DEVNAME: \"%1\"! No hwmon with index %2", devname, index), true);
+                        return false;
+                    }
+
+                    if (hwmonPointer->name().split('.').first() != name)
+                    {
+                        //Connect hwmons again
+                        foreach (const auto &hwmon, m_hwmons)
+                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+                        emit error(i18n("Wrong name for hwmon %1! Should be \"%2\"", index, hwmonPointer->name().split('.').first()), true);
+                        return false;
+                    }
+                }
+                else
+                    emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
+            }
+        }
+        else if (line.startsWith(QStringLiteral("MINTEMP=")))
+        {
+            line.remove(QStringLiteral("MINTEMP="));
+            parseConfigLine(line.simplified(), &PwmFan::setMinTemp);
+        }
+        else if (line.startsWith(QStringLiteral("MAXTEMP=")))
+        {
+            line.remove(QStringLiteral("MAXTEMP="));
+            parseConfigLine(line.simplified(), &PwmFan::setMaxTemp);
+        }
+        else if (line.startsWith(QStringLiteral("MINSTART=")))
+        {
+            line.remove(QStringLiteral("MINSTART="));
+            parseConfigLine(line.simplified(), &PwmFan::setMinStart);
+        }
+        else if (line.startsWith(QStringLiteral("MINSTOP=")))
+        {
+            line.remove(QStringLiteral("MINSTOP="));
+            parseConfigLine(line.simplified(), &PwmFan::setMinStop);
+        }
+        else if (line.startsWith(QStringLiteral("MINPWM=")))
+        {
+            line.remove(QStringLiteral("MINPWM="));
+            parseConfigLine(line.simplified(), &PwmFan::setMinPwm);
+        }
+        else if (line.startsWith(QStringLiteral("MAXPWM=")))
+        {
+            line.remove(QStringLiteral("MAXPWM="));
+            parseConfigLine(line.simplified(), &PwmFan::setMaxPwm);
+        }
+        else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
+            !line.startsWith(QStringLiteral("FCFANS=")))
+        {
+            //Connect hwmons again
+            foreach (const auto &hwmon, m_hwmons)
+                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+            emit error(i18n("Unrecognized line in config: \"%1\"", line), true);
+            return false;
+        }
+    }
+
+    updateConfig();
+
+    //Connect hwmons again
+    foreach (const auto &hwmon, m_hwmons)
+        connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
+
+    return true;
 }
 
 void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int))
@@ -203,22 +405,24 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
         const auto fanValuePair = entry.split('=');
         if (fanValuePair.size() == 2)
         {
-            const auto fanString = fanValuePair.at(0);
+            const auto pwmFanString = fanValuePair.at(0);
             const auto valueString = fanValuePair.at(1);
             auto success = false;
             const auto value = valueString.toInt(&success);
 
             if (success)
             {
-                auto fan = getPwmFan(getEntryNumbers(fanString));
-                if (fan)
-                    (fan->*memberSetFunction)(value);
+                auto pwmFanPointer = pwmFan(getEntryNumbers(pwmFanString));
+                if (pwmFanPointer)
+                    (pwmFanPointer->*memberSetFunction)(value);
+                else
+                    emit error(i18n("Invalid fan entry: \"%1\"", pwmFanString), true);
             }
             else
-                emit error(valueString + " is not an int");
+                emit error(i18n("%1 is not an integer!", valueString));
         }
         else
-            emit error(i18n("Invalid entry to parse: %1", entry));
+            emit error(i18n("Invalid entry to parse: \"%1\"", entry));
     }
 }
 
@@ -290,173 +494,15 @@ bool Loader::load(const QUrl &url)
         return false;
     }
 
-    //Disconnect hwmons for performance reasons
-    //They get reconnected later
-    foreach (const auto &hwmon, m_hwmons)
-    {
-        disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-        foreach (const auto &pwmFan, hwmon->pwmFans())
-        {
-            qobject_cast<PwmFan *>(pwmFan)->reset();
-        }
-    }
+    auto success = parseConfig(fileContent);
 
-    stream.setString(&fileContent);
-    auto lines = QStringList();
-    do
-    {
-        auto line(stream.readLine());
-
-        if (line.startsWith('#') || line.trimmed().isEmpty())
-            continue;
-
-        const auto offset = line.indexOf('#');
-
-        if (offset != -1)
-            line.truncate(offset-1);
-
-        line = line.simplified();
-        lines << line;
-    }
-    while(!stream.atEnd());
-
-    foreach (auto line, lines)
-    {
-        if (line.startsWith(QStringLiteral("INTERVAL=")))
-        {
-            line.remove(QStringLiteral("INTERVAL="));
-            auto success = false;
-            const auto interval = line.toInt(&success);
-
-            if (success)
-                setInterval(interval, false);
-            else
-            {
-                //Connect hwmons again
-                foreach (const auto &hwmon, m_hwmons)
-                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
-                emit error(i18n("Unable to parse interval line: %1", line), true);
-                return false;
-            }
-        }
-        else if (line.startsWith(QStringLiteral("FCTEMPS=")))
-        {
-            line.remove(QStringLiteral("FCTEMPS="));
-            const auto fctemps = line.split(' ');
-            foreach (const auto &fctemp, fctemps)
-            {
-                const auto nameValuePair = fctemp.split('=');
-                if (nameValuePair.size() == 2)
-                {
-                    const auto pwm = nameValuePair.at(0);
-                    const auto temp = nameValuePair.at(1);
-                    const auto pwmPointer = getPwmFan(getEntryNumbers(pwm));
-                    const auto tempPointer = getTemp(getEntryNumbers(temp));
-
-                    if (pwmPointer && tempPointer)
-                    {
-                        pwmPointer->setTemp(tempPointer);
-                        pwmPointer->setHasTemp(true);
-                        pwmPointer->setMinPwm(0);
-                    }
-                }
-                else
-                    emit error(i18n("Invalid entry: %1", fctemp));
-            }
-        }
-        else if (line.startsWith(QStringLiteral("DEVNAME=")))
-        {
-            line.remove(QStringLiteral("DEVNAME="));
-            const auto devnames = line.split(' ');
-            foreach (const auto &devname, devnames)
-            {
-                const auto indexNamePair = devname.split('=');
-                if (indexNamePair.size() == 2)
-                {
-                    auto index = indexNamePair.at(0);
-                    const auto &name = indexNamePair[1];
-                    auto success = false;
-                    index.remove(QStringLiteral("hwmon"));
-                    const auto hwmonPointer = m_hwmons.value(index.toInt(&success), Q_NULLPTR);
-
-                    if (!success)
-                    {
-                        //Connect hwmons again
-                        foreach (const auto &hwmon, m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
-                        emit error(i18n("Can not parse %1", devname), true);
-                        return false;
-                    }
-
-                    if (!hwmonPointer || hwmonPointer->name().split('.').first() != name)
-                    {
-                        //Connect hwmons again
-                        foreach (const auto &hwmon, m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
-                        emit error(i18n("Invalid config file!"), true);
-                        return false;
-                    }
-                }
-            }
-        }
-        else if (line.startsWith(QStringLiteral("MINTEMP=")))
-        {
-            line.remove(QStringLiteral("MINTEMP="));
-            parseConfigLine(line, &PwmFan::setMinTemp);
-        }
-        else if (line.startsWith(QStringLiteral("MAXTEMP=")))
-        {
-            line.remove(QStringLiteral("MAXTEMP="));
-            parseConfigLine(line, &PwmFan::setMaxTemp);
-        }
-        else if (line.startsWith(QStringLiteral("MINSTART=")))
-        {
-            line.remove(QStringLiteral("MINSTART="));
-            parseConfigLine(line, &PwmFan::setMinStart);
-        }
-        else if (line.startsWith(QStringLiteral("MINSTOP=")))
-        {
-            line.remove(QStringLiteral("MINSTOP="));
-            parseConfigLine(line, &PwmFan::setMinStop);
-        }
-        else if (line.startsWith(QStringLiteral("MINPWM=")))
-        {
-            line.remove(QStringLiteral("MINPWM="));
-            parseConfigLine(line, &PwmFan::setMinPwm);
-        }
-        else if (line.startsWith(QStringLiteral("MAXPWM=")))
-        {
-            line.remove(QStringLiteral("MAXPWM="));
-            parseConfigLine(line, &PwmFan::setMaxPwm);
-        }
-        else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
-            !line.startsWith(QStringLiteral("FCFANS=")))
-        {
-            //Connect hwmons again
-            foreach (const auto &hwmon, m_hwmons)
-                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
-            emit error(i18n("Unrecognized line in config: %1", line), true);
-            return false;
-        }
-    }
-
-    updateConfig();
-
-    //Connect hwmons again
-    foreach (const auto &hwmon, m_hwmons)
-        connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
-    if (!url.isEmpty())
+    if (success && !url.isEmpty())
     {
         m_configUrl = url;
         emit configUrlChanged();
     }
 
-    return true;
+    return success;
 }
 
 bool Loader::save(const QUrl &url)
@@ -534,12 +580,11 @@ QString Loader::createConfig() const
 
     foreach (const auto &hwmon, m_hwmons)
     {
-        if (hwmon->pwmFans().size() > 0)
+        if (hwmon->pwmFans().size() > 0 && !usedHwmons.contains(hwmon))
             usedHwmons << hwmon;
 
-        foreach (const auto &fan, hwmon->pwmFans())
+        foreach (const auto &pwmFan, hwmon->pwmFans())
         {
-            auto pwmFan = qobject_cast<PwmFan *>(fan);
             if (pwmFan->hasTemp() && pwmFan->temp() && !pwmFan->testing())
             {
                 usedFans << pwmFan;
@@ -665,6 +710,12 @@ QString Loader::createConfig() const
 
 void Loader::setInterval(int interval, bool writeNewConfig)
 {
+    if (interval < 1)
+    {
+        emit error(i18n("Interval must be greater or equal to one!"), true);
+        return;
+    }
+
     if (interval != m_interval)
     {
         m_interval = interval;
@@ -798,6 +849,12 @@ void Loader::setRestartServiceAfterTesting(bool restart)
 
     m_reactivateAfterTesting = restart;
     emit restartServiceAfterTestingChanged();
+}
+
+void Loader::reset() const
+{
+    foreach (const auto &hwmon, m_hwmons)
+        hwmon->reset();
 }
 
 }

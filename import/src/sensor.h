@@ -40,11 +40,12 @@ class Sensor : public QObject
 
 public:
 
-    explicit Sensor(Hwmon *parent, uint index, const QString &path = QString());
+    explicit Sensor(Hwmon *parent = Q_NULLPTR, uint index = 0, const QString &path = QString());
 
     virtual QString name() const = 0;
     virtual void setName(const QString &name) = 0;
     virtual void reset() = 0;
+    virtual bool isValid() const = 0;
     QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }

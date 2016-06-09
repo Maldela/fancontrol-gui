@@ -66,7 +66,7 @@ public:
         Error
     };
 
-    explicit PwmFan(Hwmon *parent, uint index);
+    explicit PwmFan(uint index, Hwmon *parent = Q_NULLPTR);
     virtual ~PwmFan();
 
     int pwm() const Q_DECL_OVERRIDE { return m_pwm; }
@@ -87,13 +87,14 @@ public:
     void setHasTemp(bool hasTemp) { if (hasTemp != m_hasTemp) { m_hasTemp = hasTemp; emit hasTempChanged(); } }
     void setMinTemp(int minTemp) { if (minTemp != m_minTemp) { m_minTemp = minTemp; emit minTempChanged(); } }
     void setMaxTemp(int maxTemp) { if (maxTemp != m_maxTemp) { m_maxTemp = maxTemp; emit maxTempChanged(); } }
-    void setMinPwm(int minPwm) { if (minPwm != m_minPwm) { m_minPwm = minPwm; emit minPwmChanged(); } }
-    void setMaxPwm(int maxPwm) { if (maxPwm != m_maxPwm) { m_maxPwm = maxPwm; emit maxPwmChanged(); } }
+    void setMinPwm(int minPwm);
+    void setMaxPwm(int maxPwm);
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
     bool setPwmMode(int pwmMode, bool write = true);
     void setActive(bool active);
     void reset() Q_DECL_OVERRIDE;
+    bool isValid() const Q_DECL_OVERRIDE;
     Q_INVOKABLE void test();
     Q_INVOKABLE void abortTest();
 
@@ -120,11 +121,16 @@ public slots:
     void continueTest();
 
 
+protected:
+
+    QTextStream *m_pwmStream;
+    QTextStream *m_modeStream;
+
+
 private:
 
     int m_pwm;
-    QTextStream *m_pwmStream;
-    QTextStream *m_modeStream;
+    int m_pwmMode;
     Temp *m_temp;
     bool m_hasTemp;
     int m_minTemp;
@@ -133,7 +139,6 @@ private:
     int m_maxPwm;
     int m_minStart;
     int m_minStop;
-    int m_pwmMode;
     int m_zeroRpm;
     TestStatus m_testStatus;
 };

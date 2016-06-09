@@ -22,6 +22,9 @@
 #define SYSTEMDCOMMUNICATOR_H
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QVariantMap>
+#include <QtCore/QVariantList>
 
 
 class QDBusInterface;
@@ -62,16 +65,16 @@ signals:
 
 
 protected slots:
-    
+
     void updateServiceProperties(QString, QVariantMap, QStringList);
     void handleDbusActionResult(KJob *job);
-    
-    
+
+
 protected:
-    
+
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
-    
-    
+
+
 private:
 
     QString m_serviceName;

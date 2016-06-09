@@ -37,13 +37,14 @@ class Fan : public Sensor
 
 public:
 
-    explicit Fan(Hwmon *parent, uint index);
+    explicit Fan(uint index, Hwmon *parent = Q_NULLPTR);
     virtual ~Fan();
 
     int rpm() const { return m_rpm; }
     QString name() const Q_DECL_OVERRIDE;
     void setName(const QString &name) Q_DECL_OVERRIDE;
     void reset() Q_DECL_OVERRIDE;
+    bool isValid() const Q_DECL_OVERRIDE;
 
     virtual int pwm() const { return 255; }
     virtual bool setPwm(int, bool) { return false; }
@@ -61,8 +62,12 @@ public slots:
 
 protected:
 
-    int m_rpm;
     QTextStream *m_rpmStream;
+
+
+private:
+
+    int m_rpm;
 };
 
 }

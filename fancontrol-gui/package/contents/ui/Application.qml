@@ -37,7 +37,7 @@ ApplicationWindow {
         Fancontrol.base.save();
         windowConfig.save(window);
     }
-    
+
     Component.onCompleted: {
         Fancontrol.base.load();
         windowConfig.restore(window);

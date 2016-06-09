@@ -112,9 +112,5 @@ if(INSTALL_SHARED)
 endif(INSTALL_SHARED)
 
 
-#add tests
-#add_subdirectory(tests)
-
-
 #summary
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

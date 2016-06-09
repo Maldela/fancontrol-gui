@@ -25,15 +25,14 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-#include "temp.h"
-#include "fan.h"
-#include "pwmfan.h"
-
 
 namespace Fancontrol
 {
 
 class Loader;
+class Fan;
+class Temp;
+class PwmFan;
 
 class Hwmon : public QObject
 {
@@ -67,12 +66,7 @@ public:
     Temp * temp(int i) const;
     bool isValid() const { return m_valid; }
     bool testing() const;
-
-
-public slots:
-
-    void updateConfig() { emit configUpdateNeeded(); }
-    void updateSensors() { emit sensorsUpdateNeeded(); }
+    void reset() const;
 
 
 signals:
@@ -85,19 +79,21 @@ signals:
     void error(QString, bool = false);
 
 
-private:
+protected:
 
-    Loader *m_parent;
     QString m_name;
-    const QString m_path;
-    bool m_valid;
     int m_index;
+    Loader *const m_parent;
+    bool m_valid;
     QList<Fan *> m_fans;
     QList<PwmFan *> m_pwmFans;
     QList<Temp *> m_temps;
+
+private:
+
+    const QString m_path;
 };
 
 }
-
 
 #endif // HWMON_H

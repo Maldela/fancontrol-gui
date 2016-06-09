@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman maldela@halloarsch.de
  *
  * This program is free software; you can redistribute it and/or
@@ -20,60 +19,44 @@
  *
  */
 
+#ifndef PWMFANTEST_H
+#define PWMFANTEST_H
 
-#ifndef TEMP_H
-#define TEMP_H
+#include <QtCore/QObject>
+#include <QtCore/QString>
+
+#include "testpwmfan.h"
 
 
-#include "sensor.h"
-
-
-class QTextStream;
-
-namespace Fancontrol
-{
-
-class Temp : public Sensor
+class PwmFanTest : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString label READ label NOTIFY labelChanged)
-    Q_PROPERTY(int value READ value NOTIFY valueChanged)
 
-public:
+private slots:
 
-    explicit Temp(uint index, Hwmon *parent = Q_NULLPTR);
-    virtual ~Temp();
+    void initTestCase();
+    void cleanupTestCase();
 
-    QString label() const { return m_label; }
-    int value() const { return m_value; }
-    QString name() const Q_DECL_OVERRIDE;
-    void setName(const QString &name) Q_DECL_OVERRIDE;
-    void reset() Q_DECL_OVERRIDE;
-    bool isValid() const Q_DECL_OVERRIDE;
+    void init();
+    void cleanup();
 
+    void nameTest_data();
+    void nameTest();
 
-public slots:
+    void pwmTest_data();
+    void pwmTest();
 
-    void update() Q_DECL_OVERRIDE;
+    void modeTest_data();
+    void modeTest();
 
-
-signals:
-
-    void labelChanged();
-    void valueChanged();
-
-
-protected:
-
-    QTextStream *m_valueStream;
+    void activeTest();
 
 
 private:
 
-    QString m_label;
-    int m_value;
+    TestPwmFan *m_fan;
+    QString m_pwmString;
+    QString m_modeString;
 };
 
-}
-
-#endif // TEMP_H
+#endif // PWMFANTEST_H

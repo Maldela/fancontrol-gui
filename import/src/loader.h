@@ -38,6 +38,7 @@ namespace Fancontrol
 class Hwmon;
 class PwmFan;
 class Temp;
+class Fan;
 class GUIBase;
 
 class Loader : public QObject
@@ -70,30 +71,37 @@ public:
     QList<QObject *> hwmonsAsObjects() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
+    PwmFan *pwmFan(const QPair<int, int> &indexPair) const { return pwmFan(indexPair.first, indexPair.second); }
+    Temp *temp(const QPair<int, int> &indexPair) const { return temp(indexPair.first, indexPair.second); }
+    Fan *fan(const QPair<int, int> &indexPair) const { return fan(indexPair.first, indexPair.second); }
+    PwmFan *pwmFan(int hwmonIndex, int pwmFanIndex) const;
+    Temp *temp(int hwmonIndex, int tempIndex) const;
+    Fan *fan(int hwmonIndex, int fanIndex) const;
+    void reset() const;
 
 
 public slots:
 
-    void updateSensors() { emit sensorsUpdateNeeded(); }
     void updateConfig();
-    void emitAllPwmFansChanged() { emit allPwmFansChanged(); }
-    void emitAllTempsChanged() { emit allTempsChanged(); }
     void handleDetectSensorsResult(KJob *job);
     void handleDetectSensorsResult(int exitCode);
     void handleTestStatusChanged();
 
 
-private:
+protected:
 
+    bool parseConfig(QString config);
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value));
     QPair<int, int> getEntryNumbers(const QString &entry);
     QString createConfig() const;
-    PwmFan *getPwmFan(const QPair<int, int> &indexPair) const;
-    Temp *getTemp(const QPair<int, int> &indexPair) const;
+
+    QList<Hwmon *> m_hwmons;
+
+
+private:
 
     bool m_reactivateAfterTesting;
     int m_interval;
-    QList<Hwmon *> m_hwmons;
     QUrl m_configUrl;
     QString m_configFile;
     QTimer *m_timer;
@@ -108,8 +116,6 @@ signals:
     void intervalChanged();
     void error(QString, bool = false);
     void sensorsUpdateNeeded();
-    void allPwmFansChanged();
-    void allTempsChanged();
     void invalidConfigUrl();
     void sensorsDetectedChanged();
     void restartServiceAfterTestingChanged();

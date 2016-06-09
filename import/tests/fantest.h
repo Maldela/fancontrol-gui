@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman maldela@halloarsch.de
  *
  * This program is free software; you can redistribute it and/or
@@ -20,60 +19,41 @@
  *
  */
 
+#ifndef FANTEST_H
+#define FANTEST_H
 
-#ifndef TEMP_H
-#define TEMP_H
+#include <QtCore/QObject>
+#include <QtCore/QString>
+
+#include "testfan.h"
 
 
-#include "sensor.h"
+using namespace Fancontrol;
 
 
-class QTextStream;
-
-namespace Fancontrol
-{
-
-class Temp : public Sensor
+class FanTest : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString label READ label NOTIFY labelChanged)
-    Q_PROPERTY(int value READ value NOTIFY valueChanged)
 
-public:
+private slots:
 
-    explicit Temp(uint index, Hwmon *parent = Q_NULLPTR);
-    virtual ~Temp();
+    void initTestCase();
+    void cleanupTestCase();
 
-    QString label() const { return m_label; }
-    int value() const { return m_value; }
-    QString name() const Q_DECL_OVERRIDE;
-    void setName(const QString &name) Q_DECL_OVERRIDE;
-    void reset() Q_DECL_OVERRIDE;
-    bool isValid() const Q_DECL_OVERRIDE;
+    void init();
+    void cleanup();
 
+    void nameTest_data();
+    void nameTest();
 
-public slots:
-
-    void update() Q_DECL_OVERRIDE;
-
-
-signals:
-
-    void labelChanged();
-    void valueChanged();
-
-
-protected:
-
-    QTextStream *m_valueStream;
+    void rpmTest_data();
+    void rpmTest();
 
 
 private:
 
-    QString m_label;
-    int m_value;
+    TestFan *m_fan;
+    QString m_rpmString;
 };
 
-}
-
-#endif // TEMP_H
+#endif // FANTEST_H

@@ -57,6 +57,8 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_unit = (system == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
     emit unitChanged(m_unit);
 
+    m_loader->parseHwmons();
+
     foreach (const auto &hwmon, m_loader->hwmons())
     {
         m_pwmFanModel->addPwmFans(hwmon->pwmFans());
