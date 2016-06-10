@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fancontrol-gui\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2016-06-10 14:46+0200\n"
-"PO-Revision-Date: 2016-06-10 15:01+0100\n"
+"POT-Creation-Date: 2016-06-10 15:20+0200\n"
+"PO-Revision-Date: 2016-06-10 15:23+0100\n"
 "Last-Translator: Malte Veerman <maldela@halloarsch.de>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de_DE\n"
@@ -187,13 +187,9 @@ msgstr "Test abbrechen"
 msgid "Test start and stop values"
 msgstr "Start und Stopwerte testen"
 
-#: import/src/fan.cpp:55
+#: import/src/fan.cpp:55 import/src/fan.cpp:112
 msgid "Can't open rpm file: \"%1\""
 msgstr "Kann rpm Datei nicht öffnen: \"%1\""
-
-#: import/src/fan.cpp:112
-msgid "Can't open rpmFile: %1"
-msgstr ""
 
 #: import/src/hwmon.cpp:46
 msgid "%1 is not readable!"
@@ -211,15 +207,15 @@ msgstr "Kein gültiger Sensor: \"%1\""
 msgid "File is not readable: \"%1\""
 msgstr "Datei ist nicht lesbar: \"%1\""
 
-#: import/src/loader.cpp:79
+#: import/src/loader.cpp:79 import/src/loader.cpp:493
 msgid "File does not exist: \"%1\""
 msgstr "Datei existiert nicht: \"%1\""
 
 #: import/src/loader.cpp:165 import/src/loader.cpp:173
 #: import/src/loader.cpp:178 import/src/loader.cpp:191
-#: import/src/loader.cpp:197 import/src/loader.cpp:425
-msgid "Invalid entry to parse: \"%1\""
-msgstr "Ungültiger Eintrag"
+#: import/src/loader.cpp:197 import/src/loader.cpp:291
+msgid "Invalid entry: \"%1\""
+msgstr "Ungültiger Eintrag: \"%1\""
 
 #: import/src/loader.cpp:256
 msgid "Unable to parse interval line: \"%1\""
@@ -232,10 +228,6 @@ msgstr "Ungültiger fan Eintrag: \"%1\""
 #: import/src/loader.cpp:287
 msgid "Invalid temp entry: \"%1\""
 msgstr "Ungültiger temp Eintrag: \"%1\""
-
-#: import/src/loader.cpp:291
-msgid "Invalid entry: \"%1\""
-msgstr "Ungültiger Eintrag: \"%1\""
 
 #: import/src/loader.cpp:317 import/src/loader.cpp:342
 msgid "Invalid DEVNAME: \"%1\"!"
@@ -257,6 +249,10 @@ msgstr "Unbekannte Zeile in Konfiguration: \"%1\""
 msgid "%1 is not an integer!"
 msgstr "%1 ist keine gültige ganze Zahl!"
 
+#: import/src/loader.cpp:425
+msgid "Invalid entry to parse: \"%1\""
+msgstr "Ungültiger Eintrag"
+
 #: import/src/loader.cpp:444 import/src/loader.cpp:521
 msgid "%1 is not a local file!"
 msgstr "%1 ist keine lokale Datei!"
@@ -271,21 +267,17 @@ msgstr "%1 ist keine gültige Url!"
 msgid "Action not supported! Try running the application as root."
 msgstr "Aktion nicht unterstützt! Starten sie die Anwendung als root."
 
-#: import/src/loader.cpp:493
-msgid "File does not exist: %1"
-msgstr "Datei existiert nicht: \"%1\""
-
 #: import/src/loader.cpp:715
 msgid "Interval must be greater or equal to one!"
 msgstr "Intervall muss größer oder gleich eins sein!"
 
 #: import/src/pwmfan.cpp:91 import/src/pwmfan.cpp:179
-msgid "Can't open pwmFile: %1"
-msgstr ""
+msgid "Can't open pwm file: \"%1\""
+msgstr "Kann pwm Datei nicht öffnen: \"%1\""
 
 #: import/src/pwmfan.cpp:109 import/src/pwmfan.cpp:197
-msgid "Can't open pwmModeFile: %1"
-msgstr ""
+msgid "Can't open pwm_mode file: \"%1\""
+msgstr "Kann pwm_mode Datei nicht öffnen: \"%1\""
 
 #: import/src/pwmfan.cpp:212
 msgid "Pwm cannot exceed 0-255!"
@@ -317,28 +309,28 @@ msgstr "Authorisationsfehler: %1"
 
 #: import/src/systemdcommunicator.cpp:168
 #: import/src/systemdcommunicator.cpp:311
-msgid "Service does not exist: %1"
-msgstr "Service existiert nicht: %1"
+msgid "Service does not exist: \"%1\""
+msgstr "Service existiert nicht: \"%1\""
 
 #: import/src/systemdcommunicator.cpp:247
 msgid "Invalid manager interface!"
 msgstr "Ungültiges Managerinterface!"
 
 #: import/src/temp.cpp:61 import/src/temp.cpp:133
-msgid "Can't open valueFile: %1"
-msgstr ""
+msgid "Can't open value file: \"%1\""
+msgstr "Kann value Datei nicht öffnen: \"%1\""
 
 #: import/src/temp.cpp:69
-msgid "Can't open labelFile: %1"
-msgstr ""
+msgid "Can't open label file: \"%1\""
+msgstr "Kann label Datei nicht öffnen: \"%1\""
 
 #: import/src/temp.cpp:72
-msgid "Temp has no label: %1"
-msgstr "Temp hat kein Label: %1"
+msgid "Temp has no label: \"%1\""
+msgstr "Temp hat kein Label: \"%1\""
 
 #: import/src/temp.cpp:146
-msgid "Can't update value of temp: %1"
-msgstr "Kann Wert von Temp nicht aktualisieren: %1"
+msgid "Can't update value of temp: \"%1\""
+msgstr "Kann Wert von Temp nicht aktualisieren: \"%1\""
 
 #: kcm/package/contents/ui/KCM.qml:101
 msgid "Control fans manually"
@@ -369,6 +361,17 @@ msgstr "Malte Veerman"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "maldela@halloarsch.de"
+
+#, fuzzy
+#~ msgid "Can't open rpm file: %1"
+#~ msgstr "Kann rpm Datei nicht öffnen: \"%1\""
+
+#~ msgid "File does not exist: %1"
+#~ msgstr "Datei existiert nicht: \"%1\""
+
+#, fuzzy
+#~ msgid "Can't open pwm file: %1"
+#~ msgstr "Kann rpm Datei nicht öffnen: \"%1\""
 
 #~ msgid "%1 does not exist!"
 #~ msgstr "%1 existiert nicht!"

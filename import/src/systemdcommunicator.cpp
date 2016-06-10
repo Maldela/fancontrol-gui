@@ -165,7 +165,7 @@ bool SystemdCommunicator::serviceExists()
             return true;
     }
 
-    emit error(i18n("Service does not exist: %1", m_serviceName));
+    emit error(i18n("Service does not exist: \"%1\"", m_serviceName));
     return false;
 }
 
@@ -308,7 +308,7 @@ bool SystemdCommunicator::restartService()
         return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 
-    emit error(i18n("Service does not exist: %1", m_serviceName));
+    emit error(i18n("Service does not exist: \"%1\"", m_serviceName));
     return false;
 }
 

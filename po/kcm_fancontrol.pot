@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2016-06-10 14:56+0200\n"
+"POT-Creation-Date: 2016-06-10 15:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -188,12 +188,8 @@ msgstr ""
 msgid "Test start and stop values"
 msgstr ""
 
-#: import/src/fan.cpp:55
+#: import/src/fan.cpp:55 import/src/fan.cpp:112
 msgid "Can't open rpm file: \"%1\""
-msgstr ""
-
-#: import/src/fan.cpp:112
-msgid "Can't open rpmFile: %1"
 msgstr ""
 
 #: import/src/hwmon.cpp:46
@@ -212,7 +208,7 @@ msgstr ""
 msgid "File is not readable: \"%1\""
 msgstr ""
 
-#: import/src/loader.cpp:79
+#: import/src/loader.cpp:79 import/src/loader.cpp:493
 msgid "File does not exist: \"%1\""
 msgstr ""
 
@@ -272,28 +268,16 @@ msgstr ""
 msgid "Action not supported! Try running the application as root."
 msgstr ""
 
-#: import/src/loader.cpp:493
-msgid "File does not exist: %1"
-msgstr ""
-
 #: import/src/loader.cpp:715
 msgid "Interval must be greater or equal to one!"
 msgstr ""
 
-#: import/src/pwmfan.cpp:91
-msgid "Can't open pwm file: %1"
+#: import/src/pwmfan.cpp:91 import/src/pwmfan.cpp:179
+msgid "Can't open pwm file: \"%1\""
 msgstr ""
 
-#: import/src/pwmfan.cpp:109
-msgid "Can't open pwm_mode file: %1"
-msgstr ""
-
-#: import/src/pwmfan.cpp:179
-msgid "Can't open pwmFile: %1"
-msgstr ""
-
-#: import/src/pwmfan.cpp:197
-msgid "Can't open pwmModeFile: %1"
+#: import/src/pwmfan.cpp:109 import/src/pwmfan.cpp:197
+msgid "Can't open pwm_mode file: \"%1\""
 msgstr ""
 
 #: import/src/pwmfan.cpp:212
@@ -326,31 +310,27 @@ msgstr ""
 
 #: import/src/systemdcommunicator.cpp:168
 #: import/src/systemdcommunicator.cpp:311
-msgid "Service does not exist: %1"
+msgid "Service does not exist: \"%1\""
 msgstr ""
 
 #: import/src/systemdcommunicator.cpp:247
 msgid "Invalid manager interface!"
 msgstr ""
 
-#: import/src/temp.cpp:61
-msgid "Can't open value file: %1"
+#: import/src/temp.cpp:61 import/src/temp.cpp:133
+msgid "Can't open value file: \"%1\""
 msgstr ""
 
 #: import/src/temp.cpp:69
-msgid "Can't open label file: %1"
+msgid "Can't open label file: \"%1\""
 msgstr ""
 
 #: import/src/temp.cpp:72
-msgid "Temp has no label: %1"
-msgstr ""
-
-#: import/src/temp.cpp:133
-msgid "Can't open valueFile: %1"
+msgid "Temp has no label: \"%1\""
 msgstr ""
 
 #: import/src/temp.cpp:146
-msgid "Can't update value of temp: %1"
+msgid "Can't update value of temp: \"%1\""
 msgstr ""
 
 #: kcm/package/contents/ui/KCM.qml:101

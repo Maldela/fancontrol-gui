@@ -490,7 +490,7 @@ bool Loader::load(const QUrl &url)
     }
     else
     {
-        emit error(i18n("File does not exist: %1" ,fileName));
+        emit error(i18n("File does not exist: \"%1\"" ,fileName));
         return false;
     }
 

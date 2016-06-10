@@ -109,7 +109,7 @@ void Fan::reset()
             }
             else
             {
-                emit error(i18n("Can't open rpmFile: %1", rpmFile->fileName()));
+                emit error(i18n("Can't open rpm file: \"%1\"", rpmFile->fileName()));
                 delete rpmFile;
             }
         }
