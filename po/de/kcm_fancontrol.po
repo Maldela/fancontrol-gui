@@ -189,7 +189,7 @@ msgstr "Start und Stopwerte testen"
 
 #: import/src/fan.cpp:55
 msgid "Can't open rpm file: \"%1\""
-msgstr "Kann rpm Datei nicht öffnen: \\"%1\\""
+msgstr "Kann rpm Datei nicht öffnen: \"%1\""
 
 #: import/src/fan.cpp:112
 msgid "Can't open rpmFile: %1"
@@ -205,7 +205,7 @@ msgstr "%1 ist ungültig!"
 
 #: import/src/hwmon.cpp:94
 msgid "Not a valid sensor: \"%1\""
-msgstr "Kein gültiger Sensor: \%1\\""
+msgstr "Kein gültiger Sensor: \"%1\""
 
 #: import/src/loader.cpp:74
 msgid "File is not readable: \"%1\""
