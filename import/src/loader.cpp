@@ -162,7 +162,7 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
-        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     auto &hwmon = list[0];
@@ -170,12 +170,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
-        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
-        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -188,13 +188,13 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     const auto hwmonResult = hwmon.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
     const auto sensorResult = sensor.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \"%1\"", entry));
         return QPair<int, int>(-1, -1);
     }
 

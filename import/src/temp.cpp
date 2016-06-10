@@ -58,7 +58,7 @@ Temp::Temp(uint index, Hwmon *parent) :
         else
         {
             delete valueFile;
-            emit error(i18n("Can't open valueFile: %1", parent->path() + "/temp" + QString::number(index) + "_input"));
+            emit error(i18n("Can't open value file: %1", parent->path() + "/temp" + QString::number(index) + "_input"));
         }
 
         if (labelFile->exists())
@@ -66,7 +66,7 @@ Temp::Temp(uint index, Hwmon *parent) :
             if (labelFile->open(QFile::ReadOnly))
                 m_label = QTextStream(labelFile).readLine();
             else
-                emit error(i18n("Can't open labelFile: %1", parent->path() + "/temp" + QString::number(index) + "_label"));
+                emit error(i18n("Can't open label file: %1", parent->path() + "/temp" + QString::number(index) + "_label"));
         }
         else
             emit error(i18n("Temp has no label: %1", parent->path() + "/temp" + QString::number(index)));

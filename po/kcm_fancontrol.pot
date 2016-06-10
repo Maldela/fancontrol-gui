@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2016-03-28 22:10+0200\n"
+"POT-Creation-Date: 2016-06-10 14:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,79 +23,79 @@ msgstr ""
 msgid "Fancontrol-GUI"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:47
+#: fancontrol-gui/package/contents/ui/Application.qml:48
 msgid "File"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:51
-#: fancontrol-gui/package/contents/ui/Application.qml:156
+#: fancontrol-gui/package/contents/ui/Application.qml:53
+#: fancontrol-gui/package/contents/ui/Application.qml:158
 msgid "Save configuration file as"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:56
+#: fancontrol-gui/package/contents/ui/Application.qml:58
 msgid "Exit"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:77
+#: fancontrol-gui/package/contents/ui/Application.qml:79
 msgid "Restart fancontrol"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:77
+#: fancontrol-gui/package/contents/ui/Application.qml:79
 msgid "Start fancontrol"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:86
+#: fancontrol-gui/package/contents/ui/Application.qml:88
 msgid "Stop fancontrol"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:102
+#: fancontrol-gui/package/contents/ui/Application.qml:104
 msgid "Sensors"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:106
+#: fancontrol-gui/package/contents/ui/Application.qml:108
 msgid "PwmFans"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:110
+#: fancontrol-gui/package/contents/ui/Application.qml:112
 msgid "Configfile"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:115
+#: fancontrol-gui/package/contents/ui/Application.qml:117
 msgid "Settings"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:129
-#: fancontrol-gui/package/contents/ui/Application.qml:132
+#: fancontrol-gui/package/contents/ui/Application.qml:131
+#: fancontrol-gui/package/contents/ui/Application.qml:134
 #: kcm/package/contents/ui/KCM.qml:329
 msgid "Load configuration file"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:137
-#: fancontrol-gui/package/contents/ui/Application.qml:140
+#: fancontrol-gui/package/contents/ui/Application.qml:139
+#: fancontrol-gui/package/contents/ui/Application.qml:142
 msgid "Save configuration file"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:146
+#: fancontrol-gui/package/contents/ui/Application.qml:148
 #: kcm/package/contents/ui/KCM.qml:335
 msgid "Please choose a configuration file"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:43
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:47
 #: kcm/package/contents/ui/KCM.qml:122
 msgid "Fan:"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:83
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:89
 #: kcm/package/contents/ui/KCM.qml:83
 msgid "There are no pwm capable fans in your system."
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:96
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:102
 #: kcm/package/contents/ui/KCM.qml:90
 msgid "Detect fans again"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:96
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:102
 #: kcm/package/contents/ui/KCM.qml:90 kcm/package/contents/ui/KCM.qml:135
 msgid "Detect fans"
 msgstr ""
@@ -188,66 +188,169 @@ msgstr ""
 msgid "Test start and stop values"
 msgstr ""
 
-#: import/src/loader.cpp:71
+#: import/src/fan.cpp:55
+msgid "Can't open rpm file: \"%1\""
+msgstr ""
+
+#: import/src/fan.cpp:112
+msgid "Can't open rpmFile: %1"
+msgstr ""
+
+#: import/src/hwmon.cpp:46
 msgid "%1 is not readable!"
 msgstr ""
 
-#: import/src/loader.cpp:76 import/src/loader.cpp:310
-msgid "%1 does not exist!"
+#: import/src/hwmon.cpp:55
+msgid "%1 is invalid!"
 msgstr ""
 
-#: import/src/loader.cpp:243 import/src/loader.cpp:489
+#: import/src/hwmon.cpp:94
+msgid "Not a valid sensor: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:74
+msgid "File is not readable: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:79
+msgid "File does not exist: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:165 import/src/loader.cpp:173
+#: import/src/loader.cpp:178 import/src/loader.cpp:191
+#: import/src/loader.cpp:197 import/src/loader.cpp:291
+msgid "Invalid entry: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:256
+msgid "Unable to parse interval line: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:284 import/src/loader.cpp:419
+msgid "Invalid fan entry: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:287
+msgid "Invalid temp entry: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:317 import/src/loader.cpp:342
+msgid "Invalid DEVNAME: \"%1\"!"
+msgstr ""
+
+#: import/src/loader.cpp:327
+msgid "Invalid DEVNAME: \"%1\"! No hwmon with index %2"
+msgstr ""
+
+#: import/src/loader.cpp:337
+msgid "Wrong name for hwmon %1! Should be \"%2\""
+msgstr ""
+
+#: import/src/loader.cpp:382
+msgid "Unrecognized line in config: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:422
+msgid "%1 is not an integer!"
+msgstr ""
+
+#: import/src/loader.cpp:425
+msgid "Invalid entry to parse: \"%1\""
+msgstr ""
+
+#: import/src/loader.cpp:444 import/src/loader.cpp:521
 msgid "%1 is not a local file!"
 msgstr ""
 
-#: import/src/loader.cpp:249
+#: import/src/loader.cpp:450
 msgid "%1 is not a valid url!"
 msgstr ""
 
-#: import/src/loader.cpp:303 import/src/loader.cpp:528
-#: import/src/loader.cpp:726 import/src/pwmfan.cpp:204
-#: import/src/pwmfan.cpp:250 import/src/pwmfan.cpp:277
+#: import/src/loader.cpp:489 import/src/loader.cpp:559
+#: import/src/loader.cpp:776 import/src/pwmfan.cpp:254
+#: import/src/pwmfan.cpp:306 import/src/pwmfan.cpp:364
 msgid "Action not supported! Try running the application as root."
 msgstr ""
 
-#: import/src/loader.cpp:359
-msgid ""
-"Unable to parse interval line: \n"
-" %1"
+#: import/src/loader.cpp:493
+msgid "File does not exist: %1"
 msgstr ""
 
-#: import/src/loader.cpp:407
-msgid "Can not parse %1"
+#: import/src/loader.cpp:715
+msgid "Interval must be greater or equal to one!"
 msgstr ""
 
-#: import/src/loader.cpp:417
-msgid "Invalid config file!"
+#: import/src/pwmfan.cpp:91
+msgid "Can't open pwm file: %1"
 msgstr ""
 
-#: import/src/loader.cpp:460
-msgid ""
-"Unrecognized line in config:\n"
-"%1"
+#: import/src/pwmfan.cpp:109
+msgid "Can't open pwm_mode file: %1"
 msgstr ""
 
-#: import/src/pwmfan.cpp:199
-msgid "Could not set pwm: "
+#: import/src/pwmfan.cpp:179
+msgid "Can't open pwmFile: %1"
 msgstr ""
 
-#: import/src/pwmfan.cpp:245
-msgid "Could not set pwm mode: "
+#: import/src/pwmfan.cpp:197
+msgid "Can't open pwmModeFile: %1"
 msgstr ""
 
-#: import/src/pwmfan.cpp:269
-msgid "Authorization error: "
+#: import/src/pwmfan.cpp:212
+msgid "Pwm cannot exceed 0-255!"
 msgstr ""
 
-#: import/src/systemdcommunicator.cpp:167
-msgid "Service %1 doesn't exist"
+#: import/src/pwmfan.cpp:249
+msgid "Could not set pwm: %1"
 msgstr ""
 
-#: import/src/systemdcommunicator.cpp:316
-msgid "Service does not exist"
+#: import/src/pwmfan.cpp:265
+msgid "PwmMode cannot exceed 0-2!"
+msgstr ""
+
+#: import/src/pwmfan.cpp:301
+msgid "Could not set pwm mode: %1"
+msgstr ""
+
+#: import/src/pwmfan.cpp:317
+msgid "MinPwm cannot exceed 0-255!"
+msgstr ""
+
+#: import/src/pwmfan.cpp:332
+msgid "MaxPwm cannot exceed 0-255!"
+msgstr ""
+
+#: import/src/pwmfan.cpp:356
+msgid "Authorization error: %1"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:168
+#: import/src/systemdcommunicator.cpp:311
+msgid "Service does not exist: %1"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:247
+msgid "Invalid manager interface!"
+msgstr ""
+
+#: import/src/temp.cpp:61
+msgid "Can't open value file: %1"
+msgstr ""
+
+#: import/src/temp.cpp:69
+msgid "Can't open label file: %1"
+msgstr ""
+
+#: import/src/temp.cpp:72
+msgid "Temp has no label: %1"
+msgstr ""
+
+#: import/src/temp.cpp:133
+msgid "Can't open valueFile: %1"
+msgstr ""
+
+#: import/src/temp.cpp:146
+msgid "Can't update value of temp: %1"
 msgstr ""
 
 #: kcm/package/contents/ui/KCM.qml:101

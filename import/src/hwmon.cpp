@@ -91,7 +91,7 @@ void Hwmon::initialize()
 
         if (!success)
         {
-            emit error(i18n("Not a valid Sensor: %1", entry));
+            emit error(i18n("Not a valid sensor: \"%1\"", entry));
             continue;
         }
 

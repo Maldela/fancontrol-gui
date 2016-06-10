@@ -88,7 +88,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             }
             else
             {
-                emit error(i18n("Can't open pwmFile: %1", pwmFile->fileName()));
+                emit error(i18n("Can't open pwm file: %1", pwmFile->fileName()));
                 delete pwmFile;
             }
 
@@ -106,7 +106,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             }
             else
             {
-                emit error(i18n("Can't open pwmModeFile: %1", pwmModeFile->fileName()));
+                emit error(i18n("Can't open pwm_mode file: %1", pwmModeFile->fileName()));
                 delete pwmModeFile;
             }
         }
