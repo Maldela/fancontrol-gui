@@ -3,7 +3,7 @@ set(LIBRARIES Qt5::Core
               KF5::CoreAddons
               KF5::I18n)
 
-find_package(KF5 COMPONENTS CoreAddons Package Declarative REQUIRED)
+find_package(KF5 COMPONENTS CoreAddons Package Declarative KCMUtils REQUIRED)
 
 add_library(kcm_fancontrol MODULE src/fancontrolkcm.cpp)
 
