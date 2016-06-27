@@ -46,9 +46,9 @@ namespace Fancontrol
 
 PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
     m_pwmStream(new QTextStream),
-    m_modeStream(new QTextStream),
+    m_enableStream(new QTextStream),
     m_pwm(0),
-    m_pwmMode(0),
+    m_pwmEnable(0),
     m_temp(Q_NULLPTR),
     m_hasTemp(false),
     m_minTemp(0),
@@ -92,22 +92,22 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
                 delete pwmFile;
             }
 
-            const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
+            const auto pwmEnableFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_enable", this);
 
-            if (pwmModeFile->open(QFile::ReadWrite))
+            if (pwmEnableFile->open(QFile::ReadWrite))
             {
-                m_modeStream->setDevice(pwmModeFile);
-                *m_modeStream >> m_pwmMode;
+                m_enableStream->setDevice(pwmEnableFile);
+                *m_enableStream >> m_pwmEnable;
             }
-            else if (pwmModeFile->open(QFile::ReadOnly))
+            else if (pwmEnableFile->open(QFile::ReadOnly))
             {
-                m_modeStream->setDevice(pwmModeFile);
-                *m_modeStream >> m_pwmMode;
+                m_enableStream->setDevice(pwmEnableFile);
+                *m_enableStream >> m_pwmEnable;
             }
             else
             {
-                emit error(i18n("Can't open pwm_mode file: \"%1\"", pwmModeFile->fileName()));
-                delete pwmModeFile;
+                emit error(i18n("Can't open pwm_enable file: \"%1\"", pwmEnableFile->fileName()));
+                delete pwmEnableFile;
             }
         }
     }
@@ -118,8 +118,8 @@ PwmFan::~PwmFan()
     auto device = m_pwmStream->device();
     delete m_pwmStream;
     delete device;
-    device = m_modeStream->device();
-    delete m_modeStream;
+    device = m_enableStream->device();
+    delete m_enableStream;
     delete device;
 }
 
@@ -130,8 +130,8 @@ void PwmFan::update()
     m_pwmStream->seek(0);
     setPwm(m_pwmStream->readAll().toInt(), false);
 
-    m_modeStream->seek(0);
-    setPwmMode(m_modeStream->readAll().toInt(), false);
+    m_enableStream->seek(0);
+    setPwmEnable(m_enableStream->readAll().toInt(), false);
 }
 
 void PwmFan::reset()
@@ -141,7 +141,7 @@ void PwmFan::reset()
     setHasTemp(false);
     setTemp(Q_NULLPTR);
     setPwm(0);
-    setPwmMode(0, true);
+    setPwmEnable(0, true);
     setMinTemp(0);
     setMaxTemp(100);
     setMinPwm(255);
@@ -152,14 +152,14 @@ void PwmFan::reset()
     m_testStatus = NotStarted;
     emit testStatusChanged();
 
-    if (m_pwmStream->device() && m_modeStream->device() && m_parent)
+    if (m_pwmStream->device() && m_enableStream->device() && m_parent)
     {
         auto device = m_pwmStream->device();
         m_pwmStream->setDevice(Q_NULLPTR);
         delete device;
 
-        device = m_modeStream->device();
-        m_modeStream->setDevice(Q_NULLPTR);
+        device = m_enableStream->device();
+        m_enableStream->setDevice(Q_NULLPTR);
         delete device;
 
         const auto pwmFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index), this);
@@ -180,29 +180,29 @@ void PwmFan::reset()
             delete pwmFile;
         }
 
-        const auto pwmModeFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_mode", this);
+        const auto pwmEnableFile = new QFile(m_parent->path() + "/pwm" + QString::number(m_index) + "_enable", this);
 
-        if (pwmModeFile->open(QFile::ReadWrite))
+        if (pwmEnableFile->open(QFile::ReadWrite))
         {
-            m_modeStream->setDevice(pwmModeFile);
-            *m_modeStream >> m_pwmMode;
+            m_enableStream->setDevice(pwmEnableFile);
+            *m_enableStream >> m_pwmEnable;
         }
-        else if (pwmModeFile->open(QFile::ReadOnly))
+        else if (pwmEnableFile->open(QFile::ReadOnly))
         {
-            m_modeStream->setDevice(pwmModeFile);
-            *m_modeStream >> m_pwmMode;
+            m_enableStream->setDevice(pwmEnableFile);
+            *m_enableStream >> m_pwmEnable;
         }
         else
         {
-            emit error(i18n("Can't open pwm_mode file: \"%1\"", pwmModeFile->fileName()));
-            delete pwmModeFile;
+            emit error(i18n("Can't open pwm_enable file: \"%1\"", pwmEnableFile->fileName()));
+            delete pwmEnableFile;
         }
     }
 }
 
 bool PwmFan::isValid() const
 {
-    return Fan::isValid() && (m_pwmStream->device() || m_pwmStream->string()) && (m_modeStream->device() || m_modeStream->string());
+    return Fan::isValid() && (m_pwmStream->device() || m_pwmStream->string()) && (m_enableStream->device() || m_enableStream->string());
 }
 
 bool PwmFan::setPwm(int pwm, bool write)
@@ -220,7 +220,7 @@ bool PwmFan::setPwm(int pwm, bool write)
 
         if (write)
         {
-            setPwmMode(1);
+            setPwmEnable(1);
 
             if (m_pwmStream->string() || (m_pwmStream->device() && m_pwmStream->device()->isWritable()))
                 *m_pwmStream << pwm;
@@ -243,7 +243,7 @@ bool PwmFan::setPwm(int pwm, bool write)
                         {
 //                            qDebug() << "Helper busy...";
 
-                            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                            QTimer::singleShot(50, this, [this] (){ setPwmEnable(m_pwmEnable); });
                         }
 
                         emit error(i18n("Could not set pwm: %1", job->errorText()));
@@ -258,23 +258,23 @@ bool PwmFan::setPwm(int pwm, bool write)
     return true;
 }
 
-bool PwmFan::setPwmMode(int pwmMode, bool write)
+bool PwmFan::setPwmEnable(int pwmEnable, bool write)
 {
-    if (pwmMode < 0 || pwmMode > 2)
+    if (pwmEnable < 0 || pwmEnable > 2)
     {
-        emit error(i18n("PwmMode cannot exceed 0-2!"), true);
+        emit error(i18n("PwmEnable cannot exceed 0-2!"), true);
         return false;
     }
 
-    if (m_pwmMode != pwmMode)
+    if (m_pwmEnable != pwmEnable)
     {
-        m_pwmMode = pwmMode;
-        emit pwmModeChanged();
+        m_pwmEnable = pwmEnable;
+        emit pwmEnableChanged();
 
         if (write)
         {
-            if (m_modeStream->string() || (m_modeStream->device() && m_modeStream->device()->isWritable()))
-                *m_modeStream << pwmMode;
+            if (m_enableStream->string() || (m_enableStream->device() && m_enableStream->device()->isWritable()))
+                *m_enableStream << pwmEnable;
 
             else
             {
@@ -284,8 +284,8 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                 {
                     QVariantMap map;
                     map[QStringLiteral("action")] = QVariant("write");
-                    map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_modeStream->device())->fileName();
-                    map[QStringLiteral("content")] = QString::number(pwmMode);
+                    map[QStringLiteral("filename")] = qobject_cast<QFile *>(m_enableStream->device())->fileName();
+                    map[QStringLiteral("content")] = QString::number(pwmEnable);
                     action.setArguments(map);
 
                     const auto job = action.execute();
@@ -295,10 +295,10 @@ bool PwmFan::setPwmMode(int pwmMode, bool write)
                         {
 //                            qDebug() << "Helper busy...";
 
-                            QTimer::singleShot(50, this, [this] (){ setPwmMode(m_pwmMode); });
+                            QTimer::singleShot(50, this, [this] (){ setPwmEnable(m_pwmEnable); });
                         }
 
-                        emit error(i18n("Could not set pwm mode: %1", job->errorText()));
+                        emit error(i18n("Could not set pwm enable: %1", job->errorText()));
                     }
                     update();
                 }
@@ -342,7 +342,7 @@ void PwmFan::setMaxPwm(int maxPwm)
 
 void PwmFan::test()
 {
-    if ((!m_modeStream->device()->isWritable() && !m_modeStream->string()) ||
+    if ((!m_enableStream->device()->isWritable() && !m_enableStream->string()) ||
         (!m_pwmStream->device()->isWritable() && !m_pwmStream->string()))
     {
         auto action = newFancontrolAction();
@@ -385,12 +385,13 @@ void PwmFan::abortTest()
         emit testStatusChanged();
 
         setPwm(255);
+        setPwmEnable(0);
     }
 }
 
 void PwmFan::continueTest()
 {
-    if ((!m_modeStream->device()->isWritable() && !m_modeStream->string()) ||
+    if ((!m_enableStream->device()->isWritable() && !m_enableStream->string()) ||
         (!m_pwmStream->device()->isWritable() && !m_pwmStream->string()))
     {
         auto action = newFancontrolAction();

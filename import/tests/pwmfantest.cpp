@@ -95,7 +95,7 @@ void PwmFanTest::pwmTest()
     }
 }
 
-void PwmFanTest::modeTest_data()
+void PwmFanTest::enableTest_data()
 {
     QTest::addColumn<int>("value");
     QTest::addColumn<QString>("error");
@@ -103,21 +103,21 @@ void PwmFanTest::modeTest_data()
     QTest::newRow("0")   <<  0  << "";
     QTest::newRow("1")   <<  1  << "";
     QTest::newRow("2")   <<  2  << "";
-    QTest::newRow("3")   <<  3  << "PwmMode cannot exceed 0-2!";
-    QTest::newRow("-1")  << -1  << "PwmMode cannot exceed 0-2!";
+    QTest::newRow("3")   <<  3  << "PwmEnable cannot exceed 0-2!";
+    QTest::newRow("-1")  << -1  << "PwmEnable cannot exceed 0-2!";
 }
 
-void PwmFanTest::modeTest()
+void PwmFanTest::enableTest()
 {
     QFETCH(int, value);
     QFETCH(QString, error);
 
     QSignalSpy spy(m_fan, SIGNAL(error(QString,bool)));
 
-    m_fan->setPwmMode(value);
+    m_fan->setPwmEnable(value);
 
     if (error.isEmpty())
-        QCOMPARE(m_fan->pwmMode(), value);
+        QCOMPARE(m_fan->pwmEnable(), value);
     else
     {
         QCOMPARE(spy.at(0).at(0).toString(), error);

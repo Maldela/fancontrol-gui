@@ -23,13 +23,13 @@
 #include "testpwmfan.h"
 
 
-TestPwmFan::TestPwmFan(QString *pwmString, QString *modeString, QString *rpmString, uint index, Hwmon *parent) : PwmFan(index, parent)
+TestPwmFan::TestPwmFan(QString *pwmString, QString *enableString, QString *rpmString, uint index, Hwmon *parent) : PwmFan(index, parent)
 {
     if (pwmString)
         m_pwmStream->setString(pwmString);
 
-    if (modeString)
-        m_modeStream->setString(modeString);
+    if (enableString)
+        m_enableStream->setString(enableString);
 
     if (rpmString)
         m_rpmStream->setString(rpmString);

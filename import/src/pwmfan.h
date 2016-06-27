@@ -50,7 +50,7 @@ class PwmFan : public Fan
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testStatusChanged)
     Q_PROPERTY(TestStatus testStatus READ testStatus NOTIFY testStatusChanged)
-    Q_PROPERTY(int pwmMode READ pwmMode WRITE setPwmMode NOTIFY pwmModeChanged)
+    Q_PROPERTY(int pwmEnable READ pwmEnable WRITE setPwmEnable NOTIFY pwmEnableChanged)
     Q_ENUMS(TestStatus)
 
 public:
@@ -78,7 +78,7 @@ public:
     int maxPwm() const { return m_maxPwm; }
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
-    int pwmMode() const { return m_pwmMode; }
+    int pwmEnable() const { return m_pwmEnable; }
     TestStatus testStatus() const { return m_testStatus; }
     bool active() const;
     bool testing() const;
@@ -91,7 +91,7 @@ public:
     void setMaxPwm(int maxPwm);
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
-    bool setPwmMode(int pwmMode, bool write = true);
+    bool setPwmEnable(int pwmEnable, bool write = true);
     void setActive(bool active);
     void reset() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
@@ -112,7 +112,7 @@ signals:
     void minStopChanged();
     void activeChanged();
     void testStatusChanged(bool = false);
-    void pwmModeChanged();
+    void pwmEnableChanged();
 
 
 public slots:
@@ -124,13 +124,13 @@ public slots:
 protected:
 
     QTextStream *m_pwmStream;
-    QTextStream *m_modeStream;
+    QTextStream *m_enableStream;
 
 
 private:
 
     int m_pwm;
-    int m_pwmMode;
+    int m_pwmEnable;
     Temp *m_temp;
     bool m_hasTemp;
     int m_minTemp;

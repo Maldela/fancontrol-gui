@@ -38,7 +38,7 @@ class TestPwmFan : public PwmFan
 
 public:
 
-    explicit TestPwmFan(QString *pwmString, QString *modeString, QString *rpmString, uint index = 0, Hwmon *parent = Q_NULLPTR);
+    explicit TestPwmFan(QString *pwmString, QString *enableString, QString *rpmString, uint index = 0, Hwmon *parent = Q_NULLPTR);
 };
 
 #endif // TESTPWMFAN_H

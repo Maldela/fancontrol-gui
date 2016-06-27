@@ -46,8 +46,8 @@ private slots:
     void pwmTest_data();
     void pwmTest();
 
-    void modeTest_data();
-    void modeTest();
+    void enableTest_data();
+    void enableTest();
 
     void activeTest();
 
