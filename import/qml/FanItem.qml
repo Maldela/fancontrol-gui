@@ -47,7 +47,7 @@ Rectangle {
 
     onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
     onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
-    onUnitChanged: if (!!fan) meshCanvas.requestRepaint()
+    onUnitChanged: if (!!fan) meshCanvas.requestPaint()
 
     SystemPalette {
         id: palette
