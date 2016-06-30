@@ -54,7 +54,7 @@ Loader::Loader(QObject *parent) : QObject(parent),
     parseHwmons();
 
     m_timer->setSingleShot(false);
-    m_timer->start(1);
+    m_timer->start(1000);
 
     connect(m_timer, &QTimer::timeout, this, &Loader::updateSensors);
 }
