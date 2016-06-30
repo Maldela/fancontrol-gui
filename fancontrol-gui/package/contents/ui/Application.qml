@@ -74,7 +74,7 @@ ApplicationWindow {
                     iconName: Fancontrol.base.systemdCom.serviceActive ? "system-reboot" : "system-run"
                     onClicked: {
                         Fancontrol.base.loader.abortTestingFans();
-                        Fancontrol.base.systemdCom.serviceActive ? base.systemdCom.restartService() : base.systemdCom.serviceActive = true;
+                        Fancontrol.base.systemdCom.serviceActive ? Fancontrol.base.systemdCom.restartService() : Fancontrol.base.systemdCom.serviceActive = true;
                     }
                     tooltip: Fancontrol.base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
                 }
