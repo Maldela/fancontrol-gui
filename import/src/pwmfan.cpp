@@ -88,7 +88,7 @@ PwmFan::PwmFan(Hwmon *parent, uint index) : Fan(parent, index),
             delete pwmFile;
         }
 
-        const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_mode", this);
+        const auto pwmModeFile = new QFile(parent->path() + "/pwm" + QString::number(index) + "_enable", this);
 
         if (pwmModeFile->open(QFile::ReadWrite))
         {
