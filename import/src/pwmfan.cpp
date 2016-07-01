@@ -220,7 +220,7 @@ bool PwmFan::setPwm(int pwm, bool write)
 
         if (write)
         {
-            setPwmEnable(1);
+            setPwmEnable(1, true);
 
             if (m_pwmStream->string() || (m_pwmStream->device() && m_pwmStream->device()->isWritable()))
                 *m_pwmStream << pwm;
@@ -366,7 +366,7 @@ void PwmFan::test()
         }
     }
 
-    setPwm(255);
+    setPwm(255, true);
 
     m_testStatus = FindingStop1;
     emit testStatusChanged();
