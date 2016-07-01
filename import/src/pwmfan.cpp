@@ -293,7 +293,7 @@ void PwmFan::test()
         }
     }
 
-    setPwm(255);
+    setPwm(255, true);
 
     m_testStatus = FindingStop1;
     emit testStatusChanged();
