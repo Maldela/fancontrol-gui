@@ -444,7 +444,7 @@ void PwmFan::continueTest()
                 break;
             }
             else
-                setPwm(qMax(m_pwm + 2, 255));
+                setPwm(qMin(m_pwm + 2, 255));
         else
         {
             m_testStatus = FindingStop2;
