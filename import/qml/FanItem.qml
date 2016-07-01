@@ -86,7 +86,7 @@ Rectangle {
 
         Connections {
             target: fan
-            onNameChanged: if (fan.name != text) text = fan.name
+            onNameChanged: if (fan.name != nameField.text) nameField.text = fan.name
         }
 
         MouseArea {
