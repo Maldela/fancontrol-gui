@@ -457,7 +457,7 @@ void PwmFan::continueTest()
     case FindingStop2:
         if (rpm() > 0)
         {
-            setPwm(m_pwm - 1);
+            setPwm(qMax(0, m_pwm - 1));
             m_zeroRpm = 0;
             QTimer::singleShot(1000, this, &PwmFan::continueTest);
         }
@@ -473,7 +473,7 @@ void PwmFan::continueTest()
                 m_testStatus = Finished;
                 emit testStatusChanged();
                 m_zeroRpm = 0;
-                setMinStop(m_pwm + 5);
+                setMinStop(qMin(255, m_pwm + 5));
                 setPwm(255);
 //                qDebug() << "Finished testing PwmFan" << m_index;
             }
