@@ -256,7 +256,7 @@ Item {
                 minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
                 value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
-                onValueChanged: Fancontrol.base.minTemp = value
+                onValueChanged: Fancontrol.base.minTemp = Units.toCelsius(value, Fancontrol.base.unit)
             }
         }
         RowLayout {
@@ -278,7 +278,7 @@ Item {
                 minimumValue: minTempBox.value
                 value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
-                onValueChanged: Fancontrol.base.maxTemp = value
+                onValueChanged: Fancontrol.base.maxTemp = Units.toCelsius(value, Fancontrol.base.unit)
             }
         }
         RowLayout {

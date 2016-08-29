@@ -84,7 +84,7 @@ void Loader::parseHwmons()
     while (!list.isEmpty())
         dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
 
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
     {
         if (!dereferencedList.contains(hwmon->path()))
         {
@@ -96,11 +96,11 @@ void Loader::parseHwmons()
             hwmon->initialize();
     }
 
-    foreach (const auto &hwmonPath, dereferencedList)
+    for (const auto &hwmonPath : dereferencedList)
     {
         auto hwmonExists = false;
 
-        foreach (const auto &hwmon, m_hwmons)
+        for (const auto &hwmon : m_hwmons)
         {
             if (hwmon->path() == hwmonPath)
             {
@@ -205,10 +205,11 @@ bool Loader::parseConfig(QString config)
 {
     //Disconnect hwmons for performance reasons
     //They get reconnected later
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
     {
         disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-        foreach (const auto &pwmFan, hwmon->pwmFans())
+        const auto pwmFans = hwmon->pwmFans();
+        for (const auto &pwmFan : pwmFans)
         {
             qobject_cast<PwmFan *>(pwmFan)->reset();
         }
@@ -234,9 +235,9 @@ bool Loader::parseConfig(QString config)
         line = line.simplified();
         lines << line;
     }
-    while(!stream.atEnd());
+    while (!stream.atEnd());
 
-    foreach (auto line, lines)
+    for (auto line : lines)
     {
         if (line.startsWith(QStringLiteral("INTERVAL=")))
         {
@@ -250,7 +251,7 @@ bool Loader::parseConfig(QString config)
             else
             {
                 //Connect hwmons again
-                foreach (const auto &hwmon, m_hwmons)
+                for (const auto &hwmon : m_hwmons)
                     connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                 emit error(i18n("Unable to parse interval line: \"%1\"", line), true);
@@ -262,7 +263,7 @@ bool Loader::parseConfig(QString config)
             line.remove(QStringLiteral("FCTEMPS="));
             line = line.simplified();
             const auto fctemps = line.split(' ');
-            foreach (const auto &fctemp, fctemps)
+            for (const auto &fctemp : fctemps)
             {
                 const auto nameValuePair = fctemp.split('=');
                 if (nameValuePair.size() == 2)
@@ -296,7 +297,7 @@ bool Loader::parseConfig(QString config)
             line.remove(QStringLiteral("DEVNAME="));
             line = line.simplified();
             const auto devnames = line.split(' ');
-            foreach (const auto &devname, devnames)
+            for (const auto &devname : devnames)
             {
                 const auto indexNamePair = devname.split('=');
 
@@ -311,7 +312,7 @@ bool Loader::parseConfig(QString config)
                     if (!success)
                     {
                         //Connect hwmons again
-                        foreach (const auto &hwmon, m_hwmons)
+                        for (const auto &hwmon : m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                         emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
@@ -321,7 +322,7 @@ bool Loader::parseConfig(QString config)
                     if (!hwmonPointer)
                     {
                         //Connect hwmons again
-                        foreach (const auto &hwmon, m_hwmons)
+                        for (const auto &hwmon : m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                         emit error(i18n("Invalid DEVNAME: \"%1\"! No hwmon with index %2", devname, index), true);
@@ -331,7 +332,7 @@ bool Loader::parseConfig(QString config)
                     if (hwmonPointer->name().split('.').first() != name)
                     {
                         //Connect hwmons again
-                        foreach (const auto &hwmon, m_hwmons)
+                        for (const auto &hwmon : m_hwmons)
                             connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
                         emit error(i18n("Wrong name for hwmon %1! Should be \"%2\"", index, hwmonPointer->name().split('.').first()), true);
@@ -376,7 +377,7 @@ bool Loader::parseConfig(QString config)
             !line.startsWith(QStringLiteral("FCFANS=")))
         {
             //Connect hwmons again
-            foreach (const auto &hwmon, m_hwmons)
+            for (const auto &hwmon : m_hwmons)
                 connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
             emit error(i18n("Unrecognized line in config: \"%1\"", line), true);
@@ -387,7 +388,7 @@ bool Loader::parseConfig(QString config)
     updateConfig();
 
     //Connect hwmons again
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
         connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
     return true;
@@ -400,7 +401,7 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
 
     const auto entries = line.split(' ');
 
-    foreach (const auto &entry, entries)
+    for (const auto &entry : entries)
     {
         const auto fanValuePair = entry.split('=');
         if (fanValuePair.size() == 2)
@@ -578,12 +579,13 @@ QString Loader::createConfig() const
     QList<Hwmon *> usedHwmons;
     QList<PwmFan *> usedFans;
 
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
     {
         if (hwmon->pwmFans().size() > 0 && !usedHwmons.contains(hwmon))
             usedHwmons << hwmon;
 
-        foreach (const auto &pwmFan, hwmon->pwmFans())
+        const auto pwmFans = hwmon->pwmFans();
+        for (const auto &pwmFan : pwmFans)
         {
             if (pwmFan->hasTemp() && pwmFan->temp() && !pwmFan->testing())
             {
@@ -603,7 +605,7 @@ QString Loader::createConfig() const
     {
         configFile += "DEVPATH=";
 
-        foreach (const auto &hwmon, usedHwmons)
+        for (const auto &hwmon : usedHwmons)
         {
             auto sanitizedPath = hwmon->path();
             sanitizedPath.remove(QRegExp("^/sys/"));
@@ -614,7 +616,7 @@ QString Loader::createConfig() const
 
         configFile += "DEVNAME=";
 
-        foreach (const auto &hwmon, usedHwmons)
+        for (const auto &hwmon : usedHwmons)
             configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + QChar(QChar::Space);
 
         configFile += QChar(QChar::LineFeed);
@@ -623,7 +625,7 @@ QString Loader::createConfig() const
         {
             configFile += "FCTEMPS=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -634,7 +636,7 @@ QString Loader::createConfig() const
 
             configFile += "FCFANS=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -645,7 +647,7 @@ QString Loader::createConfig() const
 
             configFile += "MINTEMP=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -655,7 +657,7 @@ QString Loader::createConfig() const
 
             configFile += "MAXTEMP=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -665,7 +667,7 @@ QString Loader::createConfig() const
 
             configFile += "MINSTART=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -675,7 +677,7 @@ QString Loader::createConfig() const
 
             configFile += "MINSTOP=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -685,7 +687,7 @@ QString Loader::createConfig() const
 
             configFile += "MINPWM=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -695,7 +697,7 @@ QString Loader::createConfig() const
 
             configFile += "MAXPWM=";
 
-            foreach (const auto &pwmFan, usedFans)
+            for (const auto &pwmFan : usedFans)
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -728,13 +730,13 @@ void Loader::setInterval(int interval, bool writeNewConfig)
 
 void Loader::testFans()
 {
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
         hwmon->testFans();
 }
 
 void Loader::abortTestingFans()
 {
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
         hwmon->abortTestingFans();
 }
 
@@ -817,7 +819,7 @@ void Loader::handleDetectSensorsResult(KJob *job)
 QList<QObject *> Loader::hwmonsAsObjects() const
 {
     auto list = QList<QObject *>();
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
         list << qobject_cast<QObject *>(hwmon);
 
     return list;
@@ -827,7 +829,7 @@ void Loader::handleTestStatusChanged()
 {
     auto testing = false;
 
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
     {
         if (hwmon->testing() == true)
         {
@@ -853,7 +855,7 @@ void Loader::setRestartServiceAfterTesting(bool restart)
 
 void Loader::reset() const
 {
-    foreach (const auto &hwmon, m_hwmons)
+    for (const auto &hwmon : m_hwmons)
         hwmon->reset();
 }
 

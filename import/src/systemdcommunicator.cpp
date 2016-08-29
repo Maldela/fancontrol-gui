@@ -157,9 +157,9 @@ bool SystemdCommunicator::serviceExists()
         emit error(dbusreply.errorMessage());
         return false;
     }
-    SystemdUnitFileList list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
+    const auto list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
 
-    foreach (const auto &unitFile, list)
+    for (const auto &unitFile : list)
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
             return true;

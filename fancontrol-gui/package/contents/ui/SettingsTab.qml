@@ -80,7 +80,7 @@ Item {
                 value: Fancontrol.Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
                 onValueChanged: {
-                    Fancontrol.base.minTemp = value;
+                    Fancontrol.base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
                     if (value > maxTempBox.value) maxTempBox.value = value;
                 }
             }
@@ -105,7 +105,7 @@ Item {
                 value: Fancontrol.Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
                 suffix: Fancontrol.base.unit
                 onValueChanged: {
-                    Fancontrol.base.maxTemp = value;
+                    Fancontrol.base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
                     if (value < minTempBox.value) minTempBox.value = value;
                 }
             }

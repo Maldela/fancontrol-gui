@@ -80,7 +80,7 @@ void Hwmon::initialize()
 {
     QDir dir(m_path);
     const auto entries = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach (auto entry, entries)
+    for (const auto &entry : entries)
     {
         if (!entry.contains(QStringLiteral("input")))
             continue;
@@ -101,7 +101,7 @@ void Hwmon::initialize()
             {
                 PwmFan *newPwmFan = Q_NULLPTR;
 
-                foreach (const auto &pwmFan, m_pwmFans)
+                for (const auto &pwmFan : m_pwmFans)
                 {
                     if (pwmFan->index() == index)
                     {
@@ -133,7 +133,7 @@ void Hwmon::initialize()
             {
                 Fan *newFan = Q_NULLPTR;
 
-                foreach (const auto &fan, m_fans)
+                for (const auto &fan : m_fans)
                 {
                     if (fan->index() == index)
                     {
@@ -157,7 +157,7 @@ void Hwmon::initialize()
         {
             Temp *newTemp = Q_NULLPTR;
 
-            foreach (const auto &temp, m_temps)
+            for (const auto &temp : m_temps)
             {
                 if (temp->index() == index)
                 {
@@ -182,7 +182,7 @@ QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
 
-    foreach (const auto &fan, m_fans)
+    for (const auto &fan : m_fans)
         list << qobject_cast<QObject *>(fan);
 
     return list;
@@ -192,7 +192,7 @@ QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
 
-    foreach (const auto &pwmFan, m_pwmFans)
+    for (const auto &pwmFan : m_pwmFans)
         list << qobject_cast<QObject *>(pwmFan);
 
     return list;
@@ -202,7 +202,7 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
 
-    foreach (const auto &temp, m_temps)
+    for (const auto &temp : m_temps)
         list << qobject_cast<QObject *>(temp);
 
     return list;
@@ -210,13 +210,13 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 
 void Hwmon::testFans()
 {
-    foreach (const auto &pwmFan, m_pwmFans)
+    for (const auto &pwmFan : m_pwmFans)
         pwmFan->test();
 }
 
 void Hwmon::abortTestingFans()
 {
-    foreach (const auto &pwmFan, m_pwmFans)
+    for (const auto &pwmFan : m_pwmFans)
         pwmFan->abortTest();
 }
 
@@ -239,7 +239,7 @@ bool Hwmon::testing() const
 {
     auto testing = false;
 
-    foreach (const auto &fan, m_pwmFans)
+    for (const auto &fan : m_pwmFans)
     {
         if (fan->testing())
         {
@@ -253,7 +253,7 @@ bool Hwmon::testing() const
 
 void Hwmon::reset() const
 {
-    foreach (const auto &pwmFan, m_pwmFans)
+    for (const auto &pwmFan : m_pwmFans)
         pwmFan->reset();
 }
 

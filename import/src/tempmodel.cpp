@@ -29,7 +29,7 @@ namespace Fancontrol
 {
 
 TempModel::TempModel(QObject *parent) : QStringListModel(parent),
-m_unit(QStringLiteral("°C"))
+    m_unit(QStringLiteral("°C"))
 {
 }
 
@@ -46,7 +46,7 @@ void TempModel::setTemps(const QList<Temp *> &temps)
 
     QStringList list;
 
-    foreach (const auto &temp, temps)
+    for (const auto &temp : temps)
     {
         connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
         connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
@@ -59,9 +59,9 @@ void TempModel::setTemps(const QList<Temp *> &temps)
 void TempModel::addTemps(QList<Temp *> newTemps)
 {
 
-    foreach (const auto &newTemp, newTemps)
+    for (const auto &newTemp : newTemps)
     {
-        foreach (const auto &temp, m_temps)
+        for (const auto &temp : m_temps)
         {
             if (*temp == *newTemp)
             {
@@ -80,7 +80,7 @@ void TempModel::addTemps(QList<Temp *> newTemps)
 
         insertRows(oldSize, newTemps.size());
 
-        foreach (const auto &temp, newTemps)
+        for (const auto &temp : newTemps)
         {
             connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
             connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
@@ -121,7 +121,7 @@ QList<QObject *> TempModel::temps() const
 {
     QList<QObject *> list;
 
-    foreach(const auto &temp, m_temps)
+    for (const auto &temp : m_temps)
         list << qobject_cast<QObject *>(temp);
 
     return list;

@@ -42,7 +42,7 @@ void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
 
     QStringList list;
 
-    foreach (const auto &fan, fans)
+    for (const auto &fan : fans)
     {
         connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
         list << fan->name() + "  (" + fan->path() + ")";
@@ -53,9 +53,9 @@ void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
 
 void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
 {
-    foreach (const auto &newFan, newFans)
+    for (const auto &newFan : newFans)
     {
-        foreach (const auto &fan, m_fans)
+        for (const auto &fan : m_fans)
         {
             if (*fan == *newFan)
             {
@@ -74,7 +74,7 @@ void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
 
         insertRows(oldSize, newFans.size());
 
-        foreach (const auto &fan, newFans)
+        for (const auto &fan : newFans)
         {
             connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
             updateFan(fan);
@@ -115,7 +115,7 @@ void PwmFanModel::updateFan()
 QList<QObject *> PwmFanModel::fans() const
 {
     auto list = QList<QObject *>();
-    foreach(const auto &fan, m_fans)
+    for (const auto &fan : m_fans)
         list << qobject_cast<QObject *>(fan);
     return list;
 }
