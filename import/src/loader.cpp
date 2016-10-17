@@ -31,6 +31,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
 #include <QtCore/QProcess>
+#include <QtCore/QDebug>
 
 #include <KAuth/KAuthExecuteJob>
 #include <KI18n/KLocalizedString>
@@ -476,7 +477,7 @@ bool Loader::load(const QUrl &url)
             {
                 if (reply->error() == 4)
                 {
-//                    qDebug() << "Aborted by user";
+                    qDebug() << "Loading of file aborted by user";
                     return false;
                 }
 
@@ -548,7 +549,7 @@ bool Loader::save(const QUrl &url)
             {
                 if (reply->error() == 4)
                 {
-//                    qDebug() << "Aborted by user";
+                    qDebug() << "Saving of file aborted by user";
                     return false;
                 }
 

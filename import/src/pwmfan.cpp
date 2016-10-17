@@ -140,8 +140,8 @@ void PwmFan::reset()
 
     setHasTemp(false);
     setTemp(Q_NULLPTR);
-    setPwm(0);
-    setPwmEnable(0, true);
+    setPwm(0, false);
+    setPwmEnable(0, false);
     setMinTemp(0);
     setMaxTemp(100);
     setMinPwm(255);
@@ -149,8 +149,12 @@ void PwmFan::reset()
     setMinStart(255);
     setMinStop(255);
     m_zeroRpm = 0;
-    m_testStatus = NotStarted;
-    emit testStatusChanged();
+
+    if (m_testStatus != NotStarted)
+    {
+        m_testStatus = NotStarted;
+        emit testStatusChanged();
+    }
 
     if (m_pwmStream->device() && m_enableStream->device() && m_parent)
     {
