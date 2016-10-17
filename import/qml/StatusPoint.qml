@@ -20,6 +20,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.2
+import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
 import "math.js" as MoreMath
 
@@ -36,7 +37,7 @@ Rectangle {
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
-    property string unit: "°C"
+    property string unit: Fancontrol.base.unit
 
     width: size
     height: size

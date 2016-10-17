@@ -28,8 +28,9 @@ function bound(floor, value, ceiling) {
 function intervals(lower, upper, delta) {
     var array = [lower];
     for (var i=lower+1; i<upper; i++) {
-        if (i % delta == 0) {
-            array.push(i);
+        var round = Math.round(i);
+        if (round % delta == 0) {
+            array.push(round);
         }
     }
     array.push(upper);

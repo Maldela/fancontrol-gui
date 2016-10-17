@@ -31,10 +31,10 @@ Rectangle {
     property QtObject fan
     property QtObject systemdCom
     property QtObject tempModel
-    property real minTemp: 40.0
-    property real maxTemp: 90.0
+    property real minTemp: Fancontrol.base.minTemp
+    property real maxTemp: Fancontrol.base.maxTemp
     property int margin: 5
-    property string unit: "°C"
+    property string unit: Fancontrol.base.unit
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
@@ -151,7 +151,7 @@ Rectangle {
                 model: graph.horIntervals.length;
 
                 Label {
-                    x: Math.min(horizontalScala.width, background.width / (graph.horIntervals.length - 1) * index) - width / 2
+                    x: background.scaleX(Units.toCelsius(graph.horIntervals[index], unit)) - width/2
                     y: horizontalScala.height / 2 - implicitHeight / 2
                     color: graph.pal.text
                     text: i18n("%1" + unit, graph.horIntervals[index])
@@ -286,18 +286,18 @@ Rectangle {
                 size: graph.fontSize
                 visible: background.contains(center) && !!fan && fan.hasTemp
                 fan: root.fan
-                unit: root.unit
             }
             PwmPoint {
                 id: stopPoint
                 color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
-                unit: root.unit
                 enabled: !!fan ? fan.hasTemp : false
                 drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
                 drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
                 x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
                 y: !!fan && fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
+                temp: !!fan ? fan.minTemp : 0
+                pwm: !!fan ? fan.minStop : 0
                 drag.onActiveChanged: {
                     if (!drag.active && !!fan) {
                         fan.minStop = Math.round(background.scalePwm(centerY));
@@ -316,12 +316,13 @@ Rectangle {
                 id: maxPoint
                 color: !!fan ? fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
-                unit: root.unit
                 enabled: !!fan ? fan.hasTemp : false
                 drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
                 drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
                 x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
                 y: !!fan && fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
+                temp: !!fan && fan.hasTemp ? fan.maxTemp : 0
+                pwm: !!fan && fan.hasTemp ? fan.maxPwm : 0
                 drag.onActiveChanged: {
                     if (!drag.active) {
                         fan.maxPwm = Math.round(background.scalePwm(centerY));

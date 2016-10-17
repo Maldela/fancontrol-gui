@@ -69,12 +69,9 @@ Item {
         active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
 
         sourceComponent: Fancontrol.FanItem {
-            unit: Fancontrol.base.unit
             fan: pwmFans[fanComboBox.currentIndex]
             tempModel: root.tempModel
             systemdCom: root.systemdCom
-            minTemp: Fancontrol.base.minTemp
-            maxTemp: Fancontrol.base.maxTemp
         }
     }
 

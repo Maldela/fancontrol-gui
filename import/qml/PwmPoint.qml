@@ -20,6 +20,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.4
+import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
 
 
@@ -30,9 +31,11 @@ Rectangle {
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
+    property int temp: 0
+    property int pwm: 0
     property alias drag: pwmMouse.drag
     property int size: 10
-    property string unit: "°C"
+    property string unit: Fancontrol.base.unit
     property var locale: Qt.locale()
 
     signal positionChanged()
@@ -76,12 +79,12 @@ Rectangle {
             Label {
                 id: pwm
                 font.pixelSize: root.size * 1.5
-                text: Number(Math.round(background.scalePwm(root.centerY)) / 2.55).toLocaleString(locale, 'f', 1) + i18n('%')
+                text: Number(Math.round(root.pwm / 2.55)).toLocaleString(locale, 'f', 1) + i18n('%')
             }
             Label {
                 id: temp
                 font.pixelSize: root.size * 1.5
-                text: Math.round(Units.fromCelsius(background.scaleTemp(root.centerX)), unit) + i18n(unit)
+                text: Math.round(Units.fromCelsius(root.temp, unit)) + i18n(unit)
             }
         }
     }
