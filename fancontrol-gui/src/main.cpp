@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
     KDeclarative::QmlObject qmlObject;
     qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());
-    qmlObject.loadPackage("fancontrol-gui");
+    qmlObject.loadPackage("org.kde.fancontrol.gui");
 
     return app.exec();
 }
