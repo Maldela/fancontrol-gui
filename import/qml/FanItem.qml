@@ -294,12 +294,12 @@ Rectangle {
                 enabled: !!fan ? fan.hasTemp : false
                 drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
                 drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
-                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.minTemp, maxTemp)) - width/2 : -width/2
+                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.minTemp, root.maxTemp)) - width/2 : -width/2
                 y: !!fan && fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
-                temp: !!fan ? fan.minTemp : 0
-                pwm: !!fan ? fan.minStop : 0
+                temp: !!fan && fan.hasTemp ? drag.active ? background.scaleTemp(centerX) : fan.minTemp : root.minTemp
+                pwm: !!fan && fan.hasTemp ? drag.active ? background.scalePwm(centerY) : fan.minStop : 255
                 drag.onActiveChanged: {
-                    if (!drag.active && !!fan) {
+                    if (!drag.active) {
                         fan.minStop = Math.round(background.scalePwm(centerY));
                         fan.minTemp = Math.round(background.scaleTemp(centerX));
                         if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
@@ -319,10 +319,10 @@ Rectangle {
                 enabled: !!fan ? fan.hasTemp : false
                 drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
                 drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
-                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(minTemp, fan.maxTemp, maxTemp)) - width/2 : background.width - width/2
+                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.maxTemp, root.maxTemp)) - width/2 : background.width - width/2
                 y: !!fan && fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
-                temp: !!fan && fan.hasTemp ? fan.maxTemp : 0
-                pwm: !!fan && fan.hasTemp ? fan.maxPwm : 0
+                temp: !!fan && fan.hasTemp ? drag.active ? background.scaleTemp(centerX) : fan.maxTemp : root.maxTemp
+                pwm: !!fan && fan.hasTemp ? drag.active ? background.scalePwm(centerY) : fan.maxPwm : 255
                 drag.onActiveChanged: {
                     if (!drag.active) {
                         fan.maxPwm = Math.round(background.scalePwm(centerY));
