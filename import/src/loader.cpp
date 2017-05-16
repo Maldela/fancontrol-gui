@@ -218,6 +218,7 @@ bool Loader::parseConfig(QString config)
 
     reset();
 
+    bool success = true;
     QTextStream stream;
     stream.setString(&config, QIODevice::ReadOnly);
     QStringList lines;
@@ -244,19 +245,15 @@ bool Loader::parseConfig(QString config)
         {
             line.remove(QStringLiteral("INTERVAL="));
             line = line.simplified();
-            auto success = false;
-            const auto interval = line.toInt(&success);
+            auto intSuccess = false;
+            const auto interval = line.toInt(&intSuccess);
 
-            if (success)
+            if (intSuccess)
                 setInterval(interval, false);
             else
             {
-                //Connect hwmons again
-                for (const auto &hwmon : m_hwmons)
-                    connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
                 emit error(i18n("Unable to parse interval line: \"%1\"", line), true);
-                return false;
+                success = false;
             }
         }
         else if (line.startsWith(QStringLiteral("FCTEMPS=")))
@@ -306,38 +303,25 @@ bool Loader::parseConfig(QString config)
                 {
                     auto index = indexNamePair.at(0);
                     const auto &name = indexNamePair[1];
-                    auto success = false;
+                    auto intSuccess = false;
                     index.remove(QStringLiteral("hwmon"));
-                    const auto hwmonPointer = m_hwmons.value(index.toInt(&success), Q_NULLPTR);
+                    const auto hwmonPointer = m_hwmons.value(index.toInt(&intSuccess), Q_NULLPTR);
 
-                    if (!success)
+                    if (!intSuccess)
                     {
-                        //Connect hwmons again
-                        for (const auto &hwmon : m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
                         emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
-                        return false;
+                        success = false;
                     }
 
                     if (!hwmonPointer)
                     {
-                        //Connect hwmons again
-                        for (const auto &hwmon : m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
                         emit error(i18n("Invalid DEVNAME: \"%1\"! No hwmon with index %2", devname, index), true);
-                        return false;
+                        success = false;
                     }
-
-                    if (hwmonPointer->name().split('.').first() != name)
+                    else if (hwmonPointer->name().split('.').first() != name)
                     {
-                        //Connect hwmons again
-                        for (const auto &hwmon : m_hwmons)
-                            connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
                         emit error(i18n("Wrong name for hwmon %1! Should be \"%2\"", index, hwmonPointer->name().split('.').first()), true);
-                        return false;
+                        success = false;
                     }
                 }
                 else
@@ -377,12 +361,8 @@ bool Loader::parseConfig(QString config)
         else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
             !line.startsWith(QStringLiteral("FCFANS=")))
         {
-            //Connect hwmons again
-            for (const auto &hwmon : m_hwmons)
-                connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-
             emit error(i18n("Unrecognized line in config: \"%1\"", line), true);
-            return false;
+            success = false;
         }
     }
 
@@ -392,7 +372,7 @@ bool Loader::parseConfig(QString config)
     for (const auto &hwmon : m_hwmons)
         connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
-    return true;
+    return success;
 }
 
 void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int))
@@ -498,7 +478,7 @@ bool Loader::load(const QUrl &url)
 
     auto success = parseConfig(fileContent);
 
-    if (success && !url.isEmpty())
+    if (!url.isEmpty())
     {
         m_configUrl = url;
         emit configUrlChanged();
