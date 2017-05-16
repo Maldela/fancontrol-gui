@@ -435,12 +435,12 @@ bool Loader::load(const QUrl &url)
 
     QTextStream stream;
     QFile file(fileName);
-    QString fileContent;
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         stream.setDevice(&file);
-        fileContent = stream.readAll();
+        m_configFileContent = stream.readAll();
+        emit configChanged();
     }
     else if (file.exists())
     {
@@ -465,7 +465,10 @@ bool Loader::load(const QUrl &url)
                 return false;
             }
             else
-                fileContent = reply->data().value(QStringLiteral("content")).toString();
+            {
+                m_configFileContent = reply->data().value(QStringLiteral("content")).toString();
+                emit configChanged();
+            }
         }
         else
             emit error(i18n("Action not supported! Try running the application as root."), true);
@@ -476,15 +479,16 @@ bool Loader::load(const QUrl &url)
         return false;
     }
 
-    auto success = parseConfig(fileContent);
-
     if (!url.isEmpty())
     {
         m_configUrl = url;
         emit configUrlChanged();
     }
 
-    return success;
+    if (m_config == m_configFileContent)
+        return true;
+
+    return parseConfig(m_configFileContent);
 }
 
 bool Loader::save(const QUrl &url)
@@ -496,8 +500,11 @@ bool Loader::save(const QUrl &url)
         fileName = m_configUrl.toLocalFile();
     }
     else if (url.isLocalFile())
+    {
         fileName = url.toLocalFile();
-
+        m_configUrl = url;
+        emit configUrlChanged();
+    }
     else
     {
         emit error(i18n("%1 is not a local file!", url.toDisplayString()), true);
@@ -509,7 +516,7 @@ bool Loader::save(const QUrl &url)
     if (file.open(QFile::WriteOnly | QFile::Text))
     {
         QTextStream stream(&file);
-        stream << m_configFile;
+        stream << m_config;
     }
     else
     {
@@ -520,7 +527,7 @@ bool Loader::save(const QUrl &url)
             QVariantMap map;
             map[QStringLiteral("action")] = QVariant("write");
             map[QStringLiteral("filename")] = fileName;
-            map[QStringLiteral("content")] = m_configFile;
+            map[QStringLiteral("content")] = m_config;
 
             action.setArguments(map);
             auto reply = action.execute();
@@ -538,20 +545,26 @@ bool Loader::save(const QUrl &url)
             }
         }
         else
+        {
             emit error(i18n("Action not supported! Try running the application as root."), true);
+            return false;
+        }
     }
+
+    m_configFileContent = m_config;
+    emit configChanged();
 
     return true;
 }
 
 void Loader::updateConfig()
 {
-    const auto configFile = createConfig();
+    const auto config = createConfig();
 
-    if (configFile != m_configFile)
+    if (config != m_config)
     {
-        m_configFile = configFile;
-        emit configFileChanged();
+        m_config = config;
+        emit configChanged();
     }
 }
 

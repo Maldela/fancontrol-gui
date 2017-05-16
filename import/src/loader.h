@@ -46,11 +46,12 @@ class Loader : public QObject
     Q_OBJECT
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)
     Q_PROPERTY(QString configPath READ configPath NOTIFY configUrlChanged)
-    Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
+    Q_PROPERTY(QString config READ config NOTIFY configChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmonsAsObjects NOTIFY hwmonsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
     Q_PROPERTY(bool restartServiceAfterTesting READ restartServiceAfterTesting WRITE setRestartServiceAfterTesting NOTIFY restartServiceAfterTestingChanged)
+    Q_PROPERTY(bool configEqualToLoadedFile READ configEqualToLoadedFile NOTIFY configChanged)
 
 
 public:
@@ -65,7 +66,7 @@ public:
     Q_INVOKABLE void detectSensors();
     QUrl configUrl() const { return m_configUrl; }
     QString configPath() const { return m_configUrl.path(); }
-    QString configFile() const { return m_configFile; }
+    QString config() const { return m_config; }
     QList<Hwmon *> hwmons() const { return m_hwmons; }
     bool sensorsDetected() const { return m_sensorsDetected; }
     bool restartServiceAfterTesting() const { return m_reactivateAfterTesting; }
@@ -80,6 +81,7 @@ public:
     Temp *temp(int hwmonIndex, int tempIndex) const;
     Fan *fan(int hwmonIndex, int fanIndex) const;
     void reset() const;
+    bool configEqualToLoadedFile() const { return m_config == m_configFileContent; }
 
 
 public slots:
@@ -105,7 +107,8 @@ private:
     bool m_reactivateAfterTesting;
     int m_interval;
     QUrl m_configUrl;
-    QString m_configFile;
+    QString m_config;
+    QString m_configFileContent;
     QTimer *m_timer;
     bool m_sensorsDetected;
 
@@ -113,7 +116,7 @@ private:
 signals:
 
     void configUrlChanged();
-    void configFileChanged();
+    void configChanged();
     void hwmonsChanged();
     void intervalChanged();
     void error(QString, bool = false);

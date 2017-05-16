@@ -139,7 +139,7 @@ ApplicationWindow {
         text: i18n("Save configuration file")
         onTriggered: Fancontrol.base.save(true)
         iconName: "document-save"
-        tooltip: i18n("Save configuration file") + " (" + Fancontrol.base.loader.configUrl.toString() + ")"
+        tooltip: i18n("Save configuration file") + " (" + Fancontrol.base.loader.configPath + ")"
         shortcut: StandardKey.Save
     }
 
