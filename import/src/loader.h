@@ -45,6 +45,7 @@ class Loader : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl configUrl READ configUrl NOTIFY configUrlChanged)
+    Q_PROPERTY(QString configPath READ configPath NOTIFY configUrlChanged)
     Q_PROPERTY(QString configFile READ configFile NOTIFY configFileChanged)
     Q_PROPERTY(QList<QObject *> hwmons READ hwmonsAsObjects NOTIFY hwmonsChanged)
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
@@ -63,6 +64,7 @@ public:
     Q_INVOKABLE void abortTestingFans();
     Q_INVOKABLE void detectSensors();
     QUrl configUrl() const { return m_configUrl; }
+    QString configPath() const { return m_configUrl.path(); }
     QString configFile() const { return m_configFile; }
     QList<Hwmon *> hwmons() const { return m_hwmons; }
     bool sensorsDetected() const { return m_sensorsDetected; }
