@@ -32,7 +32,7 @@ ColumnLayout {
 
     Label {
         anchors.top: parent.top
-        text: !!loader ? decodeURIComponent(loader.configPath) : ""
+        text: !!loader && loader.configEqualToLoadedFile ? loader.configPath : i18n("New config")
     }
 
     Rectangle {
@@ -48,7 +48,7 @@ ColumnLayout {
             anchors.margins: 5
 
             TextEdit {
-                text: !!loader ? loader.configFile : ""
+                text: !!loader ? loader.config : ""
                 readOnly: true
                 color: palette.text
             }
