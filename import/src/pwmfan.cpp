@@ -79,12 +79,12 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             if (pwmFile->open(QFile::ReadWrite))
             {
                 m_pwmStream->setDevice(pwmFile);
-                *m_pwmStream >> m_pwm;
+                setPwm(m_pwmStream->readAll().toInt(), false);
             }
             else if (pwmFile->open(QFile::ReadOnly))
             {
                 m_pwmStream->setDevice(pwmFile);
-                *m_pwmStream >> m_pwm;
+                setPwm(m_pwmStream->readAll().toInt(), false);
             }
             else
             {
@@ -97,12 +97,12 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             if (pwmEnableFile->open(QFile::ReadWrite))
             {
                 m_enableStream->setDevice(pwmEnableFile);
-                *m_enableStream >> m_pwmEnable;
+                setPwmEnable(m_enableStream->readAll().toInt(), false);
             }
             else if (pwmEnableFile->open(QFile::ReadOnly))
             {
                 m_enableStream->setDevice(pwmEnableFile);
-                *m_enableStream >> m_pwmEnable;
+                setPwmEnable(m_enableStream->readAll().toInt(), false);
             }
             else
             {
