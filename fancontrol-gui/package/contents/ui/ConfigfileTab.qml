@@ -32,7 +32,7 @@ ColumnLayout {
 
     Label {
         anchors.top: parent.top
-        text: !!loader ? decodeURIComponent(loader.configUrl) : ""
+        text: !!loader ? decodeURIComponent(loader.configPath) : ""
     }
 
     Rectangle {
