@@ -436,7 +436,7 @@ Rectangle {
             SpinBox {
                 id: minStartInput
                 Layout.fillWidth: true
-                minimumValue: 1
+                minimumValue: 0
                 maximumValue: 100
                 decimals: 1
                 value: !!fan ? Math.round(fan.minStart / 2.55) : 0

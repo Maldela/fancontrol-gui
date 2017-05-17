@@ -264,9 +264,9 @@ bool PwmFan::setPwm(int pwm, bool write)
 
 bool PwmFan::setPwmEnable(int pwmEnable, bool write)
 {
-    if (pwmEnable < 0 || pwmEnable > 2)
+    if (pwmEnable < 0)
     {
-        emit error(i18n("PwmEnable cannot exceed 0-2!"), true);
+        emit error(i18n("PwmEnable cannot be less than 0!"), true);
         return false;
     }
 
@@ -415,7 +415,19 @@ void PwmFan::continueTest()
     case FindingStop1:
         if (rpm() > 0)
         {
-            setPwm(qMin(m_pwm * 0.95, m_pwm - 5.0));
+            if (m_pwm == 0)
+            {
+                error(i18n("Fan never stops."), false);
+                setMinStart(0);
+                setMinStop(0);
+                setMinPwm(0);
+                setPwm(255);
+                m_testStatus = Finished;
+                emit testStatusChanged();
+                return;
+            }
+            
+            setPwm(qMax(0, (int)qMin(m_pwm * 0.95, m_pwm - 5.0)));
             m_zeroRpm = 0;
         }
         else
@@ -478,6 +490,7 @@ void PwmFan::continueTest()
                 emit testStatusChanged();
                 m_zeroRpm = 0;
                 setMinStop(qMin(255, m_pwm + 5));
+                setMinPwm(qMin(m_minPwm, m_minStop));
                 setPwm(255);
 //                qDebug() << "Finished testing PwmFan" << m_index;
             }
