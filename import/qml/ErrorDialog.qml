@@ -21,13 +21,11 @@
 import QtQuick 2.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls 1.2
+import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Dialog {
     id: dialog
-
-    property alias text: text.text
-    property QtObject base
 
     title: i18n("Error")
     width: text.implicitWidth + 20
@@ -37,11 +35,14 @@ Dialog {
     Label {
         id: text
         anchors.centerIn: parent
-        text: !!base ? base.error : ""
+        text: ""
     }
     
     Connections {
-        target: base
-        onCriticalError: dialog.open()
+        target: Fancontrol.base
+        onCriticalError: {
+            text.text = Fancontrol.base.error;
+            dialog.open();
+        }
     }
 }
