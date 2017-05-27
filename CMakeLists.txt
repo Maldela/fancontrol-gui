@@ -51,6 +51,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 include(FeatureSummary)
+include(ECMGenerateQmlTypes)
 
 include_directories (${CMAKE_SOURCE_DIR})
 

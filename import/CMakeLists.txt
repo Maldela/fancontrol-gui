@@ -51,6 +51,7 @@ target_link_libraries(fancontrol_qml_plugin PRIVATE ${LIB_PRIVATE_LIBRARIES} PUB
 install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 
+ecm_generate_qmltypes(Fancontrol.Qml 1.0 DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 
 #tests
 
