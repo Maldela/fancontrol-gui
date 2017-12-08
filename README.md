@@ -11,6 +11,13 @@ If you want to compile without systemd support set the option -DNO_SYSTEMD=true.
 To compile the additional KCM set the cmake option -DBUILD_KCM=on.
 The KCM is only build, if the -DNO_SYSTEMD option is unset or set to false.
 
+# Requirements for building
+* Qt5: Base/Core, Widgets, GUI, QML
+* KF5: I18n, Auth, Config, Package, Declarative, CoreAddons, KCMUtils
+
+## Debian/Ubuntu command to install the build requirements:
+`sudo apt-get install libkf5config-dev libkf5auth-dev libkf5package-dev libkf5declarative-dev libkf5coreaddons-dev libkf5kcmutils-dev libkf5i18n-dev libqt5core5a libqt5widgets5 libqt5gui5 libqt5qml5 extra-cmake-modules qtbase5-dev`
+
 
 ## Example:
 
