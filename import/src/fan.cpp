@@ -52,7 +52,7 @@ Fan::Fan(uint index, Hwmon *parent) : Sensor(parent, index, parent ? parent->nam
         }
         else
         {
-            emit error(i18n("Can't open rpm file: \"%1\"", rpmFile->fileName()));
+            emit error(i18n("Can't open rpm file: \'%1\'", rpmFile->fileName()));
             delete rpmFile;
         }
     }
@@ -90,7 +90,7 @@ void Fan::setName(const QString &name)
     }
 }
 
-void Fan::reset()
+void Fan::toDefault()
 {
     if (m_rpmStream->device() && m_parent)
     {
@@ -109,7 +109,7 @@ void Fan::reset()
             }
             else
             {
-                emit error(i18n("Can't open rpm file: \"%1\"", rpmFile->fileName()));
+                emit error(i18n("Can't open rpm file: \'%1\'", rpmFile->fileName()));
                 delete rpmFile;
             }
         }

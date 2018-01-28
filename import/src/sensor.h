@@ -44,7 +44,7 @@ public:
 
     virtual QString name() const = 0;
     virtual void setName(const QString &name) = 0;
-    virtual void reset() = 0;
+    virtual void toDefault() = 0;
     virtual bool isValid() const = 0;
     QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }

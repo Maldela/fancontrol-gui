@@ -58,7 +58,7 @@ Temp::Temp(uint index, Hwmon *parent) :
         else
         {
             delete valueFile;
-            emit error(i18n("Can't open value file: \"%1\"", parent->path() + "/temp" + QString::number(index) + "_input"));
+            emit error(i18n("Can't open value file: \'%1\'", parent->path() + "/temp" + QString::number(index) + "_input"));
         }
 
         if (labelFile->exists())
@@ -66,10 +66,10 @@ Temp::Temp(uint index, Hwmon *parent) :
             if (labelFile->open(QFile::ReadOnly))
                 m_label = QTextStream(labelFile).readLine();
             else
-                emit error(i18n("Can't open label file: \"%1\"", parent->path() + "/temp" + QString::number(index) + "_label"));
+                emit error(i18n("Can't open label file: \'%1\'", parent->path() + "/temp" + QString::number(index) + "_label"));
         }
         else
-            emit error(i18n("Temp has no label: \"%1\"", parent->path() + "/temp" + QString::number(index)));
+            emit error(i18n("Temp has no label: \'%1\'", parent->path() + "/temp" + QString::number(index)));
 
         delete labelFile;
     }
@@ -111,7 +111,7 @@ void Temp::setName(const QString &name)
     }
 }
 
-void Temp::reset()
+void Temp::toDefault()
 {
     if (m_valueStream->device() && m_parent)
     {
@@ -130,7 +130,7 @@ void Temp::reset()
                 m_value /= 1000;
             }
             else
-                emit error(i18n("Can't open value file: \"%1\"", m_parent->path() + "/temp" + QString::number(m_index) + "_input"));
+                emit error(i18n("Can't open value file: \'%1\'", m_parent->path() + "/temp" + QString::number(m_index) + "_input"));
         }
     }
 }
@@ -143,7 +143,7 @@ void Temp::update()
     const auto value = m_valueStream->readAll().toInt(&success) / 1000;
 
     if (!success)
-        emit error(i18n("Can't update value of temp: \"%1\"", m_parent->path() + "/temp" + QString::number(m_index)));
+        emit error(i18n("Can't update value of temp: \'%1\'", m_parent->path() + "/temp" + QString::number(m_index)));
 
     if (value != m_value)
     {

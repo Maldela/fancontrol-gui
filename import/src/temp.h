@@ -48,7 +48,7 @@ public:
     int value() const { return m_value; }
     QString name() const Q_DECL_OVERRIDE;
     void setName(const QString &name) Q_DECL_OVERRIDE;
-    void reset() Q_DECL_OVERRIDE;
+    void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
 
 

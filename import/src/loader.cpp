@@ -31,7 +31,6 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
 #include <QtCore/QProcess>
-#include <QtCore/QDebug>
 
 #include <KAuth/KAuthExecuteJob>
 #include <KI18n/KLocalizedString>
@@ -55,7 +54,10 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     m_sensorsDetected(false)
 {
     if (parent)
+    {
         connect(this, &Loader::error, parent, &GUIBase::handleError);
+        connect(this, &Loader::info, parent, &GUIBase::handleInfo);
+    }
 
     m_timer->setSingleShot(false);
     m_timer->start(1000);
@@ -72,12 +74,12 @@ void Loader::parseHwmons()
 
     else if (hwmonDir.exists())
     {
-        emit error(i18n("File is not readable: \"%1\"", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("File is not readable: \'%1\'", QStringLiteral(HWMON_PATH)), true);
         return;
     }
     else
     {
-        emit error(i18n("File does not exist: \"%1\"", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("File does not exist: \'%1\'", QStringLiteral(HWMON_PATH)), true);
         return;
     }
 
@@ -163,7 +165,7 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
-        emit error(i18n("Invalid entry: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \'%1\'", entry));
         return QPair<int, int>(-1, -1);
     }
     auto &hwmon = list[0];
@@ -171,12 +173,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
-        emit error(i18n("Invalid entry: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \'%1\'", entry));
         return QPair<int, int>(-1, -1);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
-        emit error(i18n("Invalid entry: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \'%1\'", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -189,13 +191,13 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     const auto hwmonResult = hwmon.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \'%1\'", entry));
         return QPair<int, int>(-1, -1);
     }
     const auto sensorResult = sensor.toInt(&success);
     if (!success)
     {
-        emit error(i18n("Invalid entry: \"%1\"", entry));
+        emit error(i18n("Invalid entry: \'%1\'", entry));
         return QPair<int, int>(-1, -1);
     }
 
@@ -209,14 +211,9 @@ bool Loader::parseConfig(QString config)
     for (const auto &hwmon : m_hwmons)
     {
         disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
-        const auto pwmFans = hwmon->pwmFans();
-        for (const auto &pwmFan : pwmFans)
-        {
-            qobject_cast<PwmFan *>(pwmFan)->reset();
-        }
     }
 
-    reset();
+    toDefault();
 
     bool success = true;
     QTextStream stream;
@@ -252,7 +249,7 @@ bool Loader::parseConfig(QString config)
                 setInterval(interval, false);
             else
             {
-                emit error(i18n("Unable to parse interval line: \"%1\"", line), true);
+                emit error(i18n("Unable to parse interval line: \'%1\'", line), true);
                 success = false;
             }
         }
@@ -280,14 +277,14 @@ bool Loader::parseConfig(QString config)
                     else
                     {
                         if (!pwmPointer)
-                            emit error(i18n("Invalid fan entry: \"%1\"", pwmFanString), true);
+                            emit error(i18n("Invalid fan entry: \'%1\'", pwmFanString), true);
 
                         if (!tempPointer)
-                            emit error(i18n("Invalid temp entry: \"%1\"", tempString), true);
+                            emit error(i18n("Invalid temp entry: \'%1\'", tempString), true);
                     }
                 }
                 else
-                    emit error(i18n("Invalid entry: \"%1\"", fctemp), true);
+                    emit error(i18n("Invalid entry: \'%1\'", fctemp), true);
             }
         }
         else if (line.startsWith(QStringLiteral("DEVNAME=")))
@@ -309,13 +306,13 @@ bool Loader::parseConfig(QString config)
 
                     if (!intSuccess)
                     {
-                        emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
+                        emit error(i18n("Invalid DEVNAME: \'%1\'!", devname), true);
                         success = false;
                     }
 
                     if (!hwmonPointer)
                     {
-                        emit error(i18n("Invalid DEVNAME: \"%1\"! No hwmon with index %2", devname, index), true);
+                        emit error(i18n("Invalid DEVNAME: \'%1\'! No hwmon with index %2", devname, index), true);
                         success = false;
                     }
                     else if (hwmonPointer->name().split('.').first() != name)
@@ -325,7 +322,7 @@ bool Loader::parseConfig(QString config)
                     }
                 }
                 else
-                    emit error(i18n("Invalid DEVNAME: \"%1\"!", devname), true);
+                    emit error(i18n("Invalid DEVNAME: \'%1\'!", devname), true);
             }
         }
         else if (line.startsWith(QStringLiteral("MINTEMP=")))
@@ -361,7 +358,7 @@ bool Loader::parseConfig(QString config)
         else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
             !line.startsWith(QStringLiteral("FCFANS=")))
         {
-            emit error(i18n("Unrecognized line in config: \"%1\"", line), true);
+            emit error(i18n("Unrecognized line in config: \'%1\'", line), true);
             success = false;
         }
     }
@@ -398,13 +395,13 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
                 if (pwmFanPointer)
                     (pwmFanPointer->*memberSetFunction)(value);
                 else
-                    emit error(i18n("Invalid fan entry: \"%1\"", pwmFanString), true);
+                    emit error(i18n("Invalid fan entry: \'%1\'", pwmFanString), true);
             }
             else
                 emit error(i18n("%1 is not an integer!", valueString));
         }
         else
-            emit error(i18n("Invalid entry to parse: \"%1\"", entry));
+            emit error(i18n("Invalid entry to parse: \'%1\'", entry));
     }
 }
 
@@ -412,10 +409,7 @@ bool Loader::load(const QUrl &url)
 {
     QString fileName;
     if (url.isEmpty())
-    {
-//        qDebug() << "Given empty url. Fallback to" << m_configUrl;
         fileName = m_configUrl.toLocalFile();
-    }
     else if (url.isValid())
     {
         if (url.isLocalFile())
@@ -423,15 +417,16 @@ bool Loader::load(const QUrl &url)
 
         else
         {
-            emit error(i18n("%1 is not a local file!", url.toDisplayString()));
+            emit error(i18n("\'%1\' is not a local file!", url.toDisplayString()));
             return false;
         }
     }
     else
     {
-        emit error(i18n("%1 is not a valid url!", url.toDisplayString()));
+        emit error(i18n("\'%1\' is not a valid url!", url.toDisplayString()));
         return false;
     }
+    emit info(i18n("Loading config file: \'%1\'", fileName));
 
     QTextStream stream;
     QFile file(fileName);
@@ -440,7 +435,6 @@ bool Loader::load(const QUrl &url)
     {
         stream.setDevice(&file);
         m_configFileContent = stream.readAll();
-        emit configChanged();
     }
     else if (file.exists())
     {
@@ -457,7 +451,7 @@ bool Loader::load(const QUrl &url)
             {
                 if (reply->error() == 4)
                 {
-                    qDebug() << "Loading of file aborted by user";
+                    emit info(i18n("Loading of file aborted by user"));
                     return false;
                 }
 
@@ -465,17 +459,14 @@ bool Loader::load(const QUrl &url)
                 return false;
             }
             else
-            {
                 m_configFileContent = reply->data().value(QStringLiteral("content")).toString();
-                emit configChanged();
-            }
         }
         else
             emit error(i18n("Action not supported! Try running the application as root."), true);
     }
     else
     {
-        emit error(i18n("File does not exist: \"%1\"" ,fileName));
+        emit error(i18n("File does not exist: \'%1\'" ,fileName));
         return false;
     }
 
@@ -507,12 +498,26 @@ bool Loader::save(const QUrl &url)
     }
     else
     {
-        emit error(i18n("%1 is not a local file!", url.toDisplayString()), true);
+        emit error(i18n("\'%1\' is not a local file!", url.toDisplayString()), true);
         return false;
     }
-
     QFile file(fileName);
 
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream stream(&file);
+        QString fileContent = stream.readAll();
+
+        if (m_config == fileContent)
+        {
+            emit info(i18n("No changes made to config"));
+            return false;
+        }
+        else
+            file.close();
+    }
+
+    emit info(i18n("Saving config to \'%1\'", fileName));
     if (file.open(QFile::WriteOnly | QFile::Text))
     {
         QTextStream stream(&file);
@@ -536,7 +541,7 @@ bool Loader::save(const QUrl &url)
             {
                 if (reply->error() == 4)
                 {
-                    qDebug() << "Saving of file aborted by user";
+                    emit info(i18n("Saving of file aborted by user"));
                     return false;
                 }
 
@@ -565,6 +570,7 @@ void Loader::updateConfig()
     {
         m_config = config;
         emit configChanged();
+        emit needsSaveChanged();
     }
 }
 
@@ -736,6 +742,7 @@ void Loader::abortTestingFans()
 
 void Loader::detectSensors()
 {
+    emit info(i18n("Start detecting Sensors"));
     auto program = QStringLiteral("sensors-detect");
     auto arguments = QStringList() << QStringLiteral("--auto");
 
@@ -784,6 +791,8 @@ void Loader::handleDetectSensorsResult(int exitCode)
 
     if (process)
         process->deleteLater();
+
+    emit info(i18n("Finished detecting Sensors"));
 }
 
 void Loader::handleDetectSensorsResult(KJob *job)
@@ -808,6 +817,8 @@ void Loader::handleDetectSensorsResult(KJob *job)
 
         parseHwmons();
     }
+
+    emit info(i18n("Finished detecting Sensors"));
 }
 
 QList<QObject *> Loader::hwmonsAsObjects() const
@@ -847,10 +858,9 @@ void Loader::setRestartServiceAfterTesting(bool restart)
     emit restartServiceAfterTestingChanged();
 }
 
-void Loader::reset() const
+void Loader::toDefault()
 {
     for (const auto &hwmon : m_hwmons)
-        hwmon->reset();
-}
-
+        hwmon->toDefault();
+    }
 }

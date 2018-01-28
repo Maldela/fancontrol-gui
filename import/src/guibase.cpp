@@ -29,6 +29,8 @@
 #include <QtCore/QLocale>
 #include <QtCore/QDebug>
 
+#include <KI18n/KLocalizedString>
+
 
 namespace Fancontrol
 {
@@ -42,14 +44,16 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 
     m_loader(new Loader(this)),
     m_configValid(false),
+    m_configChanged(false),
     m_pwmFanModel(new PwmFanModel(this)),
     m_tempModel(new TempModel(this))
 {
-    connect(m_config, &Config::configChanged, this, &GUIBase::emitConfigChanged);
     connect(this, &GUIBase::unitChanged, m_tempModel, &TempModel::setUnit);
+    connect(m_loader, &Loader::needsSaveChanged, this, &GUIBase::needsApplyChanged);
 
 #ifndef NO_SYSTEMD
     connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
+    connect(m_com, &SystemdCommunicator::needsApplyChanged, this, &GUIBase::needsApplyChanged);
 #endif
 
     const auto locale = QLocale::system();
@@ -74,17 +78,13 @@ void GUIBase::load()
 
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
+    m_com->reset();
 #endif
 
-    emitConfigChanged();
-}
-
-void GUIBase::save(bool saveLoader, const QUrl &url)
-{
-    m_config->save();
-
-    if (saveLoader)
-        m_loader->save(url);
+    emit serviceNameChanged();
+    emit minTempChanged();
+    emit maxTempChanged();
+    emit configUrlChanged();
 }
 
 qreal GUIBase::maxTemp() const
@@ -113,6 +113,9 @@ void GUIBase::setMaxTemp(qreal temp)
     {
         m_config->findItem(QStringLiteral("MaxTemp"))->setProperty(temp);
         emit maxTempChanged();
+
+        m_configChanged = true;
+        emit needsApplyChanged();
     }
 }
 
@@ -122,6 +125,9 @@ void GUIBase::setMinTemp(qreal temp)
     {
         m_config->findItem(QStringLiteral("MinTemp"))->setProperty(temp);
         emit minTempChanged();
+
+        m_configChanged = true;
+        emit needsApplyChanged();
     }
 }
 
@@ -136,6 +142,9 @@ void GUIBase::setServiceName(const QString& name)
 #endif
 
         emit serviceNameChanged();
+
+        m_configChanged = true;
+        emit needsApplyChanged();
     }
 }
 
@@ -147,15 +156,19 @@ void GUIBase::setConfigUrl(const QUrl &url)
 
         m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
         emit configUrlChanged();
+
+        m_configChanged = true;
+        emit needsApplyChanged();
     }
 }
 
-void GUIBase::emitConfigChanged()
+bool GUIBase::needsApply() const
 {
-    emit serviceNameChanged();
-    emit minTempChanged();
-    emit maxTempChanged();
-    emit configUrlChanged();
+#ifndef NO_SYSTEMD
+    return m_loader->needsSave() || m_configChanged || m_com->needsApply();
+#else
+    return m_loader->needsSave() || m_configChanged;
+#endif
 }
 
 bool GUIBase::hasSystemdCommunicator() const
@@ -165,6 +178,40 @@ bool GUIBase::hasSystemdCommunicator() const
 #else
     return false;
 #endif
+}
+
+void GUIBase::apply()
+{
+    qInfo() << i18n("Applying changes");
+
+    bool configChanged = m_loader->save();
+    m_config->save();
+
+#ifndef NO_SYSTEMD
+    m_com->apply(configChanged);
+#endif
+}
+
+void GUIBase::reset()
+{
+    qInfo() << i18n("Resetting changes");
+
+    m_config->load();
+    emit serviceNameChanged();
+    emit minTempChanged();
+    emit maxTempChanged();
+    emit configUrlChanged();
+    m_configChanged = false;
+
+    if (m_loader->needsSave() || configUrl() != m_loader->configUrl())
+        m_loader->load(configUrl());
+
+#ifndef NO_SYSTEMD
+    m_com->setServiceName(serviceName());
+    m_com->reset();
+#endif
+
+    emit needsApplyChanged();
 }
 
 void GUIBase::handleError(const QString &error, bool critical)
@@ -182,6 +229,15 @@ void GUIBase::handleError(const QString &error, bool critical)
     }
     else
         qWarning() << error;
+}
+
+void GUIBase::handleInfo(const QString &info)
+{
+    if (info.isEmpty())
+        return;
+
+    else
+        qInfo() << info;
 }
 
 

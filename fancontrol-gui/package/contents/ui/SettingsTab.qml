@@ -21,12 +21,13 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
+import QtQuick.Dialogs 1.2
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
     property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
-    property QtObject loader : Fancontrol.base.loader
+    property QtObject loader: Fancontrol.base.loader
     property int padding: 10
     property real textWidth: 0
     property var locale: Qt.locale()
@@ -52,12 +53,19 @@ Item {
                 Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
             }
             SpinBox {
+                id: intervalSpinBox
+
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 value: loader.interval
                 suffix: " " + i18np("second", "seconds", loader.interval)
                 minimumValue: 1.0
                 onValueChanged: loader.interval = value
+
+                Connections {
+                    target: loader
+                    onIntervalChanged: if (loader.interval != intervalSpinBox.value) intervalSpinBox.value = loader.interval
+                }
             }
         }
         RowLayout {
@@ -72,6 +80,7 @@ Item {
             }
             SpinBox {
                 id: minTempBox
+
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 decimals: 2
@@ -82,6 +91,11 @@ Item {
                 onValueChanged: {
                     Fancontrol.base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
                     if (value > maxTempBox.value) maxTempBox.value = value;
+                }
+
+                Connections {
+                    target: Fancontrol.base
+                    onMinTempChanged: if (Fancontrol.base.minTemp != minTempBox.value) minTempBox.value = Fancontrol.base.minTemp
                 }
             }
         }
@@ -97,6 +111,7 @@ Item {
             }
             SpinBox {
                 id: maxTempBox
+
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 decimals: 2
@@ -108,6 +123,34 @@ Item {
                     Fancontrol.base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
                     if (value < minTempBox.value) minTempBox.value = value;
                 }
+
+                Connections {
+                    target: Fancontrol.base
+                    onMaxTempChanged: if (Fancontrol.base.maxTemp != maxTempBox.value) maxTempBox.value = Fancontrol.base.maxTemp
+                }
+            }
+        }
+        RowLayout {
+            width: parent.width
+
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Path to the fancontrol config file:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            Fancontrol.OptionInput {
+                id: fileInput
+
+                Layout.fillWidth: true
+                value: Fancontrol.base.configUrl.toString().replace("file://", "")
+                onTextChanged: Fancontrol.base.configUrl = text;
+            }
+            Button {
+                iconName: "document-open"
+                tooltip: i18n("Open config file")
+                onClicked: openFileDialog.open();
             }
         }
         Loader {
@@ -123,6 +166,8 @@ Item {
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
                 Fancontrol.OptionInput {
+                    id: serviceNameInput
+
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: !!systemdCom && systemdCom.serviceExists ? "green" : "red"
@@ -139,12 +184,13 @@ Item {
                 Label {
                     Layout.preferredWidth: root.textWidth
                     clip: true
-                    text: i18n("Fancontrol systemd service autostart:")
+                    text: i18n("Enable service at boot:")
                     horizontalAlignment: Text.AlignRight
                     Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
                 }
                 CheckBox {
                     id: autostartBox
+
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     checked: !!systemdCom ? systemdCom.serviceEnabled : false
@@ -153,8 +199,23 @@ Item {
                             systemdCom.serviceEnabled = checked;
                         }
                     }
+
+                    Connections {
+                        target: systemdCom
+                        onServiceEnabledChanged: if (systemdCom.serviceEnabled != autostartBox.checked) autostartBox.checked = systemdCom.serviceEnabled
+                    }
                 }
             }
+        }
+        FileDialog {
+            id: openFileDialog
+            title: i18n("Please choose a configuration file")
+            folder: "file:///etc"
+            selectExisting: true
+            selectMultiple: false
+            modality: Qt.NonModal
+
+            onAccepted: fileInput.text = fileUrl;
         }
     }
 }

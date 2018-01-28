@@ -41,6 +41,7 @@ class SystemdCommunicator : public QObject
     Q_PROPERTY(bool serviceExists READ serviceExists NOTIFY serviceNameChanged)
     Q_PROPERTY(bool serviceEnabled READ serviceEnabled WRITE setServiceEnabled NOTIFY serviceEnabledChanged)
     Q_PROPERTY(bool serviceActive READ serviceActive WRITE setServiceActive NOTIFY serviceActiveChanged)
+    Q_PROPERTY(bool needsApply READ needsApply NOTIFY needsApplyChanged)
 
 public:
 
@@ -48,12 +49,15 @@ public:
 
     QString serviceName() const { return m_serviceName; }
     void setServiceName(const QString &name);
-    bool serviceExists();
-    bool serviceEnabled();
-    bool serviceActive();
-    bool setServiceEnabled(bool enabled);
-    bool setServiceActive(bool active);
+    bool serviceExists() const;
+    bool serviceEnabled() const { return m_serviceEnabled; }
+    bool serviceActive() const { return m_serviceActive; }
+    void setServiceEnabled(bool enabled);
+    void setServiceActive(bool active);
+    bool needsApply() const;
     Q_INVOKABLE bool restartService();
+    Q_INVOKABLE void apply(bool serviceRestart = false);
+    Q_INVOKABLE void reset();
 
 
 signals:
@@ -61,18 +65,21 @@ signals:
     void serviceNameChanged();
     void serviceEnabledChanged();
     void serviceActiveChanged();
-    void error(QString, bool = false);
+    void needsApplyChanged();
+    void error(QString, bool = false) const;
+    void info(QString) const;
 
 
 protected slots:
 
     void updateServiceProperties(QString, QVariantMap, QStringList);
-    void handleDbusActionResult(KJob *job);
 
 
 protected:
 
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
+    bool systemdServiceActive() const;
+    bool systemdServiceEnabled() const;
 
 
 private:
@@ -81,6 +88,8 @@ private:
     QString m_serviceObjectPath;
     QDBusInterface * const m_managerInterface;
     QDBusInterface *m_serviceInterface;
+    bool m_serviceEnabled;
+    bool m_serviceActive;
 };
 
 }

@@ -93,7 +93,7 @@ public:
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
     bool setPwmEnable(int pwmEnable, bool write = true);
     void setActive(bool active);
-    void reset() Q_DECL_OVERRIDE;
+    void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
     Q_INVOKABLE void test();
     Q_INVOKABLE void abortTest();

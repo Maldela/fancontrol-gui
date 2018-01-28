@@ -51,7 +51,7 @@ class Loader : public QObject
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(bool sensorsDetected READ sensorsDetected NOTIFY sensorsDetectedChanged)
     Q_PROPERTY(bool restartServiceAfterTesting READ restartServiceAfterTesting WRITE setRestartServiceAfterTesting NOTIFY restartServiceAfterTestingChanged)
-    Q_PROPERTY(bool configEqualToLoadedFile READ configEqualToLoadedFile NOTIFY configChanged)
+    Q_PROPERTY(bool needsSave READ needsSave NOTIFY needsSaveChanged)
 
 
 public:
@@ -80,8 +80,8 @@ public:
     PwmFan *pwmFan(int hwmonIndex, int pwmFanIndex) const;
     Temp *temp(int hwmonIndex, int tempIndex) const;
     Fan *fan(int hwmonIndex, int fanIndex) const;
-    void reset() const;
-    bool configEqualToLoadedFile() const { return m_config == m_configFileContent; }
+    void toDefault();
+    bool needsSave() const { return m_config != m_configFileContent; }
 
 
 public slots:
@@ -120,11 +120,13 @@ signals:
     void hwmonsChanged();
     void intervalChanged();
     void error(QString, bool = false);
+    void info(QString);
     void sensorsUpdateNeeded();
     void invalidConfigUrl();
     void sensorsDetectedChanged();
     void restartServiceAfterTestingChanged();
     void requestSetServiceActive(bool);
+    void needsSaveChanged();
 };
 
 }

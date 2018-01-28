@@ -58,6 +58,7 @@ class GUIBase : public QObject
     Q_PROPERTY(QUrl configUrl READ configUrl WRITE setConfigUrl NOTIFY configUrlChanged)
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
+    Q_PROPERTY(bool needsApply READ needsApply NOTIFY needsApplyChanged)
 
 public:
 
@@ -81,18 +82,20 @@ public:
     void setServiceName(const QString &name);
     void setConfigUrl(const QUrl &url);
     void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(m_unit); } }
+    bool needsApply() const;
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
     TempModel *tempModel() const { return m_tempModel; }
 
     Q_INVOKABLE bool hasSystemdCommunicator() const;
+    Q_INVOKABLE void apply();
+    Q_INVOKABLE void reset();
 
 
 public slots:
 
-    void save(bool saveLoader = false, const QUrl &url = QUrl());
     void load();
     void handleError(const QString &error, bool critical = false);
-
+    void handleInfo(const QString &info);
 
 signals:
 
@@ -103,12 +106,7 @@ signals:
     void unitChanged(QString);
     void errorChanged();
     void criticalError();
-
-
-protected:
-
-    void emitConfigChanged();
-
+    void needsApplyChanged();
 
 private:
 
@@ -122,6 +120,7 @@ private:
     Loader *const m_loader;
     QString m_unit;
     bool m_configValid;
+    bool m_configChanged;
     PwmFanModel *m_pwmFanModel;
     TempModel *m_tempModel;
 };

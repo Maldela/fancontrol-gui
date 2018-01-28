@@ -66,7 +66,7 @@ public:
     Temp * temp(int i) const;
     bool isValid() const { return m_valid; }
     bool testing() const;
-    void reset() const;
+    void toDefault() const;
 
 
 signals:

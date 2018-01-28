@@ -91,7 +91,7 @@ void Hwmon::initialize()
 
         if (!success)
         {
-            emit error(i18n("Not a valid sensor: \"%1\"", entry));
+            emit error(i18n("Not a valid sensor: \'%1\'", entry));
             continue;
         }
 
@@ -138,7 +138,7 @@ void Hwmon::initialize()
                     if (fan->index() == index)
                     {
                         newFan = fan;
-                        newFan->reset();
+                        newFan->toDefault();
                         break;
                     }
                 }
@@ -162,7 +162,7 @@ void Hwmon::initialize()
                 if (temp->index() == index)
                 {
                     newTemp = temp;
-                    newTemp->reset();
+                    newTemp->toDefault();
                     break;
                 }
             }
@@ -251,10 +251,10 @@ bool Hwmon::testing() const
     return testing;
 }
 
-void Hwmon::reset() const
+void Hwmon::toDefault() const
 {
     for (const auto &pwmFan : m_pwmFans)
-        pwmFan->reset();
+        pwmFan->toDefault();
 }
 
 }
