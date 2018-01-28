@@ -1,5 +1,5 @@
 /*
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -31,22 +31,22 @@ namespace Fancontrol
 
 class Config : public KCoreConfigSkeleton
 {
-    
+
 Q_OBJECT
 
 public:
-    
+
     static Config *instance();
-    
-    
+
+
 private:
-    
+
     Config(QObject *parent = Q_NULLPTR);
     ~Config() {}
     Q_DISABLE_COPY(Config)
-    
+
     static Config *m_instance;
-    
+
     double m_minTemp;
     double m_maxTemp;
     QString m_serviceName;

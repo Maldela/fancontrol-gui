@@ -1,6 +1,6 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -42,7 +42,7 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
                                 QString(),
                                 QStringLiteral("http://github.com/maldela/fancontrol-gui"),
                                 QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
-    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
+    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("malte.veerman@gmail.com"));
     setAboutData(about);
 
     setButtons(Apply | Default);
@@ -52,21 +52,21 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 void FancontrolKCM::save()
 {
     emit aboutToSave();
-    
+
     setNeedsSave(false);
 }
 
 void FancontrolKCM::load()
 {
     emit aboutToLoad();
-    
+
     setNeedsSave(false);
 }
 
 void FancontrolKCM::defaults()
 {
     emit aboutToDefault();
-    
+
     setNeedsSave(true);
 }
 

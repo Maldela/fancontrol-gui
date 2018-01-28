@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
                             QString(),
                             QStringLiteral("http://github.com/maldela/fancontrol-gui"),
                             QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
-    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
+    about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("malte.veerman@gmail.com"));
     KAboutData::setApplicationData(about);
 
     const auto parser = new QCommandLineParser;
