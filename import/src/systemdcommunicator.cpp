@@ -308,7 +308,7 @@ void SystemdCommunicator::apply(bool serviceRestart)
         if (m_serviceActive != systemdServiceActive())
         {
             QString method;
-            if (m_serviceEnabled)
+            if (m_serviceActive)
             {
                 emit info(i18n("Starting service: \'%1\'", m_serviceName));
                 method = QStringLiteral("StartUnit");

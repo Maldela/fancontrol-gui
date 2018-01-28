@@ -124,21 +124,19 @@ ApplicationWindow {
         id: startAction
         text: i18n("Start")
         enabled: !!Fancontrol.base.systemdCom && !Fancontrol.base.systemdCom.serviceActive
-        onTriggered: {
-            Fancontrol.base.systemdCom.serviceActive = true;
-        }
         iconName: "media-playback-start"
         tooltip: i18n("Enable manual control")
+
+        onTriggered: Fancontrol.base.systemdCom.serviceActive = true
     }
     Action {
         id: stopAction
         text: i18n("Stop")
         enabled: !!Fancontrol.base.systemdCom && Fancontrol.base.systemdCom.serviceActive
-        onTriggered: {
-            Fancontrol.base.systemdCom.serviceActive = false;
-        }
         iconName: "media-playback-stop"
         tooltip: i18n("Disable manual control")
+
+        onTriggered: Fancontrol.base.systemdCom.serviceActive = false
     }
     SystemPalette {
         id: palette

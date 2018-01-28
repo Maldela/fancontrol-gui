@@ -78,11 +78,7 @@ Rectangle {
         font.pointSize: 14
         selectByMouse: true
 
-        onTextChanged: {
-            if (!!fan) {
-                fan.name = text;
-            }
-        }
+        onTextChanged: if (!!fan && fan.name != text) fan.name = text
 
         Connections {
             target: fan
