@@ -103,7 +103,8 @@ if(INSTALL_SHARED)
 
 
     #icon
-    install(FILES icon.svg RENAME "fancontrol_gui.svg" DESTINATION "${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps")
+    include(ECMInstallIcons)
+    ecm_install_icons(ICONS sc-apps-fancontrol.svg DESTINATION "${KDE_INSTALL_ICONDIR}")
 
 
     #translations
