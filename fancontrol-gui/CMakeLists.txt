@@ -19,6 +19,6 @@ add_executable(fancontrol_gui ${Fancontrol_GUI_SRCS})
 target_link_libraries(fancontrol_gui ${LIBRARIES})
 
 install(TARGETS fancontrol_gui ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES metadata.desktop RENAME "fancontrol_gui.desktop" DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES fancontrol_gui.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
 kpackage_install_package(package org.kde.fancontrol.gui genericqml)
