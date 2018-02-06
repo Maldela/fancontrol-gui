@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+    <id>org.fancontrol.gui.desktop</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-2.0</project_license>
+    <name>Fancontrol-GUI</name>
+    <summary>GUI frontend for the fancontrol script</summary>
+    <description>
+        <p>GUI frontend for the fancontrol script.</p>
+    </description>
+    <categories>
+        <category>System</category>
+    </categories>
+    <provides>
+        <binary>fancontrol_gui</binary>
+    </provides>
+</component>
