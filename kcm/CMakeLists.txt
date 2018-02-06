@@ -12,6 +12,6 @@ target_link_libraries(kcm_fancontrol ${LIBRARIES})
 install(TARGETS kcm_fancontrol DESTINATION "${KDE_INSTALL_QTPLUGINDIR}/kcms")
 install(FILES kcm_fancontrol.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 
-kpackage_install_package(package kcm_fancontrol kcms)
+kpackage_install_bundled_package(package kcm_fancontrol kcms)
 
 kcoreaddons_desktop_to_json(kcm_fancontrol "kcm_fancontrol.desktop" SERVICE_TYPES kcmodule.desktop)
