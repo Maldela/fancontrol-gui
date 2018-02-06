@@ -29,6 +29,8 @@
 
 #include "windowconfig.h"
 
+#include <QDebug>
+
 
 Q_DECLARE_LOGGING_CATEGORY(FANCONTROL)
 Q_LOGGING_CATEGORY(FANCONTROL, "fancontrol-gui")
@@ -40,7 +42,7 @@ int main(int argc, char *argv[])
 
     KLocalizedString::setApplicationDomain("kcm_fancontrol");
 
-    auto about = KAboutData(QStringLiteral("fancontrol_gui"),
+    auto about = KAboutData(QStringLiteral("org.kde.fancontrol.gui"),
                             i18n("Fancontrol-GUI"),
                             QStringLiteral("0.4"),
                             i18n("Graphical user interface for fancontrol"),
