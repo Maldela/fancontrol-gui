@@ -46,6 +46,7 @@ class SystemdCommunicator : public QObject
 public:
 
     explicit SystemdCommunicator(GUIBase *parent = Q_NULLPTR, const QString &serviceName = QString());
+    virtual ~SystemdCommunicator();
 
     QString serviceName() const { return m_serviceName; }
     void setServiceName(const QString &name);

@@ -75,6 +75,9 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
                                           this)),
     m_serviceInterface(Q_NULLPTR)
 {
+    if (!m_managerInterface)
+        emit error(i18n("Unable to init systemd dbus manager interface!"), true);
+
     if (parent)
     {
         connect(this, &SystemdCommunicator::error, parent, &GUIBase::handleError);
@@ -93,6 +96,12 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
 
     m_serviceEnabled = systemdServiceEnabled();
     emit serviceEnabledChanged();
+}
+
+SystemdCommunicator::~SystemdCommunicator()
+{
+    delete m_managerInterface;
+    delete m_serviceInterface;
 }
 
 void SystemdCommunicator::setServiceName(const QString &name)
@@ -132,6 +141,9 @@ void SystemdCommunicator::setServiceName(const QString &name)
                                                         QStringLiteral("org.freedesktop.systemd1.Unit"),
                                                         QDBusConnection::systemBus(),
                                                         this);
+                if (!m_serviceInterface)
+                    emit error(i18n("Unable to init systemd dbus service interface!"), true);
+
                 QDBusConnection::systemBus().connect(QStringLiteral("org.freedesktop.systemd1"),
                                                      m_serviceObjectPath,
                                                      QStringLiteral("org.freedesktop.DBus.Properties"),
