@@ -103,7 +103,7 @@ if(INSTALL_SHARED)
 
     #icon
     include(ECMInstallIcons)
-    ecm_install_icons(ICONS sc-apps-fancontrol_gui.svg DESTINATION "${KDE_INSTALL_ICONDIR}")
+    ecm_install_icons(ICONS sc-apps-org.kde.fancontrol.gui.svg DESTINATION "${KDE_INSTALL_ICONDIR}")
 
 
     #translations
