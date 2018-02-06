@@ -27,13 +27,13 @@
 #include <KI18n/KLocalizedString>
 
 
-K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
+K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "fancontrol-kcm.json", registerPlugin<FancontrolKCM>();)
 
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args)
 {
-    auto about = new KAboutData(QStringLiteral("kcm_fancontrol"),
+    auto about = new KAboutData(QStringLiteral("org.kde.fancontrol.kcm"),
                                 i18n("Fancontrol-KCM"),
                                 QStringLiteral("0.3"),
                                 i18n("KDE Fancontrol Module"),
