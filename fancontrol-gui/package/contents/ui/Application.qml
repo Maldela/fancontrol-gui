@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,13 +20,13 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 ApplicationWindow {
     id: window
+
     title: i18n("Fancontrol-GUI")
     width: 1024
     height: 768
@@ -34,7 +34,6 @@ ApplicationWindow {
     visible: true
 
     onClosing: {
-        Fancontrol.base.save();
         windowConfig.save(window);
     }
 
@@ -43,49 +42,28 @@ ApplicationWindow {
         windowConfig.restore(window);
     }
 
-    menuBar: MenuBar {
-        Menu {
-            title: i18n("File")
-
-            MenuItem { action: loadAction }
-            MenuItem { action: saveAction }
-            MenuItem {
-                text: i18n("Save configuration file as")
-                onTriggered: saveFileDialog.open()
-                shortcut: StandardKey.SaveAs
-            }
-            MenuItem {
-                text: i18n("Exit")
-                onTriggered: Qt.quit()
-                shortcut: StandardKey.Quit
-            }
-        }
-    }
-
     toolBar: ToolBar {
         RowLayout {
             anchors.fill: parent
 
-            ToolButton { action: loadAction }
-            ToolButton { action: saveAction }
+            ToolButton {
+                action: applyAction
+            }
+            ToolButton {
+                action: resetAction
+            }
             Loader {
-                active: Fancontrol.base.hasSystemdCommunicator()
+                active: !!Fancontrol.base.systemdCom
+
                 sourceComponent: ToolButton {
-                    iconName: Fancontrol.base.systemdCom.serviceActive ? "system-reboot" : "system-run"
-                    onClicked: {
-                        Fancontrol.base.loader.abortTestingFans();
-                        Fancontrol.base.systemdCom.serviceActive ? Fancontrol.base.systemdCom.restartService() : Fancontrol.base.systemdCom.serviceActive = true;
-                    }
-                    tooltip: Fancontrol.base.systemdCom.serviceActive ? i18n("Restart fancontrol") : i18n("Start fancontrol")
+                    action: startAction
                 }
             }
             Loader {
-                active: Fancontrol.base.hasSystemdCommunicator()
+                active: !!Fancontrol.base.systemdCom
+
                 sourceComponent: ToolButton {
-                    iconName: "system-shutdown"
-                    enabled: Fancontrol.base.systemdCom.serviceActive
-                    onClicked: Fancontrol.base.systemdCom.serviceActive = false;
-                    tooltip: i18n("Stop fancontrol")
+                    action: stopAction
                 }
             }
             Item {
@@ -126,43 +104,40 @@ ApplicationWindow {
     }
 
     Action {
-        id: loadAction
-        text: i18n("Load configuration file")
-        iconName: "document-open"
-        onTriggered: openFileDialog.open()
-        tooltip: i18n("Load configuration file")
-        shortcut: StandardKey.Open
+        id: applyAction
+        text: i18n("Apply")
+        enabled: Fancontrol.base.needsApply
+        onTriggered: Fancontrol.base.apply()
+        iconName: "dialog-ok-apply"
+        tooltip: i18n("Apply changes")
+        shortcut: StandardKey.Apply
     }
     Action {
-        id: saveAction
-        text: i18n("Save configuration file")
-        onTriggered: Fancontrol.base.save(true)
-        iconName: "document-save"
-        tooltip: i18n("Save configuration file") + " (" + Fancontrol.base.loader.configPath + ")"
-        shortcut: StandardKey.Save
+        id: resetAction
+        text: i18n("Reset")
+        enabled: Fancontrol.base.needsApply
+        onTriggered: Fancontrol.base.reset()
+        iconName: "edit-undo"
+        tooltip: i18n("Revert changes")
     }
+    Action {
+        id: startAction
+        text: i18n("Start")
+        enabled: !!Fancontrol.base.systemdCom && !Fancontrol.base.systemdCom.serviceActive
+        iconName: "media-playback-start"
+        tooltip: i18n("Enable manual control")
 
-    FileDialog {
-        id: openFileDialog
-        title: i18n("Please choose a configuration file")
-        folder: "file:///etc"
-        selectExisting: true
-        selectMultiple: false
-        modality: Qt.NonModal
-
-        onAccepted: Fancontrol.base.configUrl = fileUrl;
+        onTriggered: Fancontrol.base.systemdCom.serviceActive = true
     }
-    FileDialog {
-        id: saveFileDialog
-        title: i18n("Save configuration file as")
-        folder: "file:///etc"
-        selectExisting: false
-        selectMultiple: false
-        modality: Qt.NonModal
+    Action {
+        id: stopAction
+        text: i18n("Stop")
+        enabled: !!Fancontrol.base.systemdCom && Fancontrol.base.systemdCom.serviceActive
+        iconName: "media-playback-stop"
+        tooltip: i18n("Disable manual control")
 
-        onAccepted: Fancontrol.base.save(true, fileUrl);
+        onTriggered: Fancontrol.base.systemdCom.serviceActive = false
     }
-
     SystemPalette {
         id: palette
     }

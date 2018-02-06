@@ -1,6 +1,6 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ public:
     int value() const { return m_value; }
     QString name() const Q_DECL_OVERRIDE;
     void setName(const QString &name) Q_DECL_OVERRIDE;
-    void reset() Q_DECL_OVERRIDE;
+    void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
 
 

@@ -1,6 +1,6 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -27,13 +27,13 @@
 #include <KI18n/KLocalizedString>
 
 
-K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
+K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "fancontrol-kcm.json", registerPlugin<FancontrolKCM>();)
 
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     : ConfigModule(parent, args)
 {
-    auto about = new KAboutData(QStringLiteral("kcm_fancontrol"),
+    auto about = new KAboutData(QStringLiteral("org.kde.fancontrol.kcm"),
                                 i18n("Fancontrol-KCM"),
                                 QStringLiteral("0.3"),
                                 i18n("KDE Fancontrol Module"),
@@ -42,7 +42,7 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
                                 QString(),
                                 QStringLiteral("http://github.com/maldela/fancontrol-gui"),
                                 QStringLiteral("http://github.com/maldela/fancontrol-gui/issues"));
-    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("maldela@halloarsch.de"));
+    about->addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("malte.veerman@gmail.com"));
     setAboutData(about);
 
     setButtons(Apply | Default);
@@ -52,21 +52,21 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
 void FancontrolKCM::save()
 {
     emit aboutToSave();
-    
+
     setNeedsSave(false);
 }
 
 void FancontrolKCM::load()
 {
     emit aboutToLoad();
-    
+
     setNeedsSave(false);
 }
 
 void FancontrolKCM::defaults()
 {
     emit aboutToDefault();
-    
+
     setNeedsSave(true);
 }
 
