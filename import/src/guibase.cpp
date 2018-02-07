@@ -186,10 +186,13 @@ void GUIBase::apply()
 
     bool configChanged = m_loader->save();
     m_config->save();
+    m_configChanged = false;
 
 #ifndef NO_SYSTEMD
     m_com->apply(configChanged);
 #endif
+
+    emit needsApplyChanged();
 }
 
 void GUIBase::reset()

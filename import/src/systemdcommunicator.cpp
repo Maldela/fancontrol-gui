@@ -31,7 +31,6 @@
 #include <KAuth/KAuthExecuteJob>
 #include <KI18n/KLocalizedString>
 
-
 #ifndef STANDARD_SERVICE_NAME
 #define STANDARD_SERVICE_NAME "fancontrol"
 #endif
@@ -152,6 +151,7 @@ void SystemdCommunicator::setServiceName(const QString &name)
 
         emit serviceEnabledChanged();
         emit serviceActiveChanged();
+        emit needsApplyChanged();
     }
 }
 
@@ -250,7 +250,6 @@ bool SystemdCommunicator::restartService()
         return dbusAction(QStringLiteral("ReloadOrRestartUnit"), args);
     }
 
-    emit error(i18n("Service does not exist: \'%1\'", m_serviceName));
     return false;
 }
 
@@ -291,9 +290,8 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         }
     }
     else
-    {
         emit error(i18n("Dbus error: %1", job->errorString()));
-    }
+
     return success;
 }
 
