@@ -75,7 +75,7 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
                                           this)),
     m_serviceInterface(Q_NULLPTR)
 {
-    if (!m_managerInterface)
+    if (!m_managerInterface || !m_managerInterface->isValid())
         emit error(i18n("Unable to init systemd dbus manager interface!"), true);
 
     if (parent)
@@ -98,12 +98,6 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
     emit serviceEnabledChanged();
 }
 
-SystemdCommunicator::~SystemdCommunicator()
-{
-    delete m_managerInterface;
-    delete m_serviceInterface;
-}
-
 void SystemdCommunicator::setServiceName(const QString &name)
 {
     if (name != m_serviceName)
@@ -121,6 +115,8 @@ void SystemdCommunicator::setServiceName(const QString &name)
         }
 
         m_serviceName = name;
+        emit serviceNameChanged();
+        emit info(i18n("New service name: \'%1\'", m_serviceName));
 
         if (serviceExists())
         {
@@ -132,17 +128,16 @@ void SystemdCommunicator::setServiceName(const QString &name)
                 emit error(dbusreply.errorMessage());
                 m_serviceObjectPath.clear();
             }
-            else
+            else if (dbusreply.type() == QDBusMessage::ReplyMessage)
             {
                 m_serviceObjectPath = qdbus_cast<QDBusObjectPath>(dbusreply.arguments().at(0)).path();
-
                 m_serviceInterface = new QDBusInterface(QStringLiteral("org.freedesktop.systemd1"),
                                                         m_serviceObjectPath,
                                                         QStringLiteral("org.freedesktop.systemd1.Unit"),
                                                         QDBusConnection::systemBus(),
                                                         this);
-                if (!m_serviceInterface)
-                    emit error(i18n("Unable to init systemd dbus service interface!"), true);
+                if (!m_serviceInterface || !m_serviceInterface->isValid())
+                    emit error(i18n("Unable to init systemd dbus service interface: %1", m_serviceInterface->lastError().message()), true);
 
                 QDBusConnection::systemBus().connect(QStringLiteral("org.freedesktop.systemd1"),
                                                      m_serviceObjectPath,
@@ -151,36 +146,47 @@ void SystemdCommunicator::setServiceName(const QString &name)
                                                      this,
                                                      SLOT(updateServiceProperties(QString, QVariantMap, QStringList)));
             }
+            else
+                emit error(i18n("Dbus reply message is not of type \'QDBusMessage::ReplyMessage\'"));
         }
 
-        emit serviceNameChanged();
         emit serviceEnabledChanged();
         emit serviceActiveChanged();
-
-        emit info(i18n("New srevice name: \'%1\'", m_serviceName));
     }
 }
 
 bool SystemdCommunicator::serviceExists() const
 {
-    if (m_serviceInterface)
-    {
-        if (m_serviceInterface->isValid())
+    if (m_serviceInterface && m_serviceInterface->isValid())
             return true;
-    }
 
     QDBusMessage dbusreply;
 
     if (m_managerInterface && m_managerInterface->isValid())
         dbusreply = m_managerInterface->call(QDBus::AutoDetect, QStringLiteral("ListUnitFiles"));
+    else
+    {
+        emit error(i18n("Systemd dbus manager interface not initialized!"), true);
+        return false;
+    }
 
     if (dbusreply.type() == QDBusMessage::ErrorMessage)
     {
         emit error(dbusreply.errorMessage());
         return false;
     }
-    const auto list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
+    else if (dbusreply.type() == QDBusMessage::InvalidMessage)
+    {
+        emit error(i18n("Dbus returned invalid answer"));
+        return false;
+    }
+    else if (dbusreply.signature() != QStringLiteral("a(ss)"))
+    {
+        emit error(i18n("Dbus returned answer with wrong signature: \'%1\'", dbusreply.signature()));
+        return false;
+    }
 
+    const auto list = qdbus_cast<SystemdUnitFileList>(dbusreply.arguments().at(0));
     for (const auto &unitFile : list)
     {
         if (unitFile.path.contains(m_serviceName + ".service"))
