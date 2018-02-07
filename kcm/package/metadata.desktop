@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Fancontrol-GUI-QML-Package
+Name=Fancontrol-KCM
 Comment=Control PWM-fans
 Icon=org.kde.fancontrol.gui
 Encoding=UTF-8
