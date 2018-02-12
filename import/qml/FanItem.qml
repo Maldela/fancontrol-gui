@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -78,11 +78,7 @@ Rectangle {
         font.pointSize: 14
         selectByMouse: true
 
-        onTextChanged: {
-            if (!!fan) {
-                fan.name = text;
-            }
-        }
+        onTextChanged: if (!!fan && fan.name != text) fan.name = text
 
         Connections {
             target: fan

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+    <id>org.kde.fancontrol.gui</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-2.0</project_license>
+    <name>Fancontrol-GUI</name>
+    <summary>GUI frontend for the fancontrol script</summary>
+    <url type="homepage">https://github.com/Maldela/fancontrol-gui</url>
+    <description>
+        GUI frontend for the fancontrol script.
+    </description>
+    <categories>
+        <category>System</category>
+    </categories>
+    <developer_name>Malte Veerman</developer_name>
+    <provides>
+        <binary>fancontrol_gui</binary>
+    </provides>
+</component>

@@ -1,14 +1,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Malte Veerman <maldela@halloarsch.de>, 2015, 2016.
+# Malte Veerman <malte.veerman@gmail.com>, 2015, 2016.
 msgid ""
 msgstr ""
 "Project-Id-Version: fancontrol-gui\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
 "POT-Creation-Date: 2016-06-10 15:20+0200\n"
 "PO-Revision-Date: 2016-06-10 15:23+0100\n"
-"Last-Translator: Malte Veerman <maldela@halloarsch.de>\n"
+"Last-Translator: Malte Veerman <malte.veerman@gmail.com>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -360,7 +360,7 @@ msgstr "Malte Veerman"
 #: po/rc.cpp:2 rc.cpp:2
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
-msgstr "maldela@halloarsch.de"
+msgstr "malte.veerman@gmail.com"
 
 #, fuzzy
 #~ msgid "Can't open rpm file: %1"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -40,32 +40,18 @@ Item {
     implicitHeight: 768
 
     Connections {
-        target: loader
-        onConfigFileChanged: kcm.needsSave = true
-    }
-
-    Connections {
         target: Fancontrol.base
-        onMinTempChanged: kcm.needsSave = true
-        onMaxTempChanged: kcm.needsSave = true
-        onServiceNameChanged: kcm.needsSave = true
-        onConfigUrlChanged: kcm.needsSave = true
+        onNeedsApplyChanged: kcm.needsSave = Fancontrol.base.needsApply
     }
 
     Connections {
         target: kcm
         onAboutToSave: {
-            Fancontrol.base.save(true);
-            if (systemdCom.serviceActive && enabledBox.checked) {
-                systemdCom.restartService();
-            } else {
-                systemdCom.serviceActive = enabledBox.checked;
-            }
-            systemdCom.serviceEnabled = enabledBox.checked;
+            Fancontrol.base.apply();
         }
         onAboutToLoad: {
             Fancontrol.base.load();
-            enabledBox.checked = systemdCom.serviceEnabled && systemdCom.serviceActive;
+            enabledBox.checked = systemdCom.serviceActive;
         }
         onAboutToDefault: enabledBox.checked = false
     }
@@ -100,9 +86,15 @@ Item {
         visible: pwmFans.length > 0
         text: i18n("Control fans manually")
         checked: systemdCom.serviceEnabled && systemdCom.serviceActive;
-        onCheckedChanged: if (checked !== systemdCom.serviceActive || checked !== systemdCom.serviceEnabled) {
-            kcm.needsSave = true;
+        onCheckedChanged: {
+            systemdCom.serviceActive = enabledBox.checked;
             loader.restartServiceAfterTesting = checked;
+            autostartBox.checked = true;
+        }
+
+        Connections {
+            target: systemdCom
+            onServiceActiveChanged: if (systemdCom.serviceActive != enabledBox.checked) enabledBox.checked = systemdCom.serviceActive
         }
     }
 
@@ -114,6 +106,19 @@ Item {
         anchors.top: enabledBox.bottom
         anchors.bottomMargin: advancedButton.height / 4
         visible: enabledBox.checked
+
+        CheckBox {
+            id: autostartBox
+
+            text: i18n("Enable service at boot")
+            checked: systemdCom.serviceEnabled
+            onCheckedChanged: systemdCom.serviceEnabled = checked
+
+            Connections {
+                target: systemdCom
+                onServiceEnabledChanged: if (systemdCom.serviceEnabled != autostartBox.checked) autostartBox.checked = systemdCom.serviceEnabled
+            }
+        }
 
         RowLayout {
             visible: enabledBox.checked && pwmFans.length > 0
@@ -312,7 +317,7 @@ Item {
             Fancontrol.OptionInput {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                text: Fancontrol.base.configUrl.toString().replace("file://", "")
+                value: Fancontrol.base.configUrl.toString().replace("file://", "")
                 color: Fancontrol.base.configValid ? "green" : "red"
                 onTextChanged: Fancontrol.base.configUrl = text
             }

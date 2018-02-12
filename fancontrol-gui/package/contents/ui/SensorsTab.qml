@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,9 +25,11 @@ import Fancontrol.Qml 1.0 as Fancontrol
 
 
 RowLayout {
+    id: root
+
+    property int padding: 10
     property QtObject loader: Fancontrol.base.loader
 
-    id: root
     anchors.fill: parent
     anchors.margins: 10
 
@@ -36,7 +38,6 @@ RowLayout {
 
         Rectangle {
             property QtObject hwmon: loader.hwmons[index]
-            property int padding: 10
 
             Layout.preferredWidth: root.width / loader.hwmons.length - root.spacing
             Layout.maximumWidth: 500
@@ -45,6 +46,7 @@ RowLayout {
             border.width: 1
             border.color: "black"
             radius: 5
+            clip: true
 
             Column {
                 id: column
@@ -65,15 +67,15 @@ RowLayout {
 
                         Label {
                             anchors.left: parent.left
-                            anchors.leftMargin: padding
-                            Layout.maximumWidth: parent.width - rpmValue.width - padding*2
+                            anchors.leftMargin: root.padding
+                            Layout.maximumWidth: parent.width - rpmValue.width - root.padding*2
                             clip: true
                             text: "Fan " + (index+1) + ":"
                         }
                         Label {
                             id: rpmValue
                             anchors.right: parent.right
-                            anchors.rightMargin: padding
+                            anchors.rightMargin: root.padding
                             text: hwmon.fans[index].rpm + " " + i18n("rpm")
                         }
                     }
@@ -86,15 +88,15 @@ RowLayout {
 
                         Label {
                             anchors.left: parent.left
-                            anchors.leftMargin: padding
+                            anchors.leftMargin: root.padding
                             text: hwmon.temps[index].name + ": "
-                            Layout.maximumWidth: parent.width - tempValue.width - padding*2
+                            Layout.maximumWidth: parent.width - tempValue.width - root.padding*2
                             clip: true
                         }
                         Label {
                             id: tempValue
                             anchors.right: parent.right
-                            anchors.rightMargin: padding
+                            anchors.rightMargin: root.padding
                             text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + i18n(Fancontrol.base.unit)
                         }
                     }

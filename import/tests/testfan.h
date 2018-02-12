@@ -1,6 +1,6 @@
 /*
  * <one line to give the program's name and a brief idea of what it does.>
- * Copyright 2016  Malte Veerman <maldela@halloarsch.de>
+ * Copyright 2016  Malte Veerman <malte.veerman@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
