@@ -1,6 +1,6 @@
 /*
  * <one line to give the library's name and an idea of what it does.>
- * Copyright 2015  Malte Veerman maldela@halloarsch.de
+ * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -88,7 +88,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             }
             else
             {
-                emit error(i18n("Can't open pwm file: \"%1\"", pwmFile->fileName()));
+                emit error(i18n("Can't open pwm file: \'%1\'", pwmFile->fileName()));
                 delete pwmFile;
             }
 
@@ -106,7 +106,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             }
             else
             {
-                emit error(i18n("Can't open pwm_enable file: \"%1\"", pwmEnableFile->fileName()));
+                emit error(i18n("Can't open pwm_enable file: \'%1\'", pwmEnableFile->fileName()));
                 delete pwmEnableFile;
             }
         }
@@ -134,9 +134,9 @@ void PwmFan::update()
     setPwmEnable(m_enableStream->readAll().toInt(), false);
 }
 
-void PwmFan::reset()
+void PwmFan::toDefault()
 {
-    Fan::reset();
+    Fan::toDefault();
 
     setHasTemp(false);
     setTemp(Q_NULLPTR);
@@ -180,7 +180,7 @@ void PwmFan::reset()
         }
         else
         {
-            emit error(i18n("Can't open pwm file: \"%1\"", pwmFile->fileName()));
+            emit error(i18n("Can't open pwm file: \'%1\'", pwmFile->fileName()));
             delete pwmFile;
         }
 
@@ -198,7 +198,7 @@ void PwmFan::reset()
         }
         else
         {
-            emit error(i18n("Can't open pwm_enable file: \"%1\"", pwmEnableFile->fileName()));
+            emit error(i18n("Can't open pwm_enable file: \'%1\'", pwmEnableFile->fileName()));
             delete pwmEnableFile;
         }
     }
@@ -426,7 +426,7 @@ void PwmFan::continueTest()
                 emit testStatusChanged();
                 return;
             }
-            
+
             setPwm(qMax(0, (int)qMin(m_pwm * 0.95, m_pwm - 5.0)));
             m_zeroRpm = 0;
         }

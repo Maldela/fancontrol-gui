@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -52,7 +52,7 @@ Fan::Fan(uint index, Hwmon *parent) : Sensor(parent, index, parent ? parent->nam
         }
         else
         {
-            emit error(i18n("Can't open rpm file: \"%1\"", rpmFile->fileName()));
+            emit error(i18n("Can't open rpm file: \'%1\'", rpmFile->fileName()));
             delete rpmFile;
         }
     }
@@ -90,7 +90,7 @@ void Fan::setName(const QString &name)
     }
 }
 
-void Fan::reset()
+void Fan::toDefault()
 {
     if (m_rpmStream->device() && m_parent)
     {
@@ -109,7 +109,7 @@ void Fan::reset()
             }
             else
             {
-                emit error(i18n("Can't open rpm file: \"%1\"", rpmFile->fileName()));
+                emit error(i18n("Can't open rpm file: \'%1\'", rpmFile->fileName()));
                 delete rpmFile;
             }
         }

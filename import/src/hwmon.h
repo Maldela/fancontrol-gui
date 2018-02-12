@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  Malte Veerman <maldela@halloarsch.de>
+ * Copyright (C) 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -66,7 +66,7 @@ public:
     Temp * temp(int i) const;
     bool isValid() const { return m_valid; }
     bool testing() const;
-    void reset() const;
+    void toDefault() const;
 
 
 signals:
