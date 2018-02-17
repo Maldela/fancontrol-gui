@@ -52,7 +52,7 @@ void FancontrolQmlExtension::registerTypes(const char* uri)
     qmlRegisterType<SystemdCommunicator>();
 #endif
 
-    qmlRegisterSingletonType<GUIBase>(uri, 1, 0, "base", base);
+    qmlRegisterSingletonType<GUIBase>(uri, 1, 0, "Base", base);
 }
 
 QObject * FancontrolQmlExtension::base(QQmlEngine *engine, QJSEngine *jsengine)

@@ -25,7 +25,7 @@ import Fancontrol.Qml 1.0 as Fancontrol
 
 
 ColumnLayout {
-    property QtObject loader: Fancontrol.base.loader
+    property QtObject loader: Fancontrol.Base.loader
 
     anchors.fill: parent
     anchors.margins: 10

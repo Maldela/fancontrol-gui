@@ -31,10 +31,10 @@ Rectangle {
     property QtObject fan
     property QtObject systemdCom
     property QtObject tempModel
-    property real minTemp: Fancontrol.base.minTemp
-    property real maxTemp: Fancontrol.base.maxTemp
+    property real minTemp: Fancontrol.Base.minTemp
+    property real maxTemp: Fancontrol.Base.maxTemp
     property int margin: 5
-    property string unit: Fancontrol.base.unit
+    property string unit: Fancontrol.Base.unit
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 

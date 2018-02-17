@@ -28,7 +28,7 @@ RowLayout {
     id: root
 
     property int padding: 10
-    property QtObject loader: Fancontrol.base.loader
+    property QtObject loader: Fancontrol.Base.loader
 
     anchors.fill: parent
     anchors.margins: 10
@@ -97,7 +97,7 @@ RowLayout {
                             id: tempValue
                             anchors.right: parent.right
                             anchors.rightMargin: root.padding
-                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + i18n(Fancontrol.base.unit)
+                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + " " + i18n(Fancontrol.Base.unit)
                         }
                     }
                 }

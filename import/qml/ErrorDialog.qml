@@ -39,9 +39,9 @@ Dialog {
     }
     
     Connections {
-        target: Fancontrol.base
+        target: Fancontrol.Base
         onCriticalError: {
-            text.text = Fancontrol.base.error;
+            text.text = Fancontrol.Base.error;
             dialog.open();
         }
     }

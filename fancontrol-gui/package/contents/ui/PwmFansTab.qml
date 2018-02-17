@@ -25,10 +25,10 @@ import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
-    property QtObject loader: Fancontrol.base.loader
-    property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
-    property QtObject pwmFanModel: Fancontrol.base.pwmFanModel
-    property QtObject tempModel: Fancontrol.base.tempModel
+    property QtObject loader: Fancontrol.Base.loader
+    property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
+    property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
+    property QtObject tempModel: Fancontrol.Base.tempModel
     property var pwmFans: pwmFanModel.fans
 
     id: root

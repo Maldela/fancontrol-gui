@@ -37,7 +37,7 @@ Rectangle {
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
     property int size: 10
-    property string unit: Fancontrol.base.unit
+    property string unit: Fancontrol.Base.unit
 
     width: size
     height: size

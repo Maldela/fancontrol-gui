@@ -35,7 +35,7 @@ Rectangle {
     property int pwm: 0
     property alias drag: pwmMouse.drag
     property int size: 10
-    property string unit: Fancontrol.base.unit
+    property string unit: Fancontrol.Base.unit
     property var locale: Qt.locale()
 
     signal positionChanged()
