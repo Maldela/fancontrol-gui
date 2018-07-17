@@ -51,7 +51,6 @@ class PwmFan : public Fan
     Q_PROPERTY(bool testing READ testing NOTIFY testStatusChanged)
     Q_PROPERTY(TestStatus testStatus READ testStatus NOTIFY testStatusChanged)
     Q_PROPERTY(int pwmEnable READ pwmEnable WRITE setPwmEnable NOTIFY pwmEnableChanged)
-    Q_ENUMS(TestStatus)
 
 public:
 
@@ -65,6 +64,7 @@ public:
         Cancelled,
         Error
     };
+    Q_ENUM(TestStatus)
 
     explicit PwmFan(uint index, Hwmon *parent = Q_NULLPTR);
     virtual ~PwmFan();
