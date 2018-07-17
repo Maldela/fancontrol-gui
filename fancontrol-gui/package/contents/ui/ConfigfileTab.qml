@@ -31,7 +31,7 @@ ColumnLayout {
     anchors.margins: 10
 
     Label {
-        anchors.top: parent.top
+        Layout.alignment: Qt.AlignTop
         text: !!loader && loader.configEqualToLoadedFile ? loader.configPath : i18n("New config")
     }
 

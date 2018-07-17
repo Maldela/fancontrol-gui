@@ -456,7 +456,7 @@ Rectangle {
 
                 text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
                 iconName: "dialog-password"
-                anchors.right: parent.right
+                Layout.alignment: Qt.AlignRight
                 onClicked: {
                     if (fan.testing) {
                         fan.abortTest();

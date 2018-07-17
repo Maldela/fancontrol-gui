@@ -66,15 +66,15 @@ RowLayout {
                         width: parent.width
 
                         Label {
-                            anchors.left: parent.left
                             anchors.leftMargin: root.padding
                             Layout.maximumWidth: parent.width - rpmValue.width - root.padding*2
+                            Layout.alignment: Qt.AlignLeft
                             clip: true
                             text: "Fan " + (index+1) + ":"
                         }
                         Label {
                             id: rpmValue
-                            anchors.right: parent.right
+                            Layout.alignment: Qt.AlignRight
                             anchors.rightMargin: root.padding
                             text: hwmon.fans[index].rpm + " " + i18n("rpm")
                         }
@@ -87,15 +87,15 @@ RowLayout {
                         width: parent.width
 
                         Label {
-                            anchors.left: parent.left
                             anchors.leftMargin: root.padding
                             text: hwmon.temps[index].name + ": "
                             Layout.maximumWidth: parent.width - tempValue.width - root.padding*2
+                            Layout.alignment: Qt.AlignLeft
                             clip: true
                         }
                         Label {
                             id: tempValue
-                            anchors.right: parent.right
+                            Layout.alignment: Qt.AlignRight
                             anchors.rightMargin: root.padding
                             text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + " " + i18n(Fancontrol.Base.unit)
                         }
