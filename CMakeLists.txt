@@ -49,7 +49,10 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 include(FeatureSummary)
-include(ECMGenerateQmlTypes)
+
+if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
+    include(ECMGenerateQmlTypes)
+endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
 
 include_directories (${CMAKE_SOURCE_DIR})
 
