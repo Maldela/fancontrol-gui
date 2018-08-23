@@ -12,10 +12,10 @@ target_link_libraries(kcm_fancontrol ${LIBRARIES})
 install(TARGETS kcm_fancontrol DESTINATION "${KDE_INSTALL_QTPLUGINDIR}/kcms")
 install(PROGRAMS fancontrol-kcm.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 
-if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42)
+if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42.0)
     kpackage_install_bundled_package(package org.kde.fancontrol.kcm kcms)
-else(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42)
+else(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42.0)
     kpackage_install_package(package org.kde.fancontrol.kcm kcms)
-endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42)
+endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.42.0)
 
 kcoreaddons_desktop_to_json(kcm_fancontrol "fancontrol-kcm.desktop" SERVICE_TYPES kcmodule.desktop)
