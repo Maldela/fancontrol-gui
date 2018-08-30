@@ -41,7 +41,7 @@ Fan::Fan(uint index, Hwmon *parent) : Sensor(parent, index, parent ? parent->nam
     m_rpmStream(new QTextStream),
     m_rpm(0)
 {
-    if (m_parent && QDir(parent->path()).isReadable())
+    if (m_parent && parent && QDir(parent->path()).isReadable())
     {
         const auto rpmFile = new QFile(parent->path() + "/fan" + QString::number(index) + "_input", this);
 

@@ -139,7 +139,7 @@ void LoaderTest::parseFctempTest()
         QCOMPARE(spy.at(0).at(0).toString(), error);
         QCOMPARE(spy.at(0).at(1).toBool(), critical);
     }
-    else
+    else if (fan)
         QCOMPARE(fan->hasTemp(), true);
 }
 
