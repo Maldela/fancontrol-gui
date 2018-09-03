@@ -46,9 +46,15 @@ Rectangle {
     radius: Kirigami.Units.smallSpacing
     clip: false
 
-    onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
-    onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
-    onUnitChanged: if (!!fan) meshCanvas.requestPaint()
+    onConvertedMinTempChanged: {
+        meshCanvas.requestPaint();
+        bgCanvas.requestPaint();
+    }
+    onConvertedMaxTempChanged: {
+        meshCanvas.requestPaint();
+        bgCanvas.requestPaint();
+    }
+    onFanChanged: bgCanvas.requestPaint()
 
     SystemPalette {
         id: palette
@@ -203,6 +209,11 @@ Rectangle {
                 onPaint: {
                     var c = bgCanvas.getContext("2d");
                     c.clearRect(0, 0, width, height);
+
+                    if (!root.fan) {
+                        return;
+                    }
+
                     var gradient = c.createLinearGradient(0, 0, width, 0);
                     gradient.addColorStop(0, "rgb(0, 0, 255)");
                     gradient.addColorStop(1, "rgb(255, 0, 0)");
