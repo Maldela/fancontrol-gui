@@ -132,7 +132,7 @@ Rectangle {
 
                 Label {
                     x: verticalScala.width - implicitWidth - graph.fontSize / 3
-                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize / 2
+                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
                     horizontalAlignment: Text.AlignRight
                     color: graph.pal.text
                     text: i18n("%1\%", index * (100 / (graph.verticalScalaCount - 1)))
