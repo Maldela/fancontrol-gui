@@ -48,13 +48,13 @@ Rectangle {
 
     onConvertedMinTempChanged: {
         meshCanvas.requestPaint();
-        bgCanvas.requestPaint();
+        curveCanvas.requestPaint();
     }
     onConvertedMaxTempChanged: {
         meshCanvas.requestPaint();
-        bgCanvas.requestPaint();
+        curveCanvas.requestPaint();
     }
-    onFanChanged: bgCanvas.requestPaint()
+    onFanChanged: curveCanvas.requestPaint()
 
     SystemPalette {
         id: palette
@@ -198,7 +198,7 @@ Rectangle {
             }
 
             Canvas {
-                id: bgCanvas
+                id: curveCanvas
 
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -207,7 +207,7 @@ Rectangle {
                 property alias pal: background.pal
 
                 onPaint: {
-                    var c = bgCanvas.getContext("2d");
+                    var c = curveCanvas.getContext("2d");
                     c.clearRect(0, 0, width, height);
 
                     if (!fan || !fan.hasTemp) {
@@ -317,7 +317,7 @@ Rectangle {
                     var left = fanOffCheckBox.checked ? x : 0;
                     var width = maxPoint.x - left;
                     var height = y - maxPoint.y;
-                    bgCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
+                    curveCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
                 }
             }
             PwmPoint {
@@ -340,7 +340,7 @@ Rectangle {
                 onPositionChanged: {
                     var width = x - stopPoint.x;
                     var height = stopPoint.y - y;
-                    bgCanvas.markDirty(Qt.rect(stopPoint.x, y, width, height));
+                    curveCanvas.markDirty(Qt.rect(stopPoint.x, y, width, height));
                 }
             }
         }
@@ -374,7 +374,7 @@ Rectangle {
                         if (checked && !!tempModel.temps[tempBox.currentIndex]) {
                             fan.temp = tempModel.temps[tempBox.currentIndex];
                         }
-                        bgCanvas.requestPaint();
+                        curveCanvas.requestPaint();
                     }
                 }
 
@@ -419,7 +419,7 @@ Rectangle {
             onCheckedChanged: {
                 if (!!fan) {
                     fan.minPwm = checked ? 0 : fan.minStop;
-                    bgCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
+                    curveCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
                 }
             }
 
