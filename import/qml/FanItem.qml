@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
 import "units.js" as Units
@@ -33,7 +34,7 @@ Rectangle {
     property QtObject tempModel
     property real minTemp: Fancontrol.Base.minTemp
     property real maxTemp: Fancontrol.Base.maxTemp
-    property int margin: 5
+    property int margin: Kirigami.Units.smallSpacing
     property string unit: Fancontrol.Base.unit
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
@@ -42,7 +43,7 @@ Rectangle {
     color: "transparent"
     border.color: palette.windowText
     border.width: 2
-    radius: 10
+    radius: Kirigami.Units.smallSpacing
     clip: false
 
     onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
@@ -69,7 +70,7 @@ Rectangle {
             top: parent.top
             topMargin: margin
         }
-        visible: root.height >= height + margin*2
+        visible: root.height >= height + margin * 2
         text: !!fan ? fan.name : ""
         color: palette.text
         horizontalAlignment: TextEdit.AlignLeft

@@ -20,6 +20,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.4
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
 
@@ -34,7 +35,7 @@ Rectangle {
     property int temp: 0
     property int pwm: 0
     property alias drag: pwmMouse.drag
-    property int size: 10
+    property int size: Kirigami.Units.smallSpacing * 2
     property string unit: Fancontrol.Base.unit
     property var locale: Qt.locale()
 

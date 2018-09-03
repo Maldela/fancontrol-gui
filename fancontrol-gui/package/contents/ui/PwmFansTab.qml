@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
@@ -33,7 +34,7 @@ Item {
 
     id: root
     anchors.fill: parent
-    anchors.margins: 10
+    anchors.margins: Kirigami.Units.smallSpacing
 
     RowLayout {
         id: fanRow
@@ -78,7 +79,7 @@ Item {
     ColumnLayout {
         id: noFansInfo
         anchors.centerIn: parent
-        spacing: 20
+        spacing: Kirigami.Units.smallSpacing * 2
         visible: pwmFans.length === 0
 
         Label {

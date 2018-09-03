@@ -22,25 +22,26 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
     property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
     property QtObject loader: Fancontrol.Base.loader
-    property int padding: 10
+    property int padding: Kirigami.Units.smallSpacing
     property real textWidth: 0
     property var locale: Qt.locale()
 
     id: root
     anchors.fill: parent
-    anchors.margins: 10
+    anchors.margins: Kirigami.Units.smallSpacing
 
     Column {
         id: column
         anchors.fill: parent
         anchors.margins: padding
-        spacing: 5
+        spacing: Kirigami.Units.smallSpacing
 
         RowLayout {
             width: parent.width

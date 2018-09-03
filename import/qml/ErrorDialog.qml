@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls 1.2
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
@@ -28,7 +29,7 @@ Dialog {
     id: dialog
 
     title: i18n("Error")
-    width: text.implicitWidth + 20
+    width: text.implicitWidth + Kirigami.Units.smallSpacing * 2
     standardButtons: StandardButton.Close
     onRejected: close()
 
@@ -37,7 +38,7 @@ Dialog {
         anchors.centerIn: parent
         text: ""
     }
-    
+
     Connections {
         target: Fancontrol.Base
         onCriticalError: {

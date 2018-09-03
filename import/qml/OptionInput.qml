@@ -20,6 +20,7 @@
 
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
+import org.kde.kirigami 2.4 as Kirigami
 
 
 FocusScope {
@@ -28,13 +29,13 @@ FocusScope {
     property alias inputMethodHints: textField.inputMethodHints
     property alias validator: textField.validator
     property alias color: textField.color
-    property real margin: 6
+    property real margin: Kirigami.Units.smallSpacing
     property var value
     property var locale: Qt.locale()
 
     id: root
-    implicitHeight: textField.implicitHeight + margin*2
-    implicitWidth: textField.implicitWidth + margin*2
+    implicitHeight: textField.implicitHeight + margin * 2
+    implicitWidth: textField.implicitWidth + margin * 2
 
     onValueChanged: {
         if (textField.text != value) {
