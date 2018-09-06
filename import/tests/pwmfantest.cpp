@@ -97,19 +97,17 @@ void PwmFanTest::pwmTest()
 
 void PwmFanTest::enableTest_data()
 {
-    QTest::addColumn<int>("value");
+    QTest::addColumn<TestPwmFan::PwmEnable>("value");
     QTest::addColumn<QString>("error");
 
-    QTest::newRow("0")   <<  0  << "";
-    QTest::newRow("1")   <<  1  << "";
-    QTest::newRow("2")   <<  2  << "";
-    QTest::newRow("3")   <<  3  << "PwmEnable cannot exceed 0-2!";
-    QTest::newRow("-1")  << -1  << "PwmEnable cannot exceed 0-2!";
+    QTest::newRow("0") << TestPwmFan::FullSpeed << "";
+    QTest::newRow("1") << TestPwmFan::ManualControl << "";
+    QTest::newRow("2") << TestPwmFan::BiosControl << "";
 }
 
 void PwmFanTest::enableTest()
 {
-    QFETCH(int, value);
+    QFETCH(TestPwmFan::PwmEnable, value);
     QFETCH(QString, error);
 
     QSignalSpy spy(m_fan, SIGNAL(error(QString,bool)));
