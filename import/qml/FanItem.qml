@@ -454,6 +454,15 @@ Rectangle {
                         fan.minStart = Math.round(value * 2.55)
                     }
                 }
+
+                Connections {
+                    target: root
+                    onFanChanged: if (!!fan) minStartInput.value = fan.minStart / 2.55
+                }
+                Connections {
+                    target: fan
+                    onMinPwmChanged: minStartInput.value = fan.minStart / 2.55
+                }
             }
         }
 
