@@ -184,7 +184,7 @@ void GUIBase::apply()
 {
     qInfo() << i18n("Applying changes");
 
-    bool configChanged = m_loader->save();
+    bool configChanged = m_loader->save(configUrl());
     m_config->save();
     m_configChanged = false;
 

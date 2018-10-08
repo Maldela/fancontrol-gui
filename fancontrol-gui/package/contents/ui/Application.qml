@@ -38,7 +38,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        Fancontrol.base.load();
+        Fancontrol.Base.load();
         windowConfig.restore(window);
     }
 
@@ -53,14 +53,14 @@ ApplicationWindow {
                 action: resetAction
             }
             Loader {
-                active: !!Fancontrol.base.systemdCom
+                active: !!Fancontrol.Base.systemdCom
 
                 sourceComponent: ToolButton {
                     action: startAction
                 }
             }
             Loader {
-                active: !!Fancontrol.base.systemdCom
+                active: !!Fancontrol.Base.systemdCom
 
                 sourceComponent: ToolButton {
                     action: stopAction
@@ -106,8 +106,8 @@ ApplicationWindow {
     Action {
         id: applyAction
         text: i18n("Apply")
-        enabled: Fancontrol.base.needsApply
-        onTriggered: Fancontrol.base.apply()
+        enabled: Fancontrol.Base.needsApply
+        onTriggered: Fancontrol.Base.apply()
         iconName: "dialog-ok-apply"
         tooltip: i18n("Apply changes")
         shortcut: StandardKey.Apply
@@ -115,28 +115,28 @@ ApplicationWindow {
     Action {
         id: resetAction
         text: i18n("Reset")
-        enabled: Fancontrol.base.needsApply
-        onTriggered: Fancontrol.base.reset()
+        enabled: Fancontrol.Base.needsApply
+        onTriggered: Fancontrol.Base.reset()
         iconName: "edit-undo"
         tooltip: i18n("Revert changes")
     }
     Action {
         id: startAction
         text: i18n("Start")
-        enabled: !!Fancontrol.base.systemdCom && !Fancontrol.base.systemdCom.serviceActive
+        enabled: !!Fancontrol.Base.systemdCom && !Fancontrol.Base.systemdCom.serviceActive
         iconName: "media-playback-start"
         tooltip: i18n("Enable manual control")
 
-        onTriggered: Fancontrol.base.systemdCom.serviceActive = true
+        onTriggered: Fancontrol.Base.systemdCom.serviceActive = true
     }
     Action {
         id: stopAction
         text: i18n("Stop")
-        enabled: !!Fancontrol.base.systemdCom && Fancontrol.base.systemdCom.serviceActive
+        enabled: !!Fancontrol.Base.systemdCom && Fancontrol.Base.systemdCom.serviceActive
         iconName: "media-playback-stop"
         tooltip: i18n("Disable manual control")
 
-        onTriggered: Fancontrol.base.systemdCom.serviceActive = false
+        onTriggered: Fancontrol.Base.systemdCom.serviceActive = false
     }
     SystemPalette {
         id: palette

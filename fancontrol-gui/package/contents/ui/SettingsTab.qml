@@ -22,25 +22,26 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
-    property QtObject systemdCom: Fancontrol.base.hasSystemdCommunicator() ? Fancontrol.base.systemdCom : null
-    property QtObject loader: Fancontrol.base.loader
-    property int padding: 10
+    property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
+    property QtObject loader: Fancontrol.Base.loader
+    property int padding: Kirigami.Units.smallSpacing
     property real textWidth: 0
     property var locale: Qt.locale()
 
     id: root
     anchors.fill: parent
-    anchors.margins: 10
+    anchors.margins: Kirigami.Units.smallSpacing
 
     Column {
         id: column
         anchors.fill: parent
         anchors.margins: padding
-        spacing: 5
+        spacing: Kirigami.Units.smallSpacing
 
         RowLayout {
             width: parent.width
@@ -85,17 +86,17 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.base.unit)
-                value: Fancontrol.Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit
+                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+                value: Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
+                suffix: Fancontrol.Base.unit
                 onValueChanged: {
-                    Fancontrol.base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
+                    Fancontrol.Base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
                     if (value > maxTempBox.value) maxTempBox.value = value;
                 }
 
                 Connections {
-                    target: Fancontrol.base
-                    onMinTempChanged: if (Fancontrol.base.minTemp != minTempBox.value) minTempBox.value = Fancontrol.base.minTemp
+                    target: Fancontrol.Base
+                    onMinTempChanged: if (Fancontrol.Base.minTemp != minTempBox.value) minTempBox.value = Fancontrol.Base.minTemp
                 }
             }
         }
@@ -116,17 +117,17 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.base.unit)
-                value: Fancontrol.Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit
+                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+                value: Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
+                suffix: Fancontrol.Base.unit
                 onValueChanged: {
-                    Fancontrol.base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.base.unit);
+                    Fancontrol.Base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
                     if (value < minTempBox.value) minTempBox.value = value;
                 }
 
                 Connections {
-                    target: Fancontrol.base
-                    onMaxTempChanged: if (Fancontrol.base.maxTemp != maxTempBox.value) maxTempBox.value = Fancontrol.base.maxTemp
+                    target: Fancontrol.Base
+                    onMaxTempChanged: if (Fancontrol.Base.maxTemp != maxTempBox.value) maxTempBox.value = Fancontrol.Base.maxTemp
                 }
             }
         }
@@ -144,8 +145,8 @@ Item {
                 id: fileInput
 
                 Layout.fillWidth: true
-                value: Fancontrol.base.configUrl.toString().replace("file://", "")
-                onTextChanged: Fancontrol.base.configUrl = text;
+                value: Fancontrol.Base.configUrl.toString().replace("file://", "")
+                onTextChanged: Fancontrol.Base.configUrl = text;
             }
             Button {
                 iconName: "document-open"
@@ -171,8 +172,8 @@ Item {
                     Layout.minimumWidth: implicitWidth
                     Layout.fillWidth: true
                     color: !!systemdCom && systemdCom.serviceExists ? "green" : "red"
-                    value: Fancontrol.base.serviceName
-                    onTextChanged: Fancontrol.base.serviceName = text
+                    value: Fancontrol.Base.serviceName
+                    onTextChanged: Fancontrol.Base.serviceName = text
                 }
             }
         }

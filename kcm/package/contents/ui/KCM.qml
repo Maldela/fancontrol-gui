@@ -22,15 +22,16 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
+import org.kde.kirigami 2.4 as Kirigami
 import org.kde.kcm 1.0
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Item {
-    property QtObject loader: Fancontrol.base.loader
-    property QtObject systemdCom: Fancontrol.base.systemdCom
-    property QtObject pwmFanModel: Fancontrol.base.pwmFanModel
-    property QtObject tempModel: Fancontrol.base.tempModel
+    property QtObject loader: Fancontrol.Base.loader
+    property QtObject systemdCom: Fancontrol.Base.systemdCom
+    property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
+    property QtObject tempModel: Fancontrol.Base.tempModel
     property var locale: Qt.locale()
     property real textWidth: 0
     property var pwmFans: pwmFanModel.fans
@@ -40,17 +41,17 @@ Item {
     implicitHeight: 768
 
     Connections {
-        target: Fancontrol.base
-        onNeedsApplyChanged: kcm.needsSave = Fancontrol.base.needsApply
+        target: Fancontrol.Base
+        onNeedsApplyChanged: kcm.needsSave = Fancontrol.Base.needsApply
     }
 
     Connections {
         target: kcm
         onAboutToSave: {
-            Fancontrol.base.apply();
+            Fancontrol.Base.apply();
         }
         onAboutToLoad: {
-            Fancontrol.base.load();
+            Fancontrol.Base.load();
             enabledBox.checked = systemdCom.serviceActive;
         }
         onAboutToDefault: enabledBox.checked = false
@@ -61,7 +62,7 @@ Item {
 
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 20
+        spacing: Kirigami.Units.smallSpacing * 2
         visible: pwmFans.length === 0
 
         Label {
@@ -148,12 +149,12 @@ Item {
             Layout.fillHeight: true
             active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
             sourceComponent: Fancontrol.FanItem {
-                unit: Fancontrol.base.unit
+                unit: Fancontrol.Base.unit
                 fan: pwmFans[fanComboBox.currentIndex]
                 systemdCom: root.systemdCom
                 tempModel: root.tempModel
-                minTemp: Fancontrol.base.minTemp
-                maxTemp: Fancontrol.base.maxTemp
+                minTemp: Fancontrol.Base.minTemp
+                maxTemp: Fancontrol.Base.maxTemp
             }
         }
     }
@@ -258,10 +259,10 @@ Item {
                 Layout.fillWidth: true
                 decimals: 2
                 maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, Fancontrol.base.unit)
-                value: Units.fromCelsius(Fancontrol.base.minTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit
-                onValueChanged: Fancontrol.base.minTemp = Units.toCelsius(value, Fancontrol.base.unit)
+                minimumValue: Units.fromKelvin(0, Fancontrol.Base.unit)
+                value: Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
+                suffix: Fancontrol.Base.unit
+                onValueChanged: Fancontrol.Base.minTemp = Units.toCelsius(value, Fancontrol.Base.unit)
             }
         }
         RowLayout {
@@ -281,9 +282,9 @@ Item {
                 decimals: 2
                 maximumValue: Number.POSITIVE_INFINITY
                 minimumValue: minTempBox.value
-                value: Units.fromCelsius(Fancontrol.base.maxTemp, Fancontrol.base.unit)
-                suffix: Fancontrol.base.unit
-                onValueChanged: Fancontrol.base.maxTemp = Units.toCelsius(value, Fancontrol.base.unit)
+                value: Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
+                suffix: Fancontrol.Base.unit
+                onValueChanged: Fancontrol.Base.maxTemp = Units.toCelsius(value, Fancontrol.Base.unit)
             }
         }
         RowLayout {
@@ -300,8 +301,8 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 color: systemdCom.serviceExists ? "green" : "red"
-                value: Fancontrol.base.serviceName
-                onTextChanged: Fancontrol.base.serviceName = text
+                value: Fancontrol.Base.serviceName
+                onTextChanged: Fancontrol.Base.serviceName = text
             }
         }
         RowLayout {
@@ -317,9 +318,9 @@ Item {
             Fancontrol.OptionInput {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                value: Fancontrol.base.configUrl.toString().replace("file://", "")
-                color: Fancontrol.base.configValid ? "green" : "red"
-                onTextChanged: Fancontrol.base.configUrl = text
+                value: Fancontrol.Base.configUrl.toString().replace("file://", "")
+                color: Fancontrol.Base.configValid ? "green" : "red"
+                onTextChanged: Fancontrol.Base.configUrl = text
             }
             Button {
                 action: loadAction
@@ -342,7 +343,7 @@ Item {
         selectExisting: true
         selectMultiple: false
 
-        onAccepted: Fancontrol.base.configUrl = fileUrl;
+        onAccepted: Fancontrol.Base.configUrl = fileUrl;
     }
 
     Fancontrol.ErrorDialog {

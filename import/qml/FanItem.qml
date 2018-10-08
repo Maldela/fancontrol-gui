@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
 import "units.js" as Units
@@ -31,10 +32,10 @@ Rectangle {
     property QtObject fan
     property QtObject systemdCom
     property QtObject tempModel
-    property real minTemp: Fancontrol.base.minTemp
-    property real maxTemp: Fancontrol.base.maxTemp
-    property int margin: 5
-    property string unit: Fancontrol.base.unit
+    property real minTemp: Fancontrol.Base.minTemp
+    property real maxTemp: Fancontrol.Base.maxTemp
+    property int margin: Kirigami.Units.smallSpacing
+    property string unit: Fancontrol.Base.unit
     property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
@@ -42,12 +43,18 @@ Rectangle {
     color: "transparent"
     border.color: palette.windowText
     border.width: 2
-    radius: 10
+    radius: Kirigami.Units.smallSpacing
     clip: false
 
-    onMinTempChanged: if (!!fan) meshCanvas.requestPaint()
-    onMaxTempChanged: if (!!fan) meshCanvas.requestPaint()
-    onUnitChanged: if (!!fan) meshCanvas.requestPaint()
+    onConvertedMinTempChanged: {
+        meshCanvas.requestPaint();
+        curveCanvas.requestPaint();
+    }
+    onConvertedMaxTempChanged: {
+        meshCanvas.requestPaint();
+        curveCanvas.requestPaint();
+    }
+    onFanChanged: curveCanvas.requestPaint()
 
     SystemPalette {
         id: palette
@@ -69,7 +76,7 @@ Rectangle {
             top: parent.top
             topMargin: margin
         }
-        visible: root.height >= height + margin*2
+        visible: root.height >= height + margin * 2
         text: !!fan ? fan.name : ""
         color: palette.text
         horizontalAlignment: TextEdit.AlignLeft
@@ -125,7 +132,7 @@ Rectangle {
 
                 Label {
                     x: verticalScala.width - implicitWidth - graph.fontSize / 3
-                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize / 2
+                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
                     horizontalAlignment: Text.AlignRight
                     color: graph.pal.text
                     text: i18n("%1\%", index * (100 / (graph.verticalScalaCount - 1)))
@@ -191,7 +198,7 @@ Rectangle {
             }
 
             Canvas {
-                id: bgCanvas
+                id: curveCanvas
 
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -200,8 +207,13 @@ Rectangle {
                 property alias pal: background.pal
 
                 onPaint: {
-                    var c = bgCanvas.getContext("2d");
+                    var c = curveCanvas.getContext("2d");
                     c.clearRect(0, 0, width, height);
+
+                    if (!fan || !fan.hasTemp) {
+                        return;
+                    }
+
                     var gradient = c.createLinearGradient(0, 0, width, 0);
                     gradient.addColorStop(0, "rgb(0, 0, 255)");
                     gradient.addColorStop(1, "rgb(255, 0, 0)");
@@ -210,7 +222,7 @@ Rectangle {
                     c.strokeStyle = gradient;
                     c.lineJoin = "round";
                     c.beginPath();
-                    if (fanOffCheckBox.checked) {
+                    if (fan.minPwm == 0) {
                         c.moveTo(stopPoint.centerX, height);
                     } else {
                         c.moveTo(0, stopPoint.centerY);
@@ -221,7 +233,7 @@ Rectangle {
                     c.lineTo(width, maxPoint.centerY);
                     c.stroke();
                     c.lineTo(width, height);
-                    if (fanOffCheckBox.checked) {
+                    if (fan.minPwm == 0) {
                         c.lineTo(stopPoint.centerX, height);
                     } else {
                         c.lineTo(0, height);
@@ -287,7 +299,7 @@ Rectangle {
                 id: stopPoint
                 color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
-                enabled: !!fan ? fan.hasTemp : false
+                visible: !!fan ? fan.hasTemp : false
                 drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
                 drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
                 x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.minTemp, root.maxTemp)) - width/2 : -width/2
@@ -305,14 +317,14 @@ Rectangle {
                     var left = fanOffCheckBox.checked ? x : 0;
                     var width = maxPoint.x - left;
                     var height = y - maxPoint.y;
-                    bgCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
+                    curveCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
                 }
             }
             PwmPoint {
                 id: maxPoint
                 color: !!fan ? fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
-                enabled: !!fan ? fan.hasTemp : false
+                visible: !!fan ? fan.hasTemp : false
                 drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
                 drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
                 x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.maxTemp, root.maxTemp)) - width/2 : background.width - width/2
@@ -328,7 +340,7 @@ Rectangle {
                 onPositionChanged: {
                     var width = x - stopPoint.x;
                     var height = stopPoint.y - y;
-                    bgCanvas.markDirty(Qt.rect(stopPoint.x, y, width, height));
+                    curveCanvas.markDirty(Qt.rect(stopPoint.x, y, width, height));
                 }
             }
         }
@@ -362,7 +374,7 @@ Rectangle {
                         if (checked && !!tempModel.temps[tempBox.currentIndex]) {
                             fan.temp = tempModel.temps[tempBox.currentIndex];
                         }
-                        bgCanvas.requestPaint();
+                        curveCanvas.requestPaint();
                     }
                 }
 
@@ -407,7 +419,7 @@ Rectangle {
             onCheckedChanged: {
                 if (!!fan) {
                     fan.minPwm = checked ? 0 : fan.minStop;
-                    bgCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
+                    curveCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
                 }
             }
 
@@ -442,6 +454,15 @@ Rectangle {
                         fan.minStart = Math.round(value * 2.55)
                     }
                 }
+
+                Connections {
+                    target: root
+                    onFanChanged: if (!!fan) minStartInput.value = Math.round(fan.minStart / 2.55)
+                }
+                Connections {
+                    target: fan
+                    onMinStartChanged: minStartInput.value = Math.round(fan.minStart / 2.55)
+                }
             }
         }
 
@@ -456,7 +477,7 @@ Rectangle {
 
                 text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
                 iconName: "dialog-password"
-                anchors.right: parent.right
+                Layout.alignment: Qt.AlignRight
                 onClicked: {
                     if (fan.testing) {
                         fan.abortTest();
