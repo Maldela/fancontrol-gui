@@ -482,6 +482,21 @@ bool Loader::load(const QUrl &url)
     return parseConfig(m_configFileContent);
 }
 
+void Loader::load(const QString& config)
+{
+    if (m_config == config)
+        return;
+
+    if (config.isEmpty())
+    {
+        emit error(i18n("Cannot load empty config."));
+        return;
+    }
+
+    m_config = config;
+    parseConfig(config);
+}
+
 bool Loader::save(const QUrl &url)
 {
     QString fileName;

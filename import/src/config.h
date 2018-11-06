@@ -51,6 +51,8 @@ private:
     double m_maxTemp;
     QString m_serviceName;
     QString m_configUrl;
+    QStringList m_profiles;
+    QStringList m_profileNames;
 };
 
 }

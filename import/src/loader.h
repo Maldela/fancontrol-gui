@@ -64,6 +64,8 @@ public:
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
     Q_INVOKABLE void detectSensors();
+
+    void load(const QString &config);
     QUrl configUrl() const { return m_configUrl; }
     QString configPath() const { return m_configUrl.path(); }
     QString config() const { return m_config; }

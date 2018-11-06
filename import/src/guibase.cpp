@@ -46,7 +46,8 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_configValid(false),
     m_configChanged(false),
     m_pwmFanModel(new PwmFanModel(this)),
-    m_tempModel(new TempModel(this))
+    m_tempModel(new TempModel(this)),
+    m_profileModel(new QStringListModel(this))
 {
     connect(this, &GUIBase::unitChanged, m_tempModel, &TempModel::setUnit);
     connect(m_loader, &Loader::needsSaveChanged, this, &GUIBase::needsApplyChanged);
@@ -76,6 +77,8 @@ void GUIBase::load()
     m_config->load();
     m_configValid = m_loader->load(configUrl());
 
+    m_profileModel->setStringList(m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList());
+
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
     m_com->reset();
@@ -89,21 +92,25 @@ void GUIBase::load()
 
 qreal GUIBase::maxTemp() const
 {
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
     return m_config->findItem(QStringLiteral("MaxTemp"))->property().toReal();
 }
 
 qreal GUIBase::minTemp() const
 {
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
     return m_config->findItem(QStringLiteral("MinTemp"))->property().toReal();
 }
 
 QString GUIBase::serviceName() const
 {
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
     return m_config->findItem(QStringLiteral("ServiceName"))->property().toString();
 }
 
 QUrl GUIBase::configUrl() const
 {
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
     return QUrl(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
 }
 
@@ -111,6 +118,7 @@ void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
     {
+        m_config->setCurrentGroup(QStringLiteral("preferences"));
         m_config->findItem(QStringLiteral("MaxTemp"))->setProperty(temp);
         emit maxTempChanged();
 
@@ -123,6 +131,7 @@ void GUIBase::setMinTemp(qreal temp)
 {
     if (temp != minTemp())
     {
+        m_config->setCurrentGroup(QStringLiteral("preferences"));
         m_config->findItem(QStringLiteral("MinTemp"))->setProperty(temp);
         emit minTempChanged();
 
@@ -133,8 +142,9 @@ void GUIBase::setMinTemp(qreal temp)
 
 void GUIBase::setServiceName(const QString& name)
 {
-    if(name != serviceName())
+    if (name != serviceName())
     {
+        m_config->setCurrentGroup(QStringLiteral("preferences"));
         m_config->findItem(QStringLiteral("ServiceName"))->setProperty(name);
 
 #ifndef NO_SYSTEMD
@@ -154,6 +164,7 @@ void GUIBase::setConfigUrl(const QUrl &url)
     {
         m_configValid = m_loader->load(url);
 
+        m_config->setCurrentGroup(QStringLiteral("preferences"));
         m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
         emit configUrlChanged();
 
@@ -243,5 +254,106 @@ void GUIBase::handleInfo(const QString &info)
         qInfo() << info;
 }
 
+void GUIBase::applyProfile(const QString& profile)
+{
+    qDebug() << "apply profile:" << profile;
+
+    if (!m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profile))
+    {
+        handleError(i18n("Unable to apply unknown profile: %1", profile));
+        return;
+    }
+
+    int index = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+
+    applyProfile(index);
+}
+
+void GUIBase::applyProfile(int index)
+{
+    qDebug() << "apply profile:" << index;
+
+    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+
+    if (index < 0 || index >= profileNames.size())
+        return;
+
+    auto newConfig = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList().value(index);
+
+    if (newConfig.isEmpty())
+    {
+        handleError(i18n("Unable to read data for profile: %1", index));
+        profileNames.removeAt(index);
+        m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
+        return;
+    }
+
+    if (m_loader->config() == newConfig)
+        return;
+
+    m_loader->load(newConfig);
+}
+
+void GUIBase::saveProfile(const QString& profile, bool updateModel)
+{
+    qDebug() << "save profile:" << profile;
+
+    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    int index = profileNames.indexOf(profile);
+
+    qDebug() << "index:" << index;
+
+    if (index < 0)
+    {
+        index = profileNames.size();
+
+        auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+        m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames << profile);
+
+        if (updateModel)
+            m_profileModel->insertRow(index);
+    }
+
+    auto profiles = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList();
+    profiles.insert(index, m_loader->config());
+    m_config->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+
+    if (updateModel)
+        m_profileModel->setData(m_profileModel->index(index, 0), profile);
+
+    m_configChanged = true;
+    emit needsApplyChanged();
+}
+
+void GUIBase::deleteProfile(const QString& profile, bool updateModel)
+{
+    qDebug() << "delete profile:" << profile;
+
+    int index = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+
+    deleteProfile(index, updateModel);
+}
+
+void GUIBase::deleteProfile(int index, bool updateModel)
+{
+    qDebug() << "delete profile:" << index;
+
+    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+
+    if (index < 0 || index >= profileNames.size())
+        return;
+
+    profileNames.removeAt(index);
+    m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
+    auto profiles = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList();
+    profileNames.removeAt(index);
+    m_config->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+
+    if (updateModel)
+        m_profileModel->removeRow(index);
+
+    m_configChanged = true;
+    emit needsApplyChanged();
+}
 
 }
