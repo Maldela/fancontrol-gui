@@ -495,6 +495,9 @@ void Loader::load(const QString& config)
 
     m_config = config;
     parseConfig(config);
+
+    emit configChanged();
+    emit needsSaveChanged();
 }
 
 bool Loader::save(const QUrl &url)
