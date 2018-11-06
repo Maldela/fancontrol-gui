@@ -20,6 +20,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.1
 import Fancontrol.Qml 1.0 as Fancontrol
 
@@ -35,6 +36,10 @@ ApplicationWindow {
 
     onClosing: {
         windowConfig.save(window);
+        if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
+            close.accepted = false;
+            saveOnCloseDialog.open();
+        }
     }
 
     Component.onCompleted: {
@@ -99,8 +104,39 @@ ApplicationWindow {
 
     Fancontrol.ErrorDialog {
         id: errorDialog
+
         visible: false
         modality: Qt.ApplicationModal
+    }
+
+    Dialog {
+        id: saveOnCloseDialog
+
+        property bool answered: false
+
+        visible: false
+        modality: Qt.ApplicationModal
+        title: i18n("Unsaved changes")
+        standardButtons: StandardButton.Cancel | StandardButton.Discard | StandardButton.Apply
+
+        onRejected: close()
+        onDiscard: {
+            answered = true;
+            close();
+            window.close();
+        }
+        onApply: {
+            Fancontrol.Base.apply();
+            answered = true;
+            close();
+            window.close();
+        }
+
+        Label {
+            id: text
+            anchors.centerIn: parent
+            text: i18n("There are unsaved changes.\nDo you want to apply these changes?")
+        }
     }
 
     Action {
