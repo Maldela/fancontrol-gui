@@ -77,7 +77,12 @@ void GUIBase::load()
     m_config->load();
     m_configValid = m_loader->load(configUrl());
 
-    m_profileModel->setStringList(m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList());
+    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    m_profileModel->setStringList(profileNames);
+
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
+    int currentProfile = m_config->findItem(QStringLiteral("CurrentProfile"))->property().toInt();
+    emit profileChanged(currentProfile);
 
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
@@ -112,6 +117,12 @@ QUrl GUIBase::configUrl() const
 {
     m_config->setCurrentGroup(QStringLiteral("preferences"));
     return QUrl(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
+}
+
+bool GUIBase::showTray() const
+{
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
+    return m_config->findItem(QStringLiteral("ShowTray"))->property().toBool();
 }
 
 void GUIBase::setMaxTemp(qreal temp)
@@ -171,6 +182,21 @@ void GUIBase::setConfigUrl(const QUrl &url)
         m_configChanged = true;
         emit needsApplyChanged();
     }
+}
+
+void GUIBase::setShowTray(bool show)
+{
+    if (showTray() == show)
+        return;
+
+    qDebug() << show;
+
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
+    m_config->findItem(QStringLiteral("ShowTray"))->setProperty(show);
+    emit showTrayChanged();
+
+    m_configChanged = true;
+    emit needsApplyChanged();
 }
 
 bool GUIBase::needsApply() const
@@ -292,6 +318,9 @@ void GUIBase::applyProfile(int index)
         return;
 
     m_loader->load(newConfig);
+
+    m_config->findItem(QStringLiteral("CurrentProfile"))->setProperty(index);
+    emit profileChanged(index);
 }
 
 void GUIBase::saveProfile(const QString& profile, bool updateModel)

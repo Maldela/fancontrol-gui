@@ -50,6 +50,8 @@ Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(
     addItemPath(QStringLiteral("ConfigUrl"), m_configUrl, QStringLiteral("file://") + STANDARD_CONFIG_FILE);
     addItemStringList(QStringLiteral("Profiles"), m_profiles, QStringList());
     addItemStringList(QStringLiteral("ProfileNames"), m_profileNames, QStringList());
+    addItemInt(QStringLiteral("CurrentProfile"), m_currentProfile, 0);
+    addItemBool(QStringLiteral("ShowTray"), m_showTray, true);
 
     load();
 }
