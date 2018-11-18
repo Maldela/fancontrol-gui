@@ -30,22 +30,22 @@ class QWindow;
 class WindowConfig : public QObject
 {
     Q_OBJECT
-    
+
 public:
-    
+
     static WindowConfig *instance();
-    
+
     Q_INVOKABLE void save(QWindow *window);
     Q_INVOKABLE void restore(QWindow *window);
-    
-    
+
+
 private:
-    
+
     WindowConfig(QObject *parent = Q_NULLPTR);
     ~WindowConfig() {}
     Q_DISABLE_COPY(WindowConfig)
-    
-    static WindowConfig *m_instance;
+
+    static WindowConfig *s_instance;
 };
 
 #endif //WINDOWCONFIG_H

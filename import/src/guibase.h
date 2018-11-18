@@ -61,6 +61,7 @@ class GUIBase : public QObject
     Q_PROPERTY(bool configValid READ configValid NOTIFY configUrlChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool needsApply READ needsApply NOTIFY needsApplyChanged)
+    Q_PROPERTY(bool showTray READ showTray WRITE setShowTray NOTIFY showTrayChanged)
 
 public:
 
@@ -85,6 +86,8 @@ public:
     void setConfigUrl(const QUrl &url);
     void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; emit unitChanged(m_unit); } }
     bool needsApply() const;
+    bool showTray() const;
+    void setShowTray(bool show);
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
     TempModel *tempModel() const { return m_tempModel; }
     QStringListModel *profileModel() const { return m_profileModel; }
@@ -114,6 +117,8 @@ signals:
     void errorChanged();
     void criticalError();
     void needsApplyChanged();
+    void showTrayChanged();
+    void profileChanged(int profile);
 
 private:
 

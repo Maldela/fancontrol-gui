@@ -61,6 +61,11 @@ Item {
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
             onActivated: Fancontrol.Base.applyProfile(index)
+
+            Connections {
+                target: Fancontrol.Base
+                onProfileChanged: profileComboBox.currentIndex = profile
+            }
         }
         Button {
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter

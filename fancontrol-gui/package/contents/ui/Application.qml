@@ -22,6 +22,8 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.1
+import QtQml 2.8
+import Fancontrol.Gui 1.0 as Gui
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
@@ -39,6 +41,7 @@ ApplicationWindow {
         if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
             close.accepted = false;
             saveOnCloseDialog.open();
+            return;
         }
     }
 
@@ -99,6 +102,30 @@ ApplicationWindow {
             id: settingsTab
             title: i18n("Settings")
             SettingsTab {}
+        }
+    }
+
+    Loader {
+        id: trayLoader
+
+        active: Fancontrol.Base.showTray
+
+        sourceComponent: Component {
+            Gui.SystemTrayIcon {
+                title: "Fancontrol-GUI"
+                iconName: "org.kde.fancontrol.gui"
+                profileModel: Fancontrol.Base.profileModel
+
+                onActivateRequested: {
+                    window.show()
+                    window.raise()
+                    window.requestActivate()
+                }
+                onActivateProfile: {
+                    Fancontrol.Base.applyProfile(profile);
+                    Fancontrol.Base.apply();
+                }
+            }
         }
     }
 
@@ -174,6 +201,7 @@ ApplicationWindow {
 
         onTriggered: Fancontrol.Base.systemdCom.serviceActive = false
     }
+
     SystemPalette {
         id: palette
     }

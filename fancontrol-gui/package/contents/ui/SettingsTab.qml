@@ -208,6 +208,31 @@ Item {
                 }
             }
         }
+        RowLayout {
+            width: column.width
+
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Show tray icon:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            CheckBox {
+                id: trayBox
+
+                Layout.minimumWidth: implicitWidth
+                Layout.fillWidth: true
+                checked: Fancontrol.Base.showTray
+                onCheckedChanged: Fancontrol.Base.showTray = checked
+
+                Connections {
+                    target: Fancontrol.Base
+                    onShowTrayChanged: if (Fancontrol.Base.showTray != trayBox.checked) trayBox.checked = Fancontrol.Base.showTray
+                }
+            }
+        }
+
         FileDialog {
             id: openFileDialog
             title: i18n("Please choose a configuration file")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
+ * Copyright 2018  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,47 +16,42 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-
-#ifndef CONFIG_H
-#define CONFIG_H
-
-#include <KConfigCore/KCoreConfigSkeleton>
+#ifndef SYSTEMTRAYICON_H
+#define SYSTEMTRAYICON_H
 
 
-namespace Fancontrol
+#include <KNotifications/KStatusNotifierItem>
+
+#include <QtCore/QStringListModel>
+#include <QtWidgets/QMenu>
+
+
+class SystemTrayIcon : public KStatusNotifierItem
 {
-
-class Config : public KCoreConfigSkeleton
-{
-
-Q_OBJECT
+    Q_OBJECT
+    Q_PROPERTY(QStringListModel* profileModel READ profileModel WRITE setProfileModel NOTIFY profileModelChanged)
 
 public:
 
-    static Config *instance();
+    SystemTrayIcon(QObject *parent = nullptr);
+
+    QStringListModel *profileModel() const { return m_profileModel; }
+    void setProfileModel(QStringListModel *model);
+    void setProfiles(const QStringList &profiles);
+
+
+signals:
+
+    void activateProfile(QString profile);
+    void profileModelChanged();
 
 
 private:
 
-    Config(QObject *parent = Q_NULLPTR);
-    ~Config() {}
-    Q_DISABLE_COPY(Config)
-
-    static Config *m_instance;
-
-    double m_minTemp;
-    double m_maxTemp;
-    QString m_serviceName;
-    QString m_configUrl;
-    QStringList m_profiles;
-    QStringList m_profileNames;
-    int m_currentProfile;
-    bool m_showTray;
+    QStringListModel *m_profileModel;
+    QMenu *m_profilesMenu;
 };
 
-}
-
-#endif // CONFIG_H
+#endif // SYSTEMTRAYICON_H
