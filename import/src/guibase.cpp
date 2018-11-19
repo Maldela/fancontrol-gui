@@ -195,8 +195,6 @@ void GUIBase::setShowTray(bool show)
     if (showTray() == show)
         return;
 
-    qDebug() << show;
-
     m_config->setCurrentGroup(QStringLiteral("preferences"));
     m_config->findItem(QStringLiteral("ShowTray"))->setProperty(show);
     emit showTrayChanged();
@@ -301,8 +299,6 @@ void GUIBase::handleInfo(const QString &info)
 
 void GUIBase::applyProfile(const QString& profile)
 {
-    qDebug() << "apply profile:" << profile;
-
     if (!m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profile))
     {
         handleError(i18n("Unable to apply unknown profile: %1", profile));
@@ -316,8 +312,6 @@ void GUIBase::applyProfile(const QString& profile)
 
 void GUIBase::applyProfile(int index)
 {
-    qDebug() << "apply profile:" << index;
-
     auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size())
@@ -344,12 +338,8 @@ void GUIBase::applyProfile(int index)
 
 void GUIBase::saveProfile(const QString& profile, bool updateModel)
 {
-    qDebug() << "save profile:" << profile;
-
     auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
     int index = profileNames.indexOf(profile);
-
-    qDebug() << "index:" << index;
 
     if (index < 0)
     {
@@ -375,8 +365,6 @@ void GUIBase::saveProfile(const QString& profile, bool updateModel)
 
 void GUIBase::deleteProfile(const QString& profile, bool updateModel)
 {
-    qDebug() << "delete profile:" << profile;
-
     int index = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
 
     deleteProfile(index, updateModel);
@@ -384,8 +372,6 @@ void GUIBase::deleteProfile(const QString& profile, bool updateModel)
 
 void GUIBase::deleteProfile(int index, bool updateModel)
 {
-    qDebug() << "delete profile:" << index;
-
     auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size())
