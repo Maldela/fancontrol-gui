@@ -232,6 +232,31 @@ Item {
                 }
             }
         }
+        RowLayout {
+            width: column.width
+            enabled: Fancontrol.Base.showTray
+
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Start minimized:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            CheckBox {
+                id: startMinimizedBox
+
+                Layout.minimumWidth: implicitWidth
+                Layout.fillWidth: true
+                checked: Fancontrol.Base.startMinimized
+                onCheckedChanged: Fancontrol.Base.startMinimized = checked
+
+                Connections {
+                    target: Fancontrol.Base
+                    onStartMinimizedChanged: if (Fancontrol.Base.startMinimized != startMinimizedBox.checked) startMinimizedBox.checked = Fancontrol.Base.startMinimized
+                }
+            }
+        }
 
         FileDialog {
             id: openFileDialog

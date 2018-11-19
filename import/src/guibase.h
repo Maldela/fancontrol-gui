@@ -62,6 +62,7 @@ class GUIBase : public QObject
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool needsApply READ needsApply NOTIFY needsApplyChanged)
     Q_PROPERTY(bool showTray READ showTray WRITE setShowTray NOTIFY showTrayChanged)
+    Q_PROPERTY(bool startMinimized READ startMinimized WRITE setStartMinimized NOTIFY startMinimizedChanged)
 
 public:
 
@@ -88,6 +89,8 @@ public:
     bool needsApply() const;
     bool showTray() const;
     void setShowTray(bool show);
+    bool startMinimized() const;
+    void setStartMinimized(bool sm);
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
     TempModel *tempModel() const { return m_tempModel; }
     QStringListModel *profileModel() const { return m_profileModel; }
@@ -118,6 +121,7 @@ signals:
     void criticalError();
     void needsApplyChanged();
     void showTrayChanged();
+    void startMinimizedChanged();
     void profileChanged(int profile);
 
 private:
