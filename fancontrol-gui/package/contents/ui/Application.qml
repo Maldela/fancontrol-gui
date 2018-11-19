@@ -34,7 +34,6 @@ ApplicationWindow {
     width: 1024
     height: 768
     color: palette.window
-    visible: true
 
     onClosing: {
         windowConfig.save(window);
@@ -48,6 +47,7 @@ ApplicationWindow {
     Component.onCompleted: {
         Fancontrol.Base.load();
         windowConfig.restore(window);
+        window.visible = !Fancontrol.Base.startMinimized;
     }
 
     toolBar: ToolBar {

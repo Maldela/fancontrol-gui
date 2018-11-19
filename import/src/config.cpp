@@ -52,6 +52,7 @@ Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(
     addItemStringList(QStringLiteral("ProfileNames"), m_profileNames, QStringList());
     addItemInt(QStringLiteral("CurrentProfile"), m_currentProfile, 0);
     addItemBool(QStringLiteral("ShowTray"), m_showTray, true);
+    addItemBool(QStringLiteral("StartMinimized"), m_startMinimized, false);
 
     load();
 }

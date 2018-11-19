@@ -55,6 +55,7 @@ private:
     QStringList m_profileNames;
     int m_currentProfile;
     bool m_showTray;
+    bool m_startMinimized;
 };
 
 }

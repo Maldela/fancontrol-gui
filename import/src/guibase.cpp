@@ -125,6 +125,12 @@ bool GUIBase::showTray() const
     return m_config->findItem(QStringLiteral("ShowTray"))->property().toBool();
 }
 
+bool GUIBase::startMinimized() const
+{
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
+    return m_config->findItem(QStringLiteral("StartMinimized"))->property().toBool();
+}
+
 void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
@@ -194,6 +200,19 @@ void GUIBase::setShowTray(bool show)
     m_config->setCurrentGroup(QStringLiteral("preferences"));
     m_config->findItem(QStringLiteral("ShowTray"))->setProperty(show);
     emit showTrayChanged();
+
+    m_configChanged = true;
+    emit needsApplyChanged();
+}
+
+void GUIBase::setStartMinimized(bool sm)
+{
+    if (startMinimized() == sm)
+        return;
+
+    m_config->setCurrentGroup(QStringLiteral("preferences"));
+    m_config->findItem(QStringLiteral("StartMinimized"))->setProperty(sm);
+    emit startMinimizedChanged();
 
     m_configChanged = true;
     emit needsApplyChanged();
