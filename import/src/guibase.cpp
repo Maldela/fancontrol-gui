@@ -35,7 +35,6 @@ namespace Fancontrol
 {
 
 GUIBase::GUIBase(QObject *parent) : QObject(parent),
-    m_config(Config::instance()),
 
 #ifndef NO_SYSTEMD
     m_com(new SystemdCommunicator(this)),
@@ -43,7 +42,6 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 
     m_loader(new Loader(this)),
     m_configValid(false),
-    m_configChanged(false),
     m_pwmFanModel(new PwmFanModel(this)),
     m_tempModel(new TempModel(this)),
     m_profileModel(new QStringListModel(this))
@@ -71,16 +69,21 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     }
 }
 
+GUIBase::~GUIBase()
+{
+    Config::instance()->save();
+}
+
 void GUIBase::load()
 {
-    m_config->load();
+    Config::instance()->load();
     m_configValid = m_loader->load(configUrl());
 
-    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
     m_profileModel->setStringList(profileNames);
 
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    int currentProfile = m_config->findItem(QStringLiteral("CurrentProfile"))->property().toInt();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    int currentProfile = Config::instance()->findItem(QStringLiteral("CurrentProfile"))->property().toInt();
     emit profileChanged(currentProfile);
 
 #ifndef NO_SYSTEMD
@@ -96,50 +99,47 @@ void GUIBase::load()
 
 qreal GUIBase::maxTemp() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return m_config->findItem(QStringLiteral("MaxTemp"))->property().toReal();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return Config::instance()->findItem(QStringLiteral("MaxTemp"))->property().toReal();
 }
 
 qreal GUIBase::minTemp() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return m_config->findItem(QStringLiteral("MinTemp"))->property().toReal();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return Config::instance()->findItem(QStringLiteral("MinTemp"))->property().toReal();
 }
 
 QString GUIBase::serviceName() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return m_config->findItem(QStringLiteral("ServiceName"))->property().toString();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return Config::instance()->findItem(QStringLiteral("ServiceName"))->property().toString();
 }
 
 QUrl GUIBase::configUrl() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return QUrl(m_config->findItem(QStringLiteral("ConfigUrl"))->property().toString());
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return QUrl(Config::instance()->findItem(QStringLiteral("ConfigUrl"))->property().toString());
 }
 
 bool GUIBase::showTray() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return m_config->findItem(QStringLiteral("ShowTray"))->property().toBool();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return Config::instance()->findItem(QStringLiteral("ShowTray"))->property().toBool();
 }
 
 bool GUIBase::startMinimized() const
 {
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    return m_config->findItem(QStringLiteral("StartMinimized"))->property().toBool();
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    return Config::instance()->findItem(QStringLiteral("StartMinimized"))->property().toBool();
 }
 
 void GUIBase::setMaxTemp(qreal temp)
 {
     if (temp != maxTemp())
     {
-        m_config->setCurrentGroup(QStringLiteral("preferences"));
-        m_config->findItem(QStringLiteral("MaxTemp"))->setProperty(temp);
+        Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+        Config::instance()->findItem(QStringLiteral("MaxTemp"))->setProperty(temp);
         emit maxTempChanged();
-
-        m_configChanged = true;
-        emit needsApplyChanged();
     }
 }
 
@@ -147,12 +147,9 @@ void GUIBase::setMinTemp(qreal temp)
 {
     if (temp != minTemp())
     {
-        m_config->setCurrentGroup(QStringLiteral("preferences"));
-        m_config->findItem(QStringLiteral("MinTemp"))->setProperty(temp);
+        Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+        Config::instance()->findItem(QStringLiteral("MinTemp"))->setProperty(temp);
         emit minTempChanged();
-
-        m_configChanged = true;
-        emit needsApplyChanged();
     }
 }
 
@@ -160,17 +157,14 @@ void GUIBase::setServiceName(const QString& name)
 {
     if (name != serviceName())
     {
-        m_config->setCurrentGroup(QStringLiteral("preferences"));
-        m_config->findItem(QStringLiteral("ServiceName"))->setProperty(name);
+        Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+        Config::instance()->findItem(QStringLiteral("ServiceName"))->setProperty(name);
 
 #ifndef NO_SYSTEMD
         m_com->setServiceName(name);
 #endif
 
         emit serviceNameChanged();
-
-        m_configChanged = true;
-        emit needsApplyChanged();
     }
 }
 
@@ -180,12 +174,9 @@ void GUIBase::setConfigUrl(const QUrl &url)
     {
         m_configValid = m_loader->load(url);
 
-        m_config->setCurrentGroup(QStringLiteral("preferences"));
-        m_config->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
+        Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+        Config::instance()->findItem(QStringLiteral("ConfigUrl"))->setProperty(url.toString());
         emit configUrlChanged();
-
-        m_configChanged = true;
-        emit needsApplyChanged();
     }
 }
 
@@ -194,12 +185,9 @@ void GUIBase::setShowTray(bool show)
     if (showTray() == show)
         return;
 
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    m_config->findItem(QStringLiteral("ShowTray"))->setProperty(show);
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    Config::instance()->findItem(QStringLiteral("ShowTray"))->setProperty(show);
     emit showTrayChanged();
-
-    m_configChanged = true;
-    emit needsApplyChanged();
 }
 
 void GUIBase::setStartMinimized(bool sm)
@@ -207,20 +195,17 @@ void GUIBase::setStartMinimized(bool sm)
     if (startMinimized() == sm)
         return;
 
-    m_config->setCurrentGroup(QStringLiteral("preferences"));
-    m_config->findItem(QStringLiteral("StartMinimized"))->setProperty(sm);
+    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
+    Config::instance()->findItem(QStringLiteral("StartMinimized"))->setProperty(sm);
     emit startMinimizedChanged();
-
-    m_configChanged = true;
-    emit needsApplyChanged();
 }
 
 bool GUIBase::needsApply() const
 {
 #ifndef NO_SYSTEMD
-    return m_loader->needsSave() || m_configChanged || m_com->needsApply();
+    return m_loader->needsSave() || m_com->needsApply();
 #else
-    return m_loader->needsSave() || m_configChanged;
+    return m_loader->needsSave();
 #endif
 }
 
@@ -238,8 +223,6 @@ void GUIBase::apply()
     qInfo() << i18n("Applying changes");
 
     bool configChanged = m_loader->save(configUrl());
-    m_config->save();
-    m_configChanged = false;
 
 #ifndef NO_SYSTEMD
     m_com->apply(configChanged);
@@ -251,13 +234,6 @@ void GUIBase::apply()
 void GUIBase::reset()
 {
     qInfo() << i18n("Resetting changes");
-
-    m_config->load();
-    emit serviceNameChanged();
-    emit minTempChanged();
-    emit maxTempChanged();
-    emit configUrlChanged();
-    m_configChanged = false;
 
     if (m_loader->needsSave() || configUrl() != m_loader->configUrl())
         m_loader->load(configUrl());
@@ -298,31 +274,31 @@ void GUIBase::handleInfo(const QString &info)
 
 void GUIBase::applyProfile(const QString& profile)
 {
-    if (!m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profile))
+    if (!Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profile))
     {
         handleError(i18n("Unable to apply unknown profile: %1", profile));
         return;
     }
 
-    int index = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
 
     applyProfile(index);
 }
 
 void GUIBase::applyProfile(int index)
 {
-    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size())
         return;
 
-    auto newConfig = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList().value(index);
+    auto newConfig = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList().value(index);
 
     if (newConfig.isEmpty())
     {
         handleError(i18n("Unable to read data for profile: %1", index));
         profileNames.removeAt(index);
-        m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
+        Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
         return;
     }
 
@@ -331,62 +307,56 @@ void GUIBase::applyProfile(int index)
 
     m_loader->load(newConfig);
 
-    m_config->findItem(QStringLiteral("CurrentProfile"))->setProperty(index);
+    Config::instance()->findItem(QStringLiteral("CurrentProfile"))->setProperty(index);
     emit profileChanged(index);
 }
 
 void GUIBase::saveProfile(const QString& profile, bool updateModel)
 {
-    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
     int index = profileNames.indexOf(profile);
 
     if (index < 0)
     {
         index = profileNames.size();
 
-        auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
-        m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames << profile);
+        auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+        Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames << profile);
 
         if (updateModel)
             m_profileModel->insertRow(index);
     }
 
-    auto profiles = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList();
+    auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
     profiles.insert(index, m_loader->config());
-    m_config->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+    Config::instance()->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
 
     if (updateModel)
         m_profileModel->setData(m_profileModel->index(index, 0), profile);
-
-    m_configChanged = true;
-    emit needsApplyChanged();
 }
 
 void GUIBase::deleteProfile(const QString& profile, bool updateModel)
 {
-    int index = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
 
     deleteProfile(index, updateModel);
 }
 
 void GUIBase::deleteProfile(int index, bool updateModel)
 {
-    auto profileNames = m_config->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size())
         return;
 
     profileNames.removeAt(index);
-    m_config->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
-    auto profiles = m_config->findItem(QStringLiteral("Profiles"))->property().toStringList();
+    Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
+    auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
     profileNames.removeAt(index);
-    m_config->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+    Config::instance()->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
 
     if (updateModel)
         m_profileModel->removeRow(index);
-
-    m_configChanged = true;
-    emit needsApplyChanged();
 }
 
 }

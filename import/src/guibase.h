@@ -67,6 +67,7 @@ class GUIBase : public QObject
 public:
 
     explicit GUIBase(QObject *parent = Q_NULLPTR);
+    ~GUIBase();
 
     Loader *loader() const { return m_loader; }
 
@@ -127,7 +128,6 @@ signals:
 private:
 
     QString m_error;
-    Config *const m_config;
 
 #ifndef NO_SYSTEMD
     SystemdCommunicator *const m_com;
@@ -136,7 +136,6 @@ private:
     Loader *const m_loader;
     QString m_unit;
     bool m_configValid;
-    bool m_configChanged;
     PwmFanModel *m_pwmFanModel;
     TempModel *m_tempModel;
     QStringListModel *m_profileModel;
