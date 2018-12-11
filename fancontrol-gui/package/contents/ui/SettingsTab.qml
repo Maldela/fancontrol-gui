@@ -91,12 +91,16 @@ Item {
                 suffix: Fancontrol.Base.unit
                 onValueChanged: {
                     Fancontrol.Base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-                    if (value > maxTempBox.value) maxTempBox.value = value;
+                    if (value >= maxTempBox.value) maxTempBox.value = value + 1;
                 }
 
                 Connections {
                     target: Fancontrol.Base
-                    onMinTempChanged: if (Fancontrol.Base.minTemp != minTempBox.value) minTempBox.value = Fancontrol.Base.minTemp
+                    onMinTempChanged: {
+                        if (Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit) != minTempBox.value) {
+                            minTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit);
+                        }
+                    }
                 }
             }
         }
@@ -122,12 +126,16 @@ Item {
                 suffix: Fancontrol.Base.unit
                 onValueChanged: {
                     Fancontrol.Base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-                    if (value < minTempBox.value) minTempBox.value = value;
+                    if (value <= minTempBox.value) minTempBox.value = value - 1;
                 }
 
                 Connections {
                     target: Fancontrol.Base
-                    onMaxTempChanged: if (Fancontrol.Base.maxTemp != maxTempBox.value) maxTempBox.value = Fancontrol.Base.maxTemp
+                    onMaxTempChanged: {
+                        if (Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit) != maxTempBox.value) {
+                            maxTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit);
+                        }
+                    }
                 }
             }
         }
