@@ -44,7 +44,7 @@ include(FindPkgConfig)
 
 #Find Qt5
 find_package(Qt5Core REQUIRED)
-find_package(Qt5 COMPONENTS Quick)
+find_package(Qt5 5.8 COMPONENTS Quick)
 set_package_properties(Qt5Quick PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 
 #Find KF5

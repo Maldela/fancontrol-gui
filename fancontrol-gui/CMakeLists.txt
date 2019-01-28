@@ -1,5 +1,6 @@
 set(Fancontrol_GUI_SRCS src/main.cpp
-                        src/windowconfig.cpp)
+                        src/windowconfig.cpp
+                        src/systemtrayicon.cpp)
 
 set(LIBRARIES Qt5::Gui
               Qt5::Widgets
@@ -7,10 +8,11 @@ set(LIBRARIES Qt5::Gui
               KF5::Declarative
               KF5::I18n
               KF5::ConfigGui
-              KF5::ConfigCore)
+              KF5::ConfigCore
+              KF5::Notifications)
 
 find_package(Qt5 COMPONENTS Gui Widgets REQUIRED)
-find_package(KF5 COMPONENTS CoreAddons Package Declarative Config REQUIRED)
+find_package(KF5 COMPONENTS CoreAddons Package Declarative Config Notifications REQUIRED)
 
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 add_definitions(${Qt5Widgets_DEFINITIONS})

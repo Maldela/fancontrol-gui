@@ -32,6 +32,7 @@ Item {
     property QtObject systemdCom: Fancontrol.Base.systemdCom
     property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
     property QtObject tempModel: Fancontrol.Base.tempModel
+    property QtObject profileModel: Fancontrol.Base.profileModel
     property var locale: Qt.locale()
     property real textWidth: 0
     property var pwmFans: pwmFanModel.fans
@@ -122,6 +123,37 @@ Item {
         }
 
         RowLayout {
+            id: profileRow
+
+            Label {
+                text: i18n("Profile:")
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                renderType: Text.NativeRendering
+            }
+            ComboBox {
+                id: profileComboBox
+
+                property string saveText: editText.length > 0 ? editText : currentText
+
+                editable: true
+                model: profileModel
+                textRole: "display"
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
+                onActivated: Fancontrol.Base.applyProfile(index)
+            }
+            Button {
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                action: saveProfileAction
+            }
+            Button {
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                action: deleteProfileAction
+            }
+        }
+
+        RowLayout {
             visible: enabledBox.checked && pwmFans.length > 0
 
             Label {
@@ -131,6 +163,7 @@ Item {
             }
             ComboBox {
                 id: fanComboBox
+
                 model: pwmFanModel
                 textRole: "display"
                 Layout.fillWidth: true
@@ -328,6 +361,20 @@ Item {
         }
     }
 
+    Action {
+        id: saveProfileAction
+
+        text: i18n("Save profile")
+        iconName: "document-save"
+        onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
+    }
+    Action {
+        id: deleteProfileAction
+
+        text: i18n("Delete profile")
+        iconName: "edit-delete"
+        onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
+    }
     Action {
         id: loadAction
         iconName: "document-open"

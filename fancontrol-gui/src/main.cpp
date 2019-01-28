@@ -17,19 +17,18 @@
  *
  */
 
-#include <QtWidgets/QApplication>
 #include <QtQml/QQmlContext>
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QLoggingCategory>
 #include <QtGui/QIcon>
+#include <QtWidgets/QApplication>
 
 #include <KDeclarative/QmlObject>
 #include <KI18n/KLocalizedString>
 #include <KCoreAddons/KAboutData>
 
+#include "systemtrayicon.h"
 #include "windowconfig.h"
-
-#include <QDebug>
 
 
 Q_DECLARE_LOGGING_CATEGORY(FANCONTROL)
@@ -59,6 +58,8 @@ int main(int argc, char *argv[])
     parser->process(app);
     about.processCommandLine(parser);
     delete parser;
+
+    qmlRegisterType<SystemTrayIcon>("Fancontrol.Gui", 1, 0, "SystemTrayIcon");
 
     KDeclarative::QmlObject qmlObject;
     qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());

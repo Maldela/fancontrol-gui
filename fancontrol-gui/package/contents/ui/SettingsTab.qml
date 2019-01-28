@@ -91,12 +91,16 @@ Item {
                 suffix: Fancontrol.Base.unit
                 onValueChanged: {
                     Fancontrol.Base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-                    if (value > maxTempBox.value) maxTempBox.value = value;
+                    if (value >= maxTempBox.value) maxTempBox.value = value + 1;
                 }
 
                 Connections {
                     target: Fancontrol.Base
-                    onMinTempChanged: if (Fancontrol.Base.minTemp != minTempBox.value) minTempBox.value = Fancontrol.Base.minTemp
+                    onMinTempChanged: {
+                        if (Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit) != minTempBox.value) {
+                            minTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit);
+                        }
+                    }
                 }
             }
         }
@@ -122,12 +126,16 @@ Item {
                 suffix: Fancontrol.Base.unit
                 onValueChanged: {
                     Fancontrol.Base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-                    if (value < minTempBox.value) minTempBox.value = value;
+                    if (value <= minTempBox.value) minTempBox.value = value - 1;
                 }
 
                 Connections {
                     target: Fancontrol.Base
-                    onMaxTempChanged: if (Fancontrol.Base.maxTemp != maxTempBox.value) maxTempBox.value = Fancontrol.Base.maxTemp
+                    onMaxTempChanged: {
+                        if (Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit) != maxTempBox.value) {
+                            maxTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit);
+                        }
+                    }
                 }
             }
         }
@@ -208,6 +216,56 @@ Item {
                 }
             }
         }
+        RowLayout {
+            width: column.width
+
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Show tray icon:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            CheckBox {
+                id: trayBox
+
+                Layout.minimumWidth: implicitWidth
+                Layout.fillWidth: true
+                checked: Fancontrol.Base.showTray
+                onCheckedChanged: Fancontrol.Base.showTray = checked
+
+                Connections {
+                    target: Fancontrol.Base
+                    onShowTrayChanged: if (Fancontrol.Base.showTray != trayBox.checked) trayBox.checked = Fancontrol.Base.showTray
+                }
+            }
+        }
+        RowLayout {
+            width: column.width
+            enabled: Fancontrol.Base.showTray
+
+            Label {
+                Layout.preferredWidth: root.textWidth
+                clip: true
+                text: i18n("Start minimized:")
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
+            }
+            CheckBox {
+                id: startMinimizedBox
+
+                Layout.minimumWidth: implicitWidth
+                Layout.fillWidth: true
+                checked: Fancontrol.Base.startMinimized
+                onCheckedChanged: Fancontrol.Base.startMinimized = checked
+
+                Connections {
+                    target: Fancontrol.Base
+                    onStartMinimizedChanged: if (Fancontrol.Base.startMinimized != startMinimizedBox.checked) startMinimizedBox.checked = Fancontrol.Base.startMinimized
+                }
+            }
+        }
+
         FileDialog {
             id: openFileDialog
             title: i18n("Please choose a configuration file")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016  Malte Veerman <malte.veerman@gmail.com>
+ * Copyright 2018  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,28 +16,42 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-#ifndef TESTPWMFAN_H
-#define TESTPWMFAN_H
+#ifndef SYSTEMTRAYICON_H
+#define SYSTEMTRAYICON_H
 
 
-#include <QtCore/QTextStream>
+#include <KNotifications/KStatusNotifierItem>
 
-#include "pwmfan.h"
-
-
-using namespace Fancontrol;
+#include <QtCore/QStringListModel>
+#include <QtWidgets/QMenu>
 
 
-class TestPwmFan : public PwmFan
+class SystemTrayIcon : public KStatusNotifierItem
 {
     Q_OBJECT
+    Q_PROPERTY(QStringListModel* profileModel READ profileModel WRITE setProfileModel NOTIFY profileModelChanged)
 
 public:
 
-    explicit TestPwmFan(QString *pwmString, QString *enableString, QString *rpmString, uint index = 0, Hwmon *parent = Q_NULLPTR);
+    SystemTrayIcon(QObject *parent = nullptr);
+
+    QStringListModel *profileModel() const { return m_profileModel; }
+    void setProfileModel(QStringListModel *model);
+    void setProfiles(const QStringList &profiles);
+
+
+signals:
+
+    void activateProfile(QString profile);
+    void profileModelChanged();
+
+
+private:
+
+    QStringListModel *m_profileModel;
+    QMenu *m_profilesMenu;
 };
 
-#endif // TESTPWMFAN_H
+#endif // SYSTEMTRAYICON_H

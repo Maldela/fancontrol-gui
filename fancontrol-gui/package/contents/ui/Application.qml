@@ -20,7 +20,10 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.1
+import QtQml 2.8
+import Fancontrol.Gui 1.0 as Gui
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
@@ -31,15 +34,20 @@ ApplicationWindow {
     width: 1024
     height: 768
     color: palette.window
-    visible: true
 
     onClosing: {
         windowConfig.save(window);
+        if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
+            close.accepted = false;
+            saveOnCloseDialog.open();
+            return;
+        }
     }
 
     Component.onCompleted: {
         Fancontrol.Base.load();
         windowConfig.restore(window);
+        window.visible = !Fancontrol.Base.startMinimized;
     }
 
     toolBar: ToolBar {
@@ -97,10 +105,65 @@ ApplicationWindow {
         }
     }
 
+    Loader {
+        id: trayLoader
+
+        active: Fancontrol.Base.showTray
+
+        sourceComponent: Component {
+            Gui.SystemTrayIcon {
+                title: "Fancontrol-GUI"
+                iconName: "org.kde.fancontrol.gui"
+                profileModel: Fancontrol.Base.profileModel
+
+                onActivateRequested: {
+                    window.show()
+                    window.raise()
+                    window.requestActivate()
+                }
+                onActivateProfile: {
+                    Fancontrol.Base.applyProfile(profile);
+                    Fancontrol.Base.apply();
+                }
+            }
+        }
+    }
+
     Fancontrol.ErrorDialog {
         id: errorDialog
+
         visible: false
         modality: Qt.ApplicationModal
+    }
+
+    Dialog {
+        id: saveOnCloseDialog
+
+        property bool answered: false
+
+        visible: false
+        modality: Qt.ApplicationModal
+        title: i18n("Unsaved changes")
+        standardButtons: StandardButton.Cancel | StandardButton.Discard | StandardButton.Apply
+
+        onRejected: close()
+        onDiscard: {
+            answered = true;
+            close();
+            window.close();
+        }
+        onApply: {
+            Fancontrol.Base.apply();
+            answered = true;
+            close();
+            window.close();
+        }
+
+        Label {
+            id: text
+            anchors.centerIn: parent
+            text: i18n("There are unsaved changes.\nDo you want to apply these changes?")
+        }
     }
 
     Action {
@@ -138,6 +201,7 @@ ApplicationWindow {
 
         onTriggered: Fancontrol.Base.systemdCom.serviceActive = false
     }
+
     SystemPalette {
         id: palette
     }

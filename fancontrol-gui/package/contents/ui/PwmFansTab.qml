@@ -30,6 +30,7 @@ Item {
     property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
     property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
     property QtObject tempModel: Fancontrol.Base.tempModel
+    property QtObject profileModel: Fancontrol.Base.profileModel
     property var pwmFans: pwmFanModel.fans
 
     id: root
@@ -37,9 +38,49 @@ Item {
     anchors.margins: Kirigami.Units.smallSpacing
 
     RowLayout {
-        id: fanRow
+        id: profileRow
 
         anchors.top: parent.top
+        width: parent.width
+        height: childrenRect.height
+
+        Label {
+            text: i18n("Profile:")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            renderType: Text.NativeRendering
+        }
+        ComboBox {
+            id: profileComboBox
+
+            property string saveText: editText.length > 0 ? editText : currentText
+
+            editable: true
+            model: profileModel
+            textRole: "display"
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
+            onActivated: Fancontrol.Base.applyProfile(index)
+
+            Connections {
+                target: Fancontrol.Base
+                onProfileChanged: profileComboBox.currentIndex = profile
+            }
+        }
+        Button {
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            action: saveProfileAction
+        }
+        Button {
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            action: deleteProfileAction
+        }
+    }
+
+    RowLayout {
+        id: fanRow
+
+        anchors.top: profileRow.bottom
         width: parent.width
         height: childrenRect.height
         visible: pwmFans.length > 0
@@ -51,6 +92,7 @@ Item {
         }
         ComboBox {
             id: fanComboBox
+
             model: pwmFanModel
             textRole: "display"
             Layout.fillWidth: true
@@ -78,6 +120,7 @@ Item {
 
     ColumnLayout {
         id: noFansInfo
+
         anchors.centerIn: parent
         spacing: Kirigami.Units.smallSpacing * 2
         visible: pwmFans.length === 0
@@ -96,7 +139,22 @@ Item {
     }
 
     Action {
+        id: saveProfileAction
+
+        text: i18n("Save profile")
+        iconName: "document-save"
+        onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
+    }
+    Action {
+        id: deleteProfileAction
+
+        text: i18n("Delete profile")
+        iconName: "edit-delete"
+        onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
+    }
+    Action {
         id: detectFansAction
+
         text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
         iconName: "dialog-password"
         onTriggered: loader.detectSensors()
