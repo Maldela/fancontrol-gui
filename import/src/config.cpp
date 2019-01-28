@@ -48,6 +48,11 @@ Config::Config(QObject *parent) : KCoreConfigSkeleton(KSharedConfig::openConfig(
     addItemDouble(QStringLiteral("MaxTemp"), m_maxTemp, 90.0);
     addItemString(QStringLiteral("ServiceName"), m_serviceName, QStringLiteral(STANDARD_SERVICE_NAME));
     addItemPath(QStringLiteral("ConfigUrl"), m_configUrl, QStringLiteral("file://") + STANDARD_CONFIG_FILE);
+    addItemStringList(QStringLiteral("Profiles"), m_profiles, QStringList());
+    addItemStringList(QStringLiteral("ProfileNames"), m_profileNames, QStringList());
+    addItemInt(QStringLiteral("CurrentProfile"), m_currentProfile, 0);
+    addItemBool(QStringLiteral("ShowTray"), m_showTray, false);
+    addItemBool(QStringLiteral("StartMinimized"), m_startMinimized, false);
 
     load();
 }

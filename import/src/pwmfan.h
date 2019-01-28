@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -50,8 +49,7 @@ class PwmFan : public Fan
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testStatusChanged)
     Q_PROPERTY(TestStatus testStatus READ testStatus NOTIFY testStatusChanged)
-    Q_PROPERTY(int pwmEnable READ pwmEnable WRITE setPwmEnable NOTIFY pwmEnableChanged)
-    Q_ENUMS(TestStatus)
+    Q_PROPERTY(PwmEnable pwmEnable READ pwmEnable WRITE setPwmEnable NOTIFY pwmEnableChanged)
 
 public:
 
@@ -65,6 +63,15 @@ public:
         Cancelled,
         Error
     };
+    Q_ENUM(TestStatus)
+
+    enum PwmEnable
+    {
+        FullSpeed = 0,
+        ManualControl = 1,
+        BiosControl = 2
+    };
+    Q_ENUM(PwmEnable)
 
     explicit PwmFan(uint index, Hwmon *parent = Q_NULLPTR);
     virtual ~PwmFan();
@@ -78,7 +85,7 @@ public:
     int maxPwm() const { return m_maxPwm; }
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
-    int pwmEnable() const { return m_pwmEnable; }
+    PwmEnable pwmEnable() const { return m_pwmEnable; }
     TestStatus testStatus() const { return m_testStatus; }
     bool active() const;
     bool testing() const;
@@ -91,7 +98,7 @@ public:
     void setMaxPwm(int maxPwm);
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
-    bool setPwmEnable(int pwmEnable, bool write = true);
+    bool setPwmEnable(PwmEnable pwmEnable, bool write = true);
     void setActive(bool active);
     void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
@@ -130,7 +137,7 @@ protected:
 private:
 
     int m_pwm;
-    int m_pwmEnable;
+    PwmEnable m_pwmEnable;
     Temp *m_temp;
     bool m_hasTemp;
     int m_minTemp;

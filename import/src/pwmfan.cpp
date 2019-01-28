@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  Malte Veerman <malte.veerman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -48,7 +47,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
     m_pwmStream(new QTextStream),
     m_enableStream(new QTextStream),
     m_pwm(0),
-    m_pwmEnable(0),
+    m_pwmEnable(FullSpeed),
     m_temp(Q_NULLPTR),
     m_hasTemp(false),
     m_minTemp(0),
@@ -79,12 +78,12 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             if (pwmFile->open(QFile::ReadWrite))
             {
                 m_pwmStream->setDevice(pwmFile);
-                setPwm(m_pwmStream->readAll().toInt(), false);
+                PwmFan::setPwm(m_pwmStream->readAll().toInt(), false);
             }
             else if (pwmFile->open(QFile::ReadOnly))
             {
                 m_pwmStream->setDevice(pwmFile);
-                setPwm(m_pwmStream->readAll().toInt(), false);
+                PwmFan::setPwm(m_pwmStream->readAll().toInt(), false);
             }
             else
             {
@@ -97,12 +96,12 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
             if (pwmEnableFile->open(QFile::ReadWrite))
             {
                 m_enableStream->setDevice(pwmEnableFile);
-                setPwmEnable(m_enableStream->readAll().toInt(), false);
+                setPwmEnable((PwmEnable)m_enableStream->readAll().toInt(), false);
             }
             else if (pwmEnableFile->open(QFile::ReadOnly))
             {
                 m_enableStream->setDevice(pwmEnableFile);
-                setPwmEnable(m_enableStream->readAll().toInt(), false);
+                setPwmEnable((PwmEnable)m_enableStream->readAll().toInt(), false);
             }
             else
             {
@@ -131,7 +130,7 @@ void PwmFan::update()
     setPwm(m_pwmStream->readAll().toInt(), false);
 
     m_enableStream->seek(0);
-    setPwmEnable(m_enableStream->readAll().toInt(), false);
+    setPwmEnable((PwmEnable)m_enableStream->readAll().toInt(), false);
 }
 
 void PwmFan::toDefault()
@@ -141,7 +140,7 @@ void PwmFan::toDefault()
     setHasTemp(false);
     setTemp(Q_NULLPTR);
     setPwm(0, false);
-    setPwmEnable(0, false);
+    setPwmEnable(FullSpeed, false);
     setMinTemp(0);
     setMaxTemp(100);
     setMinPwm(255);
@@ -189,12 +188,16 @@ void PwmFan::toDefault()
         if (pwmEnableFile->open(QFile::ReadWrite))
         {
             m_enableStream->setDevice(pwmEnableFile);
-            *m_enableStream >> m_pwmEnable;
+            int pwmEnable;
+            *m_enableStream >> pwmEnable;
+            m_pwmEnable = (PwmEnable)pwmEnable;
         }
         else if (pwmEnableFile->open(QFile::ReadOnly))
         {
             m_enableStream->setDevice(pwmEnableFile);
-            *m_enableStream >> m_pwmEnable;
+            int pwmEnable;
+            *m_enableStream >> pwmEnable;
+            m_pwmEnable = (PwmEnable)pwmEnable;
         }
         else
         {
@@ -224,7 +227,7 @@ bool PwmFan::setPwm(int pwm, bool write)
 
         if (write)
         {
-            setPwmEnable(1, true);
+            setPwmEnable(ManualControl, true);
 
             if (m_pwmStream->string() || (m_pwmStream->device() && m_pwmStream->device()->isWritable()))
                 *m_pwmStream << pwm;
@@ -262,14 +265,8 @@ bool PwmFan::setPwm(int pwm, bool write)
     return true;
 }
 
-bool PwmFan::setPwmEnable(int pwmEnable, bool write)
+bool PwmFan::setPwmEnable(PwmEnable pwmEnable, bool write)
 {
-    if (pwmEnable < 0)
-    {
-        emit error(i18n("PwmEnable cannot be less than 0!"), true);
-        return false;
-    }
-
     if (m_pwmEnable != pwmEnable)
     {
         m_pwmEnable = pwmEnable;
@@ -389,7 +386,7 @@ void PwmFan::abortTest()
         emit testStatusChanged();
 
         setPwm(255);
-        setPwmEnable(0);
+        setPwmEnable(FullSpeed);
     }
 }
 

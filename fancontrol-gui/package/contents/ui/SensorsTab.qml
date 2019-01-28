@@ -21,6 +21,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
+import org.kde.kirigami 2.4 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
@@ -28,10 +29,10 @@ RowLayout {
     id: root
 
     property int padding: 10
-    property QtObject loader: Fancontrol.base.loader
+    property QtObject loader: Fancontrol.Base.loader
 
     anchors.fill: parent
-    anchors.margins: 10
+    anchors.margins: Kirigami.Units.smallSpacing
 
     Repeater {
         model: loader.hwmons.length
@@ -45,12 +46,13 @@ RowLayout {
             color: palette.light
             border.width: 1
             border.color: "black"
-            radius: 5
+            radius: Kirigami.Units.smallSpacing
             clip: true
 
             Column {
                 id: column
                 anchors.fill: parent
+                anchors.margins: Kirigami.Units.smallSpacing
 
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -66,15 +68,15 @@ RowLayout {
                         width: parent.width
 
                         Label {
-                            anchors.left: parent.left
                             anchors.leftMargin: root.padding
                             Layout.maximumWidth: parent.width - rpmValue.width - root.padding*2
+                            Layout.alignment: Qt.AlignLeft
                             clip: true
                             text: "Fan " + (index+1) + ":"
                         }
                         Label {
                             id: rpmValue
-                            anchors.right: parent.right
+                            Layout.alignment: Qt.AlignRight
                             anchors.rightMargin: root.padding
                             text: hwmon.fans[index].rpm + " " + i18n("rpm")
                         }
@@ -87,17 +89,17 @@ RowLayout {
                         width: parent.width
 
                         Label {
-                            anchors.left: parent.left
                             anchors.leftMargin: root.padding
                             text: hwmon.temps[index].name + ": "
                             Layout.maximumWidth: parent.width - tempValue.width - root.padding*2
+                            Layout.alignment: Qt.AlignLeft
                             clip: true
                         }
                         Label {
                             id: tempValue
-                            anchors.right: parent.right
+                            Layout.alignment: Qt.AlignRight
                             anchors.rightMargin: root.padding
-                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.base.unit) + " " + i18n(Fancontrol.base.unit)
+                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + " " + i18n(Fancontrol.Base.unit)
                         }
                     }
                 }

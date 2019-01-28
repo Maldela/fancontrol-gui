@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright 2015  <copyright holder> <email>
  *
  * This program is free software; you can redistribute it and/or
@@ -139,7 +138,7 @@ void LoaderTest::parseFctempTest()
         QCOMPARE(spy.at(0).at(0).toString(), error);
         QCOMPARE(spy.at(0).at(1).toBool(), critical);
     }
-    else
+    else if (fan)
         QCOMPARE(fan->hasTemp(), true);
 }
 

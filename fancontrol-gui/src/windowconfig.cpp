@@ -34,7 +34,7 @@
 #endif
 
 
-WindowConfig *WindowConfig::m_instance = Q_NULLPTR;
+WindowConfig *WindowConfig::s_instance = Q_NULLPTR;
 
 WindowConfig::WindowConfig(QObject *parent) : QObject(parent)
 {
@@ -42,10 +42,10 @@ WindowConfig::WindowConfig(QObject *parent) : QObject(parent)
 
 WindowConfig* WindowConfig::instance()
 {
-    if (!m_instance)
-        m_instance = new WindowConfig;
+    if (!s_instance)
+        s_instance = new WindowConfig;
 
-    return m_instance;
+    return s_instance;
 }
 
 void WindowConfig::save(QWindow *window)

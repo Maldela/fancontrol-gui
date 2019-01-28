@@ -35,21 +35,26 @@ cmake_policy(SET CMP0063 NEW)
 find_package(ECM REQUIRED)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-
-#Find Qt5
-find_package(Qt5Core REQUIRED)
-
-
-#Find KF5
-find_package(KF5 COMPONENTS I18n REQUIRED)
-
-
 #includes
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 include(FeatureSummary)
-include(ECMGenerateQmlTypes)
+include(FindPkgConfig)
+
+#Find Qt5
+find_package(Qt5Core REQUIRED)
+find_package(Qt5 5.8 COMPONENTS Quick)
+set_package_properties(Qt5Quick PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
+
+#Find KF5
+find_package(KF5 COMPONENTS I18n REQUIRED)
+find_package(KF5 COMPONENTS Kirigami2)
+set_package_properties(KF5Kirigami2 PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
+
+if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
+    include(ECMGenerateQmlTypes)
+endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
 
 include_directories (${CMAKE_SOURCE_DIR})
 
