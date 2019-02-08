@@ -76,9 +76,9 @@ public:
     QList<QObject *> hwmonsAsObjects() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
-    PwmFan *pwmFan(const QPair<int, int> &indexPair) const { return pwmFan(indexPair.first, indexPair.second); }
-    Temp *temp(const QPair<int, int> &indexPair) const { return temp(indexPair.first, indexPair.second); }
-    Fan *fan(const QPair<int, int> &indexPair) const { return fan(indexPair.first, indexPair.second); }
+    PwmFan *pwmFan(QPair<int, int> indexPair) const { return pwmFan(indexPair.first, indexPair.second); }
+    Temp *temp(QPair<int, int> indexPair) const { return temp(indexPair.first, indexPair.second); }
+    Fan *fan(QPair<int, int> indexPair) const { return fan(indexPair.first, indexPair.second); }
     PwmFan *pwmFan(int hwmonIndex, int pwmFanIndex) const;
     Temp *temp(int hwmonIndex, int tempIndex) const;
     Fan *fan(int hwmonIndex, int fanIndex) const;

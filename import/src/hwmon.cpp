@@ -38,6 +38,12 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
     m_valid(true),
     m_path(path)
 {
+    if (parent)
+    {
+        connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::updateConfig);
+        connect(this, &Hwmon::error, parent, &Loader::error);
+    }
+
     if (!path.isEmpty())
     {
         QDir dir(path);
@@ -64,12 +70,6 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
             m_name = path.split('/').last();
 
         delete nameFile;
-    }
-
-    if (parent)
-    {
-        connect(this, &Hwmon::configUpdateNeeded, parent, &Loader::updateConfig);
-        connect(this, &Hwmon::error, parent, &Loader::error);
     }
 
     if (m_valid && !m_path.isEmpty())
@@ -101,7 +101,7 @@ void Hwmon::initialize()
             {
                 PwmFan *newPwmFan = Q_NULLPTR;
 
-                for (const auto &pwmFan : m_pwmFans)
+                for (const auto &pwmFan : qAsConst(m_pwmFans))
                 {
                     if (pwmFan->index() == index)
                     {
@@ -122,10 +122,9 @@ void Hwmon::initialize()
                     emit pwmFansChanged();
                 }
 
-                const auto newFan = qobject_cast<Fan *>(newPwmFan);
-                if (!m_fans.contains(newFan))
+                if (!m_fans.contains(newPwmFan))
                 {
-                    m_fans << newFan;
+                    m_fans << newPwmFan;
                     emit fansChanged();
                 }
             }
@@ -133,7 +132,7 @@ void Hwmon::initialize()
             {
                 Fan *newFan = Q_NULLPTR;
 
-                for (const auto &fan : m_fans)
+                for (const auto &fan : qAsConst(m_fans))
                 {
                     if (fan->index() == index)
                     {
@@ -157,7 +156,7 @@ void Hwmon::initialize()
         {
             Temp *newTemp = Q_NULLPTR;
 
-            for (const auto &temp : m_temps)
+            for (const auto &temp : qAsConst(m_temps))
             {
                 if (temp->index() == index)
                 {
@@ -182,8 +181,8 @@ QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &fan : m_fans)
-        list << qobject_cast<QObject *>(fan);
+    for (const auto &fan : qAsConst(m_fans))
+        list << fan;
 
     return list;
 }
@@ -192,8 +191,8 @@ QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &pwmFan : m_pwmFans)
-        list << qobject_cast<QObject *>(pwmFan);
+    for (const auto &pwmFan : qAsConst(m_pwmFans))
+        list << pwmFan;
 
     return list;
 }
@@ -202,21 +201,21 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &temp : m_temps)
-        list << qobject_cast<QObject *>(temp);
+    for (const auto &temp : qAsConst(m_temps))
+        list << temp;
 
     return list;
 }
 
 void Hwmon::testFans()
 {
-    for (const auto &pwmFan : m_pwmFans)
+    for (const auto &pwmFan : qAsConst(m_pwmFans))
         pwmFan->test();
 }
 
 void Hwmon::abortTestingFans()
 {
-    for (const auto &pwmFan : m_pwmFans)
+    for (const auto &pwmFan : qAsConst(m_pwmFans))
         pwmFan->abortTest();
 }
 

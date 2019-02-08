@@ -60,7 +60,7 @@ void TempModel::addTemps(QList<Temp *> newTemps)
 
     for (const auto &newTemp : newTemps)
     {
-        for (const auto &temp : m_temps)
+        for (const auto &temp : qAsConst(m_temps))
         {
             if (*temp == *newTemp)
             {
@@ -79,7 +79,7 @@ void TempModel::addTemps(QList<Temp *> newTemps)
 
         insertRows(oldSize, newTemps.size());
 
-        for (const auto &temp : newTemps)
+        for (const auto &temp : qAsConst(newTemps))
         {
             connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
             connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
@@ -121,7 +121,7 @@ QList<QObject *> TempModel::temps() const
     QList<QObject *> list;
 
     for (const auto &temp : m_temps)
-        list << qobject_cast<QObject *>(temp);
+        list << temp;
 
     return list;
 }

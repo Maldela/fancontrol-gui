@@ -87,7 +87,7 @@ void Loader::parseHwmons()
     while (!list.isEmpty())
         dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
 
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
     {
         if (!dereferencedList.contains(hwmon->path()))
         {
@@ -99,11 +99,11 @@ void Loader::parseHwmons()
             hwmon->initialize();
     }
 
-    for (const auto &hwmonPath : dereferencedList)
+    for (const auto &hwmonPath : qAsConst(dereferencedList))
     {
         auto hwmonExists = false;
 
-        for (const auto &hwmon : m_hwmons)
+        for (const auto &hwmon : qAsConst(m_hwmons))
         {
             if (hwmon->path() == hwmonPath)
             {
@@ -208,7 +208,7 @@ bool Loader::parseConfig(QString config)
 {
     //Disconnect hwmons for performance reasons
     //They get reconnected later
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
     {
         disconnect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
     }
@@ -236,7 +236,7 @@ bool Loader::parseConfig(QString config)
     }
     while (!stream.atEnd());
 
-    for (auto line : lines)
+    for (auto line : qAsConst(lines))
     {
         if (line.startsWith(QStringLiteral("INTERVAL=")))
         {
@@ -366,7 +366,7 @@ bool Loader::parseConfig(QString config)
     updateConfig();
 
     //Connect hwmons again
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
         connect(hwmon, &Hwmon::configUpdateNeeded, this, &Loader::updateConfig);
 
     return success;
@@ -621,9 +621,9 @@ QString Loader::createConfig() const
 
     if (!usedHwmons.isEmpty())
     {
-        configFile += "DEVPATH=";
+        configFile += QLatin1String("DEVPATH=");
 
-        for (const auto &hwmon : usedHwmons)
+        for (const auto &hwmon : qAsConst(usedHwmons))
         {
             auto sanitizedPath = hwmon->path();
             sanitizedPath.remove(QRegExp("^/sys/"));
@@ -632,18 +632,18 @@ QString Loader::createConfig() const
         }
         configFile += QChar(QChar::LineFeed);
 
-        configFile += "DEVNAME=";
+        configFile += QLatin1String("DEVNAME=");
 
-        for (const auto &hwmon : usedHwmons)
+        for (const auto &hwmon : qAsConst(usedHwmons))
             configFile += "hwmon" + QString::number(hwmon->index()) + "=" + hwmon->name().split('.').first() + QChar(QChar::Space);
 
         configFile += QChar(QChar::LineFeed);
 
         if (!usedFans.isEmpty())
         {
-            configFile += "FCTEMPS=";
+            configFile += QLatin1String("FCTEMPS=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -652,9 +652,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "FCFANS=";
+            configFile += QLatin1String("FCFANS=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -663,9 +663,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MINTEMP=";
+            configFile += QLatin1String("MINTEMP=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -673,9 +673,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MAXTEMP=";
+            configFile += QLatin1String("MAXTEMP=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -683,9 +683,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MINSTART=";
+            configFile += QLatin1String("MINSTART=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -693,9 +693,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MINSTOP=";
+            configFile += QLatin1String("MINSTOP=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -703,9 +703,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MINPWM=";
+            configFile += QLatin1String("MINPWM=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -713,9 +713,9 @@ QString Loader::createConfig() const
             }
             configFile += QChar(QChar::LineFeed);
 
-            configFile += "MAXPWM=";
+            configFile += QLatin1String("MAXPWM=");
 
-            for (const auto &pwmFan : usedFans)
+            for (const auto &pwmFan : qAsConst(usedFans))
             {
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
@@ -748,13 +748,13 @@ void Loader::setInterval(int interval, bool writeNewConfig)
 
 void Loader::testFans()
 {
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
         hwmon->testFans();
 }
 
 void Loader::abortTestingFans()
 {
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
         hwmon->abortTestingFans();
 }
 
@@ -843,7 +843,7 @@ QList<QObject *> Loader::hwmonsAsObjects() const
 {
     auto list = QList<QObject *>();
     for (const auto &hwmon : m_hwmons)
-        list << qobject_cast<QObject *>(hwmon);
+        list << hwmon;
 
     return list;
 }
@@ -852,7 +852,7 @@ void Loader::handleTestStatusChanged()
 {
     auto testing = false;
 
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
     {
         if (hwmon->testing() == true)
         {
@@ -878,7 +878,7 @@ void Loader::setRestartServiceAfterTesting(bool restart)
 
 void Loader::toDefault()
 {
-    for (const auto &hwmon : m_hwmons)
+    for (const auto &hwmon : qAsConst(m_hwmons))
         hwmon->toDefault();
     }
 }

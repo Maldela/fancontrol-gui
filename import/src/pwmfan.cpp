@@ -414,7 +414,7 @@ void PwmFan::continueTest()
         {
             if (m_pwm == 0)
             {
-                error(i18n("Fan never stops."), false);
+                emit error(i18n("Fan never stops."), false);
                 setMinStart(0);
                 setMinStop(0);
                 setMinPwm(0);

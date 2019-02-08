@@ -54,7 +54,7 @@ void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
 {
     for (const auto &newFan : newFans)
     {
-        for (const auto &fan : m_fans)
+        for (const auto &fan : qAsConst(m_fans))
         {
             if (*fan == *newFan)
             {
@@ -73,7 +73,7 @@ void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
 
         insertRows(oldSize, newFans.size());
 
-        for (const auto &fan : newFans)
+        for (const auto &fan : qAsConst(newFans))
         {
             connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
             updateFan(fan);
@@ -97,7 +97,7 @@ void PwmFanModel::updateFan(PwmFan *fan)
 
 void PwmFanModel::updateFan()
 {
-    const auto fan = qobject_cast<PwmFan *>(sender());
+    const auto fan = qobject_cast<PwmFan*>(sender());
 
     if (!fan)
         return;
@@ -115,7 +115,7 @@ QList<QObject *> PwmFanModel::fans() const
 {
     auto list = QList<QObject *>();
     for (const auto &fan : m_fans)
-        list << qobject_cast<QObject *>(fan);
+        list << fan;
     return list;
 }
 

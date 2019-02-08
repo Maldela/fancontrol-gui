@@ -72,7 +72,7 @@ signals:
 
 protected slots:
 
-    void updateServiceProperties(QString, QVariantMap, QStringList);
+    void updateServiceProperties(const QString&, const QVariantMap&, const QStringList&);
 
 
 protected:

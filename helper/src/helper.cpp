@@ -34,6 +34,8 @@
 #include <QtDBus/QDBusVariant>
 
 
+using namespace KAuth;
+
 struct StringStruct
 {
     QString type;

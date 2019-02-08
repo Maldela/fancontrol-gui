@@ -43,8 +43,8 @@ void LoaderTest::initTestCase()
 
     QCOMPARE(m_loader->hwmons().size(), 0);
 
-    m_loader->addHwmon(new TestHwmon("radeon", m_rpms.at(0), m_pwms.at(0), m_pwmModes.at(0), m_temps.at(0), 0, m_loader));
-    m_loader->addHwmon(new TestHwmon("coretemp", m_rpms.at(1), m_pwms.at(1), m_pwmModes.at(1), m_temps.at(1), 1, m_loader));
+    m_loader->addHwmon(new TestHwmon(QStringLiteral("radeon"), m_rpms.at(0), m_pwms.at(0), m_pwmModes.at(0), m_temps.at(0), 0, m_loader));
+    m_loader->addHwmon(new TestHwmon(QStringLiteral("coretemp"), m_rpms.at(1), m_pwms.at(1), m_pwmModes.at(1), m_temps.at(1), 1, m_loader));
 
     QCOMPARE(m_loader->hwmons().size(), 2);
 }

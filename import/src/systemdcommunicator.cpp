@@ -88,13 +88,8 @@ SystemdCommunicator::SystemdCommunicator(GUIBase *parent, const QString &service
     else
         setServiceName(serviceName);
 
-    emit serviceNameChanged();
-
     m_serviceActive = systemdServiceActive();
-    emit serviceActiveChanged();
-
     m_serviceEnabled = systemdServiceEnabled();
-    emit serviceEnabledChanged();
 }
 
 void SystemdCommunicator::setServiceName(const QString &name)
@@ -350,7 +345,7 @@ void SystemdCommunicator::reset()
     setServiceEnabled(systemdServiceEnabled());
 }
 
-void SystemdCommunicator::updateServiceProperties(QString, QVariantMap propchanged, QStringList)
+void SystemdCommunicator::updateServiceProperties(const QString&, const QVariantMap &propchanged, const QStringList&)
 {
     if (propchanged.value(QStringLiteral("ActiveState")).isValid())
     {

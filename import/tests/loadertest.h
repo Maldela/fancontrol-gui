@@ -64,8 +64,8 @@ public:
             if (parent)
                 connect(newPwmFan, &PwmFan::testStatusChanged, parent, &Loader::handleTestStatusChanged);
 
-            m_pwmFans << qobject_cast<PwmFan *>(newPwmFan);
-            m_fans << qobject_cast<Fan *>(newPwmFan);
+            m_pwmFans << newPwmFan;
+            m_fans << newPwmFan;
         }
         emit pwmFansChanged();
 
@@ -74,7 +74,7 @@ public:
             const auto newFan = new TestFan(rpms.at(i), i, this);
             connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
 
-            m_fans << qobject_cast<Fan *>(newFan);
+            m_fans << newFan;
         }
         emit fansChanged();
 
@@ -83,7 +83,7 @@ public:
             const auto newTemp = new TestTemp(temps.at(i), i, this);
             connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
 
-            m_temps << qobject_cast<Temp *>(newTemp);
+            m_temps << newTemp;
         }
         emit tempsChanged();
 
@@ -107,7 +107,7 @@ public:
     }
     void addHwmon(TestHwmon *hwmon)
     {
-        addHwmon(qobject_cast<Hwmon *>(hwmon));
+        addHwmon(hwmon);
     }
     void parse(const QString &string)
     {

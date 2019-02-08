@@ -19,7 +19,6 @@
 
 #include <KAuth/KAuthActionReply>
 
-using namespace KAuth;
 
 class Helper : public QObject
 {
@@ -27,5 +26,5 @@ class Helper : public QObject
 
     public Q_SLOTS:
 
-        ActionReply action(const QVariantMap &args);
+        KAuth::ActionReply action(const QVariantMap &args);
 };
