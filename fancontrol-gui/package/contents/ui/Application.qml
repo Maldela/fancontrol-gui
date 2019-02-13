@@ -29,6 +29,12 @@ import Fancontrol.Qml 1.0 as Fancontrol
 ApplicationWindow {
     id: window
 
+    function showWindow() {
+        window.show()
+        window.raise()
+        window.requestActivate()
+    }
+
     title: i18n("Fancontrol-GUI")
     width: 1024
     height: 768
@@ -115,11 +121,7 @@ ApplicationWindow {
                 iconName: "org.kde.fancontrol.gui"
                 profileModel: Fancontrol.Base.profileModel
 
-                onActivateRequested: {
-                    window.show()
-                    window.raise()
-                    window.requestActivate()
-                }
+                onActivateRequested: window.showWindow()
                 onActivateProfile: {
                     Fancontrol.Base.applyProfile(profile);
                     Fancontrol.Base.apply();

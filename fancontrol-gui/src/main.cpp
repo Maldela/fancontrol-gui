@@ -26,6 +26,7 @@
 #include <KDeclarative/QmlObject>
 #include <KI18n/KLocalizedString>
 #include <KCoreAddons/KAboutData>
+#include <KDBusAddons/KDBusService>
 
 #include "systemtrayicon.h"
 #include "windowconfig.h"
@@ -33,6 +34,32 @@
 
 Q_DECLARE_LOGGING_CATEGORY(FANCONTROL)
 Q_LOGGING_CATEGORY(FANCONTROL, "fancontrol-gui")
+
+void handleArguments(QStringList args)
+{
+    if (args.isEmpty())
+        args << qApp->applicationName();
+
+    const auto parser = new QCommandLineParser;
+    KAboutData::applicationData().setupCommandLine(parser);
+    parser->process(args);
+    KAboutData::applicationData().processCommandLine(parser);
+    delete parser;
+}
+
+void activate(const QStringList &args, const QString &workingDir)
+{
+    Q_UNUSED(workingDir);
+
+    handleArguments(args);
+
+    if (auto mainWindow = qApp->topLevelWindows().at(0))
+    {
+        mainWindow->show();
+        mainWindow->raise();
+        mainWindow->requestActivate();
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -53,11 +80,11 @@ int main(int argc, char *argv[])
     about.addAuthor(i18n("Malte Veerman"), i18n("Main Developer"), QStringLiteral("malte.veerman@gmail.com"));
     KAboutData::setApplicationData(about);
 
-    const auto parser = new QCommandLineParser;
-    about.setupCommandLine(parser);
-    parser->process(app);
-    about.processCommandLine(parser);
-    delete parser;
+    handleArguments(app.arguments());
+
+    // register  the app  to dbus
+    KDBusService dbusService(KDBusService::Unique);
+    QObject::connect(&dbusService, &KDBusService::activateRequested, qApp, activate);
 
     qmlRegisterType<SystemTrayIcon>("Fancontrol.Gui", 1, 0, "SystemTrayIcon");
 
