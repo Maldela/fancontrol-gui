@@ -553,17 +553,17 @@ bool Loader::save(const QUrl &url)
             map[QStringLiteral("content")] = m_config;
 
             action.setArguments(map);
-            auto reply = action.execute();
+            auto job = action.execute();
 
-            if (!reply->exec())
+            if (!job->exec())
             {
-                if (reply->error() == 4)
+                if (job->error() == 4)
                 {
                     emit info(i18n("Saving of file aborted by user"));
                     return false;
                 }
 
-                emit error(i18n("Error executing action. Code %1; %2; %3", reply->error(), reply->errorString(), reply->errorText()), true);
+                emit error(i18n("Error executing action. Code %1; %2; %3", job->error(), job->errorString(), job->errorText()), true);
                 return false;
             }
         }
