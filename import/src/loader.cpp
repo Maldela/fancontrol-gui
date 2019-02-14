@@ -563,7 +563,7 @@ bool Loader::save(const QUrl &url)
                     return false;
                 }
 
-                emit error(reply->errorString() + reply->errorText(), true);
+                emit error(i18n("Error executing action. Code %1; %2; %3", reply->error(), reply->errorString(), reply->errorText()), true);
                 return false;
             }
         }
