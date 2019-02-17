@@ -19,7 +19,7 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
+import QtQuick.Controls 2.3
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
@@ -64,12 +64,14 @@ Rectangle {
 
     MouseArea {
         id: pwmMouse
+
         anchors.fill: parent
         hoverEnabled: root.enabled ? true : false
     }
 
     Rectangle {
         id: tooltip
+
         x: parent.width
         y: - height
         width: Math.max(pwm.width, rpm.width)
@@ -81,17 +83,20 @@ Rectangle {
         Column {
             Label {
                 id: temp
+
                 font.pixelSize: root.height * 1.5
                 text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + i18n(unit)
 
             }
             Label {
                 id: pwm
+
                 font.pixelSize: root.height * 1.5
                 text: Number(Math.round(unscaledPwm / 2.55)).toLocaleString(locale, 'f', 1) + i18n('%')
             }
             Label {
                 id: rpm
+
                 font.pixelSize: root.height * 1.5
                 text: (!!fan ? fan.rpm : "0") + i18n("rpm")
             }

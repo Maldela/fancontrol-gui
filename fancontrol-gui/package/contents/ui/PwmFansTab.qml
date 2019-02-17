@@ -19,8 +19,8 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.2
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.10
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
@@ -34,8 +34,6 @@ Item {
     property var pwmFans: pwmFanModel.fans
 
     id: root
-    anchors.fill: parent
-    anchors.margins: Kirigami.Units.smallSpacing
 
     RowLayout {
         id: profileRow
@@ -142,21 +140,21 @@ Item {
         id: saveProfileAction
 
         text: i18n("Save profile")
-        iconName: "document-save"
+        icon.name: "document-save"
         onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
     }
     Action {
         id: deleteProfileAction
 
         text: i18n("Delete profile")
-        iconName: "edit-delete"
+        icon.name: "edit-delete"
         onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
     }
     Action {
         id: detectFansAction
 
         text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-        iconName: "dialog-password"
+        icon.name: "dialog-password"
         onTriggered: loader.detectSensors()
     }
 }

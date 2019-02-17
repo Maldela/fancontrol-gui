@@ -19,17 +19,14 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.10
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 ColumnLayout {
     property QtObject loader: Fancontrol.Base.loader
-
-    anchors.fill: parent
-    anchors.margins: Kirigami.Units.smallSpacing
 
     Label {
         Layout.alignment: Qt.AlignTop
@@ -45,6 +42,7 @@ ColumnLayout {
 
         ScrollView {
             id: scrollView
+
             anchors.fill: parent
             anchors.margins: Kirigami.Units.smallSpacing
 

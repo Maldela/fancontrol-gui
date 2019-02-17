@@ -19,8 +19,8 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Layouts 1.2
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.10
 import QtQuick.Dialogs 1.2
 import org.kde.kirigami 2.0 as Kirigami
 import org.kde.kcm 1.0
@@ -76,7 +76,7 @@ Item {
         Button {
             Layout.alignment: Qt.AlignCenter
             text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-            iconName: kcm.needsAuthorization ? "dialog-password" : ""
+            icon.name: kcm.needsAuthorization ? "dialog-password" : ""
             onClicked: loader.detectSensors()
         }
     }
@@ -172,7 +172,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 text: i18n("Detect fans")
-                iconName: kcm.needsAuthorization ? "dialog-password" : ""
+                icon.name: kcm.needsAuthorization ? "dialog-password" : ""
                 onClicked: loader.detectSensors()
             }
         }
@@ -271,9 +271,10 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 value: loader.interval
-                suffix: " " + i18np("second", "seconds", loader.interval)
-                minimumValue: 1.0
-                onValueChanged: loader.interval = value
+                editable: true
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 0) + ' ' + i18np("second", "seconds", value) }
+                from: 1.0
+                onValueModified: loader.interval = value
             }
         }
         RowLayout {
@@ -290,11 +291,10 @@ Item {
                 id: minTempBox
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                decimals: 2
-                maximumValue: maxTempBox.value
-                minimumValue: Units.fromKelvin(0, Fancontrol.Base.unit)
+                to: maxTempBox.value
+                from: Units.fromKelvin(0, Fancontrol.Base.unit)
                 value: Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
-                suffix: Fancontrol.Base.unit
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
                 onValueChanged: Fancontrol.Base.minTemp = Units.toCelsius(value, Fancontrol.Base.unit)
             }
         }
@@ -312,11 +312,10 @@ Item {
                 id: maxTempBox
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                decimals: 2
-                maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: minTempBox.value
+                from: minTempBox.value
                 value: Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
-                suffix: Fancontrol.Base.unit
+                editable: true
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
                 onValueChanged: Fancontrol.Base.maxTemp = Units.toCelsius(value, Fancontrol.Base.unit)
             }
         }
@@ -365,26 +364,28 @@ Item {
         id: saveProfileAction
 
         text: i18n("Save profile")
-        iconName: "document-save"
+        icon.name: "document-save"
         onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
     }
     Action {
         id: deleteProfileAction
 
         text: i18n("Delete profile")
-        iconName: "edit-delete"
+        icon.name: "edit-delete"
         onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
     }
     Action {
         id: loadAction
-        iconName: "document-open"
+
+        icon.name: "document-open"
         onTriggered: openFileDialog.open()
-        tooltip: i18n("Load configuration file")
+//         tooltip: i18n("Load configuration file")
         shortcut: StandardKey.Open
     }
 
     FileDialog {
         id: openFileDialog
+
         title: i18n("Please choose a configuration file")
         folder: "file:///etc"
         selectExisting: true
@@ -395,6 +396,7 @@ Item {
 
     Fancontrol.ErrorDialog {
         id: errorDialog
-        modality: Qt.ApplicationModal
+
+        modal: true
     }
 }

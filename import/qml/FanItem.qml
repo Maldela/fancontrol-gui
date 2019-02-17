@@ -19,8 +19,8 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.10
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
@@ -113,14 +113,14 @@ Rectangle {
             top: nameField.bottom
             bottom: settingsArea.top
         }
-        visible: background.height > 0 && background.width > 0
+        visible: graphBackground.height > 0 && graphBackground.width > 0
 
         Item {
             id: verticalScala
 
             anchors {
-                top: background.top
-                bottom: background.bottom
+                top: graphBackground.top
+                bottom: graphBackground.bottom
                 left: parent.left
             }
             width: MoreMath.maxWidth(children) + graph.fontSize
@@ -132,7 +132,7 @@ Rectangle {
 
                 Label {
                     x: verticalScala.width - implicitWidth - graph.fontSize / 3
-                    y: background.height - background.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
+                    y: graphBackground.height - graphBackground.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
                     horizontalAlignment: Text.AlignRight
                     color: graph.pal.text
                     text: i18n("%1\%", index * (100 / (graph.verticalScalaCount - 1)))
@@ -140,13 +140,14 @@ Rectangle {
                 }
             }
         }
+
         Item {
             id: horizontalScala
 
             anchors {
-                right: background.right
+                right: graphBackground.right
                 bottom: parent.bottom
-                left: background.left
+                left: graphBackground.left
             }
             height: graph.fontSize * 2
 
@@ -154,7 +155,7 @@ Rectangle {
                 model: graph.horIntervals.length;
 
                 Label {
-                    x: background.scaleX(Units.toCelsius(graph.horIntervals[index], unit)) - width/2
+                    x: graphBackground.scaleX(Units.toCelsius(graph.horIntervals[index], unit)) - width/2
                     y: horizontalScala.height / 2 - implicitHeight / 2
                     color: graph.pal.text
                     text: i18n("%1" + unit, graph.horIntervals[index])
@@ -164,7 +165,7 @@ Rectangle {
         }
 
         Rectangle {
-            id: background
+            id: graphBackground
 
             property alias pal: graph.pal
 
@@ -204,7 +205,7 @@ Rectangle {
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Cooperative
 
-                property alias pal: background.pal
+                property alias pal: graphBackground.pal
 
                 onPaint: {
                     var c = curveCanvas.getContext("2d");
@@ -240,10 +241,10 @@ Rectangle {
                     }
                     c.fill();
 
-                    //blend background
+                    //blend graphBackground
                     gradient = c.createLinearGradient(0, 0, 0, height);
-                    gradient.addColorStop(0, Colors.setAlpha(background.color, 0.5));
-                    gradient.addColorStop(1, Colors.setAlpha(background.color, 0.9));
+                    gradient.addColorStop(0, Colors.setAlpha(graphBackground.color, 0.5));
+                    gradient.addColorStop(1, Colors.setAlpha(graphBackground.color, 0.9));
                     c.fillStyle = gradient;
                     c.fill();
                 }
@@ -255,7 +256,7 @@ Rectangle {
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Cooperative
 
-                property alias pal: background.pal
+                property alias pal: graphBackground.pal
 
                 onPaint: {
                     var c = meshCanvas.getContext("2d");
@@ -267,7 +268,7 @@ Rectangle {
 
                     //horizontal lines
                     for (var i=0; i<=100; i+=20) {
-                        var y = background.scaleY(i*2.55);
+                        var y = graphBackground.scaleY(i*2.55);
                         if (i != 0 && i != 100) {
                             for (var j=0; j<=width; j+=15) {
                                 c.moveTo(j, y);
@@ -279,7 +280,7 @@ Rectangle {
                     //vertical lines
                     if (graph.horIntervals.length > 1) {
                         for (var i=1; i<graph.horIntervals.length; i++) {
-                            var x = background.scaleX(Units.toCelsius(graph.horIntervals[i], unit));
+                            var x = graphBackground.scaleX(Units.toCelsius(graph.horIntervals[i], unit));
                             for (var j=0; j<=height; j+=20) {
                                 c.moveTo(x, j);
                                 c.lineTo(x, Math.min(j+5, height));
@@ -292,7 +293,7 @@ Rectangle {
             StatusPoint {
                 id: currentPwm
                 size: graph.fontSize
-                visible: background.contains(center) && !!fan && fan.hasTemp
+                visible: graphBackground.contains(center) && !!fan && fan.hasTemp
                 fan: root.fan
             }
             PwmPoint {
@@ -300,16 +301,16 @@ Rectangle {
                 color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
-                drag.maximumX: Math.min(background.scaleX(background.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
-                drag.minimumY: Math.max(background.scaleY(background.scalePwm(maxPoint.y)-1), maxPoint.y+1)
-                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.minTemp, root.maxTemp)) - width/2 : -width/2
-                y: !!fan && fan.hasTemp ? background.scaleY(fan.minStop) - height/2 : -height/2
-                temp: !!fan && fan.hasTemp ? drag.active ? background.scaleTemp(centerX) : fan.minTemp : root.minTemp
-                pwm: !!fan && fan.hasTemp ? drag.active ? background.scalePwm(centerY) : fan.minStop : 255
+                drag.maximumX: Math.min(graphBackground.scaleX(graphBackground.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
+                drag.minimumY: Math.max(graphBackground.scaleY(graphBackground.scalePwm(maxPoint.y)-1), maxPoint.y+1)
+                x: !!fan && fan.hasTemp ? graphBackground.scaleX(MoreMath.bound(root.minTemp, fan.minTemp, root.maxTemp)) - width/2 : -width/2
+                y: !!fan && fan.hasTemp ? graphBackground.scaleY(fan.minStop) - height/2 : -height/2
+                temp: !!fan && fan.hasTemp ? drag.active ? graphBackground.scaleTemp(centerX) : fan.minTemp : root.minTemp
+                pwm: !!fan && fan.hasTemp ? drag.active ? graphBackground.scalePwm(centerY) : fan.minStop : 255
                 drag.onActiveChanged: {
                     if (!drag.active) {
-                        fan.minStop = Math.round(background.scalePwm(centerY));
-                        fan.minTemp = Math.round(background.scaleTemp(centerX));
+                        fan.minStop = Math.round(graphBackground.scalePwm(centerY));
+                        fan.minTemp = Math.round(graphBackground.scaleTemp(centerX));
                         if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
                     }
                 }
@@ -325,16 +326,16 @@ Rectangle {
                 color: !!fan ? fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
-                drag.minimumX: Math.max(background.scaleX(background.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
-                drag.maximumY: Math.min(background.scaleY(background.scalePwm(stopPoint.y)+1), stopPoint.y-1)
-                x: !!fan && fan.hasTemp ? background.scaleX(MoreMath.bound(root.minTemp, fan.maxTemp, root.maxTemp)) - width/2 : background.width - width/2
-                y: !!fan && fan.hasTemp ? background.scaleY(fan.maxPwm) - height/2 : -height/2
-                temp: !!fan && fan.hasTemp ? drag.active ? background.scaleTemp(centerX) : fan.maxTemp : root.maxTemp
-                pwm: !!fan && fan.hasTemp ? drag.active ? background.scalePwm(centerY) : fan.maxPwm : 255
+                drag.minimumX: Math.max(graphBackground.scaleX(graphBackground.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
+                drag.maximumY: Math.min(graphBackground.scaleY(graphBackground.scalePwm(stopPoint.y)+1), stopPoint.y-1)
+                x: !!fan && fan.hasTemp ? graphBackground.scaleX(MoreMath.bound(root.minTemp, fan.maxTemp, root.maxTemp)) - width/2 : graphBackground.width - width/2
+                y: !!fan && fan.hasTemp ? graphBackground.scaleY(fan.maxPwm) - height/2 : -height/2
+                temp: !!fan && fan.hasTemp ? drag.active ? graphBackground.scaleTemp(centerX) : fan.maxTemp : root.maxTemp
+                pwm: !!fan && fan.hasTemp ? drag.active ? graphBackground.scalePwm(centerY) : fan.maxPwm : 255
                 drag.onActiveChanged: {
                     if (!drag.active) {
-                        fan.maxPwm = Math.round(background.scalePwm(centerY));
-                        fan.maxTemp = Math.round(background.scaleTemp(centerX));
+                        fan.maxPwm = Math.round(graphBackground.scalePwm(centerY));
+                        fan.maxTemp = Math.round(graphBackground.scaleTemp(centerX));
                     }
                 }
                 onPositionChanged: {
@@ -443,13 +444,14 @@ Rectangle {
             }
             SpinBox {
                 id: minStartInput
+
                 Layout.fillWidth: true
-                minimumValue: 0
-                maximumValue: 100
-                decimals: 1
+                from: 0
+                to: 100
+                editable: true
                 value: !!fan ? Math.round(fan.minStart / 2.55) : 0
-                suffix: i18n("%")
-                onValueChanged: {
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 1) + i18n("%") }
+                onValueModified: {
                     if (!!fan) {
                         fan.minStart = Math.round(value * 2.55)
                     }
@@ -476,7 +478,7 @@ Rectangle {
                 id: testButton
 
                 text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
-                iconName: "dialog-password"
+                icon.name: "dialog-password"
                 Layout.alignment: Qt.AlignRight
                 onClicked: {
                     if (fan.testing) {

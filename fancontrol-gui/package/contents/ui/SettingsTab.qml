@@ -19,8 +19,8 @@
 
 
 import QtQuick 2.4
-import QtQuick.Layouts 1.1
-import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.10
+import QtQuick.Controls 2.3
 import QtQuick.Dialogs 1.2
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
@@ -34,8 +34,6 @@ Item {
     property var locale: Qt.locale()
 
     id: root
-    anchors.fill: parent
-    anchors.margins: Kirigami.Units.smallSpacing
 
     Column {
         id: column
@@ -59,9 +57,10 @@ Item {
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
                 value: loader.interval
-                suffix: " " + i18np("second", "seconds", loader.interval)
-                minimumValue: 1.0
-                onValueChanged: loader.interval = value
+                from: 1.0
+                editable: true
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 0) + ' ' + i18np("second", "seconds", value) }
+                onValueModified: loader.interval = value
 
                 Connections {
                     target: loader
@@ -84,12 +83,13 @@ Item {
 
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                decimals: 2
-                maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+//                 decimals: 2
+                from: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                editable: true
                 value: Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
-                suffix: Fancontrol.Base.unit
-                onValueChanged: {
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
+                onValueModified: {
                     Fancontrol.Base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
                     if (value >= maxTempBox.value) maxTempBox.value = value + 1;
                 }
@@ -119,12 +119,13 @@ Item {
 
                 Layout.minimumWidth: implicitWidth
                 Layout.fillWidth: true
-                decimals: 2
-                maximumValue: Number.POSITIVE_INFINITY
-                minimumValue: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+//                 decimals: 2
+                from: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                editable: true
                 value: Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
-                suffix: Fancontrol.Base.unit
-                onValueChanged: {
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
+                onValueModified: {
                     Fancontrol.Base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
                     if (value <= minTempBox.value) minTempBox.value = value - 1;
                 }
@@ -157,8 +158,8 @@ Item {
                 onTextChanged: Fancontrol.Base.configUrl = text;
             }
             Button {
-                iconName: "document-open"
-                tooltip: i18n("Open config file")
+                icon.name: "document-open"
+//                 tooltip: i18n("Open config file")
                 onClicked: openFileDialog.open();
             }
         }

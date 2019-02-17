@@ -19,8 +19,8 @@
 
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.0 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
@@ -32,7 +32,6 @@ RowLayout {
     property QtObject loader: Fancontrol.Base.loader
 
     anchors.fill: parent
-    anchors.margins: Kirigami.Units.smallSpacing
 
     Repeater {
         model: loader.hwmons.length
@@ -41,7 +40,7 @@ RowLayout {
             property QtObject hwmon: loader.hwmons[index]
 
             Layout.preferredWidth: root.width / loader.hwmons.length - root.spacing
-            Layout.maximumWidth: 500
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 10
             Layout.fillHeight: true
             color: palette.light
             border.width: 1
