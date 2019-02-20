@@ -44,13 +44,13 @@ include(FindPkgConfig)
 
 #Find Qt5
 find_package(Qt5Core REQUIRED)
-find_package(Qt5 5.10 COMPONENTS Quick QuickControls2)
+find_package(Qt5 5.8 COMPONENTS Quick QuickControls2)
 set_package_properties(Qt5Quick PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 set_package_properties(Qt5QuickControls2 PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 
 #Find KF5
 find_package(KF5 COMPONENTS I18n REQUIRED)
-find_package(KF5 COMPONENTS Kirigami2)
+find_package(KF5 5.37 COMPONENTS Kirigami2)
 set_package_properties(KF5Kirigami2 PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 
 if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)

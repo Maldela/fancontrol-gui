@@ -12,9 +12,11 @@ set(LIB_SRCS src/hwmon.cpp
 
 set(QML_FILES qml/qmldir
               qml/ErrorDialog.qml
-              qml/OptionInput.qml
+              qml/FanHeader.qml
               qml/FanItem.qml
               qml/PwmPoint.qml
+              qml/ProfilesDialog.qml
+              qml/SettingsForm.qml
               qml/StatusPoint.qml
               qml/colors.js
               qml/math.js

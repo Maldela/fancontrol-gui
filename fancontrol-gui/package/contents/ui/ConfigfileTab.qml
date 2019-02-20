@@ -18,43 +18,27 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.10
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.2
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
-ColumnLayout {
+Kirigami.ScrollablePage {
+    id: root
+
     property QtObject loader: Fancontrol.Base.loader
 
-    Label {
-        Layout.alignment: Qt.AlignTop
+    header: Label {
         text: !!loader && loader.configEqualToLoadedFile ? loader.configPath : i18n("New config")
     }
 
-    Rectangle {
-        Layout.fillHeight: true
-        Layout.fillWidth: true
-        color: palette.light
-        border.width: 1
-        radius: Kirigami.Units.smallSpacing
-
-        ScrollView {
-            id: scrollView
-
-            anchors.fill: parent
-            anchors.margins: Kirigami.Units.smallSpacing
-
-            TextEdit {
-                text: !!loader ? loader.config : ""
-                readOnly: true
-                color: palette.text
-            }
-        }
-    }
-
-    SystemPalette {
-        id: palette
+    TextEdit {
+        width: root.width - root.leftPadding - root.rightPadding
+        text: !!loader ? loader.config : ""
+        readOnly: true
+        color: Kirigami.Theme.textColor
+        wrapMode: TextEdit.Wrap
     }
 }

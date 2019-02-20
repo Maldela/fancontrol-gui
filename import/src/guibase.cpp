@@ -48,6 +48,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
 {
     connect(this, &GUIBase::unitChanged, m_tempModel, &TempModel::setUnit);
     connect(m_loader, &Loader::needsSaveChanged, this, &GUIBase::needsApplyChanged);
+    connect(m_loader, &Loader::configChanged, this, &GUIBase::currentProfileChanged);
 
 #ifndef NO_SYSTEMD
     connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
@@ -77,20 +78,30 @@ GUIBase::~GUIBase()
 void GUIBase::load()
 {
     Config::instance()->load();
-    m_configValid = m_loader->load(configUrl());
 
+    // Check profiles
+    auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
     auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+
+    while (profiles.size() > profileNames.size())
+        profiles.removeLast();
+
+    while (profiles.size() < profileNames.size())
+        profileNames.removeLast();
+
+    Config::instance()->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+    Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
+
     m_profileModel->setStringList(profileNames);
 
-    Config::instance()->setCurrentGroup(QStringLiteral("preferences"));
-    int currentProfile = Config::instance()->findItem(QStringLiteral("CurrentProfile"))->property().toInt();
-    emit profileChanged(currentProfile);
+    m_configValid = m_loader->load(configUrl());
 
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
     m_com->reset();
 #endif
 
+    emit currentProfileChanged();
     emit serviceNameChanged();
     emit minTempChanged();
     emit maxTempChanged();
@@ -272,15 +283,15 @@ void GUIBase::handleInfo(const QString &info)
         qInfo() << info;
 }
 
-void GUIBase::applyProfile(const QString& profile)
+void GUIBase::applyProfile(const QString& profileName)
 {
-    if (!Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profile))
+    if (!Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().contains(profileName))
     {
-        handleError(i18n("Unable to apply unknown profile: %1", profile));
+        handleError(i18n("Unable to apply unknown profile: %1", profileName));
         return;
     }
 
-    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profileName);
 
     applyProfile(index);
 }
@@ -306,22 +317,19 @@ void GUIBase::applyProfile(int index)
         return;
 
     m_loader->load(newConfig);
-
-    Config::instance()->findItem(QStringLiteral("CurrentProfile"))->setProperty(index);
-    emit profileChanged(index);
 }
 
-void GUIBase::saveProfile(const QString& profile, bool updateModel)
+void GUIBase::saveProfile(const QString& profileName, bool updateModel)
 {
     auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
-    int index = profileNames.indexOf(profile);
+    int index = profileNames.indexOf(profileName);
 
     if (index < 0)
     {
         index = profileNames.size();
 
         auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
-        Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames << profile);
+        Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames << profileName);
 
         if (updateModel)
             m_profileModel->insertRow(index);
@@ -331,13 +339,15 @@ void GUIBase::saveProfile(const QString& profile, bool updateModel)
     profiles.insert(index, m_loader->config());
     Config::instance()->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
 
+    emit currentProfileChanged();
+
     if (updateModel)
-        m_profileModel->setData(m_profileModel->index(index, 0), profile);
+        m_profileModel->setData(m_profileModel->index(index, 0), profileName);
 }
 
-void GUIBase::deleteProfile(const QString& profile, bool updateModel)
+void GUIBase::deleteProfile(const QString& profileName, bool updateModel)
 {
-    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profile);
+    int index = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList().indexOf(profileName);
 
     deleteProfile(index, updateModel);
 }
@@ -345,18 +355,40 @@ void GUIBase::deleteProfile(const QString& profile, bool updateModel)
 void GUIBase::deleteProfile(int index, bool updateModel)
 {
     auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
 
-    if (index < 0 || index >= profileNames.size())
+    if (index < 0 || index >= profileNames.size() || index >= profiles.size())
+    {
+        qDebug() << "Index out of bounds";
         return;
+    }
 
     profileNames.removeAt(index);
     Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);
-    auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
-    profileNames.removeAt(index);
+    profiles.removeAt(index);
     Config::instance()->findItem(QStringLiteral("Profiles"))->setProperty(profiles);
+
+    emit currentProfileChanged();
 
     if (updateModel)
         m_profileModel->removeRow(index);
+}
+
+QString GUIBase::currentProfile() const
+{
+    const int index = currentProfileIndex();
+
+    if (index == -1)
+        return i18n("No profile");
+
+    const auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
+    return profileNames.value(index);
+}
+
+int GUIBase::currentProfileIndex() const
+{
+    const auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
+    return profiles.indexOf(m_loader->config());
 }
 
 }

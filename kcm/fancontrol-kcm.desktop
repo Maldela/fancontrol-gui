@@ -7,6 +7,7 @@ X-KDE-ServiceTypes=KCModule
 X-KDE-Library=kcm_fancontrol
 X-KDE-PluginKeyword=Fans
 X-KDE-System-Settings-Parent-Category=hardware
+X-KDE-ParentApp=kcontrol
 
 Name=Fancontrol
 Comment=Control PWM-fans

@@ -18,17 +18,17 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.10
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.2
+import org.kde.kirigami 2.2 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
 import "units.js" as Units
 import "colors.js" as Colors
 
 
-Rectangle {
+Item {
     property QtObject fan
     property QtObject systemdCom
     property QtObject tempModel
@@ -40,10 +40,7 @@ Rectangle {
     property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
     id: root
-    color: "transparent"
-    border.color: palette.windowText
-    border.width: 2
-    radius: Kirigami.Units.smallSpacing
+
     clip: false
 
     onConvertedMinTempChanged: {
@@ -56,61 +53,17 @@ Rectangle {
     }
     onFanChanged: curveCanvas.requestPaint()
 
-    SystemPalette {
-        id: palette
-        colorGroup: SystemPalette.Active
-    }
-    SystemPalette {
-        id: disabledPalette
-        colorGroup: SystemPalette.Disabled
-    }
-
-    TextEdit {
-        id: nameField
-
-        anchors {
-            left: parent.left
-            leftMargin: margin
-            right: parent.right
-            rightMargin: margin
-            top: parent.top
-            topMargin: margin
-        }
-        visible: root.height >= height + margin * 2
-        text: !!fan ? fan.name : ""
-        color: palette.text
-        horizontalAlignment: TextEdit.AlignLeft
-        wrapMode: TextEdit.Wrap
-        font.bold: true
-        font.pointSize: 14
-        selectByMouse: true
-
-        onTextChanged: if (!!fan && fan.name != text) fan.name = text
-
-        Connections {
-            target: fan
-            onNameChanged: if (fan.name != nameField.text) nameField.text = fan.name
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.IBeamCursor
-            acceptedButtons: Qt.NoButton
-        }
-    }
-
     Item {
         id: graph
 
         property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
-        property QtObject pal: !!fan ? fan.hasTemp ? palette : disabledPalette : disabledPalette
         property int verticalScalaCount: 6
         property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
 
         anchors {
             left: parent.left
             right: parent.right
-            top: nameField.bottom
+            top: parent.top
             bottom: settingsArea.top
         }
         visible: graphBackground.height > 0 && graphBackground.width > 0
@@ -130,12 +83,12 @@ Rectangle {
 
                 model: graph.verticalScalaCount
 
-                Label {
+                Text {
                     x: verticalScala.width - implicitWidth - graph.fontSize / 3
                     y: graphBackground.height - graphBackground.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
                     horizontalAlignment: Text.AlignRight
-                    color: graph.pal.text
-                    text: i18n("%1\%", index * (100 / (graph.verticalScalaCount - 1)))
+                    color: Kirigami.Theme.textColor
+                    text: Number(index * (100 / (graph.verticalScalaCount - 1))).toLocaleString(locale, 'f', 0) + locale.percent
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -154,11 +107,11 @@ Rectangle {
             Repeater {
                 model: graph.horIntervals.length;
 
-                Label {
+                Text {
                     x: graphBackground.scaleX(Units.toCelsius(graph.horIntervals[index], unit)) - width/2
                     y: horizontalScala.height / 2 - implicitHeight / 2
-                    color: graph.pal.text
-                    text: i18n("%1" + unit, graph.horIntervals[index])
+                    color: Kirigami.Theme.textColor
+                    text: Number(graph.horIntervals[index]).toLocaleString() + i18n(unit)
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -167,10 +120,8 @@ Rectangle {
         Rectangle {
             id: graphBackground
 
-            property alias pal: graph.pal
-
-            color: pal.light
-            border.color: pal.text
+            color: Kirigami.Theme.backgroundColor
+            border.color: Kirigami.Theme.textColor
             border.width: 2
             radius: 1
 
@@ -204,8 +155,6 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Cooperative
-
-                property alias pal: graphBackground.pal
 
                 onPaint: {
                     var c = curveCanvas.getContext("2d");
@@ -256,15 +205,13 @@ Rectangle {
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Cooperative
 
-                property alias pal: graphBackground.pal
-
                 onPaint: {
                     var c = meshCanvas.getContext("2d");
                     c.clearRect(0, 0, width, height);
 
                     //draw mesh
                     c.beginPath();
-                    c.strokeStyle = Colors.setAlpha(pal.text, 0.3);
+                    c.strokeStyle = Colors.setAlpha(Kirigami.Theme.textColor, 0.3);
 
                     //horizontal lines
                     for (var i=0; i<=100; i+=20) {
@@ -298,7 +245,7 @@ Rectangle {
             }
             PwmPoint {
                 id: stopPoint
-                color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(graph.pal.light, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
+                color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(Kirigami.Theme.disabledTextColor, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
                 drag.maximumX: Math.min(graphBackground.scaleX(graphBackground.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
@@ -323,7 +270,7 @@ Rectangle {
             }
             PwmPoint {
                 id: maxPoint
-                color: !!fan ? fan.hasTemp ? "red" : Qt.tint(graph.pal.light, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
+                color: !!fan ? fan.hasTemp ? "red" : Qt.tint(Kirigami.Theme.disabledTextColor, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
                 drag.minimumX: Math.max(graphBackground.scaleX(graphBackground.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
@@ -359,7 +306,7 @@ Rectangle {
             bottom: parent.bottom
             bottomMargin: padding
         }
-        visible: root.height >= nameField.height + height + 2*margin
+        visible: root.height >= height + 2*margin
         clip: true
         spacing: 2
 
@@ -450,7 +397,7 @@ Rectangle {
                 to: 100
                 editable: true
                 value: !!fan ? Math.round(fan.minStart / 2.55) : 0
-                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 1) + i18n("%") }
+                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 1) + locale.percent }
                 onValueModified: {
                     if (!!fan) {
                         fan.minStart = Math.round(value * 2.55)
@@ -464,29 +411,6 @@ Rectangle {
                 Connections {
                     target: fan
                     onMinStartChanged: minStartInput.value = Math.round(fan.minStart / 2.55)
-                }
-            }
-        }
-
-        RowLayout {
-            visible: !!systemdCom
-
-            Item {
-                Layout.fillWidth: true
-            }
-            Button {
-                id: testButton
-
-                text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
-                icon.name: "dialog-password"
-                Layout.alignment: Qt.AlignRight
-                onClicked: {
-                    if (fan.testing) {
-                        fan.abortTest();
-                    } else {
-                        minStartInput.value = Qt.binding(function() { return Math.round(fan.minStart / 2.55) });
-                        fan.test();
-                    }
                 }
             }
         }

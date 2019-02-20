@@ -18,40 +18,44 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
+import QtQuick 2.6
+import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.0 as Kirigami
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
-RowLayout {
+Kirigami.ScrollablePage {
     id: root
 
-    property int padding: 10
     property QtObject loader: Fancontrol.Base.loader
 
-    anchors.fill: parent
+    spacing: Kirigami.Units.smallSpacing
 
-    Repeater {
+    ListView {
+        id: listView
+
+        width: root.width
+        topMargin: spacing
+        spacing: Kirigami.Units.largeSpacing * 2
+        headerPositioning: ListView.OverlayHeader
+
         model: loader.hwmons.length
 
-        Rectangle {
+        delegate: Rectangle {
             property QtObject hwmon: loader.hwmons[index]
 
-            Layout.preferredWidth: root.width / loader.hwmons.length - root.spacing
-            Layout.minimumWidth: Kirigami.Units.gridUnit * 10
-            Layout.fillHeight: true
-            color: palette.light
-            border.width: 1
-            border.color: "black"
-            radius: Kirigami.Units.smallSpacing
+            height: childrenRect.height
+            width: listView.width - listView.spacing * 2
+            x: listView.spacing
             clip: true
+            color: Kirigami.Theme.backgroundColor
 
             Column {
                 id: column
-                anchors.fill: parent
-                anchors.margins: Kirigami.Units.smallSpacing
+
+                width: parent.width
+                padding: root.spacing
 
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -64,11 +68,11 @@ RowLayout {
                     model: hwmon.fans.length
 
                     RowLayout {
-                        width: parent.width
+                        width: parent.width - parent.padding * 2
 
                         Label {
-                            anchors.leftMargin: root.padding
-                            Layout.maximumWidth: parent.width - rpmValue.width - root.padding*2
+                            anchors.leftMargin: root.spacing
+                            Layout.maximumWidth: parent.width - rpmValue.width - root.spacing*2
                             Layout.alignment: Qt.AlignLeft
                             clip: true
                             text: "Fan " + (index+1) + ":"
@@ -76,7 +80,7 @@ RowLayout {
                         Label {
                             id: rpmValue
                             Layout.alignment: Qt.AlignRight
-                            anchors.rightMargin: root.padding
+                            anchors.rightMargin: root.spacing
                             text: hwmon.fans[index].rpm + " " + i18n("rpm")
                         }
                     }
@@ -85,28 +89,24 @@ RowLayout {
                     model: hwmon.temps.length
 
                     RowLayout {
-                        width: parent.width
+                        width: parent.width - parent.padding * 2
 
                         Label {
-                            anchors.leftMargin: root.padding
+                            anchors.leftMargin: root.spacing
                             text: hwmon.temps[index].name + ": "
-                            Layout.maximumWidth: parent.width - tempValue.width - root.padding*2
+                            Layout.maximumWidth: parent.width - tempValue.width - root.spacing*2
                             Layout.alignment: Qt.AlignLeft
                             clip: true
                         }
                         Label {
                             id: tempValue
                             Layout.alignment: Qt.AlignRight
-                            anchors.rightMargin: root.padding
+                            anchors.rightMargin: root.spacing
                             text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + " " + i18n(Fancontrol.Base.unit)
                         }
                     }
                 }
             }
         }
-    }
-
-    SystemPalette {
-        id: palette
     }
 }

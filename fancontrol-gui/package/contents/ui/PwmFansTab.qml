@@ -18,143 +18,117 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.10
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.2
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
-Item {
+Kirigami.Page {
     property QtObject loader: Fancontrol.Base.loader
     property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
     property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
     property QtObject tempModel: Fancontrol.Base.tempModel
     property QtObject profileModel: Fancontrol.Base.profileModel
     property var pwmFans: pwmFanModel.fans
+    property QtObject fan: applicationWindow().fan
 
     id: root
 
-    RowLayout {
-        id: profileRow
+    header: Fancontrol.FanHeader {
+        fan: root.fan
+    }
 
-        anchors.top: parent.top
-        width: parent.width
-        height: childrenRect.height
+    contextualActions: [
+        Kirigami.Action {
+            text: i18n("Manage profiles")
+            onTriggered: profilesDialog.open()
+        },
+        Kirigami.Action {
+            text: i18n("Service")
+            visible: Fancontrol.Base.hasSystemdCommunicator
+            tooltip: i18n("Control the systemd service")
 
-        Label {
-            text: i18n("Profile:")
-            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            renderType: Text.NativeRendering
-        }
-        ComboBox {
-            id: profileComboBox
+            Kirigami.Action {
+                text: !!systemdCom && systemdCom.serviceActive ? i18n("Stop service") : i18n("Start service")
+                icon.name: !!systemdCom && systemdCom.serviceActive ? "media-playback-stop" : "media-playback-start"
 
-            property string saveText: editText.length > 0 ? editText : currentText
+                onTriggered: systemdCom.serviceActive = !systemdCom.serviceActive
+            }
+            Kirigami.Action {
+                text: !!systemdCom && systemdCom.serviceEnabled ? i18n("Disable service") : i18n("Enable service")
+                tooltip: !!systemdCom && systemdCom.serviceEnabled ? i18n("Disable service autostart at boot") : i18n("Enable service autostart at boot")
 
-            editable: true
-            model: profileModel
-            textRole: "display"
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-
-            onActivated: Fancontrol.Base.applyProfile(index)
-
-            Connections {
-                target: Fancontrol.Base
-                onProfileChanged: profileComboBox.currentIndex = profile
+                onTriggered: systemdCom.serviceEnabled = !systemdCom.serviceEnabled
+            }
+        },
+        Kirigami.Action {
+            text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
+            icon.name: "dialog-password"
+            onTriggered: loader.detectSensors()
+        },
+        Kirigami.Action {
+            visible: !!systemdCom && !!fan
+            text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
+            icon.name: "dialog-password"
+            onTriggered: {
+                if (fan.testing) {
+                    fan.abortTest();
+                } else {
+                    fan.test();
+                }
             }
         }
-        Button {
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-            action: saveProfileAction
-        }
-        Button {
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-            action: deleteProfileAction
-        }
+    ]
+
+    mainAction: Kirigami.Action {
+        text: i18n("Apply")
+        enabled: Fancontrol.Base.needsApply
+        icon.name: "dialog-ok-apply"
+        tooltip: i18n("Apply changes")
+        shortcut: StandardKey.Apply
+
+        onTriggered: Fancontrol.Base.apply()
     }
+    rightAction: Kirigami.Action {
+        text: i18n("Reset")
+        enabled: Fancontrol.Base.needsApply
+        icon.name: "edit-undo"
+        tooltip: i18n("Revert changes")
 
-    RowLayout {
-        id: fanRow
-
-        anchors.top: profileRow.bottom
-        width: parent.width
-        height: childrenRect.height
-        visible: pwmFans.length > 0
-
-        Label {
-            text: i18n("Fan:")
-            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            renderType: Text.NativeRendering
-        }
-        ComboBox {
-            id: fanComboBox
-
-            model: pwmFanModel
-            textRole: "display"
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-        }
-        Button {
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-            action: detectFansAction
-        }
-    }
-
-    Loader {
-        width: parent.width
-        anchors.top: fanRow.bottom
-        anchors.bottom: parent.bottom
-        anchors.topMargin: parent.anchors.margins
-        active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
-
-        sourceComponent: Fancontrol.FanItem {
-            fan: pwmFans[fanComboBox.currentIndex]
-            tempModel: root.tempModel
-            systemdCom: root.systemdCom
-        }
+        onTriggered: Fancontrol.Base.reset()
     }
 
     ColumnLayout {
-        id: noFansInfo
+        anchors.fill: parent
 
+        Loader {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            active: !!root.fan
+
+            sourceComponent: Fancontrol.FanItem {
+                fan: root.fan
+                tempModel: root.tempModel
+                systemdCom: root.systemdCom
+            }
+        }
+    }
+
+    Label {
         anchors.centerIn: parent
-        spacing: Kirigami.Units.smallSpacing * 2
         visible: pwmFans.length === 0
-
-        Label {
-            Layout.alignment: Qt.AlignCenter
-            text: i18n("There are no pwm capable fans in your system.")
-            font.pointSize: 14
-            font.bold: true
-        }
-
-        Button {
-            Layout.alignment: Qt.AlignCenter
-            action: detectFansAction
-        }
+        text: i18n("There are no pwm capable fans in your system.")
+        font.pointSize: 14
+        font.bold: true
     }
 
-    Action {
-        id: saveProfileAction
+    Fancontrol.ProfilesDialog {
+        id: profilesDialog
 
-        text: i18n("Save profile")
-        icon.name: "document-save"
-        onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
-    }
-    Action {
-        id: deleteProfileAction
-
-        text: i18n("Delete profile")
-        icon.name: "edit-delete"
-        onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
-    }
-    Action {
-        id: detectFansAction
-
-        text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-        icon.name: "dialog-password"
-        onTriggered: loader.detectSensors()
+        visible: false
+        modal: true
+        anchors.centerIn: parent
     }
 }

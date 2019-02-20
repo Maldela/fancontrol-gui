@@ -18,28 +18,31 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.10
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
-import org.kde.kirigami 2.0 as Kirigami
-import org.kde.kcm 1.0
+import org.kde.kirigami 2.3 as Kirigami
+import org.kde.kcm 1.0 as KCM
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
-Item {
+Kirigami.Page {
     property QtObject loader: Fancontrol.Base.loader
     property QtObject systemdCom: Fancontrol.Base.systemdCom
     property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
     property QtObject tempModel: Fancontrol.Base.tempModel
     property QtObject profileModel: Fancontrol.Base.profileModel
-    property var locale: Qt.locale()
     property real textWidth: 0
     property var pwmFans: pwmFanModel.fans
+    property QtObject fan: pwmFans[fansListView.currentIndex]
 
     id: root
-    implicitWidth: 1024
-    implicitHeight: 768
+
+    implicitWidth: Kirigami.Units.gridUnit * 50
+    implicitHeight: Kirigami.Units.gridUnit * 40
+
+    KCM.ConfigModule.quickHelp: i18n("This module lets you configure your PWM fans.")
 
     Connections {
         target: Fancontrol.Base
@@ -58,11 +61,50 @@ Item {
         onAboutToDefault: enabledBox.checked = false
     }
 
+//     contextualActions: [
+//         Kirigami.Action {
+//             text: i18n("Profiles")
+//
+//             Kirigami.Action {
+//                 id: loadProfilesAction
+//
+//                 text: i18n("Load profile")
+//             }
+//             Kirigami.Action {
+//                 text: i18n("Save profile")
+//                 icon.name: "document-save"
+//                 onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
+//             }
+//             Kirigami.Action {
+//                 text: i18n("Delete profile")
+//                 icon.name: "edit-delete"
+//                 onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
+//             }
+//         },
+//         Kirigami.Action {
+//             text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
+//             icon.name: "dialog-password"
+//             onTriggered: loader.detectSensors()
+//         },
+//         Kirigami.Action {
+//             visible: !!systemdCom && !!fan
+//             text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
+//             icon.name: "dialog-password"
+//             onTriggered: {
+//                 if (fan.testing) {
+//                     fan.abortTest();
+//                 } else {
+//                     fan.test();
+//                 }
+//             }
+//         }
+//     ]
+
     ColumnLayout {
         id: noFansInfo
 
-        width: parent.width
-        anchors.verticalCenter: parent.verticalCenter
+        width: root.width
+        y: root.height / 2 - height / 2
         spacing: Kirigami.Units.smallSpacing * 2
         visible: pwmFans.length === 0
 
@@ -81,17 +123,14 @@ Item {
         }
     }
 
-    CheckBox {
+    header: CheckBox {
         id: enabledBox
 
-        anchors.top: parent.top
-        visible: pwmFans.length > 0
         text: i18n("Control fans manually")
         checked: systemdCom.serviceEnabled && systemdCom.serviceActive;
         onCheckedChanged: {
             systemdCom.serviceActive = enabledBox.checked;
             loader.restartServiceAfterTesting = checked;
-            autostartBox.checked = true;
         }
 
         Connections {
@@ -100,303 +139,161 @@ Item {
         }
     }
 
-    ColumnLayout {
-        id: bodyLayout
+    Rectangle {
+        id: fansListViewBackground
 
-        width: parent.width
-        anchors.bottom: advancedButton.top
-        anchors.top: enabledBox.bottom
-        anchors.bottomMargin: advancedButton.height / 4
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+        }
+        width: root.width / 5
+        color: Kirigami.Theme.backgroundColor
         visible: enabledBox.checked
+        border.width: 1
+        border.color: Kirigami.Theme.textColor
 
-        CheckBox {
-            id: autostartBox
+        ListView {
+            id: fansListView
 
-            text: i18n("Enable service at boot")
-            checked: systemdCom.serviceEnabled
-            onCheckedChanged: systemdCom.serviceEnabled = checked
-
-            Connections {
-                target: systemdCom
-                onServiceEnabledChanged: if (systemdCom.serviceEnabled != autostartBox.checked) autostartBox.checked = systemdCom.serviceEnabled
-            }
-        }
-
-        RowLayout {
-            id: profileRow
-
-            Label {
-                text: i18n("Profile:")
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                renderType: Text.NativeRendering
-            }
-            ComboBox {
-                id: profileComboBox
-
-                property string saveText: editText.length > 0 ? editText : currentText
-
-                editable: true
-                model: profileModel
-                textRole: "display"
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-
-                onActivated: Fancontrol.Base.applyProfile(index)
-            }
-            Button {
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                action: saveProfileAction
-            }
-            Button {
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                action: deleteProfileAction
-            }
-        }
-
-        RowLayout {
-            visible: enabledBox.checked && pwmFans.length > 0
-
-            Label {
-                text: i18n("Fan:")
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                renderType: Text.NativeRendering
-            }
-            ComboBox {
-                id: fanComboBox
-
-                model: pwmFanModel
-                textRole: "display"
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-            }
-            Button {
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                text: i18n("Detect fans")
-                icon.name: kcm.needsAuthorization ? "dialog-password" : ""
-                onClicked: loader.detectSensors()
-            }
-        }
-
-        Loader {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            active: pwmFans.length > fanComboBox.currentIndex && fanComboBox.currentIndex >= 0
-            sourceComponent: Fancontrol.FanItem {
-                unit: Fancontrol.Base.unit
-                fan: pwmFans[fanComboBox.currentIndex]
-                systemdCom: root.systemdCom
-                tempModel: root.tempModel
-                minTemp: Fancontrol.Base.minTemp
-                maxTemp: Fancontrol.Base.maxTemp
-            }
-        }
-    }
-
-    Item {
-        id: advancedButton
-
-        property bool expanded: false
-
-        anchors.bottom: settingsArea.top
-        width: parent.width
-        height: advancedArrow.height
-        visible: enabledBox.checked
-
-        Image {
-            id: advancedArrow
-
-            source: parent.expanded ? "image://icon/go-down" : "image://icon/go-next"
-            fillMode: Image.PreserveAspectFit
-            height: advancedLabel.implicitHeight
-        }
-        Label {
-            id: advancedLabel
-
-            anchors.left: advancedArrow.right
-            text: i18n("Advanced settings")
-            font.bold: true
-        }
-        MouseArea {
             anchors.fill: parent
-            onClicked: parent.expanded = !parent.expanded
+            anchors.margins: fansListViewBackground.border.width
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            flickableDirection: Flickable.AutoFlickIfNeeded
+            model: pwmFanModel
+            header: Kirigami.BasicListItem {
+                label: '<b>' + i18n("Fans") + '</b>'
+                reserveSpaceForIcon: false
+                hoverEnabled: false
+                separatorVisible: false
+                leftPadding: Kirigami.Units.smallSpacing
+            }
+            delegate: Kirigami.BasicListItem {
+                label: display
+                reserveSpaceForIcon: false
+                hoverEnabled: true
+                highlighted: ListView.isCurrentItem
+                separatorVisible: false
+
+                onPressedChanged: if (pressed) fansListView.currentIndex = index;
+            }
         }
     }
 
-    ColumnLayout {
-        id: settingsArea
+    Fancontrol.FanHeader {
+        id: fanHeader
 
-        visible: enabledBox.checked && parent.height - enabledBox.height - bodyLayout.height - advancedButton.height > height
-        width: parent.width
-        anchors.bottom: parent.bottom
-        clip: true
-        state: advancedButton.expanded ? "VISIBLE" : "HIDDEN"
+        fan: root.fan
+        visible: enabledBox.checked
+        anchors {
+            top: parent.top
+            left: fansListViewBackground.right
+            right: parent.right
+            margins: Kirigami.Units.smallSpacing
+        }
+    }
 
-        states: [
-            State {
-                name: "VISIBLE"
+    Loader {
+        anchors {
+            top: fanHeader.bottom
+            left: fansListViewBackground.right
+            right: parent.right
+            bottom: settingsColumn.top
+        }
+        active: !!root.fan
+        visible: enabledBox.checked
+        sourceComponent: Fancontrol.FanItem {
+            unit: Fancontrol.Base.unit
+            fan: root.fan
+            systemdCom: root.systemdCom
+            tempModel: root.tempModel
+            minTemp: Fancontrol.Base.minTemp
+            maxTemp: Fancontrol.Base.maxTemp
+        }
+    }
 
-                PropertyChanges {
-                    target: settingsArea
-                    height: settingsArea.implicitHeight
+    Column {
+        id: settingsColumn
+
+        anchors {
+            left: fansListViewBackground.right
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: childrenRect.height
+        visible: enabledBox.checked
+
+        Item {
+            id: advancedButton
+
+            property bool expanded: false
+
+            width: parent.width
+            height: childrenRect.height
+
+            Image {
+                id: advancedArrow
+
+                source: parent.expanded ? "image://icon/go-down" : "image://icon/go-next"
+                fillMode: Image.PreserveAspectFit
+                height: advancedLabel.implicitHeight
+            }
+            Label {
+                id: advancedLabel
+
+                anchors.left: advancedArrow.right
+                text: i18n("Advanced settings")
+                font.bold: true
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: parent.expanded = !parent.expanded
+            }
+        }
+
+        Fancontrol.SettingsForm {
+            id: settingsArea
+
+            width: parent.width
+            showAll: false
+            clip: true
+            state: advancedButton.expanded ? "VISIBLE" : "HIDDEN"
+
+            states: [
+                State {
+                    name: "VISIBLE"
+
+                    PropertyChanges {
+                        target: settingsArea
+                        height: implicitHeight
+                    }
+                },
+                State {
+                    name: "HIDDEN"
+
+                    PropertyChanges {
+                        target: settingsArea
+                        height: 0
+                    }
                 }
-            },
-            State {
-                name: "HIDDEN"
+            ]
 
-                PropertyChanges {
-                    target: settingsArea
-                    height: 0
+            transitions: Transition {
+                NumberAnimation {
+                    properties: "height"
+                    easing.type: Easing.InOutQuad
                 }
             }
-        ]
-
-        transitions: Transition {
-            NumberAnimation {
-                properties: "height"
-                easing.type: Easing.InOutQuad
-            }
         }
-
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Interval:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            SpinBox {
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                value: loader.interval
-                editable: true
-                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 0) + ' ' + i18np("second", "seconds", value) }
-                from: 1.0
-                onValueModified: loader.interval = value
-            }
-        }
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Minimum temperature for fan graphs:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            SpinBox {
-                id: minTempBox
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                to: maxTempBox.value
-                from: Units.fromKelvin(0, Fancontrol.Base.unit)
-                value: Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
-                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
-                onValueChanged: Fancontrol.Base.minTemp = Units.toCelsius(value, Fancontrol.Base.unit)
-            }
-        }
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Maximum temperature for fan graphs:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            SpinBox {
-                id: maxTempBox
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                from: minTempBox.value
-                value: Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
-                editable: true
-                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
-                onValueChanged: Fancontrol.Base.maxTemp = Units.toCelsius(value, Fancontrol.Base.unit)
-            }
-        }
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Name of the fancontrol systemd service:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            Fancontrol.OptionInput {
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                color: systemdCom.serviceExists ? "green" : "red"
-                value: Fancontrol.Base.serviceName
-                onTextChanged: Fancontrol.Base.serviceName = text
-            }
-        }
-        RowLayout {
-            width: parent.width
-
-            Label {
-                Layout.preferredWidth: root.textWidth
-                clip: true
-                text: i18n("Path to the fancontrol config file:")
-                horizontalAlignment: Text.AlignRight
-                Component.onCompleted: root.textWidth = Math.max(root.textWidth, contentWidth)
-            }
-            Fancontrol.OptionInput {
-                Layout.minimumWidth: implicitWidth
-                Layout.fillWidth: true
-                value: Fancontrol.Base.configUrl.toString().replace("file://", "")
-                color: Fancontrol.Base.configValid ? "green" : "red"
-                onTextChanged: Fancontrol.Base.configUrl = text
-            }
-            Button {
-                action: loadAction
-            }
-        }
-    }
-
-    Action {
-        id: saveProfileAction
-
-        text: i18n("Save profile")
-        icon.name: "document-save"
-        onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
-    }
-    Action {
-        id: deleteProfileAction
-
-        text: i18n("Delete profile")
-        icon.name: "edit-delete"
-        onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
-    }
-    Action {
-        id: loadAction
-
-        icon.name: "document-open"
-        onTriggered: openFileDialog.open()
-//         tooltip: i18n("Load configuration file")
-        shortcut: StandardKey.Open
-    }
-
-    FileDialog {
-        id: openFileDialog
-
-        title: i18n("Please choose a configuration file")
-        folder: "file:///etc"
-        selectExisting: true
-        selectMultiple: false
-
-        onAccepted: Fancontrol.Base.configUrl = fileUrl;
     }
 
     Fancontrol.ErrorDialog {
         id: errorDialog
 
         modal: true
+        anchors.centerIn: root
     }
 }

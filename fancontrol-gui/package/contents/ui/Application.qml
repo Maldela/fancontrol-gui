@@ -18,16 +18,19 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.10
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.2
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Gui 1.0 as Gui
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Kirigami.ApplicationWindow {
     id: window
+
+    property string leftPage
+    property QtObject fan: Fancontrol.Base.pwmFanModel.fans.length > 0 ? Fancontrol.Base.pwmFanModel.fans[0] : null
 
     function showWindow() {
         window.show()
@@ -36,9 +39,16 @@ Kirigami.ApplicationWindow {
     }
 
     title: i18n("Fancontrol-GUI")
-    width: 1024
-    height: 768
-    color: palette.window
+    reachableModeEnabled: false
+    pageStack.defaultColumnWidth: Kirigami.Units.gridUnit * 30
+
+    onLeftPageChanged: {
+        window.pageStack.clear();
+        if (leftPage)
+            window.pageStack.push(Qt.resolvedUrl(leftPage));
+    }
+
+    onWideScreenChanged: drawer.drawerOpen = wideScreen
 
     onClosing: {
         windowConfig.save(window);
@@ -53,81 +63,80 @@ Kirigami.ApplicationWindow {
         Fancontrol.Base.load();
         windowConfig.restore(window);
         window.visible = !Fancontrol.Base.startMinimized;
+        leftPage = "SensorsTab.qml";
     }
 
-    header: ToolBar {
-        RowLayout {
-            anchors.fill: parent
+    globalDrawer: Kirigami.GlobalDrawer {
+        id: drawer
 
-            ToolButton {
-                action: applyAction
-                display: AbstractButton.IconOnly
-            }
-            ToolButton {
-                action: resetAction
-                display: AbstractButton.IconOnly
-            }
-            Loader {
-                active: !!Fancontrol.Base.systemdCom
+        width: Kirigami.Units.gridUnit * 10
+        modal: !window.wideScreen
+        handleVisible: !window.wideScreen
+        resetMenuOnTriggered: false
 
-                sourceComponent: ToolButton {
-                    action: startAction
-                    display: AbstractButton.IconOnly
-                }
+        function populateFans(fans) {
+            for (var i=fansAction.children.length-1; i>=0; i--) {
+                fansAction.children[i].destroy();
             }
-            Loader {
-                active: !!Fancontrol.Base.systemdCom
+            var actions = [];
+            for (var i=0; i<fans.length; i++) {
+                var action = fanActionComponent.createObject(fansAction, { "fan": fans[i] });
+                actions.push(action);
+            }
+            fansAction.children = actions;
+        }
 
-                sourceComponent: ToolButton {
-                    action: stopAction
-                    display: AbstractButton.IconOnly
-                }
-            }
-            Item {
-                Layout.fillWidth: true
+        Component {
+            id: fanActionComponent
+
+            Kirigami.Action {
+                property QtObject fan
+
+                text: fan.name
+                checked: window.fan === fan
+
+                onTriggered: window.fan = fan
             }
         }
-    }
 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: 5
+        Component.onCompleted: populateFans(Fancontrol.Base.pwmFanModel.fans)
 
-        TabBar {
-            id: tabBar
+        Connections {
+            target: Fancontrol.Base.pwmFanModel
+            onFansChanged: populateFans(Fancontrol.Base.pwmFanModel.fans)
+        }
 
-            Layout.fillWidth: true
-
-            TabButton {
+        actions: [
+            Kirigami.Action {
                 text: i18n("Sensors")
-                width: implicitWidth
-            }
-            TabButton {
-                text: i18n("PwmFans")
-                width: implicitWidth
-            }
-            TabButton {
+                checked: window.leftPage === "SensorsTab.qml"
+
+                onTriggered: window.leftPage = "SensorsTab.qml"
+            },
+            Kirigami.Action {
+                id: fansAction
+
+                text: i18n("Fans")
+                checked: window.leftPage === "PwmFansTab.qml"
+
+                onTriggered: window.leftPage = "PwmFansTab.qml"
+            },
+            Kirigami.Action {
                 text: i18n("Configfile")
-                width: implicitWidth
-            }
-            TabButton {
+                checked: window.leftPage === "ConfigfileTab.qml"
+
+                onTriggered: window.leftPage = "ConfigfileTab.qml"
+            },
+            Kirigami.Action {
                 text: i18n("Settings")
-                width: implicitWidth
+                checked: window.leftPage === "SettingsTab.qml"
+
+                onTriggered: window.leftPage = "SettingsTab.qml"
             }
-        }
-
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            currentIndex: tabBar.currentIndex
-            anchors.margins: Kirigami.Units.smallSpacing
-
-            SensorsTab {}
-            PwmFansTab {}
-            ConfigfileTab {}
-            SettingsTab {}
-        }
+        ]
     }
+
+    contextDrawer: Kirigami.ContextDrawer {}
 
     Loader {
         id: trayLoader
@@ -153,6 +162,7 @@ Kirigami.ApplicationWindow {
         id: errorDialog
 
         visible: false
+        anchors.centerIn: window.contentItem
     }
 
     Dialog {
@@ -164,6 +174,7 @@ Kirigami.ApplicationWindow {
         modal: true
         title: i18n("Unsaved changes")
         standardButtons: Dialog.Cancel | Dialog.Discard | Dialog.Apply
+        anchors.centerIn: window.contentItem
 
         onRejected: close()
         onDiscarded: {
@@ -183,45 +194,5 @@ Kirigami.ApplicationWindow {
             anchors.centerIn: parent
             text: i18n("There are unsaved changes.\nDo you want to apply these changes?")
         }
-    }
-
-    Action {
-        id: applyAction
-//         text: i18n("Apply")
-        enabled: Fancontrol.Base.needsApply
-        onTriggered: Fancontrol.Base.apply()
-        icon.name: "dialog-ok-apply"
-//         tooltip: i18n("Apply changes")
-        shortcut: StandardKey.Apply
-    }
-    Action {
-        id: resetAction
-//         text: i18n("Reset")
-        enabled: Fancontrol.Base.needsApply
-        onTriggered: Fancontrol.Base.reset()
-        icon.name: "edit-undo"
-//         tooltip: i18n("Revert changes")
-    }
-    Action {
-        id: startAction
-//         text: i18n("Start")
-        enabled: !!Fancontrol.Base.systemdCom && !Fancontrol.Base.systemdCom.serviceActive
-        icon.name: "media-playback-start"
-//         tooltip: i18n("Enable manual control")
-
-        onTriggered: Fancontrol.Base.systemdCom.serviceActive = true
-    }
-    Action {
-        id: stopAction
-//         text: i18n("Stop")
-        enabled: !!Fancontrol.Base.systemdCom && Fancontrol.Base.systemdCom.serviceActive
-        icon.name: "media-playback-stop"
-//         tooltip: i18n("Disable manual control")
-
-        onTriggered: Fancontrol.Base.systemdCom.serviceActive = false
-    }
-
-    SystemPalette {
-        id: palette
     }
 }

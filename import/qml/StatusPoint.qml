@@ -18,9 +18,9 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
 import "math.js" as MoreMath
@@ -33,6 +33,7 @@ Rectangle {
     property Item background: parent
     property real unscaledTemp: !!fan && fan.hasTemp && !!fan.temp ? fan.temp.value : 0
     property real unscaledPwm: !!fan ? fan.pwm : 0
+    property real unscaledRpm: !!fan ? fan.rpm : 0
     property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
@@ -51,17 +52,23 @@ Rectangle {
         SpringAnimation {
             epsilon: 0.1
             spring: 1.0
-            damping: 0.4
+            damping: 0.6
         }
     }
     Behavior on unscaledPwm {
         SpringAnimation {
             epsilon: 0.1
             spring: 1.0
-            damping: 0.4
+            damping: 0.6
         }
     }
-
+    Behavior on unscaledRpm {
+        SpringAnimation {
+            epsilon: 0.1
+            spring: 1.0
+            damping: 0.6
+        }
+    }
     MouseArea {
         id: pwmMouse
 
@@ -74,31 +81,31 @@ Rectangle {
 
         x: parent.width
         y: - height
-        width: Math.max(pwm.width, rpm.width)
-        height: temp.height + pwm.height + rpm.height
-        radius: 4
+        width: column.width
+        height: column.height
+        radius: Kirigami.Units.smallSpacing / 2
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
         visible: root.enabled && pwmMouse.containsMouse
 
         Column {
-            Label {
-                id: temp
+            id: column
 
-                font.pixelSize: root.height * 1.5
-                text: (!!fan && fan.hasTemp ? Math.round(Units.fromCelsius(root.unscaledTemp, unit)) : "0") + i18n(unit)
+            padding: Kirigami.Units.smallSpacing
 
+            Text {
+                font.pixelSize: root.size * 1.5
+                text: Number(Units.fromCelsius(root.unscaledTemp, unit)).toLocaleString(locale, 'f', 1) + i18n(unit)
+                color: Kirigami.Theme.textColor
             }
-            Label {
-                id: pwm
-
-                font.pixelSize: root.height * 1.5
-                text: Number(Math.round(unscaledPwm / 2.55)).toLocaleString(locale, 'f', 1) + i18n('%')
+            Text {
+                font.pixelSize: root.size * 1.5
+                text: Number(unscaledPwm / 2.55).toLocaleString(locale, 'f', 1) + locale.percent
+                color: Kirigami.Theme.textColor
             }
-            Label {
-                id: rpm
-
-                font.pixelSize: root.height * 1.5
-                text: (!!fan ? fan.rpm : "0") + i18n("rpm")
+            Text {
+                font.pixelSize: root.size * 1.5
+                text: Number(unscaledRpm).toLocaleString(locale, 'f', 0) + i18n("rpm")
+                color: Kirigami.Theme.textColor
             }
         }
     }

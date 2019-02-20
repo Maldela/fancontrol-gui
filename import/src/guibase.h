@@ -52,6 +52,8 @@ class GUIBase : public QObject
     Q_PROPERTY(PwmFanModel *pwmFanModel READ pwmFanModel CONSTANT)
     Q_PROPERTY(TempModel *tempModel READ tempModel CONSTANT)
     Q_PROPERTY(QStringListModel *profileModel READ profileModel CONSTANT)
+    Q_PROPERTY(QString currentProfile READ currentProfile NOTIFY currentProfileChanged)
+    Q_PROPERTY(int currentProfileIndex READ currentProfileIndex NOTIFY currentProfileChanged)
     Q_PROPERTY(Loader* loader READ loader CONSTANT)
     Q_PROPERTY(qreal minTemp READ minTemp WRITE setMinTemp NOTIFY minTempChanged)
     Q_PROPERTY(qreal maxTemp READ maxTemp WRITE setMaxTemp NOTIFY maxTempChanged)
@@ -95,14 +97,16 @@ public:
     PwmFanModel *pwmFanModel() const { return m_pwmFanModel; }
     TempModel *tempModel() const { return m_tempModel; }
     QStringListModel *profileModel() const { return m_profileModel; }
+    QString currentProfile() const;
+    int currentProfileIndex() const;
 
     Q_INVOKABLE bool hasSystemdCommunicator() const;
     Q_INVOKABLE void apply();
     Q_INVOKABLE void reset();
-    Q_INVOKABLE void applyProfile(const QString &profile);
+    Q_INVOKABLE void applyProfile(const QString &profileName);
     Q_INVOKABLE void applyProfile(int);
-    Q_INVOKABLE void saveProfile(const QString &profile, bool updateModel = true);
-    Q_INVOKABLE void deleteProfile(const QString &profile, bool updateModel = true);
+    Q_INVOKABLE void saveProfile(const QString &profileName, bool updateModel = true);
+    Q_INVOKABLE void deleteProfile(const QString &profileName, bool updateModel = true);
     Q_INVOKABLE void deleteProfile(int, bool updateModel = true);
 
 public slots:
@@ -123,7 +127,7 @@ signals:
     void needsApplyChanged();
     void showTrayChanged();
     void startMinimizedChanged();
-    void profileChanged(int profile);
+    void currentProfileChanged();
 
 private:
 

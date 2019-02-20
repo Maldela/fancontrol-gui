@@ -27,7 +27,7 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent) : KStatusNotifierItem(QStringLit
 {
     setCategory(KStatusNotifierItem::ApplicationStatus);
 
-    m_profilesMenu = contextMenu()->addMenu(i18n("Profiles"));
+    m_profilesMenu = contextMenu()->addMenu(i18n("Apply profile"));
 }
 
 void SystemTrayIcon::setProfileModel(QStringListModel* model)

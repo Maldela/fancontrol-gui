@@ -18,9 +18,9 @@
  */
 
 
-import QtQuick 2.4
-import QtQuick.Controls 2.3
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick 2.6
+import QtQuick.Controls 2.1
+import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "units.js" as Units
 
@@ -68,24 +68,29 @@ Rectangle {
 
     Rectangle {
         id: tooltip
+
         x: parent.width
         y: - height
-        width: Math.max(pwm.width, temp.width)
-        height: pwm.height + temp.height
-        radius: 4
+        width: column.width
+        height: column.height
+        radius: Kirigami.Units.smallSpacing / 2
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
         visible: root.enabled && (pwmMouse.containsMouse || drag.active)
 
         Column {
-            Label {
-                id: pwm
+            id: column
+
+            padding: Kirigami.Units.smallSpacing
+
+            Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(Math.round(root.pwm / 2.55)).toLocaleString(locale, 'f', 1) + i18n('%')
+                text: Number(Units.fromCelsius(root.temp, unit)).toLocaleString(locale, 'f', 0) + i18n(unit)
+                color: Kirigami.Theme.textColor
             }
-            Label {
-                id: temp
+            Text {
                 font.pixelSize: root.size * 1.5
-                text: Math.round(Units.fromCelsius(root.temp, unit)) + i18n(unit)
+                text: Number(root.pwm / 2.55).toLocaleString(locale, 'f', 1) + locale.percent
+                color: Kirigami.Theme.textColor
             }
         }
     }
