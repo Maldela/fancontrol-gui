@@ -259,7 +259,7 @@ void GUIBase::reset()
 
 void GUIBase::handleError(const QString &error, bool critical)
 {
-    if (error.isEmpty() || error == m_error)
+    if (error.isEmpty())
         return;
 
     m_error = error;
