@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
-"POT-Creation-Date: 2016-06-10 15:20+0200\n"
+"POT-Creation-Date: 2019-02-21 17:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,338 +18,494 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: fancontrol-gui/package/contents/ui/Application.qml:30
-#: fancontrol-gui/src/main.cpp:44
+#: fancontrol-gui/package/contents/ui/Application.qml:41
+#: fancontrol-gui/src/main.cpp:72
 msgid "Fancontrol-GUI"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:48
-msgid "File"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:53
-#: fancontrol-gui/package/contents/ui/Application.qml:158
-msgid "Save configuration file as"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:58
-msgid "Exit"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:79
-msgid "Restart fancontrol"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:79
-msgid "Start fancontrol"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:88
-msgid "Stop fancontrol"
-msgstr ""
-
-#: fancontrol-gui/package/contents/ui/Application.qml:104
+#: fancontrol-gui/package/contents/ui/Application.qml:111
 msgid "Sensors"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:108
-msgid "PwmFans"
+#: fancontrol-gui/package/contents/ui/Application.qml:119
+#: kcm/package/contents/ui/KCM.qml:168
+msgid "Fans"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:112
+#: fancontrol-gui/package/contents/ui/Application.qml:125
 msgid "Configfile"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:117
+#: fancontrol-gui/package/contents/ui/Application.qml:131
 msgid "Settings"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:131
-#: fancontrol-gui/package/contents/ui/Application.qml:134
-#: kcm/package/contents/ui/KCM.qml:329
-msgid "Load configuration file"
+#: fancontrol-gui/package/contents/ui/Application.qml:175
+msgid "Unsaved changes"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:139
-#: fancontrol-gui/package/contents/ui/Application.qml:142
-msgid "Save configuration file"
+#: fancontrol-gui/package/contents/ui/Application.qml:195
+msgid ""
+"There are unsaved changes.\n"
+"Do you want to apply these changes?"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/Application.qml:148
-#: kcm/package/contents/ui/KCM.qml:335
-msgid "Please choose a configuration file"
+#: fancontrol-gui/package/contents/ui/ConfigfileTab.qml:34
+msgid "New config"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:47
-#: kcm/package/contents/ui/KCM.qml:122
-msgid "Fan:"
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:45
+#: import/qml/ProfilesDialog.qml:29
+msgid "Manage profiles"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:89
-#: kcm/package/contents/ui/KCM.qml:83
-msgid "There are no pwm capable fans in your system."
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:49
+msgid "Service"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:102
-#: kcm/package/contents/ui/KCM.qml:90
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:51
+msgid "Control the systemd service"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:54
+msgid "Stop service"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:54
+msgid "Start service"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:60
+msgid "Disable service"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:60
+msgid "Enable service"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:61
+msgid "Disable service autostart at boot"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:61
+msgid "Enable service autostart at boot"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:67
+#: kcm/package/contents/ui/KCM.qml:120
 msgid "Detect fans again"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:102
-#: kcm/package/contents/ui/KCM.qml:90 kcm/package/contents/ui/KCM.qml:135
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:67
+#: kcm/package/contents/ui/KCM.qml:120
 msgid "Detect fans"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SensorsTab.qml:77
-#: import/qml/StatusPoint.qml:94
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:73
+msgid "Abort test"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:73
+msgid "Test start and stop values"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:86
+msgid "Apply"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:89
+msgid "Apply changes"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:95
+msgid "Reset"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:98
+msgid "Revert changes"
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:122
+#: kcm/package/contents/ui/KCM.qml:113
+msgid "There are no pwm capable fans in your system."
+msgstr ""
+
+#: fancontrol-gui/package/contents/ui/SensorsTab.qml:84
+#: import/qml/StatusPoint.qml:107
 msgid "rpm"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:50
-#: kcm/package/contents/ui/KCM.qml:227
+#: fancontrol-gui/src/main.cpp:74
+msgid "Graphical user interface for fancontrol"
+msgstr ""
+
+#: fancontrol-gui/src/main.cpp:80 kcm/src/fancontrolkcm.cpp:44
+msgid "Malte Veerman"
+msgstr ""
+
+#: fancontrol-gui/src/main.cpp:80 kcm/src/fancontrolkcm.cpp:44
+msgid "Main Developer"
+msgstr ""
+
+#: fancontrol-gui/src/systemtrayicon.cpp:31 import/qml/ProfilesDialog.qml:83
+msgid "Apply profile"
+msgstr ""
+
+#: helper/src/helper.cpp:163
+msgid "Could not create dbus interface"
+msgstr ""
+
+#: helper/src/helper.cpp:228
+msgid "This action does not exist!"
+msgstr ""
+
+#: import/qml/ErrorDialog.qml:30
+msgid "Error"
+msgstr ""
+
+#: import/qml/FanItem.qml:316
+msgid "Controlled by:"
+msgstr ""
+
+#: import/qml/FanItem.qml:364
+msgid "Turn Fan off if temp < MINTEMP"
+msgstr ""
+
+#: import/qml/FanItem.qml:388
+msgid "Pwm value for fan to start:"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:56
+msgid "Profiles"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:65
+msgid "(current profile)"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:88
+msgid "Create new profile"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:93
+msgid "Save to profile"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:98
+msgid "Delete profile"
+msgstr ""
+
+#: import/qml/ProfilesDialog.qml:111
+msgid "New profile's name"
+msgstr ""
+
+#: import/qml/SettingsForm.qml:39
 msgid "Interval:"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:58
-#: kcm/package/contents/ui/KCM.qml:235
+#: import/qml/SettingsForm.qml:44
 msgid "second"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:69
-#: kcm/package/contents/ui/KCM.qml:246
+#: import/qml/SettingsForm.qml:55
 msgid "Minimum temperature for fan graphs:"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:94
-#: kcm/package/contents/ui/KCM.qml:268
+#: import/qml/SettingsForm.qml:79
 msgid "Maximum temperature for fan graphs:"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:121
-#: kcm/package/contents/ui/KCM.qml:290
+#: import/qml/SettingsForm.qml:101
+msgid "Path to the fancontrol config file:"
+msgstr ""
+
+#: import/qml/SettingsForm.qml:126
 msgid "Name of the fancontrol systemd service:"
 msgstr ""
 
-#: fancontrol-gui/package/contents/ui/SettingsTab.qml:142
-msgid "Fancontrol systemd service autostart:"
+#: import/qml/SettingsForm.qml:140
+msgid "Show tray icon:"
 msgstr ""
 
-#: fancontrol-gui/src/main.cpp:46
-msgid "Graphical user interface for fancontrol"
+#: import/qml/SettingsForm.qml:153
+msgid "Start minimized:"
 msgstr ""
 
-#: fancontrol-gui/src/main.cpp:52 kcm/src/fancontrolkcm.cpp:45
-msgid "Malte Veerman"
-msgstr ""
-
-#: fancontrol-gui/src/main.cpp:52 kcm/src/fancontrolkcm.cpp:45
-msgid "Main Developer"
-msgstr ""
-
-#: helper/src/helper.cpp:137
-msgid "This action does not exist!"
-msgstr ""
-
-#: import/qml/ErrorDialog.qml:32
-msgid "Error"
-msgstr ""
-
-#: import/qml/FanItem.qml:135
-msgid "%1%"
-msgstr ""
-
-#: import/qml/FanItem.qml:157
-msgid "%1"
-msgstr ""
-
-#: import/qml/FanItem.qml:359
-msgid "Controlled by:"
-msgstr ""
-
-#: import/qml/FanItem.qml:407
-msgid "Turn Fan off if temp < MINTEMP"
-msgstr ""
-
-#: import/qml/FanItem.qml:431
-msgid "Pwm value for fan to start:"
-msgstr ""
-
-#: import/qml/FanItem.qml:442
-msgid "%"
-msgstr ""
-
-#: import/qml/FanItem.qml:460
-msgid "Abort test"
-msgstr ""
-
-#: import/qml/FanItem.qml:460
-msgid "Test start and stop values"
+#: import/qml/SettingsForm.qml:166
+msgid "Please choose a configuration file"
 msgstr ""
 
 #: import/src/fan.cpp:55 import/src/fan.cpp:112
-msgid "Can't open rpm file: \"%1\""
+msgid "Can't open rpm file: '%1'"
 msgstr ""
 
-#: import/src/hwmon.cpp:46
+#: import/src/guibase.cpp:234
+msgid "Applying changes"
+msgstr ""
+
+#: import/src/guibase.cpp:247
+msgid "Resetting changes"
+msgstr ""
+
+#: import/src/guibase.cpp:290
+msgid "Unable to apply unknown profile: %1"
+msgstr ""
+
+#: import/src/guibase.cpp:310
+msgid "Unable to read data for profile: %1"
+msgstr ""
+
+#: import/src/guibase.cpp:382
+msgid "No profile"
+msgstr ""
+
+#: import/src/hwmon.cpp:52
 msgid "%1 is not readable!"
 msgstr ""
 
-#: import/src/hwmon.cpp:55
+#: import/src/hwmon.cpp:61
 msgid "%1 is invalid!"
 msgstr ""
 
 #: import/src/hwmon.cpp:94
-msgid "Not a valid sensor: \"%1\""
+msgid "Not a valid sensor: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:74
-msgid "File is not readable: \"%1\""
+#: import/src/loader.cpp:77
+msgid "File is not readable: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:79 import/src/loader.cpp:493
-msgid "File does not exist: \"%1\""
+#: import/src/loader.cpp:82 import/src/loader.cpp:469
+msgid "File does not exist: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:165 import/src/loader.cpp:173
-#: import/src/loader.cpp:178 import/src/loader.cpp:191
-#: import/src/loader.cpp:197 import/src/loader.cpp:291
-msgid "Invalid entry: \"%1\""
+#: import/src/loader.cpp:168 import/src/loader.cpp:176
+#: import/src/loader.cpp:181 import/src/loader.cpp:194
+#: import/src/loader.cpp:200 import/src/loader.cpp:287
+msgid "Invalid entry: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:256
-msgid "Unable to parse interval line: \"%1\""
+#: import/src/loader.cpp:252
+msgid "Unable to parse interval line: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:284 import/src/loader.cpp:419
-msgid "Invalid fan entry: \"%1\""
+#: import/src/loader.cpp:280 import/src/loader.cpp:398
+msgid "Invalid fan entry: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:287
-msgid "Invalid temp entry: \"%1\""
+#: import/src/loader.cpp:283
+msgid "Invalid temp entry: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:317 import/src/loader.cpp:342
-msgid "Invalid DEVNAME: \"%1\"!"
+#: import/src/loader.cpp:309 import/src/loader.cpp:325
+msgid "Invalid DEVNAME: '%1'!"
 msgstr ""
 
-#: import/src/loader.cpp:327
-msgid "Invalid DEVNAME: \"%1\"! No hwmon with index %2"
+#: import/src/loader.cpp:315
+msgid "Invalid DEVNAME: '%1'! No hwmon with index %2"
 msgstr ""
 
-#: import/src/loader.cpp:337
+#: import/src/loader.cpp:320
 msgid "Wrong name for hwmon %1! Should be \"%2\""
 msgstr ""
 
-#: import/src/loader.cpp:382
-msgid "Unrecognized line in config: \"%1\""
+#: import/src/loader.cpp:361
+msgid "Unrecognized line in config: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:422
+#: import/src/loader.cpp:401
 msgid "%1 is not an integer!"
 msgstr ""
 
-#: import/src/loader.cpp:425
-msgid "Invalid entry to parse: \"%1\""
+#: import/src/loader.cpp:404
+msgid "Invalid entry to parse: '%1'"
 msgstr ""
 
-#: import/src/loader.cpp:444 import/src/loader.cpp:521
-msgid "%1 is not a local file!"
+#: import/src/loader.cpp:420 import/src/loader.cpp:519
+msgid "'%1' is not a local file!"
 msgstr ""
 
-#: import/src/loader.cpp:450
-msgid "%1 is not a valid url!"
+#: import/src/loader.cpp:426
+msgid "'%1' is not a valid url!"
 msgstr ""
 
-#: import/src/loader.cpp:489 import/src/loader.cpp:559
-#: import/src/loader.cpp:776 import/src/pwmfan.cpp:254
-#: import/src/pwmfan.cpp:306 import/src/pwmfan.cpp:364
+#: import/src/loader.cpp:429
+msgid "Loading config file: '%1'"
+msgstr ""
+
+#: import/src/loader.cpp:454
+msgid "Loading of file aborted by user"
+msgstr ""
+
+#: import/src/loader.cpp:465 import/src/loader.cpp:572
+#: import/src/loader.cpp:797 import/src/pwmfan.cpp:261
+#: import/src/pwmfan.cpp:307 import/src/pwmfan.cpp:365
 msgid "Action not supported! Try running the application as root."
 msgstr ""
 
-#: import/src/loader.cpp:715
+#: import/src/loader.cpp:492
+msgid "Cannot load empty config."
+msgstr ""
+
+#: import/src/loader.cpp:531
+msgid "No changes made to config"
+msgstr ""
+
+#: import/src/loader.cpp:538
+msgid "Saving config to '%1'"
+msgstr ""
+
+#: import/src/loader.cpp:562
+msgid "Saving of file aborted by user"
+msgstr ""
+
+#: import/src/loader.cpp:566
+msgid "Error executing action. Code %1; %2; %3"
+msgstr ""
+
+#: import/src/loader.cpp:735
 msgid "Interval must be greater or equal to one!"
 msgstr ""
 
-#: import/src/pwmfan.cpp:91 import/src/pwmfan.cpp:179
-msgid "Can't open pwm file: \"%1\""
+#: import/src/loader.cpp:763
+msgid "Start detecting Sensors"
 msgstr ""
 
-#: import/src/pwmfan.cpp:109 import/src/pwmfan.cpp:197
-msgid "Can't open pwm_mode file: \"%1\""
+#: import/src/loader.cpp:813 import/src/loader.cpp:839
+msgid "Finished detecting Sensors"
 msgstr ""
 
-#: import/src/pwmfan.cpp:212
+#: import/src/pwmfan.cpp:90 import/src/pwmfan.cpp:182
+msgid "Can't open pwm file: '%1'"
+msgstr ""
+
+#: import/src/pwmfan.cpp:108 import/src/pwmfan.cpp:204
+msgid "Can't open pwm_enable file: '%1'"
+msgstr ""
+
+#: import/src/pwmfan.cpp:219
 msgid "Pwm cannot exceed 0-255!"
 msgstr ""
 
-#: import/src/pwmfan.cpp:249
+#: import/src/pwmfan.cpp:256
 msgid "Could not set pwm: %1"
 msgstr ""
 
-#: import/src/pwmfan.cpp:265
-msgid "PwmMode cannot exceed 0-2!"
+#: import/src/pwmfan.cpp:302
+msgid "Could not set pwm enable: %1"
 msgstr ""
 
-#: import/src/pwmfan.cpp:301
-msgid "Could not set pwm mode: %1"
-msgstr ""
-
-#: import/src/pwmfan.cpp:317
+#: import/src/pwmfan.cpp:318
 msgid "MinPwm cannot exceed 0-255!"
 msgstr ""
 
-#: import/src/pwmfan.cpp:332
+#: import/src/pwmfan.cpp:333
 msgid "MaxPwm cannot exceed 0-255!"
 msgstr ""
 
-#: import/src/pwmfan.cpp:356
+#: import/src/pwmfan.cpp:357
 msgid "Authorization error: %1"
 msgstr ""
 
-#: import/src/systemdcommunicator.cpp:168
-#: import/src/systemdcommunicator.cpp:311
-msgid "Service does not exist: \"%1\""
+#: import/src/pwmfan.cpp:417
+msgid "Fan never stops."
 msgstr ""
 
-#: import/src/systemdcommunicator.cpp:247
+#: import/src/systemdcommunicator.cpp:78
+msgid "Unable to init systemd dbus manager interface!"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:113
+msgid "New service name: '%1'"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:134
+msgid "Unable to init systemd dbus service interface: %1"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:144
+msgid "Dbus reply message is not of type 'QDBusMessage::ReplyMessage'"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:164
+msgid "Systemd dbus manager interface not initialized!"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:175
+msgid "Dbus returned invalid answer"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:180
+msgid "Dbus returned answer with wrong signature: '%1'"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:191
+msgid "Service does not exist: '%1'"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:242
+msgid "Restarting service: '%1'"
+msgstr ""
+
+#: import/src/systemdcommunicator.cpp:260
 msgid "Invalid manager interface!"
 msgstr ""
 
-#: import/src/temp.cpp:61 import/src/temp.cpp:133
-msgid "Can't open value file: \"%1\""
+#: import/src/systemdcommunicator.cpp:288
+msgid "Dbus error: %1"
 msgstr ""
 
-#: import/src/temp.cpp:69
-msgid "Can't open label file: \"%1\""
+#: import/src/systemdcommunicator.cpp:302
+msgid "Enabling service autostart at boot:'%1'"
 msgstr ""
 
-#: import/src/temp.cpp:72
-msgid "Temp has no label: \"%1\""
+#: import/src/systemdcommunicator.cpp:307
+msgid "Disabling service autostart at boot: '%1'"
 msgstr ""
 
-#: import/src/temp.cpp:146
-msgid "Can't update value of temp: \"%1\""
+#: import/src/systemdcommunicator.cpp:324
+msgid "Starting service: '%1'"
 msgstr ""
 
-#: kcm/package/contents/ui/KCM.qml:101
+#: import/src/systemdcommunicator.cpp:329
+msgid "Stopping service: '%1'"
+msgstr ""
+
+#: import/src/temp.cpp:60 import/src/temp.cpp:132
+msgid "Can't open value file: '%1'"
+msgstr ""
+
+#: import/src/temp.cpp:68
+msgid "Can't open label file: '%1'"
+msgstr ""
+
+#: import/src/temp.cpp:71
+msgid "Temp has no label: '%1'"
+msgstr ""
+
+#: import/src/temp.cpp:145
+msgid "Can't update value of temp: '%1'"
+msgstr ""
+
+#: kcm/package/contents/ui/KCM.qml:45
+msgid "This module lets you configure your PWM fans."
+msgstr ""
+
+#: kcm/package/contents/ui/KCM.qml:129
 msgid "Control fans manually"
 msgstr ""
 
-#: kcm/package/contents/ui/KCM.qml:177
+#: kcm/package/contents/ui/KCM.qml:248
 msgid "Advanced settings"
 msgstr ""
 
-#: kcm/package/contents/ui/KCM.qml:308
-msgid "Path to the fancontrol config file:"
-msgstr ""
-
-#: kcm/src/fancontrolkcm.cpp:37
+#: kcm/src/fancontrolkcm.cpp:36
 msgid "Fancontrol-KCM"
 msgstr ""
 
-#: kcm/src/fancontrolkcm.cpp:39
+#: kcm/src/fancontrolkcm.cpp:38
 msgid "KDE Fancontrol Module"
 msgstr ""
 
