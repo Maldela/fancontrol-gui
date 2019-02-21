@@ -13,12 +13,17 @@ If your distro looks for QML plugins in /usr/lib/qt/qml instead of /usr/lib/qml 
 To compile the additional KCM set the cmake option -DBUILD_KCM=on.
 The KCM is only build, if the -DNO_SYSTEMD option is unset or set to false.
 
-# Requirements
-* Qt5: Base/Core, Widgets, GUI, QML, Quick, QuickControls2
-* KF5: I18n, Auth, Config, Package, Declarative, CoreAddons, DBusAddons, KCMUtils, Extra-Cmake-Modules, Kirigami2, Notifications
+# Build requirements
+* Qt5: Base/Core, Widgets, Gui, QML
+* KF5: I18n, Auth, Config, Package, Declarative, CoreAddons, DBusAddons, KCMUtils, Extra-Cmake-Modules, Notifications
+* Other: C++ compiler, Gettext, CMake
+
+# Additional runtime requirements
+* Qt5: Quick 2.6, QuickControls2 2.1, QuickLayouts 1.2, QuickDialogs 1.2
++ KF5: Kirigami2 2.3
 
 ## Debian/Ubuntu command to install the build requirements:
-`sudo apt-get install libkf5config-dev libkf5auth-dev libkf5package-dev libkf5declarative-dev libkf5coreaddons-dev libkf5dbusaddons-dev libkf5kcmutils-dev libkf5i18n-dev libqt5core5a libqt5widgets5 libqt5gui5 libqt5qml5 extra-cmake-modules qtbase5-dev kirigami2-dev libkf5kirigami2-5 libkf5notifications-dev qml-module-org-kde-kirigami2 qml-module-qtquick-dialogs qml-module-qtquick-controls2 cmake build-essential gettext`
+`sudo apt-get install libkf5config-dev libkf5auth-dev libkf5package-dev libkf5declarative-dev libkf5coreaddons-dev libkf5dbusaddons-dev libkf5kcmutils-dev libkf5i18n-dev libqt5core5a libqt5widgets5 libqt5gui5 libqt5qml5 extra-cmake-modules qtbase5-dev libkf5notifications-dev qml-module-org-kde-kirigami2 qml-module-qtquick-dialogs qml-module-qtquick-controls2 qml-module-qtquick-layouts cmake build-essential gettext`
 
 **Note:** This was tested on KDE Neon User Edition 5.14, which is based on Ubuntu 18.04 LTS (Debian 9 Stretch/Sid).
 
@@ -30,6 +35,6 @@ cd fancontrol-gui
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_KCM=on
-make -j2
+make -j
 sudo make install
 ```
