@@ -6,7 +6,7 @@ if(NOT NO_SYSTEMD)
 
     set(LIBRARIES ${LIBRARIES}
                   Qt5::DBus)
-                  
+
     find_package(Qt5DBus REQUIRED)
     include_directories(${Qt5DBus_INCLUDE_DIRS})
 

@@ -27,12 +27,11 @@ endif(BUILD_KCM AND NO_SYSTEMD)
 
 
 #Silence warnings
-cmake_policy(SET CMP0037 OLD)
 cmake_policy(SET CMP0063 NEW)
 
 
 #Find ECM
-find_package(ECM REQUIRED)
+find_package(ECM 5.38 REQUIRED)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 #includes
@@ -41,21 +40,21 @@ include(KDECMakeSettings)
 include(KDECompilerSettings)
 include(FeatureSummary)
 include(FindPkgConfig)
+include(ECMQMLModules)
+include(ECMGenerateQmlTypes)
 
 #Find Qt5
 find_package(Qt5Core REQUIRED)
-find_package(Qt5 5.8 COMPONENTS Quick QuickControls2)
-set_package_properties(Qt5Quick PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
-set_package_properties(Qt5QuickControls2 PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 
 #Find KF5
 find_package(KF5 COMPONENTS I18n REQUIRED)
-find_package(KF5 5.37 COMPONENTS Kirigami2)
-set_package_properties(KF5Kirigami2 PROPERTIES TYPE RUNTIME PURPOSE "Needed by the QML parts")
 
-if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
-    include(ECMGenerateQmlTypes)
-endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
+#Find QML modules
+ecm_find_qmlmodule(QtQuick 2.6)
+ecm_find_qmlmodule(QtQuick.Controls 2.1)
+ecm_find_qmlmodule(QtQuick.Layouts 1.2)
+ecm_find_qmlmodule(QtQuick.Dialogs 1.2)
+ecm_find_qmlmodule(org.kde.kirigami 2.3)
 
 include_directories (${CMAKE_SOURCE_DIR})
 
