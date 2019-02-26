@@ -24,7 +24,7 @@
 #define PWMFANMODEL_H
 
 
-#include <QtCore/QStringListModel>
+#include <QtCore/QAbstractListModel>
 
 
 namespace Fancontrol {
@@ -32,17 +32,27 @@ namespace Fancontrol {
 
 class PwmFan;
 
-class PwmFanModel : public QStringListModel
+class PwmFanModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QObject *> fans READ fans NOTIFY fansChanged)
+    Q_PROPERTY(int length READ rowCount NOTIFY fansChanged)
 
 public:
+
+    enum Roles
+    {
+        DisplayRole,
+        ObjectRole
+    };
+    Q_ENUM(Roles)
 
     PwmFanModel(QObject *parent = Q_NULLPTR);
     void setPwmFans(const QList<PwmFan *> &fans);
     void addPwmFans(QList<PwmFan *> newFans);
-    QList<QObject *> fans() const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override { Q_UNUSED(parent) return m_fans.size(); }
+    virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
+    Q_INVOKABLE QObject *fan(int index) const;
 
 
 public slots:

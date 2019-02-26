@@ -34,12 +34,11 @@ Rectangle {
     property real unscaledTemp: !!fan && fan.hasTemp && !!fan.temp ? fan.temp.value : 0
     property real unscaledPwm: !!fan ? fan.pwm : 0
     property real unscaledRpm: !!fan ? fan.rpm : 0
-    property var locale: Qt.locale()
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
     property int size: Kirigami.Units.smallSpacing * 2
-    property string unit: Fancontrol.Base.unit
+    readonly property string unit: Fancontrol.Base.unit
 
     width: size
     height: size
@@ -94,17 +93,17 @@ Rectangle {
 
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(Units.fromCelsius(root.unscaledTemp, unit)).toLocaleString(locale, 'f', 1) + i18n(unit)
+                text: Number(Units.fromCelsius(root.unscaledTemp, unit)).toLocaleString(Qt.locale(), 'f', 1) + i18n(unit)
                 color: Kirigami.Theme.textColor
             }
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(unscaledPwm / 2.55).toLocaleString(locale, 'f', 1) + locale.percent
+                text: Number(unscaledPwm / 2.55).toLocaleString(Qt.locale(), 'f', 1) + Qt.locale().percent
                 color: Kirigami.Theme.textColor
             }
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(unscaledRpm).toLocaleString(locale, 'f', 0) + i18n("rpm")
+                text: Number(unscaledRpm).toLocaleString(Qt.locale(), 'f', 0) + i18n("rpm")
                 color: Kirigami.Theme.textColor
             }
         }

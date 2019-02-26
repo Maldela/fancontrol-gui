@@ -27,8 +27,46 @@
 namespace Fancontrol
 {
 
-PwmFanModel::PwmFanModel(QObject *parent) : QStringListModel(parent)
+PwmFanModel::PwmFanModel(QObject *parent) : QAbstractListModel(parent)
 {
+}
+
+QHash<int, QByteArray> PwmFanModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+
+    roleNames.insert(DisplayRole, "display");
+    roleNames.insert(ObjectRole, "object");
+
+    return roleNames;
+}
+
+QVariant PwmFanModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    const int row = index.row();
+
+    if (row >= rowCount())
+        return QVariant();
+
+    const auto fan = m_fans.at(row);
+
+    if (!fan)
+        return QVariant();
+
+    switch (role)
+    {
+        case DisplayRole:
+            return fan->name() + "  (" + fan->path() + ")";
+
+        case ObjectRole:
+            return QVariant::fromValue(fan);
+
+        default:
+            return QVariant();
+    }
 }
 
 void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
@@ -39,15 +77,8 @@ void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
     m_fans = fans;
     emit fansChanged();
 
-    QStringList list;
-
     for (const auto &fan : fans)
-    {
         connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
-        list << fan->name() + "  (" + fan->path() + ")";
-    }
-
-    setStringList(list);
 }
 
 void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
@@ -90,33 +121,19 @@ void PwmFanModel::updateFan(PwmFan *fan)
     if (i == -1)
         return;
 
-    const auto string = fan->name() + "  (" + fan->path() + ")";
-    setData(index(i, 0), string);
-    emit dataChanged(index(i, 0), index(i, 0));
+    emit dataChanged(index(i, 0), index(i, 0), QVector<int>{ DisplayRole });
 }
 
 void PwmFanModel::updateFan()
 {
     const auto fan = qobject_cast<PwmFan*>(sender());
 
-    if (!fan)
-        return;
-
-    const auto i = m_fans.indexOf(fan);
-    if (i == -1)
-        return;
-
-    const auto string = fan->name() + "  (" + fan->path() + ")";
-    setData(index(i, 0), string);
-    emit dataChanged(index(i, 0), index(i, 0));
+    updateFan(fan);
 }
 
-QList<QObject *> PwmFanModel::fans() const
+QObject * PwmFanModel::fan(int index) const
 {
-    auto list = QList<QObject *>();
-    for (const auto &fan : m_fans)
-        list << fan;
-    return list;
+    return m_fans.value(index);
 }
 
 }

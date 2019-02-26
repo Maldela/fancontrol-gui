@@ -28,7 +28,7 @@ import Fancontrol.Qml 1.0 as Fancontrol
 Kirigami.ScrollablePage {
     id: root
 
-    property QtObject loader: Fancontrol.Base.loader
+    readonly property QtObject loader: Fancontrol.Base.loader
 
     spacing: Kirigami.Units.smallSpacing
 

@@ -24,7 +24,7 @@
 #define TEMPMODEL_H
 
 
-#include <QtCore/QStringListModel>
+#include <QtCore/QAbstractListModel>
 
 
 
@@ -33,38 +33,35 @@ namespace Fancontrol {
 
 class Temp;
 
-class TempModel : public QStringListModel
+class TempModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QObject *> temps READ temps NOTIFY tempsChanged)
+    Q_PROPERTY(int length READ rowCount NOTIFY tempsChanged)
 
 public:
+
+    enum Roles
+    {
+        DisplayRole,
+        ObjectRole
+    };
+    Q_ENUM(Roles)
 
     TempModel(QObject *parent = Q_NULLPTR);
     void setTemps(const QList<Temp *> &temps);
     void addTemps(QList<Temp *> newTemps);
-    QList<QObject *> temps() const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override { Q_UNUSED(parent) return m_temps.size(); }
+    virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
+    void updateTemp(Temp *temp);
+    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
+    Q_INVOKABLE QObject *temp(int index) const;
+    Q_INVOKABLE int indexOf(QObject *temp) const;
 
 
 protected:
 
-    QString composeText(Temp *temp);
-
-
-public slots:
-
-    void updateTemp(Temp *temp);
-    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
-
-
-protected slots:
-
     void updateAll();
-
-
-private slots:
-
-    void updateTemp();
 
 
 signals:
@@ -73,6 +70,8 @@ signals:
 
 
 private:
+
+    void updateTemp();
 
     QList<Temp *> m_temps;
     QString m_unit;

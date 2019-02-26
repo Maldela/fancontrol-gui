@@ -65,6 +65,7 @@ class GUIBase : public QObject
     Q_PROPERTY(bool needsApply READ needsApply NOTIFY needsApplyChanged)
     Q_PROPERTY(bool showTray READ showTray WRITE setShowTray NOTIFY showTrayChanged)
     Q_PROPERTY(bool startMinimized READ startMinimized WRITE setStartMinimized NOTIFY startMinimizedChanged)
+    Q_PROPERTY(bool hasSystemdCommunicator READ hasSystemdCommunicator CONSTANT)
 
 public:
 

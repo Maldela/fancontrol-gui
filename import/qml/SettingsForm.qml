@@ -29,8 +29,8 @@ import Fancontrol.Qml 1.0 as Fancontrol
 Kirigami.FormLayout {
     id: root
 
-    property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
-    property QtObject loader: Fancontrol.Base.loader
+    readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
+    readonly property QtObject loader: Fancontrol.Base.loader
     property bool showAll: true
 
     SpinBox {

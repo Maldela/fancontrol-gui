@@ -30,7 +30,8 @@ Kirigami.ApplicationWindow {
     id: window
 
     property string leftPage
-    property QtObject fan: Fancontrol.Base.pwmFanModel.fans.length > 0 ? Fancontrol.Base.pwmFanModel.fans[0] : null
+    readonly property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
+    property QtObject fan: pwmFanModel.length > 0 ? pwmFanModel.fan(0) : null
 
     function showWindow() {
         window.show()
@@ -74,13 +75,13 @@ Kirigami.ApplicationWindow {
         handleVisible: !window.wideScreen
         resetMenuOnTriggered: false
 
-        function populateFans(fans) {
+        function populateFans() {
             for (var i=fansAction.children.length-1; i>=0; i--) {
                 fansAction.children[i].destroy();
             }
             var actions = [];
-            for (var i=0; i<fans.length; i++) {
-                var action = fanActionComponent.createObject(fansAction, { "fan": fans[i] });
+            for (var i=0; i<20; i++) {
+                var action = fanActionComponent.createObject(fansAction, { "index": i });
                 actions.push(action);
             }
             fansAction.children = actions;
@@ -90,20 +91,26 @@ Kirigami.ApplicationWindow {
             id: fanActionComponent
 
             Kirigami.Action {
-                property QtObject fan
+                property int index
+                property QtObject fan: pwmFanModel.fan(index)
 
-                text: fan.name
+                text: !!fan ? fan.name : ""
+                visible: !!fan
                 checked: window.fan === fan
 
                 onTriggered: window.fan = fan
             }
         }
 
-        Component.onCompleted: populateFans(Fancontrol.Base.pwmFanModel.fans)
+        Component.onCompleted: populateFans()
 
         Connections {
-            target: Fancontrol.Base.pwmFanModel
-            onFansChanged: populateFans(Fancontrol.Base.pwmFanModel.fans)
+            target: pwmFanModel
+            onFansChanged: {
+                for (var i=0; i<pwmFanModel.length && i<fansAction.children.length; i++) {
+                    fansAction.children[i].fan = pwmFanModel.fan(i);
+                }
+            }
         }
 
         actions: [

@@ -27,32 +27,63 @@
 namespace Fancontrol
 {
 
-TempModel::TempModel(QObject *parent) : QStringListModel(parent),
+TempModel::TempModel(QObject *parent) : QAbstractListModel(parent),
     m_unit(QStringLiteral("°C"))
 {
 }
 
-QString TempModel::composeText(Temp *temp)
+QHash<int, QByteArray> TempModel::roleNames() const
 {
-    return temp->name() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->path() + ")";
+    QHash<int, QByteArray> roleNames;
+
+    roleNames.insert(DisplayRole, "display");
+    roleNames.insert(ObjectRole, "object");
+
+    return roleNames;
 }
 
+QVariant TempModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    const int row = index.row();
+
+    if (row >= rowCount())
+        return QVariant();
+
+    const auto temp = m_temps.at(row);
+
+    if (!temp)
+        return QVariant();
+
+    switch (role)
+    {
+        case DisplayRole:
+            return temp->name() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->path() + ")";
+
+        case ObjectRole:
+            return QVariant::fromValue(temp);
+
+        default:
+            return QVariant();
+    }
+}
 
 void TempModel::setTemps(const QList<Temp *> &temps)
 {
+    beginResetModel();
+
     m_temps = temps;
     emit tempsChanged();
-
-    QStringList list;
 
     for (const auto &temp : temps)
     {
         connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
         connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
-        list << composeText(temp);
     }
 
-    setStringList(list);
+    endResetModel();
 }
 
 void TempModel::addTemps(QList<Temp *> newTemps)
@@ -72,12 +103,10 @@ void TempModel::addTemps(QList<Temp *> newTemps)
 
     if (!newTemps.isEmpty())
     {
+        beginResetModel();
+
         m_temps += newTemps;
         emit tempsChanged();
-
-        const auto oldSize = rowCount();
-
-        insertRows(oldSize, newTemps.size());
 
         for (const auto &temp : qAsConst(newTemps))
         {
@@ -85,6 +114,8 @@ void TempModel::addTemps(QList<Temp *> newTemps)
             connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
             updateTemp(temp);
         }
+
+        endResetModel();
     }
 }
 
@@ -97,8 +128,7 @@ void TempModel::updateTemp(Temp *temp)
     if (i == -1)
         return;
 
-    setData(index(i, 0), composeText(temp));
-    emit dataChanged(index(i, 0), index(i, 0));
+    emit dataChanged(index(i, 0), index(i, 0), QVector<int>{ DisplayRole });
 }
 
 void TempModel::updateTemp()
@@ -110,21 +140,19 @@ void TempModel::updateTemp()
 
 void TempModel::updateAll()
 {
-    for (int i=0; i<m_temps.size(); i++)
-        setData(index(i, 0), composeText(m_temps.at(i)));
-
-    emit dataChanged(index(0, 0), index(m_temps.size(), 0));
+    emit dataChanged(index(0, 0), index(m_temps.size(), 0), QVector<int>{ DisplayRole });
 }
 
-QList<QObject *> TempModel::temps() const
+QObject * TempModel::temp(int index) const
 {
-    QList<QObject *> list;
-
-    for (const auto &temp : m_temps)
-        list << temp;
-
-    return list;
+    return m_temps.value(index);
 }
+
+int TempModel::indexOf(QObject* temp) const
+{
+    return m_temps.indexOf(qobject_cast<Temp*>(temp));
+}
+
 
 }
 

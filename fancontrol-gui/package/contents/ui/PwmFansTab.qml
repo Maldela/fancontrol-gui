@@ -20,18 +20,15 @@
 
 import QtQuick 2.6
 import QtQuick.Controls 2.1
-import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Kirigami.Page {
-    property QtObject loader: Fancontrol.Base.loader
-    property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator() ? Fancontrol.Base.systemdCom : null
-    property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
-    property QtObject tempModel: Fancontrol.Base.tempModel
-    property QtObject profileModel: Fancontrol.Base.profileModel
-    property var pwmFans: pwmFanModel.fans
+    readonly property QtObject loader: Fancontrol.Base.loader
+    readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
+    readonly property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
+    readonly property QtObject profileModel: Fancontrol.Base.profileModel
     property QtObject fan: applicationWindow().fan
 
     id: root
@@ -100,25 +97,18 @@ Kirigami.Page {
         onTriggered: Fancontrol.Base.reset()
     }
 
-    ColumnLayout {
+    Loader {
         anchors.fill: parent
+        active: !!root.fan
 
-        Loader {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            active: !!root.fan
-
-            sourceComponent: Fancontrol.FanItem {
-                fan: root.fan
-                tempModel: root.tempModel
-                systemdCom: root.systemdCom
-            }
+        sourceComponent: Fancontrol.FanItem {
+            fan: root.fan
         }
     }
 
     Label {
         anchors.centerIn: parent
-        visible: pwmFans.length === 0
+        visible: pwmFanModel.length === 0
         text: i18n("There are no pwm capable fans in your system.")
         font.pointSize: 14
         font.bold: true

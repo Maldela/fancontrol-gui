@@ -30,14 +30,14 @@ import "colors.js" as Colors
 
 Item {
     property QtObject fan
-    property QtObject systemdCom
-    property QtObject tempModel
-    property real minTemp: Fancontrol.Base.minTemp
-    property real maxTemp: Fancontrol.Base.maxTemp
     property int margin: Kirigami.Units.smallSpacing
-    property string unit: Fancontrol.Base.unit
-    property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
-    property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
+    readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
+    readonly property QtObject tempModel: Fancontrol.Base.tempModel
+    readonly property real minTemp: Fancontrol.Base.minTemp
+    readonly property real maxTemp: Fancontrol.Base.maxTemp
+    readonly property string unit: Fancontrol.Base.unit
+    readonly property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
+    readonly property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
     id: root
 
@@ -65,6 +65,7 @@ Item {
             right: parent.right
             top: parent.top
             bottom: settingsArea.top
+            bottomMargin: root.margin
         }
         visible: graphBackground.height > 0 && graphBackground.width > 0
 
@@ -76,7 +77,7 @@ Item {
                 bottom: graphBackground.bottom
                 left: parent.left
             }
-            width: MoreMath.maxWidth(children) + graph.fontSize
+            width: MoreMath.maxWidth(children) + graph.fontSize / 3
 
             Repeater {
                 id: verticalRepeater
@@ -88,7 +89,7 @@ Item {
                     y: graphBackground.height - graphBackground.height / (graph.verticalScalaCount - 1) * index - graph.fontSize * 2 / 3
                     horizontalAlignment: Text.AlignRight
                     color: Kirigami.Theme.textColor
-                    text: Number(index * (100 / (graph.verticalScalaCount - 1))).toLocaleString(locale, 'f', 0) + locale.percent
+                    text: Number(index * (100 / (graph.verticalScalaCount - 1))).toLocaleString(Qt.locale(), 'f', 0) + Qt.locale().percent
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -295,7 +296,7 @@ Item {
     }
 
     ColumnLayout {
-        property int padding: 10
+        property int padding: root.margin
 
         id: settingsArea
         anchors {
@@ -319,8 +320,8 @@ Item {
                 onCheckedChanged: {
                     if (!!fan) {
                         fan.hasTemp = checked;
-                        if (checked && !!tempModel.temps[tempBox.currentIndex]) {
-                            fan.temp = tempModel.temps[tempBox.currentIndex];
+                        if (checked && !!tempModel.temp(tempBox.currentIndex)) {
+                            fan.temp = tempModel.temp(tempBox.currentIndex);
                         }
                         curveCanvas.requestPaint();
                     }
@@ -340,21 +341,22 @@ Item {
                     id: tempBox
                     Layout.fillWidth: true
                     model: tempModel
+                    currentIndex: !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
                     textRole: "display"
                     enabled: hasTempCheckBox.checked
                     onCurrentIndexChanged: {
                         if (hasTempCheckBox.checked)
-                            fan.temp = tempModel.temps[currentIndex];
+                            fan.temp = tempModel.temp(currentIndex);
                     }
                 }
 
                 Connections {
                     target: root
-                    onFanChanged: if (!!fan && fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
+                    onFanChanged: tempBox.currentIndex = !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
                 }
                 Connections {
                     target: fan
-                    onTempChanged: if (fan.hasTemp) tempBox.currentIndex = tempModel.temps.indexOf(fan.temp)
+                    onTempChanged: tempBox.currentIndex = !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
                 }
             }
         }

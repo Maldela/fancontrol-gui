@@ -28,14 +28,12 @@ import Fancontrol.Qml 1.0 as Fancontrol
 
 
 Kirigami.Page {
-    property QtObject loader: Fancontrol.Base.loader
-    property QtObject systemdCom: Fancontrol.Base.systemdCom
-    property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
-    property QtObject tempModel: Fancontrol.Base.tempModel
-    property QtObject profileModel: Fancontrol.Base.profileModel
-    property real textWidth: 0
-    property var pwmFans: pwmFanModel.fans
-    property QtObject fan: pwmFans[fansListView.currentIndex]
+    readonly property QtObject loader: Fancontrol.Base.loader
+    readonly property QtObject systemdCom: Fancontrol.Base.systemdCom
+    readonly property QtObject pwmFanModel: Fancontrol.Base.pwmFanModel
+    readonly property QtObject tempModel: Fancontrol.Base.tempModel
+    readonly property QtObject profileModel: Fancontrol.Base.profileModel
+    readonly property QtObject fan: fansListView.currentItem ? fansListView.currentItem.fan : null
 
     id: root
 
@@ -61,52 +59,13 @@ Kirigami.Page {
         onAboutToDefault: enabledBox.checked = false
     }
 
-//     contextualActions: [
-//         Kirigami.Action {
-//             text: i18n("Profiles")
-//
-//             Kirigami.Action {
-//                 id: loadProfilesAction
-//
-//                 text: i18n("Load profile")
-//             }
-//             Kirigami.Action {
-//                 text: i18n("Save profile")
-//                 icon.name: "document-save"
-//                 onTriggered: Fancontrol.Base.saveProfile(profileComboBox.saveText)
-//             }
-//             Kirigami.Action {
-//                 text: i18n("Delete profile")
-//                 icon.name: "edit-delete"
-//                 onTriggered: Fancontrol.Base.deleteProfile(profileComboBox.currentIndex)
-//             }
-//         },
-//         Kirigami.Action {
-//             text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-//             icon.name: "dialog-password"
-//             onTriggered: loader.detectSensors()
-//         },
-//         Kirigami.Action {
-//             visible: !!systemdCom && !!fan
-//             text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
-//             icon.name: "dialog-password"
-//             onTriggered: {
-//                 if (fan.testing) {
-//                     fan.abortTest();
-//                 } else {
-//                     fan.test();
-//                 }
-//             }
-//         }
-//     ]
-
     ColumnLayout {
         id: noFansInfo
 
         width: root.width
         y: root.height / 2 - height / 2
         spacing: Kirigami.Units.smallSpacing * 2
-        visible: pwmFans.length === 0
+        visible: pwmFanModel.length === 0
 
         Label {
             Layout.alignment: Qt.AlignCenter
@@ -172,6 +131,8 @@ Kirigami.Page {
                 leftPadding: Kirigami.Units.smallSpacing
             }
             delegate: Kirigami.BasicListItem {
+                property QtObject fan: object
+
                 label: display
                 reserveSpaceForIcon: false
                 hoverEnabled: true
@@ -206,12 +167,7 @@ Kirigami.Page {
         active: !!root.fan
         visible: enabledBox.checked
         sourceComponent: Fancontrol.FanItem {
-            unit: Fancontrol.Base.unit
             fan: root.fan
-            systemdCom: root.systemdCom
-            tempModel: root.tempModel
-            minTemp: Fancontrol.Base.minTemp
-            maxTemp: Fancontrol.Base.maxTemp
         }
     }
 

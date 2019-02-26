@@ -36,8 +36,7 @@ Rectangle {
     property int pwm: 0
     property alias drag: pwmMouse.drag
     property int size: Kirigami.Units.smallSpacing * 2
-    property string unit: Fancontrol.Base.unit
-    property var locale: Qt.locale()
+    readonly property string unit: Fancontrol.Base.unit
 
     signal positionChanged()
 
@@ -84,12 +83,12 @@ Rectangle {
 
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(Units.fromCelsius(root.temp, unit)).toLocaleString(locale, 'f', 0) + i18n(unit)
+                text: Number(Units.fromCelsius(root.temp, unit)).toLocaleString(Qt.locale(), 'f', 0) + i18n(unit)
                 color: Kirigami.Theme.textColor
             }
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(root.pwm / 2.55).toLocaleString(locale, 'f', 1) + locale.percent
+                text: Number(root.pwm / 2.55).toLocaleString(Qt.locale(), 'f', 1) + Qt.locale().percent
                 color: Kirigami.Theme.textColor
             }
         }
