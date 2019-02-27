@@ -5,6 +5,8 @@ set(LIBRARIES Qt5::Core
 
 find_package(KF5 COMPONENTS CoreAddons Package Declarative KCMUtils REQUIRED)
 
+ecm_find_qmlmodule(org.kde.kcm 1.0)
+
 add_library(kcm_fancontrol MODULE src/fancontrolkcm.cpp)
 
 target_link_libraries(kcm_fancontrol ${LIBRARIES})
