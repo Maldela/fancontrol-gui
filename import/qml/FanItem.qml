@@ -58,7 +58,7 @@ Item {
         id: graph
 
         property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
-        property int verticalScalaCount: 6
+        property int verticalScalaCount: height > Kirigami.Units.gridUnit * 30 ? 11 : 6
         property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
 
         anchors {
@@ -224,7 +224,7 @@ Item {
                     c.strokeStyle = Colors.setAlpha(Kirigami.Theme.textColor, 0.3);
 
                     //horizontal lines
-                    for (var i=0; i<=100; i+=20) {
+                    for (var i=0; i<=100; i+=100/(graph.verticalScalaCount-1)) {
                         var y = graphBackground.scaleY(i*2.55);
                         if (i != 0 && i != 100) {
                             for (var j=0; j<=width; j+=15) {
