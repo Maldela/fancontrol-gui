@@ -1,5 +1,4 @@
 set(Fancontrol_GUI_SRCS src/main.cpp
-                        src/windowconfig.cpp
                         src/systemtrayicon.cpp)
 
 set(LIBRARIES Qt5::Gui

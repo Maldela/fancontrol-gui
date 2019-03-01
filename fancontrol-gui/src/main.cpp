@@ -27,13 +27,20 @@
 #include <KI18n/KLocalizedString>
 #include <KCoreAddons/KAboutData>
 #include <KDBusAddons/KDBusService>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigGui/KWindowConfig>
 
 #include "systemtrayicon.h"
-#include "windowconfig.h"
+
+
+#ifndef CONFIG_NAME
+#define CONFIG_NAME "fancontrol-gui"
+#endif
 
 
 Q_DECLARE_LOGGING_CATEGORY(FANCONTROL)
 Q_LOGGING_CATEGORY(FANCONTROL, "fancontrol-gui")
+
 
 void handleArguments(QStringList args)
 {
@@ -89,8 +96,17 @@ int main(int argc, char *argv[])
     qmlRegisterType<SystemTrayIcon>("Fancontrol.Gui", 1, 0, "SystemTrayIcon");
 
     KDeclarative::QmlObject qmlObject;
-    qmlObject.rootContext()->setContextProperty(QStringLiteral("windowConfig"), WindowConfig::instance());
     qmlObject.loadPackage(QStringLiteral("org.kde.fancontrol.gui"));
+    if (auto window = qobject_cast<QWindow*>(qmlObject.rootObject()))
+    {
+        KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
+        KWindowConfig::restoreWindowSize(window, configGroup);
+        QObject::connect(&app, &QApplication::aboutToQuit, window, [window] () {
+            KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
+            KWindowConfig::saveWindowSize(window, configGroup);
+            configGroup.sync();
+        });
+    }
 
     return app.exec();
 }

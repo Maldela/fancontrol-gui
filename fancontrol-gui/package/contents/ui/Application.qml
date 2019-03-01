@@ -52,7 +52,6 @@ Kirigami.ApplicationWindow {
     onWideScreenChanged: drawer.drawerOpen = wideScreen
 
     onClosing: {
-        windowConfig.save(window);
         if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
             close.accepted = false;
             saveOnCloseDialog.open();
@@ -62,7 +61,6 @@ Kirigami.ApplicationWindow {
 
     Component.onCompleted: {
         Fancontrol.Base.load();
-        windowConfig.restore(window);
         window.visible = !Fancontrol.Base.startMinimized;
         leftPage = "SensorsTab.qml";
     }
