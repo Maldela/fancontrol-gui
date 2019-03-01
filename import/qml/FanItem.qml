@@ -200,6 +200,12 @@ Item {
                     c.fillStyle = gradient;
                     c.fill();
                 }
+
+                Connections {
+                    target: fan
+                    onTempChanged: curveCanvas.requestPaint()
+                    onMinPwmChanged: curveCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y))
+                }
             }
             Canvas {
                 id: meshCanvas
@@ -262,11 +268,11 @@ Item {
                     if (!drag.active) {
                         fan.minStop = Math.round(graphBackground.scalePwm(centerY));
                         fan.minTemp = Math.round(graphBackground.scaleTemp(centerX));
-                        if (!fanOffCheckBox.checked) fan.minPwm = fan.minStop;
+                        if (fan.minPwm !== 0) fan.minPwm = fan.minStop;
                     }
                 }
                 onPositionChanged: {
-                    var left = fanOffCheckBox.checked ? x : 0;
+                    var left = fan.minPwm === 0 ? x : 0;
                     var width = maxPoint.x - left;
                     var height = y - maxPoint.y;
                     curveCanvas.markDirty(Qt.rect(left, maxPoint.y, width, height));
@@ -298,10 +304,11 @@ Item {
         }
     }
 
-    ColumnLayout {
-        property int padding: root.margin
-
+    FanControls {
         id: settingsArea
+
+        fan: root.fan
+        padding: root.margin
         anchors {
             left: parent.left
             leftMargin: padding
@@ -311,113 +318,5 @@ Item {
             bottomMargin: padding
         }
         visible: root.showControls && root.height >= height + 2*margin
-        clip: true
-        spacing: 2
-
-        RowLayout {
-            CheckBox {
-                id: hasTempCheckBox
-                text: i18n("Controlled by:")
-                checked: !!fan ? fan.hasTemp : false
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                onCheckedChanged: {
-                    if (!!fan) {
-                        fan.hasTemp = checked;
-                        if (checked && !!tempModel.temp(tempBox.currentIndex)) {
-                            fan.temp = tempModel.temp(tempBox.currentIndex);
-                        }
-                        curveCanvas.requestPaint();
-                    }
-                }
-
-                Connections {
-                    target: root
-                    onFanChanged: hasTempCheckBox.checked = !!fan ? fan.hasTemp : false
-                }
-                Connections {
-                    target: fan
-                    onHasTempChanged: hasTempCheckBox.checked = fan.hasTemp
-                }
-            }
-            RowLayout {
-                ComboBox {
-                    id: tempBox
-                    Layout.fillWidth: true
-                    model: tempModel
-                    currentIndex: !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
-                    textRole: "display"
-                    enabled: hasTempCheckBox.checked
-                    onCurrentIndexChanged: {
-                        if (hasTempCheckBox.checked)
-                            fan.temp = tempModel.temp(currentIndex);
-                    }
-                }
-
-                Connections {
-                    target: root
-                    onFanChanged: tempBox.currentIndex = !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
-                }
-                Connections {
-                    target: fan
-                    onTempChanged: tempBox.currentIndex = !!fan && fan.hasTemp ? tempModel.indexOf(fan.temp) : -1
-                }
-            }
-        }
-
-        CheckBox {
-            id: fanOffCheckBox
-            text: i18n("Turn Fan off if temp < MINTEMP")
-            enabled: hasTempCheckBox.checked
-            checked: !!fan ? fan.minPwm == 0 : false
-            onCheckedChanged: {
-                if (!!fan) {
-                    fan.minPwm = checked ? 0 : fan.minStop;
-                    curveCanvas.markDirty(Qt.rect(0, 0, stopPoint.x, stopPoint.y));
-                }
-            }
-
-            Connections {
-                target: root
-                onFanChanged: if (!!fan) fanOffCheckBox.checked = fan.minPwm == 0
-            }
-            Connections {
-                target: fan
-                onMinPwmChanged: fanOffCheckBox.checked = fan.minPwm == 0
-            }
-        }
-
-        RowLayout {
-            enabled: fanOffCheckBox.checked && fanOffCheckBox.enabled
-
-            Label {
-                text: i18n("Pwm value for fan to start:")
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                renderType: Text.NativeRendering
-            }
-            SpinBox {
-                id: minStartInput
-
-                Layout.fillWidth: true
-                from: 0
-                to: 100
-                editable: true
-                value: !!fan ? Math.round(fan.minStart / 2.55) : 0
-                textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 1) + locale.percent }
-                onValueModified: {
-                    if (!!fan) {
-                        fan.minStart = Math.round(value * 2.55)
-                    }
-                }
-
-                Connections {
-                    target: root
-                    onFanChanged: if (!!fan) minStartInput.value = Math.round(fan.minStart / 2.55)
-                }
-                Connections {
-                    target: fan
-                    onMinStartChanged: minStartInput.value = Math.round(fan.minStart / 2.55)
-                }
-            }
-        }
     }
 }

@@ -12,6 +12,7 @@ set(LIB_SRCS src/hwmon.cpp
 
 set(QML_FILES qml/qmldir
               qml/ErrorDialog.qml
+              qml/FanControls.qml
               qml/FanHeader.qml
               qml/FanItem.qml
               qml/PwmPoint.qml
@@ -53,12 +54,13 @@ target_link_libraries(fancontrol_qml_plugin PRIVATE ${LIB_PRIVATE_LIBRARIES} PUB
 install(TARGETS fancontrol_qml_plugin DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 install(FILES ${QML_FILES} DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
 
-if(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
-    ecm_generate_qmltypes(Fancontrol.Qml 1.0 DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
-endif(${KF5_VERSION} VERSION_GREATER_EQUAL 5.33.0)
+
+#install qmltypes file
+include(ECMGenerateQmlTypes)
+ecm_generate_qmltypes(Fancontrol.Qml 1.0 DESTINATION "${KDE_INSTALL_QMLDIR}/Fancontrol/Qml/")
+
 
 #tests
-
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif(BUILD_TESTING)
