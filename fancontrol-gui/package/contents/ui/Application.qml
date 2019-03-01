@@ -41,7 +41,7 @@ Kirigami.ApplicationWindow {
 
     title: i18n("Fancontrol-GUI")
     reachableModeEnabled: false
-    pageStack.defaultColumnWidth: Kirigami.Units.gridUnit * 30
+    pageStack.defaultColumnWidth: Kirigami.Units.gridUnit * 25
 
     onLeftPageChanged: {
         window.pageStack.clear();
