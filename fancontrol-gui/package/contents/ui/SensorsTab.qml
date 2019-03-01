@@ -43,12 +43,11 @@ Kirigami.ScrollablePage {
         model: loader.hwmons.length
 
         delegate: Rectangle {
-            property QtObject hwmon: loader.hwmons[index]
+            readonly property QtObject hwmon: loader.hwmons[index]
 
             height: childrenRect.height
             width: listView.width - listView.spacing * 2
             x: listView.spacing
-            clip: true
             color: Kirigami.Theme.backgroundColor
 
             Column {
@@ -71,17 +70,14 @@ Kirigami.ScrollablePage {
                         width: parent.width - parent.padding * 2
 
                         Label {
-                            anchors.leftMargin: root.spacing
-                            Layout.maximumWidth: parent.width - rpmValue.width - root.spacing*2
                             Layout.alignment: Qt.AlignLeft
-                            clip: true
-                            text: "Fan " + (index+1) + ":"
+                            text: i18n("Fan %1:", index+1)
                         }
                         Label {
                             id: rpmValue
+
                             Layout.alignment: Qt.AlignRight
-                            anchors.rightMargin: root.spacing
-                            text: hwmon.fans[index].rpm + " " + i18n("rpm")
+                            text: i18n("%1 rpm", hwmon.fans[index].rpm)
                         }
                     }
                 }
@@ -92,17 +88,14 @@ Kirigami.ScrollablePage {
                         width: parent.width - parent.padding * 2
 
                         Label {
-                            anchors.leftMargin: root.spacing
-                            text: hwmon.temps[index].name + ": "
-                            Layout.maximumWidth: parent.width - tempValue.width - root.spacing*2
+                            text: i18n("%1:", hwmon.temps[index].name)
                             Layout.alignment: Qt.AlignLeft
-                            clip: true
                         }
                         Label {
                             id: tempValue
+
+                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + i18n(Fancontrol.Base.unit)
                             Layout.alignment: Qt.AlignRight
-                            anchors.rightMargin: root.spacing
-                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + " " + i18n(Fancontrol.Base.unit)
                         }
                     }
                 }

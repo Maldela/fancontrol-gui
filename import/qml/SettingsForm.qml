@@ -163,6 +163,7 @@ Kirigami.FormLayout {
 
     FileDialog {
         id: openFileDialog
+
         title: i18n("Please choose a configuration file")
         folder: "file:///etc"
         selectExisting: true

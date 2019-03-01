@@ -31,7 +31,6 @@ ColumnLayout {
     property QtObject fan
     readonly property QtObject tempModel: Fancontrol.Base.tempModel
 
-    clip: true
     spacing: 2
 
     RowLayout {

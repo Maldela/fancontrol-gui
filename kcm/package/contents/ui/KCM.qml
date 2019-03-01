@@ -119,7 +119,6 @@ Kirigami.Page {
 
             anchors.fill: parent
             anchors.margins: fansListViewBackground.border.width
-            clip: true
             boundsBehavior: Flickable.StopAtBounds
             flickableDirection: Flickable.AutoFlickIfNeeded
             model: pwmFanModel

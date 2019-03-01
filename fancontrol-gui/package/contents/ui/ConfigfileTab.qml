@@ -31,7 +31,7 @@ Kirigami.ScrollablePage {
     readonly property QtObject loader: Fancontrol.Base.loader
 
     header: Label {
-        text: !!loader && loader.configEqualToLoadedFile ? loader.configPath : i18n("New config")
+        text: !!loader && loader.needsSave ? i18n("New config") : loader.configPath
     }
 
     TextEdit {
