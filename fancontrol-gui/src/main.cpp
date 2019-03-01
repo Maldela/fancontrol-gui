@@ -42,6 +42,9 @@ Q_DECLARE_LOGGING_CATEGORY(FANCONTROL)
 Q_LOGGING_CATEGORY(FANCONTROL, "fancontrol-gui")
 
 
+static QWindow *s_window = nullptr;
+
+
 void handleArguments(QStringList args)
 {
     if (args.isEmpty())
@@ -60,11 +63,11 @@ void activate(const QStringList &args, const QString &workingDir)
 
     handleArguments(args);
 
-    if (auto mainWindow = qApp->topLevelWindows().at(0))
+    if (s_window)
     {
-        mainWindow->show();
-        mainWindow->raise();
-        mainWindow->requestActivate();
+        s_window->show();
+        s_window->raise();
+        s_window->requestActivate();
     }
 }
 
@@ -97,13 +100,14 @@ int main(int argc, char *argv[])
 
     KDeclarative::QmlObject qmlObject;
     qmlObject.loadPackage(QStringLiteral("org.kde.fancontrol.gui"));
-    if (auto window = qobject_cast<QWindow*>(qmlObject.rootObject()))
+    s_window = qobject_cast<QWindow*>(qmlObject.rootObject());
+    if (s_window)
     {
         KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
-        KWindowConfig::restoreWindowSize(window, configGroup);
-        QObject::connect(&app, &QApplication::aboutToQuit, window, [window] () {
+        KWindowConfig::restoreWindowSize(s_window, configGroup);
+        QObject::connect(&app, &QApplication::aboutToQuit, s_window, [] () {
             KConfigGroup configGroup(KSharedConfig::openConfig(QStringLiteral(CONFIG_NAME)), "window");
-            KWindowConfig::saveWindowSize(window, configGroup);
+            KWindowConfig::saveWindowSize(s_window, configGroup);
             configGroup.sync();
         });
     }
