@@ -31,6 +31,7 @@ import "colors.js" as Colors
 Item {
     property QtObject fan
     property int margin: Kirigami.Units.smallSpacing
+    property bool showControls: true
     readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
     readonly property QtObject tempModel: Fancontrol.Base.tempModel
     readonly property real minTemp: Fancontrol.Base.minTemp
@@ -64,7 +65,7 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            bottom: settingsArea.top
+            bottom: root.showControls ? settingsArea.top : parent.bottom
             bottomMargin: root.margin
         }
         visible: graphBackground.height > 0 && graphBackground.width > 0
@@ -155,7 +156,8 @@ Item {
 
                 anchors.fill: parent
                 anchors.margins: parent.border.width
-                renderStrategy: Canvas.Cooperative
+                renderStrategy: Canvas.Threaded
+                renderTarget: Canvas.FramebufferObject
 
                 onPaint: {
                     var c = curveCanvas.getContext("2d");
@@ -204,7 +206,8 @@ Item {
 
                 anchors.fill: parent
                 anchors.margins: parent.border.width
-                renderStrategy: Canvas.Cooperative
+                renderStrategy: Canvas.Threaded
+                renderTarget: Canvas.FramebufferObject
 
                 onPaint: {
                     var c = meshCanvas.getContext("2d");
@@ -307,7 +310,7 @@ Item {
             bottom: parent.bottom
             bottomMargin: padding
         }
-        visible: root.height >= height + 2*margin
+        visible: root.showControls && root.height >= height + 2*margin
         clip: true
         spacing: 2
 
