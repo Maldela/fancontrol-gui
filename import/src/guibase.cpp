@@ -358,10 +358,7 @@ void GUIBase::deleteProfile(int index, bool updateModel)
     auto profiles = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size() || index >= profiles.size())
-    {
-        qDebug() << "Index out of bounds";
         return;
-    }
 
     profileNames.removeAt(index);
     Config::instance()->findItem(QStringLiteral("ProfileNames"))->setProperty(profileNames);

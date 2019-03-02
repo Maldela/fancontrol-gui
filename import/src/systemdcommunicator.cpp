@@ -284,7 +284,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         }
     }
     else
-        emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2; %3", job->error(), job->errorString(), job->errorText()), true);
+        emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2", job->error(), job->errorString()), true);
 
     return success;
 }

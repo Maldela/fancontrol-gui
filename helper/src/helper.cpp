@@ -98,6 +98,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
             {
                 if (dbusmessage.type() == QDBusMessage::ErrorMessage)
                 {
+                    reply = ActionReply::HelperErrorReply();
                     reply.setErrorCode(ActionReply::DBusError);
                     reply.setErrorDescription(dbusmessage.errorMessage());
                 }
@@ -117,6 +118,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
+                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -136,6 +138,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
+                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -151,6 +154,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
+                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -160,6 +164,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
+            reply.setErrorCode(ActionReply::DBusError);
             reply.setErrorDescription(i18n("Could not create dbus interface"));
         }
         delete iface;
@@ -181,6 +186,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
+            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(file.errorString());
         }
     }
@@ -198,6 +204,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
+            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(file.errorString());
         }
     }
@@ -213,11 +220,13 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!process.waitForStarted(1000))
         {
             reply = ActionReply::HelperErrorReply();
+            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(process.errorString());
         }
         else if (!process.waitForFinished(10000))
         {
             reply = ActionReply::HelperErrorReply();
+            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(process.errorString());
         }
     }
@@ -225,6 +234,7 @@ ActionReply Helper::action(const QVariantMap &arguments)
     else
     {
         reply = ActionReply::HelperErrorReply();
+        reply.setErrorCode(ActionReply::NoSuchActionError);
         reply.setErrorDescription(i18n("This action does not exist!"));
     }
 
