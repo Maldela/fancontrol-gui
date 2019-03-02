@@ -34,6 +34,11 @@
 #include <QtDBus/QDBusVariant>
 
 
+#ifndef STANDARD_HELPER_ID
+#define STANDARD_HELPER_ID "fancontrol.gui.helper"
+#endif
+
+
 using namespace KAuth;
 
 struct StringStruct
@@ -99,7 +104,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
                 if (dbusmessage.type() == QDBusMessage::ErrorMessage)
                 {
                     reply = ActionReply::HelperErrorReply();
-                    reply.setErrorCode(ActionReply::DBusError);
                     reply.setErrorDescription(dbusmessage.errorMessage());
                 }
                 else if (dbusmessage.type() == QDBusMessage::ReplyMessage)
@@ -118,7 +122,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
-                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -138,7 +141,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
-                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -154,7 +156,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
                         else
                         {
                             reply = ActionReply::HelperErrorReply();
-                            reply.setErrorCode(ActionReply::DBusError);
                             reply.setErrorDescription(dbusreply.error().message());
                         }
                     }
@@ -164,7 +165,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
-            reply.setErrorCode(ActionReply::DBusError);
             reply.setErrorDescription(i18n("Could not create dbus interface"));
         }
         delete iface;
@@ -186,7 +186,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
-            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(file.errorString());
         }
     }
@@ -204,7 +203,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
         else
         {
             reply = ActionReply::HelperErrorReply();
-            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(file.errorString());
         }
     }
@@ -220,13 +218,11 @@ ActionReply Helper::action(const QVariantMap &arguments)
         if (!process.waitForStarted(1000))
         {
             reply = ActionReply::HelperErrorReply();
-            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(process.errorString());
         }
         else if (!process.waitForFinished(10000))
         {
             reply = ActionReply::HelperErrorReply();
-            reply.setErrorCode(ActionReply::InvalidActionError);
             reply.setErrorDescription(process.errorString());
         }
     }
@@ -234,11 +230,10 @@ ActionReply Helper::action(const QVariantMap &arguments)
     else
     {
         reply = ActionReply::HelperErrorReply();
-        reply.setErrorCode(ActionReply::NoSuchActionError);
         reply.setErrorDescription(i18n("This action does not exist!"));
     }
 
     return reply;
 }
 
-KAUTH_HELPER_MAIN("fancontrol.gui.helper", Helper)
+KAUTH_HELPER_MAIN(STANDARD_HELPER_ID, Helper)

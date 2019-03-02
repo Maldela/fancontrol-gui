@@ -27,13 +27,18 @@
 #include <KAuth/KAuthAction>
 
 
+#ifndef STANDARD_HELPER_ID
+#define STANDARD_HELPER_ID "fancontrol.gui.helper"
+#endif
+
+
 namespace Fancontrol
 {
 
 inline KAuth::Action newFancontrolAction()
 {
-    KAuth::Action action(QStringLiteral("fancontrol.gui.helper.action"));
-    action.setHelperId(QStringLiteral("fancontrol.gui.helper"));
+    KAuth::Action action(QStringLiteral(STANDARD_HELPER_ID) + ".action");
+    action.setHelperId(QStringLiteral(STANDARD_HELPER_ID));
 
     return action;
 }

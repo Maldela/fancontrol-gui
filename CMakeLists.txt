@@ -13,9 +13,10 @@ option(INSTALL_SHARED "Install the shared parts" ON)
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
 set(STANDARD_CONFIG_FILE "/etc/fancontrol" CACHE STRING "The location of the standard config file for the fancontrol script")
+set(STANDARD_HELPER_ID "fancontrol.gui.helper" CACHE STRING "The standard id for the KAuth helper")
 add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
 add_definitions(-DSTANDARD_CONFIG_FILE="${STANDARD_CONFIG_FILE}")
-
+add_definitions(-DSTANDARD_HELPER_ID="${STANDARD_HELPER_ID}")
 
 #KCM can't be build without systemd support
 if(BUILD_KCM AND NO_SYSTEMD)
