@@ -446,20 +446,20 @@ bool Loader::load(const QUrl &url)
             map[QStringLiteral("action")] = QVariant("read");
             map[QStringLiteral("filename")] = fileName;
             action.setArguments(map);
-            auto reply = action.execute();
-            if (!reply->exec())
+            auto job = action.execute();
+            if (!job->exec())
             {
-                if (reply->error() == 4)
+                if (job->error() == 4)
                 {
                     emit info(i18n("Loading of file aborted by user"));
                     return false;
                 }
 
-                emit error(reply->errorString() + reply->errorText(), true);
+                emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2; %3", job->error(), job->errorString(), job->errorText()), true);
                 return false;
             }
             else
-                m_configFileContent = reply->data().value(QStringLiteral("content")).toString();
+                m_configFileContent = job->data().value(QStringLiteral("content")).toString();
         }
         else
             emit error(i18n("Action not supported! Try running the application as root."), true);

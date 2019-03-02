@@ -259,7 +259,6 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     {
         emit error(i18n("Invalid manager interface!"), true);
         return false;
-
     }
 
     auto action = newFancontrolAction();
@@ -285,7 +284,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         }
     }
     else
-        emit error(i18n("Dbus error: %1", job->errorString()));
+        emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2; %3", job->error(), job->errorString(), job->errorText()), true);
 
     return success;
 }
