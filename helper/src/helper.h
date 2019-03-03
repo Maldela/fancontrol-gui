@@ -20,11 +20,13 @@
 #include <KAuth/KAuthActionReply>
 
 
+using namespace KAuth;
+
 class Helper : public QObject
 {
     Q_OBJECT
 
     public Q_SLOTS:
 
-        KAuth::ActionReply action(const QVariantMap &args);
+        ActionReply action(const QVariantMap &args);
 };
