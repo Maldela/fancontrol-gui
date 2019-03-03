@@ -1,5 +1,5 @@
 # fancontrol-gui
-GUI for Fancontrol.
+GUI for fancontrol which is part of lm_sensors <link>https://github.com/lm-sensors/lm-sensors</link>.
 It uses the KAuth module of the KDE Frameworks 5 to write the generated config file.
 Furthermore it communicates with systemd via dbus to control the fancontrol service.
 
