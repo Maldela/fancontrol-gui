@@ -61,11 +61,6 @@ Kirigami.Page {
             }
         },
         Kirigami.Action {
-            text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-            icon.name: "dialog-password"
-            onTriggered: loader.detectSensors()
-        },
-        Kirigami.Action {
             visible: !!systemdCom && !!fan
             text: !!fan ? fan.testing ? i18n("Abort test") : i18n("Test start and stop values") : ""
             icon.name: "dialog-password"
@@ -106,12 +101,16 @@ Kirigami.Page {
         }
     }
 
-    Label {
+    Loader {
         anchors.centerIn: parent
-        visible: pwmFanModel.length === 0
-        text: i18n("There are no pwm capable fans in your system.")
-        font.pointSize: 14
-        font.bold: true
+        active: pwmFanModel.length === 0
+
+        sourceComponent: Label {
+            text: i18n("There are no pwm capable fans in your system.\nTry running 'sensors-detect' in a terminal and restart this application.")
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: 14
+            font.bold: true
+        }
     }
 
     Fancontrol.ProfilesDialog {

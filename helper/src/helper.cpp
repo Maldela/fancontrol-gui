@@ -21,7 +21,6 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
-#include <QtCore/QProcess>
 #include <QtCore/QFileInfo>
 
 #include <KAuth/KAuthHelperSupport>
@@ -204,26 +203,6 @@ ActionReply Helper::action(const QVariantMap &arguments)
         {
             reply = ActionReply::HelperErrorReply();
             reply.setErrorDescription(file.errorString());
-        }
-    }
-
-    else if (arguments[QStringLiteral("action")] == "detectSensors")
-    {
-        const auto program = QStringLiteral("sensors-detect");
-        const auto arguments = QStringList() << QStringLiteral("--auto");
-
-        QProcess process;
-        process.start(program, arguments);
-
-        if (!process.waitForStarted(1000))
-        {
-            reply = ActionReply::HelperErrorReply();
-            reply.setErrorDescription(process.errorString());
-        }
-        else if (!process.waitForFinished(10000))
-        {
-            reply = ActionReply::HelperErrorReply();
-            reply.setErrorDescription(process.errorString());
         }
     }
 

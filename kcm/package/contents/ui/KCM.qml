@@ -59,26 +59,15 @@ Kirigami.Page {
         onAboutToDefault: enabledBox.checked = false
     }
 
-    ColumnLayout {
-        id: noFansInfo
+    Loader {
+        anchors.centerIn: parent
+        active: pwmFanModel.length === 0
 
-        width: root.width
-        y: root.height / 2 - height / 2
-        spacing: Kirigami.Units.smallSpacing * 2
-        visible: pwmFanModel.length === 0
-
-        Label {
-            Layout.alignment: Qt.AlignCenter
-            text: i18n("There are no pwm capable fans in your system.")
+        sourceComponent: Label {
+            text: i18n("There are no pwm capable fans in your system.\nTry running 'sensors-detect' in a terminal and restart this application.")
+            horizontalAlignment: Text.AlignHCenter
             font.pointSize: 14
             font.bold: true
-        }
-
-        Button {
-            Layout.alignment: Qt.AlignCenter
-            text: loader.sensorsDetected ? i18n("Detect fans again") : i18n("Detect fans")
-            icon.name: kcm.needsAuthorization ? "dialog-password" : ""
-            onClicked: loader.detectSensors()
         }
     }
 
@@ -86,7 +75,8 @@ Kirigami.Page {
         id: enabledBox
 
         text: i18n("Control fans manually")
-        checked: systemdCom.serviceEnabled && systemdCom.serviceActive;
+        checked: systemdCom.serviceEnabled && systemdCom.serviceActive && pwmFanModel.length > 0
+        enabled: pwmFanModel.length > 0
         onCheckedChanged: {
             systemdCom.serviceActive = enabledBox.checked;
             loader.restartServiceAfterTesting = checked;

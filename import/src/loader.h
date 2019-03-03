@@ -63,7 +63,6 @@ public:
     Q_INVOKABLE bool save(const QUrl & = QUrl());
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
-    Q_INVOKABLE void detectSensors();
 
     void load(const QString &config);
     QUrl configUrl() const { return m_configUrl; }
@@ -84,13 +83,7 @@ public:
     Fan *fan(int hwmonIndex, int fanIndex) const;
     void toDefault();
     bool needsSave() const { return m_config != m_configFileContent; }
-
-
-public slots:
-
     void updateConfig();
-    void handleDetectSensorsResult(KJob *job);
-    void handleDetectSensorsResult(int exitCode);
     void handleTestStatusChanged();
 
 
