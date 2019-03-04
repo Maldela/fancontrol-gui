@@ -49,10 +49,6 @@ public:
     void setName(const QString &name) Q_DECL_OVERRIDE;
     void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
-
-
-public slots:
-
     void update() Q_DECL_OVERRIDE;
 
 

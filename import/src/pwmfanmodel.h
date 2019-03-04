@@ -52,17 +52,9 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override { Q_UNUSED(parent) return m_fans.size(); }
     virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
-    Q_INVOKABLE QObject *fan(int index) const;
-
-
-public slots:
-
     void updateFan(PwmFan *fan);
 
-
-private slots:
-
-    void updateFan();
+    Q_INVOKABLE QObject *fan(int index) const;
 
 
 signals:
@@ -71,6 +63,8 @@ signals:
 
 
 private:
+
+    void updateFan();
 
     QList<PwmFan *> m_fans;
 };

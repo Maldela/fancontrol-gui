@@ -100,8 +100,11 @@ public:
     QStringListModel *profileModel() const { return m_profileModel; }
     QString currentProfile() const;
     int currentProfileIndex() const;
+    void handleError(const QString &error, bool critical = false);
+    void handleInfo(const QString &info);
 
     Q_INVOKABLE bool hasSystemdCommunicator() const;
+    Q_INVOKABLE void load();
     Q_INVOKABLE void apply();
     Q_INVOKABLE void reset();
     Q_INVOKABLE void applyProfile(const QString &profileName);
@@ -110,11 +113,6 @@ public:
     Q_INVOKABLE void deleteProfile(const QString &profileName, bool updateModel = true);
     Q_INVOKABLE void deleteProfile(int, bool updateModel = true);
 
-public slots:
-
-    void load();
-    void handleError(const QString &error, bool critical = false);
-    void handleInfo(const QString &info);
 
 signals:
 

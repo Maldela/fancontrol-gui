@@ -70,16 +70,12 @@ signals:
     void info(QString) const;
 
 
-protected slots:
-
-    void updateServiceProperties(const QString&, const QVariantMap&, const QStringList&);
-
-
 protected:
 
     bool dbusAction(const QString &method, const QVariantList &arguments = QVariantList());
     bool systemdServiceActive() const;
     bool systemdServiceEnabled() const;
+    void updateServiceProperties(const QString&, const QVariantMap&, const QStringList&);
 
 
 private:

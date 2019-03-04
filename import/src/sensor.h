@@ -46,17 +46,13 @@ public:
     virtual void setName(const QString &name) = 0;
     virtual void toDefault() = 0;
     virtual bool isValid() const = 0;
+    virtual void update() = 0;
     QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
 
     bool operator==(const Sensor &other) { return m_path == other.path(); }
     bool operator!=(const Sensor &other) { return m_path != other.path(); }
-
-
-public slots:
-
-    virtual void update() = 0;
 
 
 signals:

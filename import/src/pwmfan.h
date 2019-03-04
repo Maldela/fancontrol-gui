@@ -102,6 +102,9 @@ public:
     void setActive(bool active);
     void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
+    void update() Q_DECL_OVERRIDE;
+    void continueTest();
+
     Q_INVOKABLE void test();
     Q_INVOKABLE void abortTest();
 
@@ -120,12 +123,6 @@ signals:
     void activeChanged();
     void testStatusChanged(bool = false);
     void pwmEnableChanged();
-
-
-public slots:
-
-    void update() Q_DECL_OVERRIDE;
-    void continueTest();
 
 
 protected:

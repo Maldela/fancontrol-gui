@@ -45,6 +45,7 @@ public:
     void setName(const QString &name) Q_DECL_OVERRIDE;
     void toDefault() Q_DECL_OVERRIDE;
     bool isValid() const Q_DECL_OVERRIDE;
+    void update() Q_DECL_OVERRIDE;
 
     virtual int pwm() const { return 255; }
     virtual bool setPwm(int, bool) { return false; }
@@ -53,11 +54,6 @@ public:
 signals:
 
     void rpmChanged();
-
-
-public slots:
-
-    void update() Q_DECL_OVERRIDE;
 
 
 protected:
