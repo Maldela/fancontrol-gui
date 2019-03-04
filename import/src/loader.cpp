@@ -30,7 +30,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
-#include <QtCore/QProcess>
 
 #include <KAuth/KAuthExecuteJob>
 #include <KI18n/KLocalizedString>

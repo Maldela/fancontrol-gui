@@ -29,7 +29,6 @@
 
 
 class QTextStream;
-class KJob;
 
 namespace Fancontrol
 {

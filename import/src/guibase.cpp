@@ -55,9 +55,7 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     connect(m_com, &SystemdCommunicator::needsApplyChanged, this, &GUIBase::needsApplyChanged);
 #endif
 
-    const auto locale = QLocale::system();
-    const auto system = locale.measurementSystem();
-    m_unit = (system == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
+    m_unit = (QLocale::system().measurementSystem() == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
     emit unitChanged(m_unit);
 
     m_loader->parseHwmons();

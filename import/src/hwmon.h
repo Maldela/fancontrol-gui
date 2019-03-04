@@ -22,8 +22,6 @@
 #define HWMON_H
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
 
 
 namespace Fancontrol

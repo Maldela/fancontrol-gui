@@ -22,13 +22,9 @@
 #define SYSTEMDCOMMUNICATOR_H
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariantMap>
-#include <QtCore/QVariantList>
 
 
 class QDBusInterface;
-class KJob;
 
 namespace Fancontrol
 {

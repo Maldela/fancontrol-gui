@@ -23,14 +23,9 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QPair>
 
 
 class QTimer;
-class KJob;
-class QProcess;
 
 namespace Fancontrol
 {
