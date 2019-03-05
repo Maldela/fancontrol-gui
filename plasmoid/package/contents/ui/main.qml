@@ -33,6 +33,7 @@ ColumnLayout {
 
     Layout.minimumWidth: Plasmoid.formFactor == PlasmaCore.Types.Horizontal ? height : header.implicitWidth
     Layout.minimumHeight: Plasmoid.formFactor == PlasmaCore.Types.Vertical ? width  : header.implicitHeight + Kirigami.Units.gridUnit * 5
+    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
     Plasmoid.associatedApplication: "fancontrol_gui"
     Plasmoid.icon: "org.kde.fancontrol.gui"
     Kirigami.Theme.backgroundColor: PlasmaCore.ColorScope.backgroundColor

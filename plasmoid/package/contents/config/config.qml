@@ -25,7 +25,7 @@ import org.kde.plasma.configuration 2.0
 ConfigModel {
     ConfigCategory {
         name: i18n("General")
-        icon: "preferences-desktop-color"
+        icon: "org.kde.fancontrol.gui"
         source: "configGeneral.qml"
     }
 }
