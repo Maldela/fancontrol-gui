@@ -83,7 +83,7 @@ Rectangle {
         width: column.width
         height: column.height
         radius: Kirigami.Units.smallSpacing / 2
-        color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
+        color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.3)
         visible: root.enabled && pwmMouse.containsMouse
 
         Column {
