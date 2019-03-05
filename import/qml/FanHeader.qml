@@ -24,22 +24,43 @@ import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.3 as Kirigami
 
 
-Item {
+RowLayout {
     property QtObject fan
+    property bool editable: true
 
-    implicitHeight: layout.childrenRect.height
+    Loader {
+        active: !!fan
+        sourceComponent: editable ? editableNameComponent : nameComponent
+        Layout.alignment: Qt.AlignLeft
+        Layout.leftMargin: Kirigami.Units.smallSpacing
+    }
+    Item {
+        Layout.fillWidth: true
+    }
+    Label {
+        Layout.alignment: Qt.AlignRight
+        Layout.rightMargin: Kirigami.Units.smallSpacing
+        text: !!fan ? fan.path : ""
+        horizontalAlignment: Text.AlignRight
+    }
 
-    RowLayout {
-        id: layout
+    Component {
+        id: nameComponent
 
-        anchors.fill: parent
-        anchors.leftMargin: Kirigami.Units.smallSpacing
-        anchors.rightMargin: Kirigami.Units.smallSpacing
+        Label {
+            text: !!fan ? fan.name : ""
+            horizontalAlignment: TextEdit.AlignLeft
+            wrapMode: TextEdit.Wrap
+            font.bold: true
+            font.pointSize: Kirigami.Theme.defaultFont.pointSize + 2
+        }
+    }
+    Component {
+        id: editableNameComponent
 
         TextEdit {
             id: nameField
 
-            Layout.alignment: Qt.AlignLeft
             text: !!fan ? fan.name : ""
             color: Kirigami.Theme.textColor
             horizontalAlignment: TextEdit.AlignLeft
@@ -60,11 +81,6 @@ Item {
                 cursorShape: Qt.IBeamCursor
                 acceptedButtons: Qt.NoButton
             }
-        }
-        Label {
-            Layout.alignment: Qt.AlignRight
-            text: !!fan ? fan.path : ""
-            horizontalAlignment: Text.AlignRight
         }
     }
 }

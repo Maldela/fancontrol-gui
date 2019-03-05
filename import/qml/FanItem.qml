@@ -29,9 +29,12 @@ import "colors.js" as Colors
 
 
 Item {
+    id: root
+
     property QtObject fan
     property int margin: Kirigami.Units.smallSpacing
     property bool showControls: true
+    property bool editable: true
     readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
     readonly property QtObject tempModel: Fancontrol.Base.tempModel
     readonly property real minTemp: Fancontrol.Base.minTemp
@@ -39,10 +42,6 @@ Item {
     readonly property string unit: Fancontrol.Base.unit
     readonly property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
     readonly property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
-
-    id: root
-
-    clip: false
 
     onConvertedMinTempChanged: {
         meshCanvas.requestPaint();
@@ -249,27 +248,26 @@ Item {
             }
             StatusPoint {
                 id: currentPwm
+
                 size: graph.fontSize
                 visible: graphBackground.contains(center) && !!fan && fan.hasTemp
                 fan: root.fan
             }
             PwmPoint {
                 id: stopPoint
+
                 color: !!fan ? fan.hasTemp ? "blue" : Qt.tint(Kirigami.Theme.disabledTextColor, Qt.rgba(0, 0, 1, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
-                drag.maximumX: Math.min(graphBackground.scaleX(graphBackground.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
-                drag.minimumY: Math.max(graphBackground.scaleY(graphBackground.scalePwm(maxPoint.y)-1), maxPoint.y+1)
+                draggable: root.editable
+                maximumX: Math.min(graphBackground.scaleX(graphBackground.scaleTemp(maxPoint.x)-1), maxPoint.x-1)
+                minimumY: Math.max(graphBackground.scaleY(graphBackground.scalePwm(maxPoint.y)-1), maxPoint.y+1)
                 x: !!fan && fan.hasTemp ? graphBackground.scaleX(MoreMath.bound(root.minTemp, fan.minTemp, root.maxTemp)) - width/2 : -width/2
                 y: !!fan && fan.hasTemp ? graphBackground.scaleY(fan.minStop) - height/2 : -height/2
-                temp: !!fan && fan.hasTemp ? drag.active ? graphBackground.scaleTemp(centerX) : fan.minTemp : root.minTemp
-                pwm: !!fan && fan.hasTemp ? drag.active ? graphBackground.scalePwm(centerY) : fan.minStop : 255
-                drag.onActiveChanged: {
-                    if (!drag.active) {
-                        fan.minStop = Math.round(graphBackground.scalePwm(centerY));
-                        fan.minTemp = Math.round(graphBackground.scaleTemp(centerX));
-                        if (fan.minPwm !== 0) fan.minPwm = fan.minStop;
-                    }
+                onDragFinished: {
+                    fan.minStop = Math.round(graphBackground.scalePwm(centerY));
+                    fan.minTemp = Math.round(graphBackground.scaleTemp(centerX));
+                    if (fan.minPwm !== 0) fan.minPwm = fan.minStop;
                 }
                 onPositionChanged: {
                     var left = fan.minPwm === 0 ? x : 0;
@@ -280,20 +278,18 @@ Item {
             }
             PwmPoint {
                 id: maxPoint
+
                 color: !!fan ? fan.hasTemp ? "red" : Qt.tint(Kirigami.Theme.disabledTextColor, Qt.rgba(1, 0, 0, 0.5)) : "transparent"
                 size: graph.fontSize
                 visible: !!fan ? fan.hasTemp : false
-                drag.minimumX: Math.max(graphBackground.scaleX(graphBackground.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
-                drag.maximumY: Math.min(graphBackground.scaleY(graphBackground.scalePwm(stopPoint.y)+1), stopPoint.y-1)
+                draggable: root.editable
+                minimumX: Math.max(graphBackground.scaleX(graphBackground.scaleTemp(stopPoint.x)+1), stopPoint.x+1)
+                maximumY: Math.min(graphBackground.scaleY(graphBackground.scalePwm(stopPoint.y)+1), stopPoint.y-1)
                 x: !!fan && fan.hasTemp ? graphBackground.scaleX(MoreMath.bound(root.minTemp, fan.maxTemp, root.maxTemp)) - width/2 : graphBackground.width - width/2
                 y: !!fan && fan.hasTemp ? graphBackground.scaleY(fan.maxPwm) - height/2 : -height/2
-                temp: !!fan && fan.hasTemp ? drag.active ? graphBackground.scaleTemp(centerX) : fan.maxTemp : root.maxTemp
-                pwm: !!fan && fan.hasTemp ? drag.active ? graphBackground.scalePwm(centerY) : fan.maxPwm : 255
-                drag.onActiveChanged: {
-                    if (!drag.active) {
-                        fan.maxPwm = Math.round(graphBackground.scalePwm(centerY));
-                        fan.maxTemp = Math.round(graphBackground.scaleTemp(centerX));
-                    }
+                onDragFinished: {
+                    fan.maxPwm = Math.round(graphBackground.scalePwm(centerY));
+                    fan.maxTemp = Math.round(graphBackground.scaleTemp(centerX));
                 }
                 onPositionChanged: {
                     var width = x - stopPoint.x;

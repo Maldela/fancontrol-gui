@@ -13,6 +13,8 @@ If your distro looks for QML plugins in /usr/lib/qt/qml instead of /usr/lib/qml 
 To compile the additional KCM set the cmake option -DBUILD_KCM=on.
 The KCM is only build, if the -DNO_SYSTEMD option is unset or set to false.
 
+To compile the additional KDE Plasma plasmoid set the cmake option -DBUILD_PLASMOID=on.
+
 # Build requirements
 * Qt5: Base/Core, Widgets, Gui, QML
 * KF5: I18n, Auth, Config, Package, Declarative, CoreAddons, DBusAddons, KCMUtils, Extra-Cmake-Modules, Notifications

@@ -7,6 +7,7 @@ project(fancontroller)
 option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality significantly!" OFF)
 option(BUILD_GUI "Build the standalone application" ON)
 option(BUILD_KCM "Build the KCM" OFF)
+option(BUILD_PLASMOID "Build the plasmoid" OFF)
 option(BUILD_HELPER "Build the KHelper" ON)
 option(INSTALL_SHARED "Install the shared parts" ON)
 
@@ -42,7 +43,6 @@ include(KDECompilerSettings)
 include(FeatureSummary)
 include(FindPkgConfig)
 include(ECMQMLModules)
-include(ECMGenerateQmlTypes)
 
 #Find Qt5
 find_package(Qt5Core REQUIRED)
@@ -98,6 +98,15 @@ if(BUILD_KCM)
     add_subdirectory(kcm)
 
 endif(BUILD_KCM)
+
+
+#Build the plasmoid
+if(BUILD_PLASMOID)
+
+    message(STATUS "Build the plasmoid")
+    add_subdirectory(plasmoid)
+
+endif(BUILD_PLASMOID)
 
 
 #build and install the shared parts

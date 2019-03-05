@@ -32,18 +32,23 @@ Rectangle {
     readonly property real centerX: x + width / 2
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
-    property int temp: 0
-    property int pwm: 0
-    property alias drag: pwmMouse.drag
+    property int temp: !!background ? background.scaleTemp(centerX) : 0
+    property int pwm: !!background ? background.scalePwm(centerY) : 0
+    property real minimumX: - width / 2
+    property real maximumX: parent.width - width / 2
+    property real minimumY: - height / 2
+    property real maximumY: parent.height - height / 2
     property int size: Kirigami.Units.smallSpacing * 2
     readonly property string unit: Fancontrol.Base.unit
+    property bool draggable: true
 
     signal positionChanged()
+    signal dragFinished()
 
     width: size
     height: size
     radius: size / 2
-    border.width: pwmMouse.containsMouse || drag.active ? 1 : 0
+    border.width: pwmMouse.containsMouse || pwmMouse.drag.active ? 1 : 0
 
     onXChanged: positionChanged()
     onYChanged: positionChanged()
@@ -55,14 +60,18 @@ Rectangle {
 
         anchors.fill: parent
         hoverEnabled: root.enabled ? true : false
-        cursorShape: containsPress || drag.active ? Qt.DragMoveCursor : Qt.PointingHandCursor
-        drag.target: root
+        cursorShape: draggable ? containsPress || drag.active ? Qt.DragMoveCursor : Qt.PointingHandCursor : Qt.ArrowCursor
+        drag.target: draggable ? root : null
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false
-        drag.minimumX: - root.width/2
-        drag.maximumX: background.width - root.width/2
-        drag.minimumY: - root.height/2
-        drag.maximumY: background.height - root.height/2
+        drag.minimumX: root.minimumX
+        drag.maximumX: root.maximumX
+        drag.minimumY: root.minimumY
+        drag.maximumY: root.maximumY
+        drag.onActiveChanged: {
+            if (!drag.active)
+                root.dragFinished();
+        }
     }
 
     Rectangle {
@@ -74,7 +83,7 @@ Rectangle {
         height: column.height
         radius: Kirigami.Units.smallSpacing / 2
         color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.5)
-        visible: root.enabled && (pwmMouse.containsMouse || drag.active)
+        visible: root.enabled && (pwmMouse.containsMouse || pwmMouse.drag.active)
 
         Column {
             id: column
