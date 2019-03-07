@@ -77,12 +77,14 @@ Rectangle {
     Rectangle {
         id: tooltip
 
-        x: parent.width
-        y: - height
+        parent: root.parent
+        x: root.width + root.x
+        y: root.y - height
+        z: 2
         width: column.width
         height: column.height
         radius: Kirigami.Units.smallSpacing / 2
-        color: Qt.rgba(parent.color.r, parent.color.g, parent.color.b, 0.3)
+        color: Qt.rgba(root.color.r, root.color.g, root.color.b, 0.3)
         visible: root.enabled && (pwmMouse.containsMouse || pwmMouse.drag.active)
 
         Column {
