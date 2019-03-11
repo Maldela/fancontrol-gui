@@ -2,7 +2,9 @@
 Type=Application
 Version=1.0
 Name=Fancontrol-GUI
+Name[hu]=Fancontrol-felület
 Comment=GUI for the fancontrol script
+Comment[hu]=Grafikus felület a ventilátorvezérlő scripthez
 Exec=fancontrol_gui
 Icon=org.kde.fancontrol.gui
 Terminal=false

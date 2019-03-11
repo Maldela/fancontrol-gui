@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Fancontrol-GUI-QML-Package
 Comment=Control PWM-fans
+Comment[hu]=PWM-ventiláltorok vezérlése
 Icon=org.kde.fancontrol.gui
 Encoding=UTF-8
 Keywords=
