@@ -124,7 +124,6 @@ Item {
             color: Kirigami.Theme.backgroundColor
             border.color: Kirigami.Theme.textColor
             border.width: 2
-            radius: 1
 
             anchors {
                 top: parent.top
@@ -132,9 +131,7 @@ Item {
                 bottom: horizontalScala.top
                 right: parent.right
                 topMargin: parent.fontSize
-                bottomMargin: 0
                 rightMargin: parent.fontSize * 2
-                leftMargin: 0
             }
 
             function scaleX(temp) {

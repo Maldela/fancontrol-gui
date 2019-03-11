@@ -79,8 +79,8 @@ Rectangle {
         id: tooltip
 
         parent: root.parent
-        x: root.width + root.x
-        y: root.y - height
+        x: Math.min(root.width + root.x, background.width - width + background.anchors.rightMargin)
+        y: Math.max(root.y - height, -background.anchors.topMargin)
         z: 2
         width: column.width
         height: column.height

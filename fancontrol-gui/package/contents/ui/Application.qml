@@ -40,6 +40,8 @@ Kirigami.ApplicationWindow {
     }
 
     title: i18n("Fancontrol-GUI")
+    minimumWidth: Kirigami.Units.gridUnit * 20
+    minimumHeight: Kirigami.Units.gridUnit * 15
     reachableModeEnabled: false
     pageStack.defaultColumnWidth: Kirigami.Units.gridUnit * 25
 
