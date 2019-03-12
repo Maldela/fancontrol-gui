@@ -24,6 +24,7 @@ import QtQuick.Controls 2.1
 import QtQuick.Dialogs 1.2
 import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
+import "units.js" as Units
 
 
 Kirigami.FormLayout {
@@ -31,69 +32,89 @@ Kirigami.FormLayout {
 
     readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
     readonly property QtObject loader: Fancontrol.Base.loader
+    readonly property string unit: Fancontrol.Base.unit
     property bool showAll: true
 
     SpinBox {
         id: intervalSpinBox
+
+        readonly property string suffix: ' ' + i18np("second", "seconds", value)
 
         Kirigami.FormData.label: i18n("Interval:")
         Layout.fillWidth: true
         value: loader.interval
         from: 1.0
         editable: true
-        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 0) + ' ' + i18np("second", "seconds", value) }
+        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 0) + suffix }
+        valueFromText: function(text, locale) { return Number.fromLocaleString(locale, text.replace(suffix, "")); }
+
         onValueModified: loader.interval = value
 
         Connections {
             target: loader
-            onIntervalChanged: if (loader.interval != intervalSpinBox.value) intervalSpinBox.value = loader.interval
+            onIntervalChanged: {
+                if (loader.interval != intervalSpinBox.value)
+                    intervalSpinBox.value = loader.interval;
+            }
         }
     }
     SpinBox {
         id: minTempBox
 
+        readonly property int celsiusValue: Units.toCelsius(value, unit)
+        readonly property string suffix: i18n(unit)
+
         Kirigami.FormData.label: i18n("Minimum temperature for fan graphs:")
         Layout.fillWidth: true
-        from: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+        from: Units.fromKelvin(0, unit)
+        to: 999
         inputMethodHints: Qt.ImhFormattedNumbersOnly
         editable: true
-        value: Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit)
-        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
-        onValueModified: {
-            Fancontrol.Base.minTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-            if (value >= maxTempBox.value) maxTempBox.value = value + 1;
+        value: Units.fromCelsius(Fancontrol.Base.minTemp, unit)
+        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + suffix }
+        valueFromText: function(text, locale) { return Number.fromLocaleString(locale, text.replace(suffix, "")); }
+
+        onCelsiusValueChanged: {
+            if (celsiusValue >= maxTempBox.celsiusValue)
+                maxTempBox.value = Math.max(value + 1, Units.fromCelsius(Units.toCelsius(value, unit) + 1, unit));
+            Fancontrol.Base.minTemp = celsiusValue;
         }
 
         Connections {
             target: Fancontrol.Base
             onMinTempChanged: {
-                if (Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit) != minTempBox.value) {
-                    minTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.minTemp, Fancontrol.Base.unit);
-                }
+                if (Fancontrol.Base.minTemp !== minTempBox.celsiusValue)
+                    minTempBox.value = Units.fromCelsius(Fancontrol.Base.minTemp, unit);
             }
         }
     }
     SpinBox {
         id: maxTempBox
 
+        readonly property int celsiusValue: Units.toCelsius(value, unit)
+        readonly property string suffix: i18n(unit)
+
         Kirigami.FormData.label: i18n("Maximum temperature for fan graphs:")
         Layout.fillWidth: true
-        from: Fancontrol.Units.fromKelvin(0, Fancontrol.Base.unit)
+        from: Units.fromKelvin(0, unit)
+        to: 999
         inputMethodHints: Qt.ImhFormattedNumbersOnly
         editable: true
-        value: Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit)
-        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + Fancontrol.Base.unit }
-        onValueModified: {
-            Fancontrol.Base.maxTemp = Fancontrol.Units.toCelsius(value, Fancontrol.Base.unit);
-            if (value <= minTempBox.value) minTempBox.value = value - 1;
+        value: Units.fromCelsius(Fancontrol.Base.maxTemp, unit)
+        textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + suffix }
+        valueFromText: function(text, locale) { return Number.fromLocaleString(locale, text.replace(suffix, "")); }
+
+        onCelsiusValueChanged: {
+            if (celsiusValue <= minTempBox.celsiusValue)
+                minTempBox.value = Math.min(value - 1, Units.fromCelsius(Units.toCelsius(value, unit) - 1, unit));
+            Fancontrol.Base.maxTemp = celsiusValue;
         }
 
         Connections {
             target: Fancontrol.Base
             onMaxTempChanged: {
-                if (Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit) != maxTempBox.value) {
-                    maxTempBox.value = Fancontrol.Units.fromCelsius(Fancontrol.Base.maxTemp, Fancontrol.Base.unit);
-                }
+                if (Fancontrol.Base.maxTemp !== maxTempBox.celsuisValue)
+                    maxTempBox.value = Units.fromCelsius(Fancontrol.Base.maxTemp, unit);
             }
         }
     }
