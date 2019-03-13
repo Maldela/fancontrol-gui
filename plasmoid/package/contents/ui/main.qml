@@ -43,6 +43,12 @@ ColumnLayout {
         Fancontrol.Base.load();
     }
 
+    Connections {
+        target: Fancontrol.Base.loader
+
+        onConfigFileChanged: Fancontrol.Base.loader.load()
+    }
+
     Fancontrol.FanHeader {
         id: header
 

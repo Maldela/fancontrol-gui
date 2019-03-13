@@ -27,6 +27,7 @@
 #include "fancontrolaction.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QFileSystemWatcher>
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
@@ -50,6 +51,7 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     m_interval(10),
     m_configUrl(QUrl::fromLocalFile(QStringLiteral(STANDARD_CONFIG_FILE))),
     m_timer(new QTimer(this)),
+    m_watcher(new QFileSystemWatcher(this)),
     m_sensorsDetected(false)
 {
     if (parent)
@@ -62,6 +64,8 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     m_timer->start(1000);
 
     connect(m_timer, &QTimer::timeout, this, &Loader::sensorsUpdateNeeded);
+    connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &Loader::configFileChanged);
+    connect(this, &Loader::configFileChanged, this, &Loader::needsSaveChanged);
 }
 
 void Loader::parseHwmons()
@@ -406,13 +410,13 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
 
 bool Loader::load(const QUrl &url)
 {
-    QString fileName;
+    QString filePath;
     if (url.isEmpty())
-        fileName = m_configUrl.toLocalFile();
+        filePath = m_configUrl.toLocalFile();
     else if (url.isValid())
     {
         if (url.isLocalFile())
-            fileName = url.toLocalFile();
+            filePath = url.toLocalFile();
 
         else
         {
@@ -425,10 +429,10 @@ bool Loader::load(const QUrl &url)
         emit error(i18n("\'%1\' is not a valid url!", url.toDisplayString()));
         return false;
     }
-    emit info(i18n("Loading config file: \'%1\'", fileName));
+    emit info(i18n("Loading config file: \'%1\'", filePath));
 
     QTextStream stream;
-    QFile file(fileName);
+    QFile file(filePath);
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -443,7 +447,7 @@ bool Loader::load(const QUrl &url)
         {
             auto map = QVariantMap();
             map[QStringLiteral("action")] = QVariant("read");
-            map[QStringLiteral("filename")] = fileName;
+            map[QStringLiteral("filename")] = filePath;
             action.setArguments(map);
             auto job = action.execute();
             if (!job->exec())
@@ -465,9 +469,11 @@ bool Loader::load(const QUrl &url)
     }
     else
     {
-        emit error(i18n("File does not exist: \'%1\'" ,fileName));
+        emit error(i18n("File does not exist: \'%1\'" ,filePath));
         return false;
     }
+
+    watchPath(filePath);
 
     if (!url.isEmpty())
     {
@@ -501,15 +507,15 @@ void Loader::load(const QString& config)
 
 bool Loader::save(const QUrl &url)
 {
-    QString fileName;
+    QString filePath;
     if (url.isEmpty())
     {
 //        qDebug() << "Given empty url. Fallback to " << m_configUrl;
-        fileName = m_configUrl.toLocalFile();
+        filePath = m_configUrl.toLocalFile();
     }
     else if (url.isLocalFile())
     {
-        fileName = url.toLocalFile();
+        filePath = url.toLocalFile();
         m_configUrl = url;
         emit configUrlChanged();
     }
@@ -518,7 +524,7 @@ bool Loader::save(const QUrl &url)
         emit error(i18n("\'%1\' is not a local file!", url.toDisplayString()), true);
         return false;
     }
-    QFile file(fileName);
+    QFile file(filePath);
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -534,7 +540,7 @@ bool Loader::save(const QUrl &url)
             file.close();
     }
 
-    emit info(i18n("Saving config to \'%1\'", fileName));
+    emit info(i18n("Saving config to \'%1\'", filePath));
     if (file.open(QFile::WriteOnly | QFile::Text))
     {
         QTextStream stream(&file);
@@ -548,7 +554,7 @@ bool Loader::save(const QUrl &url)
         {
             QVariantMap map;
             map[QStringLiteral("action")] = QVariant("write");
-            map[QStringLiteral("filename")] = fileName;
+            map[QStringLiteral("filename")] = filePath;
             map[QStringLiteral("content")] = m_config;
 
             action.setArguments(map);
@@ -725,6 +731,15 @@ QString Loader::createConfig() const
     }
 
     return configFile;
+}
+
+bool Loader::watchPath(const QString& path)
+{
+    if (m_watcher->files().contains(path))
+        return true;
+
+    m_watcher->removePaths(m_watcher->files());
+    return m_watcher->addPath(path);
 }
 
 void Loader::setInterval(int interval, bool writeNewConfig)

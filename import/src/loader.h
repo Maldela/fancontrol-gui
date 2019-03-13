@@ -25,6 +25,7 @@
 #include <QtCore/QUrl>
 
 
+class QFileSystemWatcher;
 class QTimer;
 
 namespace Fancontrol
@@ -88,6 +89,7 @@ protected:
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value));
     QPair<int, int> getEntryNumbers(const QString &entry);
     QString createConfig() const;
+    bool watchPath(const QString &path);
 
     QList<Hwmon *> m_hwmons;
 
@@ -100,6 +102,7 @@ private:
     QString m_config;
     QString m_configFileContent;
     QTimer *m_timer;
+    QFileSystemWatcher *m_watcher;
     bool m_sensorsDetected;
 
 
@@ -107,6 +110,7 @@ signals:
 
     void configUrlChanged();
     void configChanged();
+    void configFileChanged();
     void hwmonsChanged();
     void intervalChanged();
     void error(QString, bool = false);
