@@ -121,6 +121,7 @@ Item {
         Rectangle {
             id: graphBackground
 
+            Kirigami.Theme.colorSet: Kirigami.Theme.View
             color: Kirigami.Theme.backgroundColor
             border.color: Kirigami.Theme.textColor
             border.width: 2
