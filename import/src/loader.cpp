@@ -433,11 +433,12 @@ bool Loader::load(const QUrl &url)
 
     QTextStream stream;
     QFile file(filePath);
+    QString fileContent;
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         stream.setDevice(&file);
-        m_configFileContent = stream.readAll();
+        fileContent = stream.readAll();
     }
     else if (file.exists())
     {
@@ -462,7 +463,7 @@ bool Loader::load(const QUrl &url)
                 return false;
             }
             else
-                m_configFileContent = job->data().value(QStringLiteral("content")).toString();
+                fileContent = job->data().value(QStringLiteral("content")).toString();
         }
         else
             emit error(i18n("Action not supported! Try running the application as root."), true);
@@ -473,36 +474,39 @@ bool Loader::load(const QUrl &url)
         return false;
     }
 
-    watchPath(filePath);
+    bool success = load(fileContent);
 
-    if (!url.isEmpty())
+    if (success)
     {
-        m_configUrl = url;
-        emit configUrlChanged();
+        watchPath(filePath);
+
+        if (!url.isEmpty())
+        {
+            m_configUrl = url;
+            emit configUrlChanged();
+        }
     }
 
-    if (m_config == m_configFileContent)
-        return true;
-
-    return parseConfig(m_configFileContent);
+    return success;
 }
 
-void Loader::load(const QString& config)
+bool Loader::load(const QString& config)
 {
     if (m_config == config)
-        return;
+        return true;
 
     if (config.isEmpty())
     {
-        emit error(i18n("Cannot load empty config."));
-        return;
+        emit error(i18n("Cannot load empty config."), true);
+        return false;
     }
 
-    m_config = config;
-    parseConfig(config);
+    bool success = parseConfig(config);
 
-    emit configChanged();
-    emit needsSaveChanged();
+    if (success)
+        m_loadedConfig = config;
+
+    return success;
 }
 
 bool Loader::save(const QUrl &url)
@@ -579,10 +583,18 @@ bool Loader::save(const QUrl &url)
         }
     }
 
-    m_configFileContent = m_config;
+    m_loadedConfig = m_config;
     emit configChanged();
 
     return true;
+}
+
+void Loader::reset()
+{
+    if (m_config == m_loadedConfig)
+        return;
+
+    load(m_loadedConfig);
 }
 
 void Loader::updateConfig()

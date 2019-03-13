@@ -57,10 +57,11 @@ public:
     Q_INVOKABLE void parseHwmons();
     Q_INVOKABLE bool load(const QUrl & = QUrl());
     Q_INVOKABLE bool save(const QUrl & = QUrl());
+    Q_INVOKABLE void reset();
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
 
-    void load(const QString &config);
+    bool load(const QString &config);
     QUrl configUrl() const { return m_configUrl; }
     QString configPath() const { return m_configUrl.path(); }
     QString config() const { return m_config; }
@@ -78,7 +79,7 @@ public:
     Temp *temp(int hwmonIndex, int tempIndex) const;
     Fan *fan(int hwmonIndex, int fanIndex) const;
     void toDefault();
-    bool needsSave() const { return m_config != m_configFileContent; }
+    bool needsSave() const { return m_config != m_loadedConfig; }
     void updateConfig();
     void handleTestStatusChanged();
 
@@ -100,7 +101,7 @@ private:
     int m_interval;
     QUrl m_configUrl;
     QString m_config;
-    QString m_configFileContent;
+    QString m_loadedConfig;
     QTimer *m_timer;
     QFileSystemWatcher *m_watcher;
     bool m_sensorsDetected;

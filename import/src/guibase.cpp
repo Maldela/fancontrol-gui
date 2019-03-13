@@ -244,8 +244,7 @@ void GUIBase::reset()
 {
     qInfo() << i18n("Resetting changes");
 
-    if (m_loader->needsSave() || configUrl() != m_loader->configUrl())
-        m_loader->load(configUrl());
+    m_loader->reset();
 
 #ifndef NO_SYSTEMD
     m_com->setServiceName(serviceName());
