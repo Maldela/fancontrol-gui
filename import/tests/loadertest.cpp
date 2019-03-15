@@ -75,8 +75,8 @@ void LoaderTest::parseIntervalTest_data()
     QTest::newRow("valid2") << "INTERVAL=2" << 2 << "" << false;
     QTest::newRow("valid2") << "INTERVAL= 3" << 3 << "" << false;
     QTest::newRow("invalid0") << "INTERVAL=0" << 0 << "Interval must be greater or equal to one!" << true;
-    QTest::newRow("invalid6") << "INTERVA=6" << 6 << "Unrecognized line in config: \"INTERVA=6\"" << true;
-    QTest::newRow("invalid1") << "INTEVAL=1" << 1 << "Unrecognized line in config: \"INTEVAL=1\"" << true;
+    QTest::newRow("invalid6") << "INTERVA=6" << 6 << "Unrecognized line in config: \'INTERVA=6\'" << true;
+    QTest::newRow("invalid1") << "INTEVAL=1" << 1 << "Unrecognized line in config: \'INTEVAL=1\'" << true;
 }
 
 void LoaderTest::parseIntervalTest()
@@ -109,11 +109,11 @@ void LoaderTest::parseFctempTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("fan02temp11") << "FCTEMPS=hwmon0/fan2=hwmon1/temp1" << m_loader->hwmons().at(0)->pwmFan(1) << m_loader->hwmons().at(1)->temp(0) << "" << false;
-    QTest::newRow("fan11temp03") << "FCTEMPS=hwmon1/fan1=hwmon0/temp3" << m_loader->hwmons().at(1)->pwmFan(0) << m_loader->hwmons().at(0)->temp(2) << "" << false;
-    QTest::newRow("fan12temp12") << "FCTEMPS=hwmon1/fan2=hwmon1/temp2" << m_loader->hwmons().at(1)->pwmFan(1) << m_loader->hwmons().at(1)->temp(1) << "" << false;
-    QTest::newRow("invalid0") << "FCTEMPS=hwmon2/fan1=hwmon0/temp3" << static_cast<PwmFan *>(Q_NULLPTR) << m_loader->hwmons().at(0)->temp(2) << "Invalid fan entry: \"hwmon2/fan1\"" << true;
-    QTest::newRow("invalid1") << "FCTEMPS=hwmon0/fan1=hwmon0/temp4" << m_loader->hwmons().at(0)->pwmFan(0) << static_cast<Temp *>(Q_NULLPTR) << "Invalid temp entry: \"hwmon0/temp4\"" << true;
+    QTest::newRow("fan02temp11") << "FCTEMPS=hwmon0/fan2=hwmon1/temp1" << m_loader->hwmons().at(0)->pwmFans().value(2) << m_loader->hwmons().at(1)->temps().value(1) << "" << false;
+    QTest::newRow("fan11temp03") << "FCTEMPS=hwmon1/fan1=hwmon0/temp3" << m_loader->hwmons().at(1)->pwmFans().value(1) << m_loader->hwmons().at(0)->temps().value(3) << "" << false;
+    QTest::newRow("fan12temp12") << "FCTEMPS=hwmon1/fan2=hwmon1/temp2" << m_loader->hwmons().at(1)->pwmFans().value(2) << m_loader->hwmons().at(1)->temps().value(2) << "" << false;
+    QTest::newRow("invalid0") << "FCTEMPS=hwmon2/fan1=hwmon0/temp3" << static_cast<PwmFan *>(Q_NULLPTR) << m_loader->hwmons().at(0)->temps().value(3) << "Invalid fan entry: \'hwmon2/fan1\'" << true;
+    QTest::newRow("invalid1") << "FCTEMPS=hwmon0/fan1=hwmon0/temp4" << m_loader->hwmons().at(0)->pwmFans().value(0) << static_cast<Temp *>(Q_NULLPTR) << "Invalid temp entry: \'hwmon0/temp4\'" << true;
 }
 
 void LoaderTest::parseFctempTest()
@@ -152,8 +152,8 @@ void LoaderTest::parseDevnameTest_data()
     QTest::newRow("valid1") << "DEVNAME=hwmon1=coretemp" << "" << false;
     QTest::newRow("valid2") << "DEVNAME=hwmon0=radeon hwmon1=coretemp" << "" << false;
     QTest::newRow("valid3") << "DEVNAME= hwmon1=coretemp hwmon0=radeon" << "" << false;
-    QTest::newRow("invalid0") << "DEVNAME=hwmon2=radeon" << "Invalid DEVNAME: \"hwmon2=radeon\"! No hwmon with index 2" << true;
-    QTest::newRow("invalid0") << "DEVNAME=hwmon1=radeon" << "Wrong name for hwmon 1! Should be \"coretemp\"" << true;
+    QTest::newRow("invalid0") << "DEVNAME=hwmon2=radeon" << "Invalid DEVNAME: \'hwmon2=radeon\'! No hwmon with index 2" << true;
+    QTest::newRow("invalid0") << "DEVNAME=hwmon1=radeon" << "Wrong name for hwmon 1! Should be \'coretemp\'" << true;
 }
 
 void LoaderTest::parseDevnameTest()
@@ -183,10 +183,10 @@ void LoaderTest::parseMintempTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MINTEMP=hwmon0/fan1=20" << m_loader->pwmFan(0, 0) << 20 << "" << false;
-    QTest::newRow("valid12") << "MINTEMP=hwmon1/fan2=35" << m_loader->pwmFan(1, 1) << 35 << "" << false;
-    QTest::newRow("valid02") << "MINTEMP=hwmon0/fan2=-35" << m_loader->pwmFan(0, 1) << -35 << "" << false;
-    QTest::newRow("valid11") << "MINTEMP= hwmon1/fan1=40" << m_loader->pwmFan(1, 0) << 40 << "" << false;
+    QTest::newRow("valid01") << "MINTEMP=hwmon0/fan1=20" << m_loader->pwmFan(0, 1) << 20 << "" << false;
+    QTest::newRow("valid12") << "MINTEMP=hwmon1/fan2=35" << m_loader->pwmFan(1, 2) << 35 << "" << false;
+    QTest::newRow("valid02") << "MINTEMP=hwmon0/fan2=-35" << m_loader->pwmFan(0, 2) << -35 << "" << false;
+    QTest::newRow("valid11") << "MINTEMP= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
 }
 
 void LoaderTest::parseMintempTest()
@@ -220,10 +220,10 @@ void LoaderTest::parseMaxtempTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MAXTEMP=hwmon0/fan1=80" << m_loader->pwmFan(0, 0) << 80 << "" << false;
-    QTest::newRow("valid12") << "MAXTEMP=hwmon1/fan2=78 #iuf" << m_loader->pwmFan(1, 1) << 78 << "" << false;
-    QTest::newRow("valid02") << "MAXTEMP=hwmon0/fan2=-78" << m_loader->pwmFan(0, 1) << -78 << "" << false;
-    QTest::newRow("valid11") << "MAXTEMP= hwmon1/fan1=53" << m_loader->pwmFan(1, 0) << 53 << "" << false;
+    QTest::newRow("valid01") << "MAXTEMP=hwmon0/fan1=80" << m_loader->pwmFan(0, 1) << 80 << "" << false;
+    QTest::newRow("valid12") << "MAXTEMP=hwmon1/fan2=78 #iuf" << m_loader->pwmFan(1, 2) << 78 << "" << false;
+    QTest::newRow("valid02") << "MAXTEMP=hwmon0/fan2=-78" << m_loader->pwmFan(0, 2) << -78 << "" << false;
+    QTest::newRow("valid11") << "MAXTEMP= hwmon1/fan1=53" << m_loader->pwmFan(1, 1) << 53 << "" << false;
 }
 
 void LoaderTest::parseMaxtempTest()
@@ -257,10 +257,10 @@ void LoaderTest::parseMinstartTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MINSTART=hwmon0/fan1=20" << m_loader->pwmFan(0, 0) << 20 << "" << false;
-    QTest::newRow("valid12") << "MINSTART=hwmon1/fan2=35" << m_loader->pwmFan(1, 1) << 35 << "" << false;
-    QTest::newRow("valid02") << "MINSTART=hwmon0/fan2=0#rtg" << m_loader->pwmFan(0, 1) << 0 << "" << false;
-    QTest::newRow("valid11") << "MINSTART= hwmon1/fan1=40" << m_loader->pwmFan(1, 0) << 40 << "" << false;
+    QTest::newRow("valid01") << "MINSTART=hwmon0/fan1=20" << m_loader->pwmFan(0, 1) << 20 << "" << false;
+    QTest::newRow("valid12") << "MINSTART=hwmon1/fan2=35" << m_loader->pwmFan(1, 2) << 35 << "" << false;
+    QTest::newRow("valid02") << "MINSTART=hwmon0/fan2=0#rtg" << m_loader->pwmFan(0, 2) << 0 << "" << false;
+    QTest::newRow("valid11") << "MINSTART= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
 }
 
 void LoaderTest::parseMinstartTest()
@@ -294,10 +294,10 @@ void LoaderTest::parseMinstopTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MINSTOP=hwmon0/fan1=20" << m_loader->pwmFan(0, 0) << 20 << "" << false;
-    QTest::newRow("valid12") << "MINSTOP=hwmon1/fan2=35" << m_loader->pwmFan(1, 1) << 35 << "" << false;
-    QTest::newRow("valid02") << "MINSTOP=hwmon0/fan2=0" << m_loader->pwmFan(0, 1) << 0 << "" << false;
-    QTest::newRow("valid11") << "MINSTOP= hwmon1/fan1=40" << m_loader->pwmFan(1, 0) << 40 << "" << false;
+    QTest::newRow("valid01") << "MINSTOP=hwmon0/fan1=20" << m_loader->pwmFan(0, 1) << 20 << "" << false;
+    QTest::newRow("valid12") << "MINSTOP=hwmon1/fan2=35" << m_loader->pwmFan(1, 2) << 35 << "" << false;
+    QTest::newRow("valid02") << "MINSTOP=hwmon0/fan2=0" << m_loader->pwmFan(0, 2) << 0 << "" << false;
+    QTest::newRow("valid11") << "MINSTOP= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
 }
 
 void LoaderTest::parseMinstopTest()
@@ -331,12 +331,12 @@ void LoaderTest::parseMinpwmTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MINPWM=hwmon0/fan1=20#fgiuh" << m_loader->pwmFan(0, 0) << 20 << "" << false;
-    QTest::newRow("valid12") << "MINPWM=hwmon1/fan2=35" << m_loader->pwmFan(1, 1) << 35 << "" << false;
-    QTest::newRow("valid02") << "MINPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 1) << 0 << "" << false;
-    QTest::newRow("valid11") << "MINPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 0) << 40 << "" << false;
-    QTest::newRow("invalid02") << "MINPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 1) << 256 << "MinPwm cannot exceed 0-255!" << true;
-    QTest::newRow("invalid11") << "MINPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 1) << -2 << "MinPwm cannot exceed 0-255!" << true;
+    QTest::newRow("valid01") << "MINPWM=hwmon0/fan1=20#fgiuh" << m_loader->pwmFan(0, 1) << 20 << "" << false;
+    QTest::newRow("valid12") << "MINPWM=hwmon1/fan2=35" << m_loader->pwmFan(1, 2) << 35 << "" << false;
+    QTest::newRow("valid02") << "MINPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 2) << 0 << "" << false;
+    QTest::newRow("valid11") << "MINPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
+    QTest::newRow("invalid02") << "MINPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 2) << 256 << "MinPwm cannot exceed 0-255!" << true;
+    QTest::newRow("invalid11") << "MINPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "MinPwm cannot exceed 0-255!" << true;
 }
 
 void LoaderTest::parseMinpwmTest()
@@ -370,12 +370,12 @@ void LoaderTest::parseMaxpwmTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MAXPWM=hwmon0/fan1=20" << m_loader->pwmFan(0, 0) << 20 << "" << false;
-    QTest::newRow("valid12") << "MAXPWM=hwmon1/fan2=35 #uivnriuhgfdn" << m_loader->pwmFan(1, 1) << 35 << "" << false;
-    QTest::newRow("valid02") << "MAXPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 1) << 0 << "" << false;
-    QTest::newRow("valid11") << "MAXPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 0) << 40 << "" << false;
-    QTest::newRow("invalid02") << "MAXPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 1) << 256 << "MaxPwm cannot exceed 0-255!" << true;
-    QTest::newRow("invalid11") << "MAXPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 1) << -2 << "MaxPwm cannot exceed 0-255!" << true;
+    QTest::newRow("valid01") << "MAXPWM=hwmon0/fan1=20" << m_loader->pwmFan(0, 1) << 20 << "" << false;
+    QTest::newRow("valid12") << "MAXPWM=hwmon1/fan2=35 #uivnriuhgfdn" << m_loader->pwmFan(1, 2) << 35 << "" << false;
+    QTest::newRow("valid02") << "MAXPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 2) << 0 << "" << false;
+    QTest::newRow("valid11") << "MAXPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
+    QTest::newRow("invalid02") << "MAXPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 2) << 256 << "MaxPwm cannot exceed 0-255!" << true;
+    QTest::newRow("invalid11") << "MAXPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "MaxPwm cannot exceed 0-255!" << true;
 }
 
 void LoaderTest::parseMaxpwmTest()
@@ -407,7 +407,7 @@ void LoaderTest::parseUnrecognizableLineTest_data()
     QTest::addColumn<QString>("error");
     QTest::addColumn<bool>("critical");
 
-    QTest::newRow("valid01") << "MMAXPWM=hwmon0/fan1=20" << "Unrecognized line in config: \"MMAXPWM=hwmon0/fan1=20\"" << true;
+    QTest::newRow("valid01") << "MMAXPWM=hwmon0/fan1=20" << "Unrecognized line in config: \'MMAXPWM=hwmon0/fan1=20\'" << true;
 }
 
 void LoaderTest::parseUnrecognizableLineTest()
@@ -431,8 +431,8 @@ void LoaderTest::parseUnrecognizableLineTest()
 
 void LoaderTest::createConfigTest()
 {
-    auto pwmFan = m_loader->pwmFan(0, 0);
-    pwmFan->setTemp(m_loader->temp(1, 0));
+    auto pwmFan = m_loader->pwmFan(0, 1);
+    pwmFan->setTemp(m_loader->temp(1, 1));
     pwmFan->setMinTemp(20);
     pwmFan->setMaxTemp(60);
     pwmFan->setMaxPwm(200);
@@ -440,8 +440,8 @@ void LoaderTest::createConfigTest()
     pwmFan->setMinStart(120);
     pwmFan->setMinStop(80);
 
-    pwmFan = m_loader->pwmFan(1, 1);
-    pwmFan->setTemp(m_loader->temp(1, 2));
+    pwmFan = m_loader->pwmFan(1, 2);
+    pwmFan->setTemp(m_loader->temp(1, 3));
     pwmFan->setMinTemp(30);
     pwmFan->setMaxTemp(70);
     pwmFan->setMaxPwm(255);
@@ -456,14 +456,14 @@ void LoaderTest::createConfigTest()
                              "INTERVAL=5\n"
                              "DEVPATH=hwmon0= hwmon1= \n"
                              "DEVNAME=hwmon0=radeon hwmon1=coretemp \n"
-                             "FCTEMPS=hwmon0/pwm0=hwmon1/temp0_input hwmon1/pwm1=hwmon1/temp2_input \n"
-                             "FCFANS=hwmon0/pwm0=hwmon0/fan0_input hwmon1/pwm1=hwmon1/fan1_input \n"
-                             "MINTEMP=hwmon0/pwm0=20 hwmon1/pwm1=30 \n"
-                             "MAXTEMP=hwmon0/pwm0=60 hwmon1/pwm1=70 \n"
-                             "MINSTART=hwmon0/pwm0=120 hwmon1/pwm1=110 \n"
-                             "MINSTOP=hwmon0/pwm0=80 hwmon1/pwm1=75 \n"
-                             "MINPWM=hwmon0/pwm0=100 hwmon1/pwm1=120 \n"
-                             "MAXPWM=hwmon0/pwm0=200 hwmon1/pwm1=255 \n";
+                             "FCTEMPS=hwmon0/pwm1=hwmon1/temp1_input hwmon1/pwm2=hwmon1/temp3_input \n"
+                             "FCFANS=hwmon0/pwm1=hwmon0/fan1_input hwmon1/pwm2=hwmon1/fan2_input \n"
+                             "MINTEMP=hwmon0/pwm1=20 hwmon1/pwm2=30 \n"
+                             "MAXTEMP=hwmon0/pwm1=60 hwmon1/pwm2=70 \n"
+                             "MINSTART=hwmon0/pwm1=120 hwmon1/pwm2=110 \n"
+                             "MINSTOP=hwmon0/pwm1=80 hwmon1/pwm2=75 \n"
+                             "MINPWM=hwmon0/pwm1=100 hwmon1/pwm2=120 \n"
+                             "MAXPWM=hwmon0/pwm1=200 hwmon1/pwm2=255 \n";
 
     auto expectedLines = expectedConfig.split(QChar(QChar::LineFeed));
     auto configLines = config.split(QChar(QChar::LineFeed));

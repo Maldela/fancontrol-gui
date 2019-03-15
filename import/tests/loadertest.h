@@ -58,32 +58,32 @@ public:
 
         for (auto i=0; i<pwms.size(); i++)
         {
-            const auto newPwmFan = new TestPwmFan(pwms.at(i), pwmmodes.at(i), rpms.at(i), i, this);
+            const auto newPwmFan = new TestPwmFan(pwms.at(i), pwmmodes.at(i), rpms.at(i), i+1, this);
             connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
 
             if (parent)
                 connect(newPwmFan, &PwmFan::testStatusChanged, parent, &Loader::handleTestStatusChanged);
 
-            m_pwmFans << newPwmFan;
-            m_fans << newPwmFan;
+            m_pwmFans.insert(newPwmFan->index(), newPwmFan);
+            m_fans.insert(newPwmFan->index(), newPwmFan);
         }
         emit pwmFansChanged();
 
         for (auto i=m_pwmFans.size()-1; i<rpms.size(); i++)
         {
-            const auto newFan = new TestFan(rpms.at(i), i, this);
+            const auto newFan = new TestFan(rpms.at(i), i+1, this);
             connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
 
-            m_fans << newFan;
+            m_fans.insert(newFan->index(), newFan);
         }
         emit fansChanged();
 
         for (auto i=0; i<temps.size(); i++)
         {
-            const auto newTemp = new TestTemp(temps.at(i), i, this);
+            const auto newTemp = new TestTemp(temps.at(i), i+1, this);
             connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
 
-            m_temps << newTemp;
+            m_temps.insert(newTemp->index(), newTemp);
         }
         emit tempsChanged();
 
@@ -104,10 +104,6 @@ public:
         connect(this, &Loader::sensorsUpdateNeeded, hwmon, &Hwmon::sensorsUpdateNeeded);
         m_hwmons << hwmon;
         emit hwmonsChanged();
-    }
-    void addHwmon(TestHwmon *hwmon)
-    {
-        addHwmon(hwmon);
     }
     void parse(const QString &string)
     {
