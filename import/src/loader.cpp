@@ -135,7 +135,7 @@ void Loader::parseHwmons(QString path)
     m_watcher->addPath(path);
 }
 
-PwmFan * Loader::pwmFan(int hwmonIndex, int pwmFanIndex) const
+PwmFan * Loader::pwmFan(uint hwmonIndex, uint pwmFanIndex) const
 {
     const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
 
@@ -145,7 +145,7 @@ PwmFan * Loader::pwmFan(int hwmonIndex, int pwmFanIndex) const
     return hwmon->pwmFans().value(pwmFanIndex);
 }
 
-Temp * Loader::temp(int hwmonIndex, int tempIndex) const
+Temp * Loader::temp(uint hwmonIndex, uint tempIndex) const
 {
     const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
 
@@ -155,7 +155,7 @@ Temp * Loader::temp(int hwmonIndex, int tempIndex) const
     return hwmon->temps().value(tempIndex);
 }
 
-Fan * Loader::fan(int hwmonIndex, int fanIndex) const
+Fan * Loader::fan(uint hwmonIndex, uint fanIndex) const
 {
     const auto hwmon = m_hwmons.value(hwmonIndex, Q_NULLPTR);
 
@@ -165,16 +165,16 @@ Fan * Loader::fan(int hwmonIndex, int fanIndex) const
     return hwmon->fans().value(fanIndex);
 }
 
-QPair<int, int> Loader::getEntryNumbers(const QString &entry)
+QPair<uint, uint> Loader::getEntryNumbers(const QString &entry)
 {
     if (entry.isEmpty())
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
 
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
     }
     auto &hwmon = list[0];
     auto &sensor = list[1];
@@ -182,12 +182,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
     }
 
     auto success = false;
@@ -196,20 +196,20 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     sensor.remove(QRegExp("^(pwm|fan|temp)"));
     sensor.remove(QStringLiteral("_input"));
 
-    const auto hwmonResult = hwmon.toInt(&success);
+    const auto hwmonResult = hwmon.toUInt(&success);
     if (!success)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
     }
-    const auto sensorResult = sensor.toInt(&success);
+    const auto sensorResult = sensor.toUInt(&success);
     if (!success)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(0, 0);
+        return QPair<uint, uint>(0, 0);
     }
 
-    return QPair<int, int>(hwmonResult, sensorResult);
+    return QPair<uint, uint>(hwmonResult, sensorResult);
 }
 
 bool Loader::parseConfig(QString config)
@@ -251,7 +251,7 @@ bool Loader::parseConfig(QString config)
             line.remove(QStringLiteral("INTERVAL="));
             line = line.simplified();
             auto intSuccess = false;
-            const auto interval = line.toInt(&intSuccess);
+            const auto interval = line.toUInt(&intSuccess);
 
             if (intSuccess)
                 setInterval(interval, false);
@@ -310,7 +310,7 @@ bool Loader::parseConfig(QString config)
                     const auto &name = indexNamePair[1];
                     auto intSuccess = false;
                     index.remove(QStringLiteral("hwmon"));
-                    const auto hwmonPointer = m_hwmons.value(index.toInt(&intSuccess), Q_NULLPTR);
+                    const auto hwmonPointer = m_hwmons.value(index.toUInt(&intSuccess), Q_NULLPTR);
 
                     if (!intSuccess)
                     {
@@ -395,7 +395,7 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
             const auto pwmFanString = fanValuePair.at(0);
             const auto valueString = fanValuePair.at(1);
             auto success = false;
-            const auto value = valueString.toInt(&success);
+            const auto value = valueString.toUInt(&success);
 
             if (success)
             {

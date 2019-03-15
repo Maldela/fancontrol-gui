@@ -72,12 +72,12 @@ public:
     QList<QObject *> hwmonsAsObjects() const;
     int interval() const { return m_interval; }
     void setInterval(int interval, bool writeNewConfig = true);
-    PwmFan *pwmFan(QPair<int, int> indexPair) const { return pwmFan(indexPair.first, indexPair.second); }
-    Temp *temp(QPair<int, int> indexPair) const { return temp(indexPair.first, indexPair.second); }
-    Fan *fan(QPair<int, int> indexPair) const { return fan(indexPair.first, indexPair.second); }
-    PwmFan *pwmFan(int hwmonIndex, int pwmFanIndex) const;
-    Temp *temp(int hwmonIndex, int tempIndex) const;
-    Fan *fan(int hwmonIndex, int fanIndex) const;
+    PwmFan *pwmFan(QPair<uint, uint> indexPair) const { return pwmFan(indexPair.first, indexPair.second); }
+    Temp *temp(QPair<uint, uint> indexPair) const { return temp(indexPair.first, indexPair.second); }
+    Fan *fan(QPair<uint, uint> indexPair) const { return fan(indexPair.first, indexPair.second); }
+    PwmFan *pwmFan(uint hwmonIndex, uint pwmFanIndex) const;
+    Temp *temp(uint hwmonIndex, uint tempIndex) const;
+    Fan *fan(uint hwmonIndex, uint fanIndex) const;
     void toDefault();
     bool needsSave() const { return m_config != m_loadedConfig; }
     void updateConfig();
@@ -88,7 +88,7 @@ protected:
 
     bool parseConfig(QString config);
     void parseConfigLine(const QString &line, void (PwmFan::*memberSetFunction)(int value));
-    QPair<int, int> getEntryNumbers(const QString &entry);
+    QPair<uint, uint> getEntryNumbers(const QString &entry);
     QString createConfig() const;
     bool watchPath(const QString &path);
 
