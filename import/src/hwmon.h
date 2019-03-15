@@ -22,6 +22,7 @@
 #define HWMON_H
 
 #include <QtCore/QObject>
+#include <QtCore/QHash>
 
 
 namespace Fancontrol
@@ -51,17 +52,15 @@ public:
     QString name() const { return m_name; }
     QString path() const { return m_path; }
     int index() const { return m_index; }
-    QList<Fan *> fans() const { return m_fans; }
-    QList<PwmFan *> pwmFans() const { return m_pwmFans; }
-    QList<Temp *> temps() const { return m_temps; }
+    QHash<uint, Fan *> fans() const { return m_fans; }
+    QHash<uint, PwmFan *> pwmFans() const { return m_pwmFans; }
+    QHash<uint, Temp *> temps() const { return m_temps; }
     QList<QObject *> fansAsObjects() const;
     QList<QObject *> pwmFansAsObjects() const;
     QList<QObject *> tempsAsObjects() const;
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
-    Fan * fan(int i) const;
-    PwmFan * pwmFan(int i) const;
-    Temp * temp(int i) const;
+
     bool isValid() const { return m_valid; }
     bool testing() const;
     void toDefault() const;
@@ -83,9 +82,9 @@ protected:
     int m_index;
     Loader *const m_parent;
     bool m_valid;
-    QList<Fan *> m_fans;
-    QList<PwmFan *> m_pwmFans;
-    QList<Temp *> m_temps;
+    QHash<uint, Fan *> m_fans;
+    QHash<uint, PwmFan *> m_pwmFans;
+    QHash<uint, Temp *> m_temps;
 
 private:
 

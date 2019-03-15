@@ -68,21 +68,24 @@ Loader::Loader(GUIBase *parent) : QObject(parent),
     connect(this, &Loader::configFileChanged, this, &Loader::needsSaveChanged);
 }
 
-void Loader::parseHwmons()
+void Loader::parseHwmons(QString path)
 {
-    const auto hwmonDir = QDir(QStringLiteral(HWMON_PATH));
+    if (path.isEmpty())
+        path = QStringLiteral(HWMON_PATH);
+
+    const auto hwmonDir = QDir(path);
     QStringList list;
     if (hwmonDir.isReadable())
         list = hwmonDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
 
     else if (hwmonDir.exists())
     {
-        emit error(i18n("File is not readable: \'%1\'", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("Hwmon path is not readable: \'%1\'", path), true);
         return;
     }
     else
     {
-        emit error(i18n("File does not exist: \'%1\'", QStringLiteral(HWMON_PATH)), true);
+        emit error(i18n("Hwmon path does not exist: \'%1\'", path), true);
         return;
     }
 
@@ -90,7 +93,7 @@ void Loader::parseHwmons()
     while (!list.isEmpty())
         dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
 
-    for (const auto &hwmon : qAsConst(m_hwmons))
+    for (auto &hwmon : m_hwmons)
     {
         if (!dereferencedList.contains(hwmon->path()))
         {
@@ -128,6 +131,8 @@ void Loader::parseHwmons()
                 delete newHwmon;
         }
     }
+
+    m_watcher->addPath(path);
 }
 
 PwmFan * Loader::pwmFan(int hwmonIndex, int pwmFanIndex) const
@@ -137,7 +142,7 @@ PwmFan * Loader::pwmFan(int hwmonIndex, int pwmFanIndex) const
     if (!hwmon)
         return Q_NULLPTR;
 
-    return hwmon->pwmFan(pwmFanIndex);
+    return hwmon->pwmFans().value(pwmFanIndex);
 }
 
 Temp * Loader::temp(int hwmonIndex, int tempIndex) const
@@ -147,7 +152,7 @@ Temp * Loader::temp(int hwmonIndex, int tempIndex) const
     if (!hwmon)
         return Q_NULLPTR;
 
-    return hwmon->temp(tempIndex);
+    return hwmon->temps().value(tempIndex);
 }
 
 Fan * Loader::fan(int hwmonIndex, int fanIndex) const
@@ -157,19 +162,19 @@ Fan * Loader::fan(int hwmonIndex, int fanIndex) const
     if (!hwmon)
         return Q_NULLPTR;
 
-    return hwmon->fan(fanIndex);
+    return hwmon->fans().value(fanIndex);
 }
 
 QPair<int, int> Loader::getEntryNumbers(const QString &entry)
 {
     if (entry.isEmpty())
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
 
     auto list = entry.split('/', QString::SkipEmptyParts);
     if (list.size() != 2)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
     }
     auto &hwmon = list[0];
     auto &sensor = list[1];
@@ -177,12 +182,12 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     if (!hwmon.startsWith(QStringLiteral("hwmon")))
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
     }
     if (!sensor.contains(QRegExp("^(pwm|fan|temp)\\d+")))
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
     }
 
     auto success = false;
@@ -195,16 +200,16 @@ QPair<int, int> Loader::getEntryNumbers(const QString &entry)
     if (!success)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
     }
     const auto sensorResult = sensor.toInt(&success);
     if (!success)
     {
         emit error(i18n("Invalid entry: \'%1\'", entry));
-        return QPair<int, int>(-1, -1);
+        return QPair<int, int>(0, 0);
     }
 
-    return QPair<int, int>(hwmonResult, sensorResult - 1);
+    return QPair<int, int>(hwmonResult, sensorResult);
 }
 
 bool Loader::parseConfig(QString config)
@@ -320,7 +325,7 @@ bool Loader::parseConfig(QString config)
                     }
                     else if (hwmonPointer->name().split('.').first() != name)
                     {
-                        emit error(i18n("Wrong name for hwmon %1! Should be \"%2\"", index, hwmonPointer->name().split('.').first()), true);
+                        emit error(i18n("Wrong name for hwmon %1! Should be \'%2\'", index, hwmonPointer->name().split('.').first()), true);
                         success = false;
                     }
                 }

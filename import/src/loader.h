@@ -54,7 +54,7 @@ public:
 
     explicit Loader(GUIBase *parent = Q_NULLPTR);
 
-    Q_INVOKABLE void parseHwmons();
+    Q_INVOKABLE void parseHwmons(QString path = QString());
     Q_INVOKABLE bool load(const QUrl & = QUrl());
     Q_INVOKABLE bool save(const QUrl & = QUrl());
     Q_INVOKABLE void reset();

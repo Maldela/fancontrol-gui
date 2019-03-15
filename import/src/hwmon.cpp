@@ -99,54 +99,29 @@ void Hwmon::initialize()
         {
             if (QFile::exists(m_path + "/pwm" + QString::number(index)))
             {
-                PwmFan *newPwmFan = Q_NULLPTR;
-
-                for (const auto &pwmFan : qAsConst(m_pwmFans))
+                if (!m_pwmFans.contains(index))
                 {
-                    if (pwmFan->index() == index)
-                    {
-                        newPwmFan = pwmFan;
-                        break;
-                    }
-                }
-
-                if (!newPwmFan)
-                {
-                    newPwmFan = new PwmFan(index, this);
+                    auto newPwmFan = new PwmFan(index, this);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
 
                     if (m_parent)
                         connect(newPwmFan, &PwmFan::testStatusChanged, m_parent, &Loader::handleTestStatusChanged);
 
-                    m_pwmFans << newPwmFan;
+                    m_pwmFans.insert(index, newPwmFan);
                     emit pwmFansChanged();
-                }
 
-                if (!m_fans.contains(newPwmFan))
-                {
-                    m_fans << newPwmFan;
+                    m_fans.insert(index, newPwmFan);
                     emit fansChanged();
                 }
             }
             else
             {
-                Fan *newFan = Q_NULLPTR;
-
-                for (const auto &fan : qAsConst(m_fans))
+                if (!m_fans.contains(index))
                 {
-                    if (fan->index() == index)
-                    {
-                        newFan = fan;
-                        newFan->toDefault();
-                        break;
-                    }
-                }
-
-                if (!newFan)
-                {
-                    newFan = new Fan(index, this);
+                    auto newFan = new Fan(index, this);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
-                    m_fans << newFan;
+
+                    m_fans.insert(index, newFan);
                     emit fansChanged();
                 }
             }
@@ -154,23 +129,12 @@ void Hwmon::initialize()
 
         if (entry.contains(QStringLiteral("temp")))
         {
-            Temp *newTemp = Q_NULLPTR;
-
-            for (const auto &temp : qAsConst(m_temps))
+            if (!m_temps.contains(index))
             {
-                if (temp->index() == index)
-                {
-                    newTemp = temp;
-                    newTemp->toDefault();
-                    break;
-                }
-            }
-
-            if (!newTemp)
-            {
-                newTemp = new Temp(index, this);
+                auto newTemp = new Temp(index, this);
                 connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
-                m_temps << newTemp;
+
+                m_temps.insert(index, newTemp);
                 emit tempsChanged();
             }
         }
@@ -181,7 +145,7 @@ QList<QObject *> Hwmon::fansAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &fan : qAsConst(m_fans))
+    for (const auto &fan : m_fans.values())
         list << fan;
 
     return list;
@@ -191,7 +155,7 @@ QList<QObject *> Hwmon::pwmFansAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &pwmFan : qAsConst(m_pwmFans))
+    for (const auto &pwmFan : m_pwmFans.values())
         list << pwmFan;
 
     return list;
@@ -201,7 +165,7 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 {
     QList<QObject *> list;
 
-    for (const auto &temp : qAsConst(m_temps))
+    for (const auto &temp : m_temps.values())
         list << temp;
 
     return list;
@@ -209,29 +173,14 @@ QList<QObject *> Hwmon::tempsAsObjects() const
 
 void Hwmon::testFans()
 {
-    for (const auto &pwmFan : qAsConst(m_pwmFans))
+    for (const auto &pwmFan : m_pwmFans.values())
         pwmFan->test();
 }
 
 void Hwmon::abortTestingFans()
 {
-    for (const auto &pwmFan : qAsConst(m_pwmFans))
+    for (const auto &pwmFan : m_pwmFans.values())
         pwmFan->abortTest();
-}
-
-Fan* Hwmon::fan(int i) const
-{
-    return m_fans.value(i, Q_NULLPTR);
-}
-
-PwmFan* Hwmon::pwmFan(int i) const
-{
-    return m_pwmFans.value(i, Q_NULLPTR);
-}
-
-Temp* Hwmon::temp(int i) const
-{
-    return m_temps.value(i, Q_NULLPTR);
 }
 
 bool Hwmon::testing() const

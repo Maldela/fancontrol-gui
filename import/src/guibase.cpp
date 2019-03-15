@@ -63,8 +63,8 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     const auto hwmons = m_loader->hwmons();
     for (const auto &hwmon : hwmons)
     {
-        m_pwmFanModel->addPwmFans(hwmon->pwmFans());
-        m_tempModel->addTemps(hwmon->temps());
+        m_pwmFanModel->addPwmFans(hwmon->pwmFans().values());
+        m_tempModel->addTemps(hwmon->temps().values());
     }
 }
 
