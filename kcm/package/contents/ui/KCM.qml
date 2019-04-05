@@ -239,6 +239,7 @@ Kirigami.Page {
         id: errorDialog
 
         modal: true
-        anchors.centerIn: root
+        x: (root.width - width) / 2
+        y: (root.height - height) / 2
     }
 }

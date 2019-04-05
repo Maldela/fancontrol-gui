@@ -111,7 +111,8 @@ Dialog {
         title: i18n("New profile's name")
         standardButtons: Dialog.Ok | Dialog.Cancel
         visible: false
-        anchors.centerIn: parent
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
 
         onAccepted: {
             Fancontrol.Base.saveProfile(newProfileNameField.text);

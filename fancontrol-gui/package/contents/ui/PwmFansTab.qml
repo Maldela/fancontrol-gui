@@ -118,6 +118,7 @@ Kirigami.Page {
 
         visible: false
         modal: true
-        anchors.centerIn: parent
+        x: (root.width - width) / 2
+        y: (root.height - height) / 2
     }
 }

@@ -169,7 +169,8 @@ Kirigami.ApplicationWindow {
         id: errorDialog
 
         visible: false
-        anchors.centerIn: window.contentItem
+        x: (window.width - width) / 2
+        y: (window.height - height) / 2
     }
 
     Dialog {
@@ -181,7 +182,8 @@ Kirigami.ApplicationWindow {
         modal: true
         title: i18n("Unsaved changes")
         standardButtons: Dialog.Cancel | Dialog.Discard | Dialog.Apply
-        anchors.centerIn: window.contentItem
+        x: (window.width - width) / 2
+        y: (window.height - height) / 2
 
         onRejected: close()
         onDiscarded: {
