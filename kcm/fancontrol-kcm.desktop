@@ -10,4 +10,6 @@ X-KDE-System-Settings-Parent-Category=hardware
 X-KDE-ParentApp=kcontrol
 
 Name=Fancontrol
+Name[hu]=Ventilátorvezérlés
 Comment=Control PWM-fans
+Comment[hu]=PWM-hűtőventilátorok beállítása, vezérlése

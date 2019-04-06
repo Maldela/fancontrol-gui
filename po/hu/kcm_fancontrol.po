@@ -1,0 +1,522 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://github.com/maldela/fancontrol-gui\n"
+"POT-Creation-Date: 2019-02-21 17:53+0100\n"
+"PO-Revision-Date: 2019-03-11 14:39+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2\n"
+"Last-Translator: Barcza Károly <kbarcza@blackpanther.hu>\n"
+"Language: hu_HU\n"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:41
+#: fancontrol-gui/src/main.cpp:72
+msgid "Fancontrol-GUI"
+msgstr "Fancontrol-GUI"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:111
+msgid "Sensors"
+msgstr "Szenzorok"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:119
+#: kcm/package/contents/ui/KCM.qml:168
+msgid "Fans"
+msgstr "Ventillátorok"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:125
+msgid "Configfile"
+msgstr "Beállítófájl"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:131
+msgid "Settings"
+msgstr "Beállítások"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:175
+msgid "Unsaved changes"
+msgstr "Nem mentett módosítások"
+
+#: fancontrol-gui/package/contents/ui/Application.qml:195
+msgid ""
+"There are unsaved changes.\n"
+"Do you want to apply these changes?"
+msgstr ""
+"Ezek még mentetlen változások.\n"
+"Szeretnéd alkalmazni ezeket a változásokat?"
+
+#: fancontrol-gui/package/contents/ui/ConfigfileTab.qml:34
+msgid "New config"
+msgstr "Új beállítás"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:45
+#: import/qml/ProfilesDialog.qml:29
+msgid "Manage profiles"
+msgstr "Profilok kezelése"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:49
+msgid "Service"
+msgstr "Szolgáltatás"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:51
+msgid "Control the systemd service"
+msgstr "Systemd szolgáltatás vezérlése"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:54
+msgid "Stop service"
+msgstr "Szolgáltatás leállítása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:54
+msgid "Start service"
+msgstr "Szolgáltatás indítása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:60
+msgid "Disable service"
+msgstr "Szolgáltatás kikapcsolása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:60
+msgid "Enable service"
+msgstr "Szolgáltatás bekapcsolása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:61
+msgid "Disable service autostart at boot"
+msgstr "Automatikus indítás kikapcsolása a gép indításakor"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:61
+msgid "Enable service autostart at boot"
+msgstr "Automatikus indítás engedélyezése a gép indításakor"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:67
+#: kcm/package/contents/ui/KCM.qml:120
+msgid "Detect fans again"
+msgstr "Ventilátorok felismerése újra"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:67
+#: kcm/package/contents/ui/KCM.qml:120
+msgid "Detect fans"
+msgstr "Ventilátorok felismerése"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:73
+msgid "Abort test"
+msgstr "Teszt megszakítása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:73
+msgid "Test start and stop values"
+msgstr "Indítási és leállítási értékek tesztje"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:86
+msgid "Apply"
+msgstr "Alkalmazás"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:89
+msgid "Apply changes"
+msgstr "A módosítások elmentése"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:95
+msgid "Reset"
+msgstr "Alaphelyzet"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:98
+msgid "Revert changes"
+msgstr "Változtatások visszavonása"
+
+#: fancontrol-gui/package/contents/ui/PwmFansTab.qml:122
+#: kcm/package/contents/ui/KCM.qml:113
+msgid "There are no pwm capable fans in your system."
+msgstr "Nincsenek pwm-képes ventilátorok a rendszerben."
+
+#: fancontrol-gui/package/contents/ui/SensorsTab.qml:84
+#: import/qml/StatusPoint.qml:107
+msgid "rpm"
+msgstr "percenkénti fordulat"
+
+#: fancontrol-gui/src/main.cpp:74
+msgid "Graphical user interface for fancontrol"
+msgstr "Grafikus felület a fancontrol-hoz"
+
+#: fancontrol-gui/src/main.cpp:80 kcm/src/fancontrolkcm.cpp:44
+msgid "Malte Veerman"
+msgstr "Malte Veerman"
+
+#: fancontrol-gui/src/main.cpp:80 kcm/src/fancontrolkcm.cpp:44
+msgid "Main Developer"
+msgstr "Vezető fejlesztő"
+
+#: fancontrol-gui/src/systemtrayicon.cpp:31 import/qml/ProfilesDialog.qml:83
+msgid "Apply profile"
+msgstr "Profil alkalmazása"
+
+#: helper/src/helper.cpp:163
+msgid "Could not create dbus interface"
+msgstr "Nem sikerült dbus interfészt létrehozni"
+
+#: helper/src/helper.cpp:228
+msgid "This action does not exist!"
+msgstr "Ez a művelet nem létezik!"
+
+#: import/qml/ErrorDialog.qml:30
+msgid "Error"
+msgstr "Hiba"
+
+#: import/qml/FanItem.qml:316
+msgid "Controlled by:"
+msgstr "A következő vezérli:"
+
+#: import/qml/FanItem.qml:364
+msgid "Turn Fan off if temp < MINTEMP"
+msgstr "Ventilátor kikapcsol ha a hőmérséklet < MINTEMP"
+
+#: import/qml/FanItem.qml:388
+msgid "Pwm value for fan to start:"
+msgstr "A ventilátor Pwm értéke az indításhoz:"
+
+#: import/qml/ProfilesDialog.qml:56
+msgid "Profiles"
+msgstr "Profilok"
+
+#: import/qml/ProfilesDialog.qml:65
+msgid "(current profile)"
+msgstr "(jelenlegi profil)"
+
+#: import/qml/ProfilesDialog.qml:88
+msgid "Create new profile"
+msgstr "Új profil létrehozása"
+
+#: import/qml/ProfilesDialog.qml:93
+msgid "Save to profile"
+msgstr "Mentés a profilba"
+
+#: import/qml/ProfilesDialog.qml:98
+msgid "Delete profile"
+msgstr "Profil törlése"
+
+#: import/qml/ProfilesDialog.qml:111
+msgid "New profile's name"
+msgstr "A profil új neve"
+
+#: import/qml/SettingsForm.qml:39
+msgid "Interval:"
+msgstr "Időköz:"
+
+#: import/qml/SettingsForm.qml:44
+msgid "second"
+msgid_plural "seconds"
+msgstr[0] "második"
+msgstr[1] "másodperc után"
+
+#: import/qml/SettingsForm.qml:55
+msgid "Minimum temperature for fan graphs:"
+msgstr "Minimális hőmérséklet a ventilátor grafikonhoz:"
+
+#: import/qml/SettingsForm.qml:79
+msgid "Maximum temperature for fan graphs:"
+msgstr "Maxmális hőmérséklet a ventilátor grafikonhoz:"
+
+#: import/qml/SettingsForm.qml:101
+msgid "Path to the fancontrol config file:"
+msgstr "A konfigurációs fájl elérési útvonala:"
+
+#: import/qml/SettingsForm.qml:126
+msgid "Name of the fancontrol systemd service:"
+msgstr "A Fancontrol systemd szolgáltatás neve:"
+
+#: import/qml/SettingsForm.qml:140
+msgid "Show tray icon:"
+msgstr "Tálcaikon megjelenítése:"
+
+#: import/qml/SettingsForm.qml:153
+msgid "Start minimized:"
+msgstr "Indítás minimalizálva:"
+
+#: import/qml/SettingsForm.qml:166
+msgid "Please choose a configuration file"
+msgstr "Kérem válasszon egy beállítófájlt"
+
+#: import/src/fan.cpp:55 import/src/fan.cpp:112
+msgid "Can't open rpm file: '%1'"
+msgstr "\"%1\" rpm-fájl megnyitása nem sikerült"
+
+#: import/src/guibase.cpp:234
+msgid "Applying changes"
+msgstr "Változtatások alkalmazása"
+
+#: import/src/guibase.cpp:247
+msgid "Resetting changes"
+msgstr "Változtatások visszaállítása"
+
+#: import/src/guibase.cpp:290
+msgid "Unable to apply unknown profile: %1"
+msgstr "Nem lehetett alkalmazni az ismeretlen profilt: %1"
+
+#: import/src/guibase.cpp:310
+msgid "Unable to read data for profile: %1"
+msgstr "Nem sikerült az adatok olvasása a profilhoz: %1"
+
+#: import/src/guibase.cpp:382
+msgid "No profile"
+msgstr "Nincs profil"
+
+#: import/src/hwmon.cpp:52
+msgid "%1 is not readable!"
+msgstr "%1 nem olvasható!"
+
+#: import/src/hwmon.cpp:61
+msgid "%1 is invalid!"
+msgstr "A(z) %1 érvénytelen!"
+
+#: import/src/hwmon.cpp:94
+msgid "Not a valid sensor: '%1'"
+msgstr "Nem létező szenzor: '%1'"
+
+#: import/src/loader.cpp:77
+msgid "File is not readable: '%1'"
+msgstr "A(z) '%1' fájl nem olvasható"
+
+#: import/src/loader.cpp:82 import/src/loader.cpp:469
+msgid "File does not exist: '%1'"
+msgstr "'%1' nevű fájl nem létezik"
+
+#: import/src/loader.cpp:168 import/src/loader.cpp:176
+#: import/src/loader.cpp:181 import/src/loader.cpp:194
+#: import/src/loader.cpp:200 import/src/loader.cpp:287
+msgid "Invalid entry: '%1'"
+msgstr "Érvénytelen bejegyzés: '%1'"
+
+#: import/src/loader.cpp:252
+msgid "Unable to parse interval line: '%1'"
+msgstr "Nem sikerült feldolgozni az időköz sort: '%1'"
+
+#: import/src/loader.cpp:280 import/src/loader.cpp:398
+msgid "Invalid fan entry: '%1'"
+msgstr "Érvénytelen ventilátor bejegyzés: '%1'"
+
+#: import/src/loader.cpp:283
+msgid "Invalid temp entry: '%1'"
+msgstr "Érvénytelen temp bejegyzés: %1"
+
+#: import/src/loader.cpp:309 import/src/loader.cpp:325
+msgid "Invalid DEVNAME: '%1'!"
+msgstr "A hibás '%1' eszköznév!"
+
+#: import/src/loader.cpp:315
+msgid "Invalid DEVNAME: '%1'! No hwmon with index %2"
+msgstr "Érvénytelen DEVNAME: '%1' ! Nem hwmon %2 indexszel"
+
+#: import/src/loader.cpp:320
+msgid "Wrong name for hwmon %1! Should be \"%2\""
+msgstr "Rossz név a %1 hwmon-hoz! Ennek kellene lennie: \"%2\""
+
+#: import/src/loader.cpp:361
+msgid "Unrecognized line in config: '%1'"
+msgstr "Ismeretlen sor a konfigfájlban: '%1'"
+
+#: import/src/loader.cpp:401
+msgid "%1 is not an integer!"
+msgstr "%1 nem egész szám!"
+
+#: import/src/loader.cpp:404
+msgid "Invalid entry to parse: '%1'"
+msgstr "Érvénytelen bejegyzés a feldolgozáshoz: '%1'"
+
+#: import/src/loader.cpp:420 import/src/loader.cpp:519
+msgid "'%1' is not a local file!"
+msgstr "\"%1\" nem helyi fájl!"
+
+#: import/src/loader.cpp:426
+msgid "'%1' is not a valid url!"
+msgstr "A(z) %1 URL érvénytelen!"
+
+#: import/src/loader.cpp:429
+msgid "Loading config file: '%1'"
+msgstr "A(z) %1 beállítófájl betöltése"
+
+#: import/src/loader.cpp:454
+msgid "Loading of file aborted by user"
+msgstr "A fájlbetöltést felhasználó megszakította"
+
+#: import/src/loader.cpp:465 import/src/loader.cpp:572
+#: import/src/loader.cpp:797 import/src/pwmfan.cpp:261
+#: import/src/pwmfan.cpp:307 import/src/pwmfan.cpp:365
+msgid "Action not supported! Try running the application as root."
+msgstr "A művelet nem támogatott! Próbálja meg futtatni az alkalmazást rendszergazdaként."
+
+#: import/src/loader.cpp:492
+msgid "Cannot load empty config."
+msgstr "Az üres beállítófájl betöltése sikertelen."
+
+#: import/src/loader.cpp:531
+msgid "No changes made to config"
+msgstr "Nem végzett módosításokat a beállításokban"
+
+#: import/src/loader.cpp:538
+msgid "Saving config to '%1'"
+msgstr "Beállítás mentése ide: '%1'"
+
+#: import/src/loader.cpp:562
+msgid "Saving of file aborted by user"
+msgstr "A mentéset a felhasználó megszakította"
+
+#: import/src/loader.cpp:566
+msgid "Error executing action. Code %1; %2; %3"
+msgstr "Nem sikerült végrehajtani a műveletet. Hibakód: %1; %2; %3"
+
+#: import/src/loader.cpp:735
+msgid "Interval must be greater or equal to one!"
+msgstr "Az intervallumnak nagyobbnak vagy egyenlőnek kell lennie eggyel!"
+
+#: import/src/loader.cpp:763
+msgid "Start detecting Sensors"
+msgstr "Szenzorfelderítés indítása"
+
+#: import/src/loader.cpp:813 import/src/loader.cpp:839
+msgid "Finished detecting Sensors"
+msgstr "Szenzorok felderítése befejezve"
+
+#: import/src/pwmfan.cpp:90 import/src/pwmfan.cpp:182
+msgid "Can't open pwm file: '%1'"
+msgstr "\"%1\" pwm-fájl megnyitása nem sikerült"
+
+#: import/src/pwmfan.cpp:108 import/src/pwmfan.cpp:204
+msgid "Can't open pwm_enable file: '%1'"
+msgstr "\"%1\" pwm_enable fájl megnyitása nem sikerült"
+
+#: import/src/pwmfan.cpp:219
+msgid "Pwm cannot exceed 0-255!"
+msgstr "A Pwm nem haladhatja meg a 0-255-t!"
+
+#: import/src/pwmfan.cpp:256
+msgid "Could not set pwm: %1"
+msgstr "PWM beállítása sikertelen: %1"
+
+#: import/src/pwmfan.cpp:302
+msgid "Could not set pwm enable: %1"
+msgstr "PWM bekapcsolás beállítása sikertelen: %1"
+
+#: import/src/pwmfan.cpp:318
+msgid "MinPwm cannot exceed 0-255!"
+msgstr "A MinPwm nem haladhatja meg a 0-255-t!"
+
+#: import/src/pwmfan.cpp:333
+msgid "MaxPwm cannot exceed 0-255!"
+msgstr "A MaxPwm nem haladhatja meg a 0-255-t!"
+
+#: import/src/pwmfan.cpp:357
+msgid "Authorization error: %1"
+msgstr "Jogosultsági hiba: %1"
+
+#: import/src/pwmfan.cpp:417
+msgid "Fan never stops."
+msgstr "Ventilátor soha nem áll meg."
+
+#: import/src/systemdcommunicator.cpp:78
+msgid "Unable to init systemd dbus manager interface!"
+msgstr "A Dbus kezelőfelület nincs előkészítve!"
+
+#: import/src/systemdcommunicator.cpp:113
+msgid "New service name: '%1'"
+msgstr "Új szolgáltatás neve: '%1'"
+
+#: import/src/systemdcommunicator.cpp:134
+msgid "Unable to init systemd dbus service interface: %1"
+msgstr "Nem sikerült előkészítenii a Dbus szolgáltatási felületet:% 1"
+
+#: import/src/systemdcommunicator.cpp:144
+msgid "Dbus reply message is not of type 'QDBusMessage::ReplyMessage'"
+msgstr "A Dbus válaszüzenet nem \"QDBusMessage :: ReplyMessage\" típusú"
+
+#: import/src/systemdcommunicator.cpp:164
+msgid "Systemd dbus manager interface not initialized!"
+msgstr "A Systemd dbus kezelőfelület nincs előkészítve!"
+
+#: import/src/systemdcommunicator.cpp:175
+msgid "Dbus returned invalid answer"
+msgstr "Ismeretlen választ adott a DBus"
+
+#: import/src/systemdcommunicator.cpp:180
+msgid "Dbus returned answer with wrong signature: '%1'"
+msgstr "A Dbus rossz aláírással válaszolt vissza: '% 1'"
+
+#: import/src/systemdcommunicator.cpp:191
+msgid "Service does not exist: '%1'"
+msgstr "A(z) „%1” szolgáltatás nem létezik"
+
+#: import/src/systemdcommunicator.cpp:242
+msgid "Restarting service: '%1'"
+msgstr "'%1' szolgáltatás újraindítása"
+
+#: import/src/systemdcommunicator.cpp:260
+msgid "Invalid manager interface!"
+msgstr "Érvénytelen kezelőfelület!"
+
+#: import/src/systemdcommunicator.cpp:288
+msgid "Dbus error: %1"
+msgstr "Dbus hiba: %1"
+
+#: import/src/systemdcommunicator.cpp:302
+msgid "Enabling service autostart at boot:'%1'"
+msgstr "Automatikus indítás a gép indításakor: '%1'"
+
+#: import/src/systemdcommunicator.cpp:307
+msgid "Disabling service autostart at boot: '%1'"
+msgstr "Automatikus indítás kikapcsolása a gép indításakor: '%1'"
+
+#: import/src/systemdcommunicator.cpp:324
+msgid "Starting service: '%1'"
+msgstr "A(z) '%1' szolgáltatás indítása"
+
+#: import/src/systemdcommunicator.cpp:329
+msgid "Stopping service: '%1'"
+msgstr "A(z) '%1' szolgáltatás leállítása"
+
+#: import/src/temp.cpp:60 import/src/temp.cpp:132
+msgid "Can't open value file: '%1'"
+msgstr "\"%1\" érték-fájl megnyitása nem sikerült"
+
+#: import/src/temp.cpp:68
+msgid "Can't open label file: '%1'"
+msgstr "\"%1\" címlkefájl megnyitása nem sikerült"
+
+#: import/src/temp.cpp:71
+msgid "Temp has no label: '%1'"
+msgstr "Temp címke nélkül: '%1'"
+
+#: import/src/temp.cpp:145
+msgid "Can't update value of temp: '%1'"
+msgstr "A temp értékét nem lehetett frissíteni: '%1'"
+
+#: kcm/package/contents/ui/KCM.qml:45
+msgid "This module lets you configure your PWM fans."
+msgstr "Ez a modul lehetővé teszi a PWM ventilátorok konfigurálását."
+
+#: kcm/package/contents/ui/KCM.qml:129
+msgid "Control fans manually"
+msgstr "Ventilátorok manuális kezelése"
+
+#: kcm/package/contents/ui/KCM.qml:248
+msgid "Advanced settings"
+msgstr "Haladó beállítások"
+
+#: kcm/src/fancontrolkcm.cpp:36
+msgid "Fancontrol-KCM"
+msgstr "Fancontrol-KCM"
+
+#: kcm/src/fancontrolkcm.cpp:38
+msgid "KDE Fancontrol Module"
+msgstr "KDE Fancontrol beállítómodul"
+
+#: po/rc.cpp:1 rc.cpp:1
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Barcza Károly (blackPanther OS - www.blackpanther.hu)"
+
+#: po/rc.cpp:2 rc.cpp:2
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "Charles K Barcza - kbarcza@blackpanther.hu"
