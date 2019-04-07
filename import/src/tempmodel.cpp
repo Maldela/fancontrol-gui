@@ -21,6 +21,7 @@
 
 
 #include "tempmodel.h"
+#include "hwmon.h"
 #include "temp.h"
 
 
@@ -70,8 +71,13 @@ QVariant TempModel::data(const QModelIndex& index, int role) const
     }
 }
 
-void TempModel::setTemps(const QList<Temp *> &temps)
+void TempModel::setTemps(QList<Temp *> temps)
 {
+    std::sort(temps.begin(), temps.end(), [] (Temp *a, Temp *b) { if (a->parent() == b->parent()) return a->index() < b->index(); return a->parent()->name() < b->parent()->name(); });
+
+    if (m_temps == temps)
+        return;
+
     beginResetModel();
 
     m_temps = temps;
@@ -86,36 +92,31 @@ void TempModel::setTemps(const QList<Temp *> &temps)
     endResetModel();
 }
 
-void TempModel::addTemps(QList<Temp *> newTemps)
+void TempModel::addTemp(Temp *newTemp)
 {
-
-    for (const auto &newTemp : newTemps)
+    for (const auto &oldTemp : qAsConst(m_temps))
     {
-        for (const auto &temp : qAsConst(m_temps))
-        {
-            if (*temp == *newTemp)
-            {
-                newTemps.removeAll(newTemp);
-                break;
-            }
-        }
+        if (*oldTemp == *newTemp)
+            return;
     }
 
-    if (!newTemps.isEmpty())
+    auto newTemps = m_temps << newTemp;
+    std::sort(newTemps.begin(), newTemps.end(), [] (Temp *a, Temp *b) { if (a->parent() == b->parent()) return a->index() < b->index(); return a->parent()->name() < b->parent()->name(); });
+    int index = newTemps.indexOf(newTemp);
+
+    connect(newTemp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
+
+    beginInsertRows(QModelIndex(), index, index);
+    m_temps = newTemps;
+    emit tempsChanged();
+    endInsertRows();
+}
+
+void TempModel::addTemps(const QList<Temp *> &newTemps)
+{
+    for (const auto &newTemp : newTemps)
     {
-        beginResetModel();
-
-        m_temps += newTemps;
-        emit tempsChanged();
-
-        for (const auto &temp : qAsConst(newTemps))
-        {
-            connect(temp, &Temp::nameChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
-            connect(temp, &Temp::valueChanged, this, static_cast<void(TempModel::*)()>(&TempModel::updateTemp));
-            updateTemp(temp);
-        }
-
-        endResetModel();
+        addTemp(newTemp);
     }
 }
 

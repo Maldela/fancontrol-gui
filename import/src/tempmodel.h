@@ -48,8 +48,9 @@ public:
     Q_ENUM(Roles)
 
     TempModel(QObject *parent = Q_NULLPTR);
-    void setTemps(const QList<Temp *> &temps);
-    void addTemps(QList<Temp *> newTemps);
+    void setTemps(QList<Temp *> temps);
+    void addTemp(Temp *newTemp);
+    void addTemps(const QList<Temp *> &newTemps);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override { Q_UNUSED(parent) return m_temps.size(); }
     virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;

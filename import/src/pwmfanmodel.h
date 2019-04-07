@@ -47,8 +47,9 @@ public:
     Q_ENUM(Roles)
 
     PwmFanModel(QObject *parent = Q_NULLPTR);
-    void setPwmFans(const QList<PwmFan *> &fans);
-    void addPwmFans(QList<PwmFan *> newFans);
+    void setPwmFans(QList<PwmFan *> fans);
+    void addPwmFan(PwmFan *newFan);
+    void addPwmFans(const QList<PwmFan *> &newFans);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override { Q_UNUSED(parent) return m_fans.size(); }
     virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;

@@ -21,6 +21,7 @@
 
 
 #include "pwmfanmodel.h"
+#include "hwmon.h"
 #include "pwmfan.h"
 
 
@@ -69,46 +70,49 @@ QVariant PwmFanModel::data(const QModelIndex& index, int role) const
     }
 }
 
-void PwmFanModel::setPwmFans(const QList<PwmFan *> &fans)
+void PwmFanModel::setPwmFans(QList<PwmFan *> fans)
 {
+    std::sort(fans.begin(), fans.end(), [] (PwmFan *a, PwmFan *b) { if (a->parent() == b->parent()) return a->index() < b->index(); return a->parent()->name() < b->parent()->name(); });
+
     if (m_fans == fans)
         return;
+
+    beginResetModel();
 
     m_fans = fans;
     emit fansChanged();
 
     for (const auto &fan : fans)
         connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
+
+    endResetModel();
 }
 
-void PwmFanModel::addPwmFans(QList<PwmFan *> newFans)
+void PwmFanModel::addPwmFan(PwmFan* newFan)
+{
+    for (const auto &oldFan : qAsConst(m_fans))
+    {
+        if (*oldFan == *newFan)
+            return;
+    }
+
+    auto newFans = m_fans << newFan;
+    std::sort(newFans.begin(), newFans.end(), [] (PwmFan *a, PwmFan *b) { if (a->parent() == b->parent()) return a->index() < b->index(); return a->parent()->name() < b->parent()->name(); });
+    int index = newFans.indexOf(newFan);
+
+    connect(newFan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
+
+    beginInsertRows(QModelIndex(), index, index);
+    m_fans = newFans;
+    emit fansChanged();
+    endInsertRows();
+}
+
+void PwmFanModel::addPwmFans(const QList<PwmFan *> &newFans)
 {
     for (const auto &newFan : newFans)
     {
-        for (const auto &fan : qAsConst(m_fans))
-        {
-            if (*fan == *newFan)
-            {
-                newFans.removeAll(newFan);
-                break;
-            }
-        }
-    }
-
-    if (!newFans.isEmpty())
-    {
-        m_fans += newFans;
-        emit fansChanged();
-
-        const auto oldSize = rowCount();
-
-        insertRows(oldSize, newFans.size());
-
-        for (const auto &fan : qAsConst(newFans))
-        {
-            connect(fan, &PwmFan::nameChanged, this, static_cast<void(PwmFanModel::*)()>(&PwmFanModel::updateFan));
-            updateFan(fan);
-        }
+        addPwmFan(newFan);
     }
 }
 

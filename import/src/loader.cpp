@@ -625,8 +625,11 @@ QString Loader::createConfig() const
             usedHwmons << hwmon;
 
         const auto pwmFans = hwmon->pwmFans();
-        for (const auto &pwmFan : pwmFans)
+        auto keys = pwmFans.keys();
+        std::sort(keys.begin(), keys.end());
+        for (const auto &key : keys)
         {
+            const auto pwmFan = pwmFans.value(key);
             if (pwmFan->hasTemp() && pwmFan->temp() && !pwmFan->testing())
             {
                 usedFans << pwmFan;
@@ -635,6 +638,8 @@ QString Loader::createConfig() const
             }
         }
     }
+
+    std::sort(usedHwmons.begin(), usedHwmons.end(), [] (Hwmon *a, Hwmon *b) { return a->index() < b->index(); });
 
     auto configFile = QStringLiteral("# This file was created by Fancontrol-GUI") + QChar(QChar::LineFeed);
 
