@@ -154,7 +154,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Threaded
-                renderTarget: Canvas.FramebufferObject
+//                 renderTarget: Canvas.FramebufferObject
 
                 onPaint: {
                     var c = curveCanvas.getContext("2d");
@@ -210,7 +210,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: parent.border.width
                 renderStrategy: Canvas.Threaded
-                renderTarget: Canvas.FramebufferObject
+//                 renderTarget: Canvas.FramebufferObject
 
                 onPaint: {
                     var c = meshCanvas.getContext("2d");
