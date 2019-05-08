@@ -53,13 +53,13 @@ Kirigami.ApplicationWindow {
 
     onWideScreenChanged: drawer.drawerOpen = wideScreen
 
-    onClosing: {
-        if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
-            close.accepted = false;
-            saveOnCloseDialog.open();
-            return;
-        }
-    }
+//     onClosing: {
+//         if (Fancontrol.Base.needsApply && !saveOnCloseDialog.answered) {
+//             close.accepted = false;
+//             saveOnCloseDialog.open();
+//             return;
+//         }
+//     }
 
     Component.onCompleted: {
         Fancontrol.Base.load();
@@ -173,35 +173,35 @@ Kirigami.ApplicationWindow {
         y: (window.height - height) / 2
     }
 
-    Dialog {
-        id: saveOnCloseDialog
-
-        property bool answered: false
-
-        visible: false
-        modal: true
-        title: i18n("Unsaved changes")
-        standardButtons: Dialog.Cancel | Dialog.Discard | Dialog.Apply
-        x: (window.width - width) / 2
-        y: (window.height - height) / 2
-
-        onRejected: close()
-        onDiscarded: {
-            answered = true;
-            close();
-            window.close();
-        }
-        onAccepted: {
-            Fancontrol.Base.apply();
-            answered = true;
-            close();
-            window.close();
-        }
-
-        Label {
-            id: text
-            anchors.centerIn: parent
-            text: i18n("There are unsaved changes.\nDo you want to apply these changes?")
-        }
-    }
+//     Dialog {
+//         id: saveOnCloseDialog
+//
+//         property bool answered: false
+//
+//         visible: false
+//         modal: true
+//         title: i18n("Unsaved changes")
+//         standardButtons: Dialog.Cancel | Dialog.Discard | Dialog.Apply
+//         x: (window.width - width) / 2
+//         y: (window.height - height) / 2
+//
+//         onRejected: close()
+//         onDiscarded: {
+//             answered = true;
+//             close();
+//             window.close();
+//         }
+//         onApplied: {
+//             Fancontrol.Base.apply();
+//             answered = true;
+//             close();
+//             window.close();
+//         }
+//
+//         Label {
+//             id: text
+//             anchors.centerIn: parent
+//             text: i18n("There are unsaved changes.\nDo you want to apply these changes?")
+//         }
+//     }
 }
