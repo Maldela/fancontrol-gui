@@ -191,7 +191,7 @@ Kirigami.ApplicationWindow {
             close();
             window.close();
         }
-        onApplied: {
+        onAccepted: {
             Fancontrol.Base.apply();
             answered = true;
             close();
