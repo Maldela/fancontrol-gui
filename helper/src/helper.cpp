@@ -173,8 +173,15 @@ ActionReply Helper::action(const QVariantMap &arguments)
     if (arguments[QStringLiteral("action")] == "read")
     {
         const auto filename = arguments[QStringLiteral("filename")].toString();
-        QFile file(filename);
 
+        if (!filename.startsWith(QStringLiteral("/etc")))
+        {
+            reply = ActionReply::HelperErrorReply();
+            reply.setErrorDescription(QStringLiteral("File must be located in /etc"));
+            return reply;
+        }
+
+        QFile file(filename);
         if (file.open(QIODevice::ReadOnly))
         {
             QTextStream stream(&file);
@@ -192,8 +199,15 @@ ActionReply Helper::action(const QVariantMap &arguments)
     else if (arguments[QStringLiteral("action")] == "write")
     {
         const auto filename = arguments[QStringLiteral("filename")].toString();
-        QFile file(filename);
 
+        if (!filename.startsWith(QStringLiteral("/etc")))
+        {
+            reply = ActionReply::HelperErrorReply();
+            reply.setErrorDescription(QStringLiteral("File must be located in /etc"));
+            return reply;
+        }
+
+        QFile file(filename);
         if (file.open(QIODevice::WriteOnly))
         {
             QTextStream stream(&file);
