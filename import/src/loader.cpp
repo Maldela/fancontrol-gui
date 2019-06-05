@@ -436,63 +436,75 @@ bool Loader::load(const QUrl &url)
     }
     emit info(i18n("Loading config file: \'%1\'", filePath));
 
+    watchPath(filePath);
+
     QTextStream stream;
     QFile file(filePath);
     QString fileContent;
 
-    if (file.open(QFile::ReadOnly | QFile::Text))
+    if (file.exists())
     {
-        stream.setDevice(&file);
-        fileContent = stream.readAll();
-    }
-    else if (file.exists())
-    {
-        auto action = newFancontrolAction();
-
-        if (action.isValid())
+        if (file.open(QFile::ReadOnly | QFile::Text))
         {
-            auto map = QVariantMap();
-            map[QStringLiteral("action")] = QVariant("read");
-            map[QStringLiteral("filename")] = filePath;
-            action.setArguments(map);
-            auto job = action.execute();
-            if (!job->exec())
-            {
-                if (job->error() == 4)
-                {
-                    emit info(i18n("Loading of file aborted by user"));
-                    return false;
-                }
-
-                emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2", job->error(), job->errorString()), true);
-                return false;
-            }
-            else
-                fileContent = job->data().value(QStringLiteral("content")).toString();
+            stream.setDevice(&file);
+            fileContent = stream.readAll();
         }
         else
-            emit error(i18n("Action not supported! Try running the application as root."), true);
-    }
-    else
-    {
-        emit error(i18n("File does not exist: \'%1\'" ,filePath));
-        return false;
-    }
+        {
+            auto action = newFancontrolAction();
 
-    bool success = load(fileContent);
+            if (action.isValid())
+            {
+                auto map = QVariantMap();
+                map[QStringLiteral("action")] = QVariant("read");
+                map[QStringLiteral("filename")] = filePath;
+                action.setArguments(map);
+                auto job = action.execute();
+                if (!job->exec())
+                {
+                    if (job->error() == 4)
+                    {
+                        emit info(i18n("Loading of file aborted by user"));
+                        return false;
+                    }
 
-    if (success)
-    {
-        watchPath(filePath);
+                    emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2", job->error(), job->errorString()), true);
+                    return false;
+                }
+                else
+                    fileContent = job->data().value(QStringLiteral("content")).toString();
+            }
+            else
+                emit error(i18n("Action not supported! Try running the application as root."), true);
+        }
+
+        bool success = load(fileContent);
 
         if (!url.isEmpty())
         {
             m_configUrl = url;
             emit configUrlChanged();
         }
+
+        return success;
+    }
+    else
+    {
+        emit error(i18n("File does not yet exist: \'%1\'" ,filePath));
+
+        m_loadedConfig = QString();
+        emit needsSaveChanged();
+
+        if (!url.isEmpty())
+        {
+            m_configUrl = url;
+            emit configUrlChanged();
+        }
+
+        return false;
     }
 
-    return success;
+    return false;
 }
 
 bool Loader::load(const QString& config)
@@ -508,8 +520,8 @@ bool Loader::load(const QString& config)
 
     bool success = parseConfig(config);
 
-    if (success)
-        m_loadedConfig = config;
+    m_loadedConfig = config;
+    emit needsSaveChanged();
 
     return success;
 }
