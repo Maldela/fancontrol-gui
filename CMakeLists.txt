@@ -10,11 +10,13 @@ option(BUILD_KCM "Build the KCM" OFF)
 option(BUILD_PLASMOID "Build the plasmoid" OFF)
 option(BUILD_HELPER "Build the KHelper" ON)
 option(INSTALL_SHARED "Install the shared parts" ON)
+option(INSTALL_POLKIT "Install polkit files and rules" OFF)
 
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
 set(STANDARD_CONFIG_FILE "/etc/fancontrol" CACHE STRING "The location of the standard config file for the fancontrol script")
 set(STANDARD_HELPER_ID "fancontrol.gui.helper" CACHE STRING "The standard id for the KAuth helper")
+set(POLKIT_GROUP_NAME "fancontrol" CACHE STRING "The group which is granted elevated permissions by polkit to manipulate fancontrol")
 add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
 add_definitions(-DSTANDARD_CONFIG_FILE="${STANDARD_CONFIG_FILE}")
 add_definitions(-DSTANDARD_HELPER_ID="${STANDARD_HELPER_ID}")
@@ -125,6 +127,14 @@ if(INSTALL_SHARED)
     ki18n_install(po)
 
 endif(INSTALL_SHARED)
+
+
+#install polkit files
+if(INSTALL_POLKIT)
+
+    add_subdirectory(polkit)
+
+endif(INSTALL_POLKIT)
 
 
 #summary

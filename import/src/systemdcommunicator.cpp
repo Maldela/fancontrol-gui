@@ -26,7 +26,9 @@
 #include <QtCore/QTimer>
 #include <QtDBus/QDBusArgument>
 #include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusMetaType>
 #include <QtDBus/QDBusReply>
+#include <QtDBus/QDBusVariant>
 
 #include <KAuth/KAuthExecuteJob>
 #include <KI18n/KLocalizedString>
@@ -261,6 +263,34 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         return false;
     }
 
+    const auto systembus = QDBusConnection::systemBus();
+    QScopedPointer<QDBusInterface> iface(new QDBusInterface (QStringLiteral("org.freedesktop.systemd1"),
+                                         QStringLiteral("/org/freedesktop/systemd1"),
+                                         QStringLiteral("org.freedesktop.systemd1.Manager"),
+                                         systembus,
+                                         this));
+    QDBusMessage dbusmessage;
+    bool success = false;
+    QString error;
+
+    if (iface->isValid())
+    {
+        if (arguments.isEmpty())
+            dbusmessage = iface->call(QDBus::AutoDetect, method);
+        else
+            dbusmessage = iface->callWithArgumentList(QDBus::AutoDetect, method, arguments);
+
+        if (dbusmessage.type() == QDBusMessage::ErrorMessage)
+        {
+            success = false;
+            error = dbusmessage.errorMessage();
+            emit this->error("DBus error: " + error);
+        }
+    }
+
+    if (success)
+        return true;
+
     auto action = newFancontrolAction();
     QVariantMap map;
     map[QStringLiteral("action")] = "dbusaction";
@@ -269,7 +299,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
     action.setArguments(map);
 
     const auto job = action.execute();
-    bool success = job->exec();
+    success = job->exec();
     if (success)
     {
         if (method == QStringLiteral("EnableUnitFiles") || method == QStringLiteral("DisableUnitFiles"))
@@ -284,7 +314,7 @@ bool SystemdCommunicator::dbusAction(const QString &method, const QVariantList &
         }
     }
     else
-        emit error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2", job->error(), job->errorString()), true);
+        emit this->error(i18n("KAuth::ExecuteJob error! Code: %1\nAdditional Info: %2", job->error(), job->errorString()), true);
 
     return success;
 }

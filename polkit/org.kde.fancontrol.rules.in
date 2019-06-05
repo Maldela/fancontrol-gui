@@ -1,0 +1,14 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "@STANDARD_HELPER_ID@.action" && subject.isInGroup("@POLKIT_GROUP_NAME@")) {
+        return polkit.Result.YES;
+    }
+
+    if (action.id == "org.freedesktop.systemd1.manage-units") {
+        if (action.lookup("unit") == "@STANDARD_SERVICE_NAME@.service" && subject.isInGroup("@POLKIT_GROUP_NAME@")) {
+            var verb = action.lookup("verb");
+            if (verb == "start" || verb == "stop" || verb == "restart") {
+                return polkit.Result.YES;
+            }
+        }
+    }
+});

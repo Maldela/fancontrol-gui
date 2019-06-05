@@ -5,6 +5,7 @@ Furthermore it communicates with systemd via dbus to control the fancontrol serv
 
 KAuth currently doesn't support install prefixes other than where KAuth itself was installed.
 If you want to use another install prefix, you have to run the application as root or another user with the necessary privileges to avoid the KAuth helper.
+If you want to avoid authorizing yourself when using the helper you can set the option -DINSTALL_POLKIT=true. This will install a polkit rules file allowing members of the group 'fancontrol' to edit the config file and manipulate the systemd service. You can change the group name with the -DPOLKIT_GROUP_NAME option. Service name and config file can be set with the options -DSTANDARD_SERVICE_NAME and -DSTANDARD_CONFIG_FILE.
 
 If you want to compile without systemd support set the option -DNO_SYSTEMD=true.
 
