@@ -15,7 +15,7 @@ option(INSTALL_POLKIT "Install polkit files and rules" OFF)
 #variables
 set(STANDARD_SERVICE_NAME "fancontrol" CACHE STRING "The name of the systemd service for the fancontrol script")
 set(STANDARD_CONFIG_FILE "/etc/fancontrol" CACHE STRING "The location of the standard config file for the fancontrol script")
-set(STANDARD_HELPER_ID "fancontrol.gui.helper" CACHE STRING "The standard id for the KAuth helper")
+set(STANDARD_HELPER_ID "org.kde.fancontrol.gui.helper" CACHE STRING "The standard id for the KAuth helper")
 set(POLKIT_GROUP_NAME "fancontrol" CACHE STRING "The group which is granted elevated permissions by polkit to manipulate fancontrol")
 add_definitions(-DSTANDARD_SERVICE_NAME="${STANDARD_SERVICE_NAME}")
 add_definitions(-DSTANDARD_CONFIG_FILE="${STANDARD_CONFIG_FILE}")

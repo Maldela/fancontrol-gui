@@ -4,6 +4,7 @@ Name=Fancontrol
 Name[hu]=Ventilátorvezérlés
 Comment=Plasmoid to observe and control fan speeds.
 Comment[hu]=Plasmoid a ventilátorok megfigyelésére és sebességük vezérlésre.
+Icon=org.kde.fancontrol.gui
 Type=Service
 
 X-KDE-PluginInfo-Author=Malte Veerman

@@ -26,7 +26,7 @@
 #include <KI18n/KLocalizedString>
 
 
-K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "fancontrol-kcm.json", registerPlugin<FancontrolKCM>();)
+K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
 
 
 FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)

@@ -34,7 +34,7 @@
 
 
 #ifndef STANDARD_HELPER_ID
-#define STANDARD_HELPER_ID "fancontrol.gui.helper"
+#define STANDARD_HELPER_ID "org.kde.fancontrol.gui.helper"
 #endif
 
 

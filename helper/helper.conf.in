@@ -5,7 +5,7 @@
 
   <!-- Only user root can own the foo helper -->
   <policy user="root">
-    <allow own="fancontrol.gui.helper"/>
+    <allow own="@STANDARD_HELPER_ID@"/>
   </policy>
 
 </busconfig>

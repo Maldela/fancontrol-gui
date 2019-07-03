@@ -1,3 +1,3 @@
-configure_file(org.kde.fancontrol.rules.in org.kde.fancontrol.rules @ONLY)
+configure_file(rules.in ${STANDARD_HELPER_ID}.rules @ONLY)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.kde.fancontrol.rules" DESTINATION "/etc/polkit-1/rules.d")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${STANDARD_HELPER_ID}.rules DESTINATION /etc/polkit-1/rules.d)

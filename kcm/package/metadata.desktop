@@ -6,6 +6,7 @@ Icon=org.kde.fancontrol.gui
 Encoding=UTF-8
 Keywords=
 Type=Service
+
 X-KDE-PluginInfo-Author=Malte Veerman
 X-KDE-PluginInfo-Email=malte.veerman@gmail.com
 X-KDE-PluginInfo-License=GPL
