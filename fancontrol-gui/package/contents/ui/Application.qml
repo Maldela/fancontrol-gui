@@ -169,8 +169,8 @@ Kirigami.ApplicationWindow {
         id: errorDialog
 
         visible: false
-        x: (window.width - width) / 2
-        y: (window.height - height) / 2
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
     }
 
 //     Dialog {

@@ -28,14 +28,17 @@ Dialog {
     id: dialog
 
     title: i18n("Error")
-    width: text.implicitWidth + Kirigami.Units.smallSpacing * 2
+    width: Math.min(text.implicitWidth + Kirigami.Units.smallSpacing * 2, parent.width - Kirigami.Units.largeSpacing * 2)
     standardButtons: Dialog.Close
     onRejected: close()
 
     Label {
         id: text
+
         anchors.centerIn: parent
         text: ""
+        wrapMode: Text.Wrap
+        width: parent.width - Kirigami.Units.smallSpacing * 2
     }
 
     Connections {
