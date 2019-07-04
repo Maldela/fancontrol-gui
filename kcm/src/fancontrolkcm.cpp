@@ -26,6 +26,11 @@
 #include <KI18n/KLocalizedString>
 
 
+#ifndef STANDARD_HELPER_ID
+#define STANDARD_HELPER_ID "org.kde.fancontrol.gui.helper"
+#endif
+
+
 K_PLUGIN_FACTORY_WITH_JSON(FancontrolKCMFactory, "kcm_fancontrol.json", registerPlugin<FancontrolKCM>();)
 
 
@@ -45,7 +50,7 @@ FancontrolKCM::FancontrolKCM(QObject *parent, const QVariantList& args)
     setAboutData(about);
 
     setButtons(Apply | Default);
-    setAuthActionName(QStringLiteral("fancontrol.gui.helper.action"));
+    setAuthActionName(QString(STANDARD_HELPER_ID) + ".action");
 }
 
 void FancontrolKCM::save()
