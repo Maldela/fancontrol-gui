@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0.2)
 
 project(fancontroller)
 
+set(QT_MIN_VERSION "5.8.0")
+
 
 #options
 option(NO_SYSTEMD "Compile without Systemd support. Reduces functionality significantly!" OFF)
@@ -47,7 +49,7 @@ include(FindPkgConfig)
 include(ECMQMLModules)
 
 #Find Qt5
-find_package(Qt5Core REQUIRED)
+find_package(Qt5Core ${QT_MIN_VERSION} REQUIRED)
 
 #Find KF5
 find_package(KF5 COMPONENTS I18n REQUIRED)
