@@ -56,6 +56,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
     m_maxPwm(255),
     m_minStart(255),
     m_minStop(255),
+    m_average(1),
     m_zeroRpm(0),
     m_testStatus(NotStarted)
 {
@@ -69,6 +70,7 @@ PwmFan::PwmFan(uint index, Hwmon *parent) : Fan(index, parent),
         connect(this, &PwmFan::maxPwmChanged, parent, &Hwmon::configUpdateNeeded);
         connect(this, &PwmFan::minStartChanged, parent, &Hwmon::configUpdateNeeded);
         connect(this, &PwmFan::minStopChanged, parent, &Hwmon::configUpdateNeeded);
+        connect(this, &PwmFan::averageChanged, parent, &Hwmon::configUpdateNeeded);
         connect(this, &PwmFan::testStatusChanged, parent, &Hwmon::configUpdateNeeded);
 
         if (QDir(parent->path()).isReadable())

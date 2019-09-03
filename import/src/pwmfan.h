@@ -45,6 +45,7 @@ class PwmFan : public Fan
     Q_PROPERTY(int maxPwm READ maxPwm WRITE setMaxPwm NOTIFY maxPwmChanged)
     Q_PROPERTY(int minStart READ minStart WRITE setMinStart NOTIFY minStartChanged)
     Q_PROPERTY(int minStop READ minStop WRITE setMinStop NOTIFY minStopChanged)
+    Q_PROPERTY(int average READ average WRITE setAverage NOTIFY averageChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testStatusChanged)
     Q_PROPERTY(TestStatus testStatus READ testStatus NOTIFY testStatusChanged)
@@ -84,6 +85,7 @@ public:
     int maxPwm() const { return m_maxPwm; }
     int minStart() const { return m_minStart; }
     int minStop() const { return m_minStop; }
+    int average() const { return m_average; }
     PwmEnable pwmEnable() const { return m_pwmEnable; }
     TestStatus testStatus() const { return m_testStatus; }
     bool active() const;
@@ -97,6 +99,7 @@ public:
     void setMaxPwm(int maxPwm);
     void setMinStart(int minStart) { if (minStart != m_minStart) { m_minStart = minStart; emit minStartChanged(); } }
     void setMinStop(int minStop) { if (minStop != m_minStop) { m_minStop = minStop; emit minStopChanged(); } }
+    void setAverage(int average) { if (average != m_average) { m_average = average; emit averageChanged(); } }
     bool setPwmEnable(PwmEnable pwmEnable, bool write = true);
     void setActive(bool active);
     void toDefault() Q_DECL_OVERRIDE;
@@ -119,6 +122,7 @@ signals:
     void maxPwmChanged();
     void minStartChanged();
     void minStopChanged();
+    void averageChanged();
     void activeChanged();
     void testStatusChanged(bool = false);
     void pwmEnableChanged();
@@ -142,6 +146,7 @@ private:
     int m_maxPwm;
     int m_minStart;
     int m_minStop;
+    int m_average;
     int m_zeroRpm;
     TestStatus m_testStatus;
 };

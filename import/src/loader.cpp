@@ -363,6 +363,11 @@ bool Loader::parseConfig(QString config)
             line.remove(QStringLiteral("MAXPWM="));
             parseConfigLine(line.simplified(), &PwmFan::setMaxPwm);
         }
+        else if (line.startsWith(QStringLiteral("AVERAGE=")))
+        {
+            line.remove(QStringLiteral("AVERAGE="));
+            parseConfigLine(line.simplified(), &PwmFan::setAverage);
+        }
         else if (!line.startsWith(QStringLiteral("DEVPATH=")) &&
             !line.startsWith(QStringLiteral("FCFANS=")))
         {
@@ -759,6 +764,16 @@ QString Loader::createConfig() const
                 configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
                 configFile += "pwm" + QString::number(pwmFan->index()) + "=";
                 configFile += QString::number(pwmFan->maxPwm()) + QChar(QChar::Space);
+            }
+            configFile += QChar(QChar::LineFeed);
+
+            configFile += QLatin1String("AVERAGE=");
+
+            for (const auto &pwmFan : qAsConst(usedFans))
+            {
+                configFile += "hwmon" + QString::number(pwmFan->parent()->index()) + "/";
+                configFile += "pwm" + QString::number(pwmFan->index()) + "=";
+                configFile += QString::number(pwmFan->average()) + QChar(QChar::Space);
             }
             configFile += QChar(QChar::LineFeed);
         }

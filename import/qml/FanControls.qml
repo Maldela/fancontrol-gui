@@ -82,6 +82,38 @@ ColumnLayout {
         }
     }
 
+    RowLayout {
+        Label {
+            text: i18n("Number of cycles to average temperature")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            renderType: Text.NativeRendering
+        }
+        SpinBox {
+            id: averageInput
+
+            Layout.fillWidth: true
+            from: 1
+            to: 100
+            editable: true
+            value: !!fan ? fan.average : 1
+            textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 1) }
+            onValueModified: {
+                if (!!fan) {
+                    fan.average = value
+                }
+            }
+
+            Connections {
+                target: root
+                onFanChanged: if (!!fan) averageInput.value = fan.average
+            }
+            Connections {
+                target: fan
+                onAverageChanged: averageInput.value = fan.average
+            }
+        }
+    }
+
     CheckBox {
         id: fanOffCheckBox
 
