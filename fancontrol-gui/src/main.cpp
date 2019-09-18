@@ -21,6 +21,7 @@
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QLoggingCategory>
 #include <QtGui/QIcon>
+#include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
 
 #include <KDeclarative/QmlObject>
