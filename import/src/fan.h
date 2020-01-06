@@ -37,7 +37,7 @@ class Fan : public Sensor
 
 public:
 
-    explicit Fan(uint index, Hwmon *parent = Q_NULLPTR);
+    explicit Fan(uint index, Hwmon *parent, bool device = false);
     virtual ~Fan();
 
     int rpm() const { return m_rpm; }

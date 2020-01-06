@@ -139,6 +139,71 @@ void Hwmon::initialize()
             }
         }
     }
+
+    if (isEmpty())
+    {
+        QDir deviceDir(m_path + "/device");
+        const auto entries = deviceDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+        for (const auto &entry : entries)
+        {
+            if (!entry.contains(QStringLiteral("input")))
+                continue;
+
+            auto str = entry;
+            auto success = false;
+            const auto index = str.remove(QRegExp("\\D+")).toUInt(&success);
+
+            if (!success)
+            {
+                emit error(i18n("Not a valid sensor: \'%1\'", entry));
+                continue;
+            }
+
+            if (entry.contains(QStringLiteral("fan")))
+            {
+                if (QFile::exists(m_path + "/pwm" + QString::number(index)))
+                {
+                    if (!m_pwmFans.contains(index))
+                    {
+                        auto newPwmFan = new PwmFan(index, this);
+                        connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
+
+                        if (m_parent)
+                            connect(newPwmFan, &PwmFan::testStatusChanged, m_parent, &Loader::handleTestStatusChanged);
+
+                        m_pwmFans.insert(index, newPwmFan);
+                        emit pwmFansChanged();
+
+                        m_fans.insert(index, newPwmFan);
+                        emit fansChanged();
+                    }
+                }
+                else
+                {
+                    if (!m_fans.contains(index))
+                    {
+                        auto newFan = new Fan(index, this);
+                        connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
+
+                        m_fans.insert(index, newFan);
+                        emit fansChanged();
+                    }
+                }
+            }
+
+            if (entry.contains(QStringLiteral("temp")))
+            {
+                if (!m_temps.contains(index))
+                {
+                    auto newTemp = new Temp(index, this);
+                    connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
+
+                    m_temps.insert(index, newTemp);
+                    emit tempsChanged();
+                }
+            }
+        }
+    }
 }
 
 QList<QObject *> Hwmon::fansAsObjects() const

@@ -34,24 +34,25 @@ class Sensor : public QObject
     Q_OBJECT
     Q_PROPERTY(uint index READ index CONSTANT)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString path READ path CONSTANT)
+    Q_PROPERTY(QString id READ id CONSTANT)
     Q_PROPERTY(Hwmon * parent READ parent CONSTANT)
 
 public:
 
-    explicit Sensor(Hwmon *parent = Q_NULLPTR, uint index = 0, const QString &path = QString());
+    explicit Sensor(Hwmon *parent, uint index, const QString &type, bool device = false);
 
     virtual QString name() const = 0;
     virtual void setName(const QString &name) = 0;
     virtual void toDefault() = 0;
     virtual bool isValid() const = 0;
     virtual void update() = 0;
-    QString path() const { return m_path; }
+    QString id() const { return m_id; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
+    bool device() const { return m_device; }
 
-    bool operator==(const Sensor &other) { return m_path == other.path(); }
-    bool operator!=(const Sensor &other) { return m_path != other.path(); }
+    bool operator==(const Sensor &other) { return m_id == other.id(); }
+    bool operator!=(const Sensor &other) { return m_id != other.id(); }
 
 
 signals:
@@ -60,11 +61,12 @@ signals:
     void error(QString, bool = false);
 
 
-protected:
+private:
 
     Hwmon *const m_parent;
     const uint m_index;
-    const QString m_path;
+    QString m_id;
+    bool m_device;
 };
 
 }

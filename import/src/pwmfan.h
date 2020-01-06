@@ -73,7 +73,7 @@ public:
     };
     Q_ENUM(PwmEnable)
 
-    explicit PwmFan(uint index, Hwmon *parent = Q_NULLPTR);
+    explicit PwmFan(uint index, Hwmon *parent, bool device = false);
     virtual ~PwmFan();
 
     int pwm() const Q_DECL_OVERRIDE { return m_pwm; }

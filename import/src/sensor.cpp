@@ -26,13 +26,17 @@
 namespace Fancontrol
 {
 
-Sensor::Sensor(Hwmon *parent, uint index, const QString &path) : QObject(parent),
+Sensor::Sensor(Hwmon *parent, uint index, const QString &type, bool device) : QObject(parent),
     m_parent(parent),
     m_index(index),
-    m_path(path)
+    m_device(device)
 {
-    if (parent)
-        connect(this, &Sensor::error, parent, &Hwmon::error);
+    if (!parent)
+        return;
+
+    m_id = device ? parent->name() + "/device/" + type + QString::number(index) : parent->name() + "/" + type + QString::number(index);
+
+    connect(this, &Sensor::error, parent, &Hwmon::error);
 }
 
 }

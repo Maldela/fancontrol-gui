@@ -39,14 +39,19 @@
 namespace Fancontrol
 {
 
-Temp::Temp(uint index, Hwmon *parent) :
-    Sensor(parent, index, parent ? parent->name() + QStringLiteral("/temp") + QString::number(index) : QString()),
+Temp::Temp(uint index, Hwmon *parent, bool device) :
+    Sensor(parent, index, QStringLiteral("temp"), device),
     m_valueStream(new QTextStream)
 {
-    if (parent && QDir(parent->path()).isReadable())
+    if (!parent)
+        return;
+
+    auto path = device ? parent->path() + "/device" : parent->path();
+
+    if (QDir(path).isReadable())
     {
-        const auto valueFile = new QFile(parent->path() + "/temp" + QString::number(index) + "_input", this);
-        const auto labelFile = new QFile(parent->path() + "/temp" + QString::number(index) + "_label");
+        const auto valueFile = new QFile(path + "/temp" + QString::number(index) + "_input", this);
+        const auto labelFile = new QFile(path + "/temp" + QString::number(index) + "_label");
 
         if (valueFile->open(QFile::ReadOnly))
         {
@@ -57,7 +62,7 @@ Temp::Temp(uint index, Hwmon *parent) :
         else
         {
             delete valueFile;
-            emit error(i18n("Can't open value file: \'%1\'", parent->path() + "/temp" + QString::number(index) + "_input"));
+            emit error(i18n("Can't open value file: \'%1\'", path + "/temp" + QString::number(index) + "_input"));
         }
 
         if (labelFile->exists())
@@ -65,10 +70,10 @@ Temp::Temp(uint index, Hwmon *parent) :
             if (labelFile->open(QFile::ReadOnly))
                 m_label = QTextStream(labelFile).readLine();
             else
-                emit error(i18n("Can't open label file: \'%1\'", parent->path() + "/temp" + QString::number(index) + "_label"));
+                emit error(i18n("Can't open label file: \'%1\'", path + "/temp" + QString::number(index) + "_label"));
         }
         else
-            emit error(i18n("Temp has no label: \'%1\'", parent->path() + "/temp" + QString::number(index)));
+            emit error(i18n("Temp has no label: \'%1\'", path + "/temp" + QString::number(index)));
 
         delete labelFile;
     }
@@ -84,13 +89,13 @@ Temp::~Temp()
 QString Temp::name() const
 {
     const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    const auto localNames = names.group(m_parent ? m_parent->name() : QStringLiteral(TEST_HWMON_NAME));
-    const auto name = localNames.readEntry("temp" + QString::number(m_index), QString());
+    const auto localNames = names.group(parent() ? parent()->name() : QStringLiteral(TEST_HWMON_NAME));
+    const auto name = localNames.readEntry("temp" + QString::number(index()), QString());
 
     if (name.isEmpty())
     {
         if (m_label.isEmpty())
-            return "temp" + QString::number(m_index);
+            return "temp" + QString::number(index());
 
         return m_label;
     }
@@ -100,27 +105,27 @@ QString Temp::name() const
 void Temp::setName(const QString &name)
 {
     const auto names = KSharedConfig::openConfig(QStringLiteral("fancontrol-gui"))->group("names");
-    auto localNames = names.group(m_parent ? m_parent->name() : QStringLiteral(TEST_HWMON_NAME));
+    auto localNames = names.group(parent() ? parent()->name() : QStringLiteral(TEST_HWMON_NAME));
 
-    if (name != localNames.readEntry("temp" + QString::number(m_index), QString())
+    if (name != localNames.readEntry("temp" + QString::number(index()), QString())
         && !name.isEmpty())
     {
-        localNames.writeEntry("temp" + QString::number(m_index), name);
+        localNames.writeEntry("temp" + QString::number(index()), name);
         emit nameChanged();
     }
 }
 
 void Temp::toDefault()
 {
-    if (m_valueStream->device() && m_parent)
+    if (m_valueStream->device() && parent())
     {
         auto device = m_valueStream->device();
         m_valueStream->setDevice(Q_NULLPTR);
         delete device;
 
-        if (QDir(m_parent->path()).isReadable())
+        if (QDir(parent()->path()).isReadable())
         {
-            const auto valueFile = new QFile(m_parent->path() + "/temp" + QString::number(m_index) + "_input", this);
+            const auto valueFile = new QFile(parent()->path() + "/temp" + QString::number(index()) + "_input", this);
 
             if (valueFile->open(QFile::ReadOnly))
             {
@@ -129,7 +134,7 @@ void Temp::toDefault()
                 m_value /= 1000;
             }
             else
-                emit error(i18n("Can't open value file: \'%1\'", m_parent->path() + "/temp" + QString::number(m_index) + "_input"));
+                emit error(i18n("Can't open value file: \'%1\'", parent()->path() + "/temp" + QString::number(index()) + "_input"));
         }
     }
 }
@@ -142,7 +147,7 @@ void Temp::update()
     const auto value = m_valueStream->readAll().toInt(&success) / 1000;
 
     if (!success)
-        emit error(i18n("Can't update value of temp: \'%1\'", m_parent->path() + "/temp" + QString::number(m_index)));
+        emit error(i18n("Can't update value of temp: \'%1\'", parent()->path() + "/temp" + QString::number(index())));
 
     if (value != m_value)
     {

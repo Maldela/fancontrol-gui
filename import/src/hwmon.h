@@ -61,6 +61,7 @@ public:
     Q_INVOKABLE void testFans();
     Q_INVOKABLE void abortTestingFans();
 
+    bool isEmpty() const { return m_temps.isEmpty() && m_fans.isEmpty() && m_pwmFans.isEmpty(); }
     bool isValid() const { return m_valid; }
     bool testing() const;
     void toDefault() const;

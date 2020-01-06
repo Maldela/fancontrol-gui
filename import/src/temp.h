@@ -40,7 +40,7 @@ class Temp : public Sensor
 
 public:
 
-    explicit Temp(uint index, Hwmon *parent = Q_NULLPTR);
+    explicit Temp(uint index, Hwmon *parent, bool device = false);
     virtual ~Temp();
 
     QString label() const { return m_label; }
