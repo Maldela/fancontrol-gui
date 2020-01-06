@@ -45,7 +45,7 @@ Rectangle {
     radius: size / 2
     x: MoreMath.bound(-width/2, background.scaleX(unscaledTemp) - width/2, background.width-width/2)
     y: background.scaleY(unscaledPwm) - height/2
-    color: "black"
+    color: palette.mid
 
     Behavior on unscaledTemp {
         SpringAnimation {
@@ -85,7 +85,7 @@ Rectangle {
         width: column.width
         height: column.height
         radius: Kirigami.Units.smallSpacing / 2
-        color: Qt.rgba(root.color.r, root.color.g, root.color.b, 0.3)
+        color: Qt.rgba(root.color.r, root.color.g, root.color.b, 0.5)
         visible: root.enabled && pwmMouse.containsMouse
 
         Column {
@@ -109,5 +109,9 @@ Rectangle {
                 color: Kirigami.Theme.textColor
             }
         }
+    }
+
+    SystemPalette {
+        id: palette
     }
 }
