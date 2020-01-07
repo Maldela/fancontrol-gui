@@ -165,7 +165,7 @@ void Hwmon::initialize()
                 {
                     if (!m_pwmFans.contains(index))
                     {
-                        auto newPwmFan = new PwmFan(index, this);
+                        auto newPwmFan = new PwmFan(index, this, true);
                         connect(this, &Hwmon::sensorsUpdateNeeded, newPwmFan, &PwmFan::update);
 
                         if (m_parent)
@@ -182,7 +182,7 @@ void Hwmon::initialize()
                 {
                     if (!m_fans.contains(index))
                     {
-                        auto newFan = new Fan(index, this);
+                        auto newFan = new Fan(index, this, true);
                         connect(this, &Hwmon::sensorsUpdateNeeded, newFan, &Fan::update);
 
                         m_fans.insert(index, newFan);
@@ -195,7 +195,7 @@ void Hwmon::initialize()
             {
                 if (!m_temps.contains(index))
                 {
-                    auto newTemp = new Temp(index, this);
+                    auto newTemp = new Temp(index, this, true);
                     connect(this, &Hwmon::sensorsUpdateNeeded, newTemp, &Temp::update);
 
                     m_temps.insert(index, newTemp);

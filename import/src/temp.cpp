@@ -147,7 +147,7 @@ void Temp::update()
     const auto value = m_valueStream->readAll().toInt(&success) / 1000;
 
     if (!success)
-        emit error(i18n("Can't update value of temp: \'%1\'", parent()->path() + "/temp" + QString::number(index())));
+        emit error(i18n("Can't update value of temp: \'%1\'", id()));
 
     if (value != m_value)
     {
