@@ -62,12 +62,20 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
             m_valid = false;
         }
 
-        const auto nameFile = new QFile(path + "/name");
+        auto nameFile = new QFile(path + "/name");
 
         if (nameFile->open(QFile::ReadOnly))
             m_name = QTextStream(nameFile).readLine();
         else
-            m_name = path.split('/').last();
+        {
+            delete nameFile;
+            nameFile = new QFile(path + "/device/name");
+
+            if (nameFile->open(QFile::ReadOnly))
+                m_name = QTextStream(nameFile).readLine();
+            else
+                m_name = path.split('/').last();
+        }
 
         delete nameFile;
     }
