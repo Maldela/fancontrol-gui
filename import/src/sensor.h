@@ -47,12 +47,13 @@ public:
     virtual bool isValid() const = 0;
     virtual void update() = 0;
     QString id() const { return m_id; }
+    QString path() const { return m_path; }
     Hwmon * parent() const { return m_parent; }
     uint index() const { return m_index; }
     bool device() const { return m_device; }
 
-    bool operator==(const Sensor &other) { return m_id == other.id(); }
-    bool operator!=(const Sensor &other) { return m_id != other.id(); }
+    bool operator==(const Sensor &other) { return m_path == other.path(); }
+    bool operator!=(const Sensor &other) { return m_path != other.path(); }
 
 
 signals:
@@ -61,11 +62,16 @@ signals:
     void error(QString, bool = false);
 
 
+protected:
+
+    QString m_id;
+
+
 private:
 
     Hwmon *const m_parent;
     const uint m_index;
-    QString m_id;
+    QString m_path;
     bool m_device;
 };
 

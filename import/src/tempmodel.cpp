@@ -61,7 +61,7 @@ QVariant TempModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case DisplayRole:
-            return temp->name() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->id() + ")";
+            return temp->id() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->path() + ")";
 
         case ObjectRole:
             return QVariant::fromValue(temp);
