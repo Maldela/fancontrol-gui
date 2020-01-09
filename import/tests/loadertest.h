@@ -113,6 +113,10 @@ public:
     {
         return Loader::createConfig();
     }
+    QPair<uint, uint> getEntryNumbers(const QString &entry)
+    {
+        return Loader::getEntryNumbers(entry);
+    }
 };
 
 class LoaderTest : public QObject
@@ -156,6 +160,9 @@ private slots:
 
     void parseUnrecognizableLineTest_data();
     void parseUnrecognizableLineTest();
+
+    void getEntryNumberTest_data();
+    void getEntryNumberTest();
 
     void createConfigTest();
 

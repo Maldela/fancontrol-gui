@@ -153,7 +153,7 @@ void LoaderTest::parseDevnameTest_data()
     QTest::newRow("valid2") << "DEVNAME=hwmon0=radeon hwmon1=coretemp" << "" << false;
     QTest::newRow("valid3") << "DEVNAME= hwmon1=coretemp hwmon0=radeon" << "" << false;
     QTest::newRow("invalid0") << "DEVNAME=hwmon2=radeon" << "Invalid DEVNAME: \'hwmon2=radeon\'! No hwmon with index 2" << true;
-    QTest::newRow("invalid0") << "DEVNAME=hwmon1=radeon" << "Wrong name for hwmon 1! Should be \'coretemp\'" << true;
+    QTest::newRow("invalid0") << "DEVNAME=hwmon1=radeon" << "Wrong name for hwmon1! Should be \'coretemp\'" << true;
 }
 
 void LoaderTest::parseDevnameTest()
@@ -185,7 +185,7 @@ void LoaderTest::parseMintempTest_data()
 
     QTest::newRow("valid01") << "MINTEMP=hwmon0/fan1=20" << m_loader->pwmFan(0, 1) << 20 << "" << false;
     QTest::newRow("valid12") << "MINTEMP=hwmon1/fan2=35" << m_loader->pwmFan(1, 2) << 35 << "" << false;
-    QTest::newRow("valid02") << "MINTEMP=hwmon0/fan2=-35" << m_loader->pwmFan(0, 2) << -35 << "" << false;
+    QTest::newRow("valid02") << "MINTEMP=hwmon0/fan2=-35" << m_loader->pwmFan(0, 2) << -35 << "-35 is not an unsigned integer!" << false;
     QTest::newRow("valid11") << "MINTEMP= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
 }
 
@@ -222,7 +222,7 @@ void LoaderTest::parseMaxtempTest_data()
 
     QTest::newRow("valid01") << "MAXTEMP=hwmon0/fan1=80" << m_loader->pwmFan(0, 1) << 80 << "" << false;
     QTest::newRow("valid12") << "MAXTEMP=hwmon1/fan2=78 #iuf" << m_loader->pwmFan(1, 2) << 78 << "" << false;
-    QTest::newRow("valid02") << "MAXTEMP=hwmon0/fan2=-78" << m_loader->pwmFan(0, 2) << -78 << "" << false;
+    QTest::newRow("valid02") << "MAXTEMP=hwmon0/fan2=-78" << m_loader->pwmFan(0, 2) << -78 << "-78 is not an unsigned integer!" << false;
     QTest::newRow("valid11") << "MAXTEMP= hwmon1/fan1=53" << m_loader->pwmFan(1, 1) << 53 << "" << false;
 }
 
@@ -336,7 +336,7 @@ void LoaderTest::parseMinpwmTest_data()
     QTest::newRow("valid02") << "MINPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 2) << 0 << "" << false;
     QTest::newRow("valid11") << "MINPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
     QTest::newRow("invalid02") << "MINPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 2) << 256 << "MinPwm cannot exceed 0-255!" << true;
-    QTest::newRow("invalid11") << "MINPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "MinPwm cannot exceed 0-255!" << true;
+    QTest::newRow("invalid11") << "MINPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "-2 is not an unsigned integer!" << false;
 }
 
 void LoaderTest::parseMinpwmTest()
@@ -375,7 +375,7 @@ void LoaderTest::parseMaxpwmTest_data()
     QTest::newRow("valid02") << "MAXPWM=hwmon0/fan2=0" << m_loader->pwmFan(0, 2) << 0 << "" << false;
     QTest::newRow("valid11") << "MAXPWM= hwmon1/fan1=40" << m_loader->pwmFan(1, 1) << 40 << "" << false;
     QTest::newRow("invalid02") << "MAXPWM=hwmon0/fan2=256" << m_loader->pwmFan(0, 2) << 256 << "MaxPwm cannot exceed 0-255!" << true;
-    QTest::newRow("invalid11") << "MAXPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "MaxPwm cannot exceed 0-255!" << true;
+    QTest::newRow("invalid11") << "MAXPWM=hwmon1/fan2=-2" << m_loader->pwmFan(1, 2) << -2 << "-2 is not an unsigned integer!" << false;
 }
 
 void LoaderTest::parseMaxpwmTest()
@@ -429,6 +429,25 @@ void LoaderTest::parseUnrecognizableLineTest()
     }
 }
 
+void LoaderTest::getEntryNumberTest_data()
+{
+    QTest::addColumn<QString>("entry");
+    QTest::addColumn<QPair<uint, uint> >("numbers");
+
+    QTest::newRow("valid01") << "hwmon6/device/pwm1" << QPair<uint, uint>(6, 1);
+    QTest::newRow("valid0") << "hwmon2/pwm3" << QPair<uint, uint>(2, 3);
+}
+
+void LoaderTest::getEntryNumberTest()
+{
+    typedef QPair<uint, uint> UPair;
+
+    QFETCH(QString, entry);
+    QFETCH(UPair, numbers);
+
+    QCOMPARE(m_loader->getEntryNumbers(entry), numbers);
+}
+
 void LoaderTest::createConfigTest()
 {
     auto pwmFan = m_loader->pwmFan(0, 1);
@@ -463,7 +482,8 @@ void LoaderTest::createConfigTest()
                              "MINSTART=hwmon0/pwm1=120 hwmon1/pwm2=110 \n"
                              "MINSTOP=hwmon0/pwm1=80 hwmon1/pwm2=75 \n"
                              "MINPWM=hwmon0/pwm1=100 hwmon1/pwm2=120 \n"
-                             "MAXPWM=hwmon0/pwm1=200 hwmon1/pwm2=255 \n";
+                             "MAXPWM=hwmon0/pwm1=200 hwmon1/pwm2=255 \n"
+                             "AVERAGE=hwmon0/pwm1=1 hwmon1/pwm2=1 \n";
 
     auto expectedLines = expectedConfig.split(QChar(QChar::LineFeed));
     auto configLines = config.split(QChar(QChar::LineFeed));

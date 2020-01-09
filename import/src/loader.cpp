@@ -307,7 +307,7 @@ bool Loader::parseConfig(QString config)
                 if (indexNamePair.size() == 2)
                 {
                     auto index = indexNamePair.at(0);
-                    const auto &name = indexNamePair[1];
+                    const auto &name = indexNamePair.at(1);
                     auto intSuccess = false;
                     index.remove(QStringLiteral("hwmon"));
                     const auto hwmonPointer = m_hwmons.value(index.toUInt(&intSuccess), Q_NULLPTR);
@@ -325,7 +325,7 @@ bool Loader::parseConfig(QString config)
                     }
                     else if (hwmonPointer->name().split('.').first() != name)
                     {
-                        emit error(i18n("Wrong name for hwmon %1! Should be \'%2\'", index, hwmonPointer->name().split('.').first()), true);
+                        emit error(i18n("Wrong name for hwmon%1! Should be \'%2\'", index, hwmonPointer->name().split('.').first()), true);
                         success = false;
                     }
                 }
@@ -411,7 +411,7 @@ void Loader::parseConfigLine(const QString &line, void (PwmFan::*memberSetFuncti
                     emit error(i18n("Invalid fan entry: \'%1\'", pwmFanString), true);
             }
             else
-                emit error(i18n("%1 is not an integer!", valueString));
+                emit error(i18n("%1 is not an unsigned integer!", valueString));
         }
         else
             emit error(i18n("Invalid entry to parse: \'%1\'", entry));
