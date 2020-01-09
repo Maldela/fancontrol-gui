@@ -34,7 +34,7 @@ Sensor::Sensor(Hwmon *parent, uint index, const QString &type, bool device) : QO
     if (!parent)
         return;
 
-    m_id = device ? parent->name() + "/device/" + type + QString::number(index) : parent->name() + "/" + type + QString::number(index);
+    m_id = QStringLiteral("hwmon") + parent->index() + "/" + type + QString::number(index);
 
     connect(this, &Sensor::error, parent, &Hwmon::error);
 }
