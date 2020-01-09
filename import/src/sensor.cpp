@@ -40,4 +40,13 @@ Sensor::Sensor(Hwmon *parent, uint index, const QString &type, bool device) : QO
     connect(this, &Sensor::error, parent, &Hwmon::error);
 }
 
+void Sensor::setId(const QString& id)
+{
+    if (m_id == id)
+        return;
+
+    m_id = id;
+}
+
+
 }

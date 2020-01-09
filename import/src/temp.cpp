@@ -70,7 +70,7 @@ Temp::Temp(uint index, Hwmon *parent, bool device) :
             if (labelFile->open(QFile::ReadOnly))
             {
                 m_label = QTextStream(labelFile).readLine();
-                m_id = parent->name() + "/" + m_label;
+                setId(parent->name() + "/" + m_label);
             }
             else
                 emit error(i18n("Can't open label file: \'%1\'", path + "/temp" + QString::number(index) + "_label"));

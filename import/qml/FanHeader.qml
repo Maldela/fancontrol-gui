@@ -40,7 +40,7 @@ RowLayout {
     Label {
         Layout.alignment: Qt.AlignRight
         Layout.rightMargin: Kirigami.Units.smallSpacing
-        text: !!fan ? fan.path : ""
+        text: !!fan ? fan.id : ""
         horizontalAlignment: Text.AlignRight
     }
 

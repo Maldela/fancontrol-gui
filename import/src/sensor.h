@@ -64,7 +64,7 @@ signals:
 
 protected:
 
-    QString m_id;
+    void setId(const QString &id);
 
 
 private:
@@ -72,6 +72,7 @@ private:
     Hwmon *const m_parent;
     const uint m_index;
     QString m_path;
+    QString m_id;
     bool m_device;
 };
 
