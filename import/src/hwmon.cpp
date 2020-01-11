@@ -170,7 +170,7 @@ void Hwmon::initialize()
 
             if (entry.contains(QStringLiteral("fan")))
             {
-                if (QFile::exists(m_path + "/pwm" + QString::number(index)))
+                if (QFile::exists(m_path + "/device/pwm" + QString::number(index)))
                 {
                     if (!m_pwmFans.contains(index))
                     {
