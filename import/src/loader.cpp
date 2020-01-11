@@ -93,42 +93,32 @@ void Loader::parseHwmons(QString path)
     while (!list.isEmpty())
         dereferencedList << QFile::symLinkTarget(hwmonDir.absoluteFilePath(list.takeFirst()));
 
-    for (auto &hwmon : m_hwmons)
+    for (auto &hwmon : m_hwmons.values())
     {
-        if (!dereferencedList.contains(hwmon->path()))
-        {
-            hwmon->deleteLater();
-            m_hwmons.removeOne(hwmon);
-            emit hwmonsChanged();
-        }
-        else
-            hwmon->initialize();
+        hwmon->deleteLater();
     }
+    m_hwmons.clear();
 
     for (const auto &hwmonPath : qAsConst(dereferencedList))
     {
-        auto hwmonExists = false;
+        auto newHwmon = new Hwmon(hwmonPath, this);
 
-        for (const auto &hwmon : qAsConst(m_hwmons))
+        if (m_hwmons.contains(newHwmon->index()))
         {
-            if (hwmon->path() == hwmonPath)
-            {
-                hwmonExists = true;
-                break;
-            }
+            emit error(i18n("An Hwmon with index %1 already exists.", newHwmon->index()));
+            continue;
         }
 
-        if (!hwmonExists)
+        if (newHwmon->isValid())
         {
-            auto newHwmon = new Hwmon(hwmonPath, this);
-            if (newHwmon->isValid())
-            {
-                connect(this, &Loader::sensorsUpdateNeeded, newHwmon, &Hwmon::sensorsUpdateNeeded);
-                m_hwmons << newHwmon;
-                emit hwmonsChanged();
-            }
-            else
-                delete newHwmon;
+            connect(this, &Loader::sensorsUpdateNeeded, newHwmon, &Hwmon::sensorsUpdateNeeded);
+            m_hwmons.insert(newHwmon->index(), newHwmon);
+            emit hwmonsChanged();
+        }
+        else
+        {
+            delete newHwmon;
+            emit error(i18n("Invalid hwmon found at: %1", hwmonPath));
         }
     }
 

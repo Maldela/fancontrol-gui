@@ -22,7 +22,7 @@
 #define HWMON_H
 
 #include <QtCore/QObject>
-#include <QtCore/QHash>
+#include <QtCore/QMap>
 
 
 namespace Fancontrol
@@ -51,10 +51,10 @@ public:
     void initialize();
     QString name() const { return m_name; }
     QString path() const { return m_path; }
-    int index() const { return m_index; }
-    QHash<uint, Fan *> fans() const { return m_fans; }
-    QHash<uint, PwmFan *> pwmFans() const { return m_pwmFans; }
-    QHash<uint, Temp *> temps() const { return m_temps; }
+    uint index() const { return m_index; }
+    QMap<uint, Fan *> fans() const { return m_fans; }
+    QMap<uint, PwmFan *> pwmFans() const { return m_pwmFans; }
+    QMap<uint, Temp *> temps() const { return m_temps; }
     QList<QObject *> fansAsObjects() const;
     QList<QObject *> pwmFansAsObjects() const;
     QList<QObject *> tempsAsObjects() const;
@@ -80,12 +80,12 @@ signals:
 protected:
 
     QString m_name;
-    int m_index;
+    uint m_index;
     Loader *const m_parent;
     bool m_valid;
-    QHash<uint, Fan *> m_fans;
-    QHash<uint, PwmFan *> m_pwmFans;
-    QHash<uint, Temp *> m_temps;
+    QMap<uint, Fan *> m_fans;
+    QMap<uint, PwmFan *> m_pwmFans;
+    QMap<uint, Temp *> m_temps;
 
 private:
 

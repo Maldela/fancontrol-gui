@@ -27,6 +27,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
+
 #include <KI18n/KLocalizedString>
 
 
@@ -54,7 +55,7 @@ Hwmon::Hwmon(const QString &path, Loader *parent) : QObject(parent),
         }
 
         auto success = false;
-        m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toInt(&success);
+        m_index = path.split('/').last().remove(QStringLiteral("hwmon")).toUInt(&success);
 
         if (!success)
         {

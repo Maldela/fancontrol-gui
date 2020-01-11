@@ -21,6 +21,7 @@
 #ifndef LOADER_H
 #define LOADER_H
 
+#include <QtCore/QMap>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
@@ -65,7 +66,7 @@ public:
     QUrl configUrl() const { return m_configUrl; }
     QString configPath() const { return m_configUrl.path(); }
     QString config() const { return m_config; }
-    QList<Hwmon *> hwmons() const { return m_hwmons; }
+    QList<Hwmon *> hwmons() const { return m_hwmons.values(); }
     bool sensorsDetected() const { return m_sensorsDetected; }
     bool restartServiceAfterTesting() const { return m_reactivateAfterTesting; }
     void setRestartServiceAfterTesting(bool restart);
@@ -92,7 +93,7 @@ protected:
     QString createConfig() const;
     bool watchPath(const QString &path);
 
-    QList<Hwmon *> m_hwmons;
+    QMap<uint, Hwmon *> m_hwmons;
 
 
 private:

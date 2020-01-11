@@ -102,7 +102,7 @@ public:
     void addHwmon(Hwmon *hwmon)
     {
         connect(this, &Loader::sensorsUpdateNeeded, hwmon, &Hwmon::sensorsUpdateNeeded);
-        m_hwmons << hwmon;
+        m_hwmons.insert(hwmon->index(), hwmon);
         emit hwmonsChanged();
     }
     void parse(const QString &string)
