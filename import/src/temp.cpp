@@ -122,13 +122,15 @@ void Temp::toDefault()
 {
     if (m_valueStream->device() && parent())
     {
-        auto device = m_valueStream->device();
+        auto valueDevice = m_valueStream->device();
         m_valueStream->setDevice(Q_NULLPTR);
-        delete device;
+        delete valueDevice;
 
-        if (QDir(parent()->path()).isReadable())
+        auto path = device() ? parent()->path() + "/device" : parent()->path();
+
+        if (QDir(path).isReadable())
         {
-            const auto valueFile = new QFile(parent()->path() + "/temp" + QString::number(index()) + "_input", this);
+            const auto valueFile = new QFile(path + "/temp" + QString::number(index()) + "_input", this);
 
             if (valueFile->open(QFile::ReadOnly))
             {
@@ -137,7 +139,7 @@ void Temp::toDefault()
                 m_value /= 1000;
             }
             else
-                emit error(i18n("Can't open value file: \'%1\'", parent()->path() + "/temp" + QString::number(index()) + "_input"));
+                emit error(i18n("Can't open value file: \'%1\'", valueFile->fileName()));
         }
     }
 }

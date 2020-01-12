@@ -100,13 +100,15 @@ void Fan::toDefault()
 {
     if (m_rpmStream->device() && parent())
     {
-        auto device = m_rpmStream->device();
+        auto rpmDevice = m_rpmStream->device();
         m_rpmStream->setDevice(Q_NULLPTR);
-        delete device;
+        delete rpmDevice;
 
-        if (QDir(parent()->path()).isReadable())
+        auto path = device() ? parent()->path() + "/device" : parent()->path();
+
+        if (QDir(path).isReadable())
         {
-            const auto rpmFile = new QFile(parent()->path() + "/fan" + QString::number(index()) + "_input", this);
+            const auto rpmFile = new QFile(path + "/fan" + QString::number(index()) + "_input", this);
 
             if (rpmFile->open(QFile::ReadOnly))
             {

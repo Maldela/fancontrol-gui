@@ -161,6 +161,8 @@ void PwmFan::toDefault()
 
     if (m_pwmStream->device() && m_enableStream->device() && parent())
     {
+        auto path = device() ? parent()->path() + "/device" : parent()->path();
+
         auto device = m_pwmStream->device();
         m_pwmStream->setDevice(Q_NULLPTR);
         delete device;
@@ -169,7 +171,7 @@ void PwmFan::toDefault()
         m_enableStream->setDevice(Q_NULLPTR);
         delete device;
 
-        const auto pwmFile = new QFile(parent()->path() + "/pwm" + QString::number(index()), this);
+        const auto pwmFile = new QFile(path + "/pwm" + QString::number(index()), this);
 
         if (pwmFile->open(QFile::ReadWrite))
         {
@@ -187,7 +189,7 @@ void PwmFan::toDefault()
             delete pwmFile;
         }
 
-        const auto pwmEnableFile = new QFile(parent()->path() + "/pwm" + QString::number(index()) + "_enable", this);
+        const auto pwmEnableFile = new QFile(path + "/pwm" + QString::number(index()) + "_enable", this);
 
         if (pwmEnableFile->open(QFile::ReadWrite))
         {
