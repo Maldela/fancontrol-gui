@@ -8,5 +8,4 @@ FanItem 1.0 FanItem.qml
 ErrorDialog 1.0 ErrorDialog.qml
 ProfilesDialog 1.0 ProfilesDialog.qml
 SettingsForm 1.0 SettingsForm.qml
-Units 1.0 units.js
 

@@ -24,7 +24,6 @@ import QtQuick.Controls 2.1
 import QtQuick.Dialogs 1.2
 import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
-import "units.js" as Units
 
 
 Kirigami.FormLayout {
@@ -32,7 +31,6 @@ Kirigami.FormLayout {
 
     readonly property QtObject systemdCom: Fancontrol.Base.hasSystemdCommunicator ? Fancontrol.Base.systemdCom : null
     readonly property QtObject loader: Fancontrol.Base.loader
-    readonly property string unit: Fancontrol.Base.unit
     property bool showAll: true
 
     SpinBox {
@@ -61,60 +59,58 @@ Kirigami.FormLayout {
     SpinBox {
         id: minTempBox
 
-        readonly property int celsiusValue: Units.toCelsius(value, unit)
-        readonly property string suffix: i18n(unit)
+        readonly property string suffix: i18n("°C")
 
         Kirigami.FormData.label: i18n("Minimum temperature for fan graphs:")
         Layout.fillWidth: true
-        from: Units.fromKelvin(0, unit)
+        from: -273
         to: 999
         inputMethodHints: Qt.ImhFormattedNumbersOnly
         editable: true
-        value: Units.fromCelsius(Fancontrol.Base.minTemp, unit)
+        value: Fancontrol.Base.minTemp
         textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + suffix }
         valueFromText: function(text, locale) { return Number.fromLocaleString(locale, text.replace(suffix, "")); }
 
-        onCelsiusValueChanged: {
-            if (celsiusValue >= maxTempBox.celsiusValue)
-                maxTempBox.value = Math.max(value + 1, Units.fromCelsius(Units.toCelsius(value, unit) + 1, unit));
-            Fancontrol.Base.minTemp = celsiusValue;
+        onValueChanged: {
+            if (value >= maxTempBox.value)
+                maxTempBox.value = value + 1;
+            Fancontrol.Base.minTemp = value;
         }
 
         Connections {
             target: Fancontrol.Base
             onMinTempChanged: {
-                if (Fancontrol.Base.minTemp !== minTempBox.celsiusValue)
-                    minTempBox.value = Units.fromCelsius(Fancontrol.Base.minTemp, unit);
+                if (Fancontrol.Base.minTemp !== minTempBox.value)
+                    minTempBox.value = Fancontrol.Base.minTemp;
             }
         }
     }
     SpinBox {
         id: maxTempBox
 
-        readonly property int celsiusValue: Units.toCelsius(value, unit)
-        readonly property string suffix: i18n(unit)
+        readonly property string suffix: i18n("°C")
 
         Kirigami.FormData.label: i18n("Maximum temperature for fan graphs:")
         Layout.fillWidth: true
-        from: Units.fromKelvin(0, unit)
+        from: -273
         to: 999
         inputMethodHints: Qt.ImhFormattedNumbersOnly
         editable: true
-        value: Units.fromCelsius(Fancontrol.Base.maxTemp, unit)
+        value: Fancontrol.Base.maxTemp
         textFromValue: function(value, locale) { return Number(value).toLocaleString(locale, 'f', 2) + suffix }
         valueFromText: function(text, locale) { return Number.fromLocaleString(locale, text.replace(suffix, "")); }
 
-        onCelsiusValueChanged: {
-            if (celsiusValue <= minTempBox.celsiusValue)
-                minTempBox.value = Math.min(value - 1, Units.fromCelsius(Units.toCelsius(value, unit) - 1, unit));
-            Fancontrol.Base.maxTemp = celsiusValue;
+        onValueChanged: {
+            if (value <= minTempBox.value)
+                minTempBox.value = value - 1;
+            Fancontrol.Base.maxTemp = value;
         }
 
         Connections {
             target: Fancontrol.Base
             onMaxTempChanged: {
                 if (Fancontrol.Base.maxTemp !== maxTempBox.celsuisValue)
-                    maxTempBox.value = Units.fromCelsius(Fancontrol.Base.maxTemp, unit);
+                    maxTempBox.value = Fancontrol.Base.maxTemp;
             }
         }
     }

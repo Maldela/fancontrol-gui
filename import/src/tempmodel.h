@@ -55,7 +55,6 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
     void updateTemp(Temp *temp);
-    void setUnit(const QString &unit) { if (unit != m_unit) { m_unit = unit; updateAll(); } }
     Q_INVOKABLE QObject *temp(int index) const;
     Q_INVOKABLE int indexOf(QObject *temp) const;
 
@@ -75,7 +74,6 @@ private:
     void updateTemp();
 
     QList<Temp *> m_temps;
-    QString m_unit;
 };
 
 }

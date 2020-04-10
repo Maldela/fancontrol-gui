@@ -94,7 +94,7 @@ Kirigami.ScrollablePage {
                         Label {
                             id: tempValue
 
-                            text: Units.fromCelsius(hwmon.temps[index].value, Fancontrol.Base.unit) + i18n(Fancontrol.Base.unit)
+                            text: hwmon.temps[index].value + i18n("°C")
                             Layout.alignment: Qt.AlignRight
                         }
                     }

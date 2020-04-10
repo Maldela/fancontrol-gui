@@ -22,7 +22,6 @@ import QtQuick 2.6
 import QtQuick.Controls 2.1
 import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
-import "units.js" as Units
 import "math.js" as MoreMath
 
 
@@ -38,7 +37,6 @@ Rectangle {
     readonly property real centerY: y + height / 2
     readonly property point center: Qt.point(centerX, centerY)
     property int size: Kirigami.Units.smallSpacing * 2
-    readonly property string unit: Fancontrol.Base.unit
 
     width: size
     height: size
@@ -95,7 +93,7 @@ Rectangle {
 
             Text {
                 font.pixelSize: root.size * 1.5
-                text: Number(Units.fromCelsius(root.unscaledTemp, unit)).toLocaleString(Qt.locale(), 'f', 1) + i18n(unit)
+                text: Number(root.unscaledTemp).toLocaleString(Qt.locale(), 'f', 1) + i18n("°C")
                 color: Kirigami.Theme.textColor
             }
             Text {

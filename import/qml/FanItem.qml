@@ -24,7 +24,6 @@ import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.3 as Kirigami
 import Fancontrol.Qml 1.0 as Fancontrol
 import "math.js" as MoreMath
-import "units.js" as Units
 import "colors.js" as Colors
 
 
@@ -39,15 +38,12 @@ Item {
     readonly property QtObject tempModel: Fancontrol.Base.tempModel
     readonly property real minTemp: Fancontrol.Base.minTemp
     readonly property real maxTemp: Fancontrol.Base.maxTemp
-    readonly property string unit: Fancontrol.Base.unit
-    readonly property real convertedMinTemp: Units.fromCelsius(minTemp, unit)
-    readonly property real convertedMaxTemp: Units.fromCelsius(maxTemp, unit)
 
-    onConvertedMinTempChanged: {
+    onMinTempChanged: {
         meshCanvas.requestPaint();
         curveCanvas.requestPaint();
     }
-    onConvertedMaxTempChanged: {
+    onMaxTempChanged: {
         meshCanvas.requestPaint();
         curveCanvas.requestPaint();
     }
@@ -58,7 +54,7 @@ Item {
 
         property int fontSize: MoreMath.bound(8, height / 20 + 1, 16)
         property int verticalScalaCount: height > Kirigami.Units.gridUnit * 30 ? 11 : 6
-        property var horIntervals: MoreMath.intervals(root.convertedMinTemp, root.convertedMaxTemp, 10)
+        property var horIntervals: MoreMath.intervals(root.minTemp, root.maxTemp, 10)
 
         anchors {
             left: parent.left
@@ -109,10 +105,10 @@ Item {
                 model: graph.horIntervals.length;
 
                 Text {
-                    x: graphBackground.scaleX(Units.toCelsius(graph.horIntervals[index], unit)) - width/2
+                    x: graphBackground.scaleX(graph.horIntervals[index]) - width/2
                     y: horizontalScala.height / 2 - implicitHeight / 2
                     color: Kirigami.Theme.textColor
-                    text: Number(graph.horIntervals[index]).toLocaleString() + i18n(unit)
+                    text: Number(graph.horIntervals[index]).toLocaleString() + i18n("°C")
                     font.pixelSize: graph.fontSize
                 }
             }
@@ -234,7 +230,7 @@ Item {
                     //vertical lines
                     if (graph.horIntervals.length > 1) {
                         for (var i=1; i<graph.horIntervals.length; i++) {
-                            var x = graphBackground.scaleX(Units.toCelsius(graph.horIntervals[i], unit));
+                            var x = graphBackground.scaleX(graph.horIntervals[i]);
                             for (var j=0; j<=height; j+=20) {
                                 c.moveTo(x, j);
                                 c.lineTo(x, Math.min(j+5, height));

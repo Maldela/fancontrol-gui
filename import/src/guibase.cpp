@@ -46,7 +46,6 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     m_tempModel(new TempModel(this)),
     m_profileModel(new QStringListModel(this))
 {
-    connect(this, &GUIBase::unitChanged, m_tempModel, &TempModel::setUnit);
     connect(m_loader, &Loader::needsSaveChanged, this, &GUIBase::needsApplyChanged);
     connect(m_loader, &Loader::configChanged, this, &GUIBase::currentProfileChanged);
 
@@ -54,9 +53,6 @@ GUIBase::GUIBase(QObject *parent) : QObject(parent),
     connect(m_loader, &Loader::requestSetServiceActive, m_com, &SystemdCommunicator::setServiceActive);
     connect(m_com, &SystemdCommunicator::needsApplyChanged, this, &GUIBase::needsApplyChanged);
 #endif
-
-    m_unit = (QLocale::system().measurementSystem() == QLocale::ImperialUSSystem) ? QStringLiteral("°F") : QStringLiteral("°C");
-    emit unitChanged(m_unit);
 
     m_loader->parseHwmons();
 

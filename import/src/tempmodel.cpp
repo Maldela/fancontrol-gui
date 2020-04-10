@@ -25,11 +25,13 @@
 #include "temp.h"
 
 
+#define UNIT_SUFFIX "°C"
+
+
 namespace Fancontrol
 {
 
-TempModel::TempModel(QObject *parent) : QAbstractListModel(parent),
-    m_unit(QStringLiteral("°C"))
+TempModel::TempModel(QObject *parent) : QAbstractListModel(parent)
 {
 }
 
@@ -61,7 +63,7 @@ QVariant TempModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case DisplayRole:
-            return temp->id() + ": " + QString::number(temp->value()) + m_unit + "   (" + temp->path() + ")";
+            return temp->id() + ": " + QString::number(temp->value()) + UNIT_SUFFIX + "   (" + temp->path() + ")";
 
         case ObjectRole:
             return QVariant::fromValue(temp);

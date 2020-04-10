@@ -20,8 +20,7 @@ set(QML_FILES qml/qmldir
               qml/SettingsForm.qml
               qml/StatusPoint.qml
               qml/colors.js
-              qml/math.js
-              qml/units.js)
+              qml/math.js)
 
 set(LIB_PRIVATE_LIBRARIES Qt5::Qml
                           KF5::Auth
