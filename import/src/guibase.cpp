@@ -294,7 +294,10 @@ void GUIBase::applyProfile(int index)
     auto profileNames = Config::instance()->findItem(QStringLiteral("ProfileNames"))->property().toStringList();
 
     if (index < 0 || index >= profileNames.size())
+    {
+        handleError(i18n("Profile with index %1 not found.", index));
         return;
+    }
 
     auto newConfig = Config::instance()->findItem(QStringLiteral("Profiles"))->property().toStringList().value(index);
 
