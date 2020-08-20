@@ -16,6 +16,16 @@ The KCM is only build, if the -DNO_SYSTEMD option is unset or set to false.
 
 To compile the additional KDE Plasma plasmoid set the cmake option -DBUILD_PLASMOID=on.
 
+# Screenshots
+
+![image](https://user-images.githubusercontent.com/8409391/89116324-02da7480-d4bd-11ea-867c-3172edf87f2e.png)
+
+![image](https://user-images.githubusercontent.com/8409391/89116322-f8b87600-d4bc-11ea-89e4-515121cd7d71.png)
+
+![image](https://user-images.githubusercontent.com/8409391/89116328-0a9a1900-d4bd-11ea-955f-f4e80c885d8b.png)
+
+![image](https://user-images.githubusercontent.com/8409391/89116329-108ffa00-d4bd-11ea-990c-2c1f2ca3dc90.png)
+
 # Build requirements
 * Qt5: Base/Core, Widgets, Gui, QML
 * KF5: I18n, Auth, Config, Package, Declarative, CoreAddons, DBusAddons, Extra-Cmake-Modules, Notifications
