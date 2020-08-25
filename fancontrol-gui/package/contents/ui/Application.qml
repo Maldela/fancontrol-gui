@@ -47,8 +47,22 @@ Kirigami.ApplicationWindow {
 
     onLeftPageChanged: {
         window.pageStack.clear();
-        if (leftPage)
-            window.pageStack.push(Qt.resolvedUrl(leftPage));
+        if (leftPage) {
+            var url = Qt.resolvedUrl(leftPage);
+            var component = Qt.createComponent(url);
+
+            if (component.status == Component.Ready) {
+                var page = component.createObject(window.pageStack);
+
+                if (page)
+                    window.pageStack.push(page);
+                else
+                    console.log("Error creating page object: %1", url);
+            } else {
+                console.log("Error creating page component: %1", component.errorString());
+            }
+
+        }
     }
 
     onWideScreenChanged: drawer.drawerOpen = wideScreen
@@ -79,10 +93,15 @@ Kirigami.ApplicationWindow {
             for (var i=fansAction.children.length-1; i>=0; i--) {
                 fansAction.children[i].destroy();
             }
+
             var actions = [];
             for (var i=0; i<20; i++) {
                 var action = fanActionComponent.createObject(fansAction, { "index": i });
-                actions.push(action);
+
+                if (action)
+                    actions.push(action);
+                else
+                    console.log("Error creating fan action with index %1", i);
             }
             fansAction.children = actions;
         }
