@@ -107,7 +107,7 @@ sudo apt-get install ca-certificates git build-essential cmake gcc g++ libkf5con
 ```
 
 > [!NOTE]  
-> This was tested on `Ubuntu 20.04.1 LTS` and `Debian 10`.
+> This was tested on `Ubuntu 20.04.1 LTS`, `Ubuntu 24.04 LTS` and `Debian 10`.
 
 ### Fedora
 
