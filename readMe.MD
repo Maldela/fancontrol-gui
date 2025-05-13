@@ -118,6 +118,15 @@ sudo dnf install git gcc g++ cmake kf5-ki18n-devel kf5-kauth-devel kf5-kconfig-d
 > [!NOTE]  
 > This was tested on `Fedora 33`.
 
+### Nix
+
+This repository offers a nix flake:
+
+```sh
+nix develop
+nix build
+```
+
 # Installation
 
 ```sh
@@ -128,6 +137,25 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_KCM=on -DBUILD_PLASMOID=on
 make -j
 sudo make install
+```
+
+## Nix
+
+This repository offers a home-manager module or alternatively the package itself.
+
+Add this repository to your inputs.
+```nix
+fancontrol-gui.url = "github:Maldela/fancontrol-gui";
+```
+
+Enable the home-manager module.
+```nix
+inputs.fancontrol-gui.homeManagerModules.default
+```
+
+And add fancontrol-gui to your enabled programs.
+```nix
+programs.fancontrol-gui.enable = true;
 ```
 
 # Uninstallation

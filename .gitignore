@@ -1,0 +1,5 @@
+# nix related files
+.envrc
+.direnv/
+result/
+result
